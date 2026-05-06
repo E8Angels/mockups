@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audience Builder — UX Mockup (In-Context Forms)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* Custom scrollbar */
+  .audience-scroll::-webkit-scrollbar { width: 6px; }
+  .audience-scroll::-webkit-scrollbar-track { background: transparent; }
+  .audience-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  .audience-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+  /* Tooltip */
+  [data-tip] { position: relative; }
+  [data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 6px);
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: #f1f5f9;
+    font-size: 11px;
+    line-height: 1.4;
+    padding: 5px 10px;
+    border-radius: 6px;
+    white-space: normal;
+    max-width: 280px;
+    z-index: 50;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+
+  /* Checkbox styling */
+  .cb-label { display: flex; align-items: flex-start; gap: 8px; padding: 5px 12px; cursor: pointer; font-size: 13px; color: #334155; border-radius: 4px; transition: background .1s; }
+  .cb-label:hover { background: #f1f5f9; }
+  .cb-label input[type="checkbox"] { width: 15px; height: 15px; accent-color: #0f172a; flex-shrink: 0; cursor: pointer; margin-top: 1px; }
+
+  .exclude-mode .cb-label input[type="checkbox"] { accent-color: #e11d48; }
+  .exclude-mode .cb-label { color: #9f1239; }
+
+  /* Category header */
+  .cat-header { display: flex; align-items: center; justify-content: space-between; padding: 7px 12px; cursor: pointer; user-select: none; }
+  .cat-header:hover { background: #f8fafc; }
+  .cat-header h3 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: #64748b; }
+
+  /* Chevron rotation */
+  .chevron { transition: transform .15s ease; }
+  .chevron.collapsed { transform: rotate(-90deg); }
+
+  /* Search */
+  .search-box { border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px 6px 32px; font-size: 13px; width: 100%; outline: none; transition: border-color .15s; background: #fff; }
+  .search-box:focus { border-color: #94a3b8; box-shadow: 0 0 0 2px rgba(148,163,184,.15); }
+
+  /* Person pill */
+  .person-pill { display: inline-flex; align-items: center; gap: 4px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 999px; padding: 2px 8px 2px 10px; font-size: 12px; color: #334155; }
+  .person-pill button { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; color: #94a3b8; font-size: 14px; line-height: 1; cursor: pointer; border: none; background: none; }
+  .person-pill button:hover { color: #475569; background: #e2e8f0; }
+  .person-pill.excluded { background: #fff1f2; border-color: #fecdd3; color: #9f1239; }
+
+  /* Token pill (selected summary) */
+  .token-pill { display: inline-flex; align-items: center; gap: 4px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 999px; padding: 3px 6px 3px 10px; font-size: 12px; color: #334155; }
+  .token-pill.exclude { background: #fff1f2; border-color: #fecdd3; color: #9f1239; text-decoration: line-through; }
+  .token-pill .remove-btn { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; color: #94a3b8; font-size: 14px; line-height: 1; cursor: pointer; border: none; background: none; margin-left: 2px; }
+  .token-pill .remove-btn:hover { color: #475569; background: #e2e8f0; }
+  .token-pill.exclude .remove-btn:hover { color: #9f1239; background: #fecdd3; }
+
+  /* Quick-select pill */
+  .quick-pill { display: inline-flex; align-items: center; padding: 4px 12px; font-size: 12px; font-weight: 500; border-radius: 999px; border: 1px solid #e2e8f0; background: #fff; color: #475569; cursor: pointer; transition: all .12s ease; user-select: none; white-space: nowrap; }
+  .quick-pill:hover { background: #f8fafc; border-color: #cbd5e1; }
+  .quick-pill.active { background: #0f172a; border-color: #0f172a; color: #fff; }
+  .quick-pill.active:hover { background: #1e293b; border-color: #1e293b; }
+  .quick-pill .pill-count { opacity: 0.7; margin-left: 1px; }
+
+  /* Resolved list */
+  .resolved-row { display: flex; align-items: center; padding: 4px 12px; font-size: 12px; color: #475569; }
+  .resolved-row:nth-child(even) { background: #f8fafc; }
+
+  /* Expander link */
+  .expander-link { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; color: #64748b; cursor: pointer; user-select: none; transition: color .12s; }
+  .expander-link:hover { color: #334155; }
+
+  /* Form field styling */
+  .form-input { border: 1px solid #e2e8f0; border-radius: 6px; padding: 7px 10px; font-size: 13px; width: 100%; outline: none; transition: border-color .15s; background: #fff; color: #334155; }
+  .form-input:focus { border-color: #94a3b8; box-shadow: 0 0 0 2px rgba(148,163,184,.15); }
+  .form-select { border: 1px solid #e2e8f0; border-radius: 6px; padding: 7px 10px; font-size: 13px; outline: none; transition: border-color .15s; background: #fff; color: #334155; appearance: auto; }
+  .form-select:focus { border-color: #94a3b8; box-shadow: 0 0 0 2px rgba(148,163,184,.15); }
+
+  /* Description text ellipsis */
+  .desc-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
+
+  /* Audience expand/collapse */
+  .audience-collapsed {
+    cursor: pointer;
+    padding: 7px 10px;
+    font-size: 13px;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: 36px;
+    background: #fff;
+  }
+  .audience-collapsed:hover {
+    background: #f8fafc;
+  }
+  .audience-collapsed .placeholder {
+    color: #94a3b8;
+  }
+  .audience-collapsed .count-label {
+    font-size: 12px;
+    color: #64748b;
+    white-space: nowrap;
+  }
+
+  .audience-expandable {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.2s ease, opacity 0.15s ease;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .audience-builder-container.is-expanded .audience-expandable {
+    max-height: 900px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .audience-builder-container.is-expanded .audience-collapsed {
+    display: none;
+  }
+  .audience-builder-container.is-expanded {
+    box-shadow: 0 0 0 2px rgba(148,163,184,.25), 0 4px 12px rgba(0,0,0,.06);
+    border-color: #94a3b8 !important;
+  }
+</style>
+</head>
+<body class="bg-slate-100 min-h-screen p-8">
+
+<h1 class="text-2xl font-semibold text-slate-800 mb-2">Audience Builder — UX Mockup</h1>
+<p class="text-sm text-slate-500 mb-8">Shown in context of realistic forms. Two admin contexts with different frequently-used audiences.</p>
+
+<div class="flex flex-wrap gap-8 items-start">
+
+  <!-- ==================== MEETING FORM CONTEXT (narrow) ==================== -->
+  <div style="width:520px" class="flex-shrink-0">
+    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Context: Meeting Creation Form (~520px)</div>
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <!-- Form header -->
+      <div class="px-5 py-4 border-b border-slate-200">
+        <h2 class="text-base font-semibold text-slate-800">New Meeting</h2>
+      </div>
+      <!-- Form body -->
+      <div class="px-5 py-4 space-y-4">
+        <!-- Title -->
+        <div class="grid grid-cols-[100px_1fr] items-center gap-2">
+          <label class="text-sm font-medium text-slate-600">Title</label>
+          <input type="text" class="form-input" placeholder="Meeting title" value="Q2 Member Update" />
+        </div>
+        <!-- Type -->
+        <div class="grid grid-cols-[100px_1fr] items-center gap-2">
+          <label class="text-sm font-medium text-slate-600">Type</label>
+          <select class="form-select w-[180px]">
+            <option>Member Meeting</option>
+            <option>Committee Meeting</option>
+            <option>Board Meeting</option>
+            <option>Special Event</option>
+          </select>
+        </div>
+        <!-- Date/Time -->
+        <div class="grid grid-cols-[100px_1fr] items-center gap-2">
+          <label class="text-sm font-medium text-slate-600">Date / Time</label>
+          <div class="flex items-center gap-2">
+            <input type="date" class="form-input !w-[150px]" value="2026-04-15" />
+            <input type="time" class="form-input !w-[120px]" value="14:00" />
+          </div>
+        </div>
+        <!-- Audience section (inline) -->
+        <div class="grid grid-cols-[100px_1fr] items-start gap-2">
+          <label class="text-sm font-medium text-slate-600 pt-2">Audience</label>
+          <div id="meeting-audience" class="audience-builder-container border border-slate-200 rounded-lg overflow-hidden" data-context="meeting"></div>
+        </div>
+        <!-- Location -->
+        <div class="grid grid-cols-[100px_1fr] items-center gap-2">
+          <label class="text-sm font-medium text-slate-600">Location</label>
+          <input type="text" class="form-input" placeholder="Zoom link or address" />
+        </div>
+      </div>
+      <!-- Form footer -->
+      <div class="px-5 py-3 border-t border-slate-100 flex justify-end gap-2">
+        <button class="px-4 py-1.5 text-sm text-slate-500 hover:text-slate-700">Cancel</button>
+        <button class="px-4 py-1.5 text-sm font-medium bg-slate-900 text-white rounded-lg hover:bg-slate-800">Create Meeting</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== EMAIL FORM CONTEXT (wider) ==================== -->
+  <div style="width:700px" class="flex-shrink-0">
+    <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Context: Send Email Form (~700px)</div>
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <!-- Form header -->
+      <div class="px-5 py-4 border-b border-slate-200">
+        <h2 class="text-base font-semibold text-slate-800">Send Email</h2>
+      </div>
+      <!-- Form body -->
+      <div class="px-5 py-4 space-y-4">
+        <!-- To (audience) -->
+        <div class="grid grid-cols-[80px_1fr] items-start gap-2">
+          <label class="text-sm font-medium text-slate-600 pt-2">To</label>
+          <div id="email-audience" class="audience-builder-container border border-slate-200 rounded-lg overflow-hidden" data-context="email"></div>
+        </div>
+        <!-- Subject -->
+        <div class="grid grid-cols-[80px_1fr] items-center gap-2">
+          <label class="text-sm font-medium text-slate-600">Subject</label>
+          <input type="text" class="form-input" placeholder="Email subject" />
+        </div>
+        <!-- Body -->
+        <div class="grid grid-cols-[80px_1fr] items-start gap-2">
+          <label class="text-sm font-medium text-slate-600 pt-2">Body</label>
+          <div class="form-input min-h-[120px] text-slate-400 cursor-text" contenteditable="true" style="line-height:1.5">Write your message here...</div>
+        </div>
+      </div>
+      <!-- Form footer -->
+      <div class="px-5 py-3 border-t border-slate-100 flex justify-end gap-2">
+        <button class="px-4 py-1.5 text-sm text-slate-500 hover:text-slate-700">Save Draft</button>
+        <button class="px-4 py-1.5 text-sm font-medium bg-slate-900 text-white rounded-lg hover:bg-slate-800">Send</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Data ─────────────────────────────────────────────────────────────────
+const CATEGORIES = [
+  {
+    id: 'roles',
+    label: 'Membership Roles',
+    items: [
+      { id: 'members', label: 'Members', desc: 'People with the Member role', count: 144 },
+      { id: 'additional_members', label: 'Additional Members', desc: 'Secondary contacts on a membership', count: 38 },
+      { id: 'corporate_members', label: 'Corporate Members', desc: 'Corporate membership holders', count: 15 },
+      { id: 'fellows', label: 'Fellows', desc: 'E8 Fellowship participants', count: 22 },
+      { id: 'partners', label: 'Partners', desc: 'E8 Partners', count: 8 },
+      { id: 'past_members', label: 'Past Members', desc: 'Former members (no longer active)', count: 67 },
+      { id: 'student_investor', label: 'Student Investors', desc: 'Student investor program participants', count: 5 },
+      { id: 'operational_partners', label: 'Operational Partners', desc: 'Operational advisory partners', count: 9 },
+      { id: 'staff_extended', label: 'Staff', desc: 'E8 staff + support manager', count: 4 },
+    ]
+  },
+  {
+    id: 'special',
+    label: 'Special Groups',
+    items: [
+      { id: 'portfolio_entrepreneurs', label: 'Portfolio Entrepreneurs', desc: 'Founders of portfolio companies', count: 18 },
+      { id: 'non_portfolio_entrepreneurs', label: 'Non-Portfolio Entrepreneurs', desc: 'Entrepreneurs NOT in the portfolio (applicants, prospects)', count: 63 },
+      { id: 'fund_prospects', label: 'Fund Prospects', desc: 'Members & Corporate Members not yet on the active upcoming fund', count: 52 },
+    ]
+  },
+  {
+    id: 'fund_e8',
+    label: 'E8 Fund Investors',
+    items: [
+      { id: 'e8_fund_investors_2026', label: 'E8 Fund 2026', desc: 'E8 Annual Fund vintage 2026 LPs', count: 12 },
+      { id: 'e8_fund_investors_2025', label: 'E8 Fund 2025', desc: 'E8 Annual Fund vintage 2025 LPs', count: 42 },
+      { id: 'e8_fund_investors_all', label: 'E8 Fund All', desc: 'All E8 Annual Fund investors (deduplicated across vintages)', count: 58 },
+    ]
+  },
+  {
+    id: 'fund_d8',
+    label: 'Decarbon8 Investors',
+    items: [
+      { id: 'd8_investors_2026', label: 'D8 2026', desc: 'Decarbon8 Fund vintage 2026 donors', count: 11 },
+      { id: 'd8_investors_2025', label: 'D8 2025', desc: 'Decarbon8 Fund vintage 2025 donors', count: 15 },
+      { id: 'd8_investors_2024', label: 'D8 2024', desc: 'Decarbon8 Fund vintage 2024 donors', count: 14 },
+      { id: 'd8_investors_2023', label: 'D8 2023', desc: 'Decarbon8 Fund vintage 2023 donors', count: 12 },
+      { id: 'd8_investors_2022', label: 'D8 2022', desc: 'Decarbon8 Fund vintage 2022 donors', count: 10 },
+      { id: 'd8_investors_2021', label: 'D8 2021', desc: 'Decarbon8 Fund vintage 2021 donors', count: 8 },
+      { id: 'd8_investors_2020', label: 'D8 2020', desc: 'Decarbon8 Fund vintage 2020 donors', count: 6 },
+      { id: 'd8_investors_all', label: 'D8 All', desc: 'All Decarbon8 donors (deduplicated across vintages)', count: 47 },
+    ]
+  },
+  {
+    id: 'committees',
+    label: 'Committees',
+    items: [
+      { id: 'committee_screening', label: 'Screening Committee', desc: 'Screening Committee members', count: 12 },
+      { id: 'committee_pipeline', label: 'Pipeline Committee', desc: 'Pipeline Committee members', count: 9 },
+      { id: 'committee_portfolio', label: 'Portfolio Committee', desc: 'Portfolio Committee members', count: 8 },
+      { id: 'committee_sourcing', label: 'Sourcing Committee', desc: 'Sourcing Committee members', count: 11 },
+      { id: 'committee_membership', label: 'Membership Committee', desc: 'Membership Committee members', count: 7 },
+      { id: 'committee_fellowship', label: 'Fellowship Committee', desc: 'Fellowship Committee members', count: 6 },
+      { id: 'committee_development', label: 'Development Committee', desc: 'Development Committee members', count: 5 },
+      { id: 'committee_decarbon8', label: 'Decarbon8 Committee', desc: 'Decarbon8 Committee members', count: 4 },
+    ]
+  },
+  {
+    id: 'diligence',
+    label: 'Diligence Teams',
+    items: [
+      { id: 'dd_acme', label: 'Acme Corp DD Team', desc: 'Due diligence team for Acme Corp', count: 5 },
+      { id: 'dd_beta', label: 'Beta Inc DD Team', desc: 'Due diligence team for Beta Inc', count: 4 },
+      { id: 'dd_gamma', label: 'Gamma Health DD Team', desc: 'Due diligence team for Gamma Health', count: 6 },
+      { id: 'dd_delta', label: 'Delta Energy DD Team', desc: 'Due diligence team for Delta Energy', count: 3 },
+      { id: 'dd_epsilon', label: 'Epsilon AI DD Team', desc: 'Due diligence team for Epsilon AI', count: 4 },
+    ]
+  },
+  {
+    id: 'interest',
+    label: 'Investment Interest',
+    items: [
+      { id: 'interest_acme', label: 'Interested in Acme Corp', desc: 'Members who expressed interest in Acme Corp', count: 14 },
+      { id: 'interest_beta', label: 'Interested in Beta Inc', desc: 'Members who expressed interest in Beta Inc', count: 9 },
+      { id: 'interest_gamma', label: 'Interested in Gamma Health', desc: 'Members who expressed interest in Gamma Health', count: 11 },
+      { id: 'interest_delta', label: 'Interested in Delta Energy', desc: 'Members who expressed interest in Delta Energy', count: 7 },
+      { id: 'interest_epsilon', label: 'Interested in Epsilon AI', desc: 'Members who expressed interest in Epsilon AI', count: 16 },
+    ]
+  },
+];
+
+// Per-context frequently used pills (simulating per-user learned behavior)
+const FREQUENT_PILLS = {
+  meeting: [
+    { label: 'Members', ids: ['members'], count: 144 },
+    { label: 'Additional Members', ids: ['additional_members'], count: 38 },
+    { label: 'Fellows', ids: ['fellows'], count: 22 },
+    { label: 'E8 Fund 2026', ids: ['e8_fund_investors_2026'], count: 12 },
+    { label: 'Staff', ids: ['staff_extended'], count: 4 },
+  ],
+  email: [
+    { label: 'Members', ids: ['members'], count: 144 },
+    { label: 'Partners', ids: ['partners'], count: 8 },
+    { label: 'Corporate Members', ids: ['corporate_members'], count: 15 },
+    { label: 'D8 All', ids: ['d8_investors_all'], count: 47 },
+    { label: 'Fund Prospects', ids: ['fund_prospects'], count: 52 },
+  ],
+};
+
+const SAMPLE_PEOPLE = [
+  { id: 'p1', name: 'Alice Johnson', email: 'alice@example.com' },
+  { id: 'p2', name: 'Bob Martinez', email: 'bob@example.com' },
+  { id: 'p3', name: 'Carol Wu', email: 'carol@example.com' },
+  { id: 'p4', name: 'David Kim', email: 'david@example.com' },
+  { id: 'p5', name: 'Emily Davis', email: 'emily@example.com' },
+  { id: 'p6', name: 'Frank Lopez', email: 'frank@example.com' },
+  { id: 'p7', name: 'Grace Chen', email: 'grace@example.com' },
+  { id: 'p8', name: 'Hank Patel', email: 'hank@example.com' },
+  { id: 'p9', name: 'Irene Novak', email: 'irene@example.com' },
+  { id: 'p10', name: 'Jake Thompson', email: 'jake@example.com' },
+];
+
+const RESOLVED_LIST = [
+  'Alice Johnson <alice@example.com>',
+  'Bob Martinez <bob@example.com>',
+  'Carol Wu <carol@example.com>',
+  'David Kim <david@example.com>',
+  'Emily Davis <emily@example.com>',
+  'Frank Lopez <frank@example.com>',
+  'Grace Chen <grace@example.com>',
+  'Hank Patel <hank@example.com>',
+  'Irene Novak <irene@example.com>',
+  'Jake Thompson <jake@example.com>',
+  'Karen Osei <karen@example.com>',
+  'Leo Rivera <leo@example.com>',
+  'Mia Zhang <mia@example.com>',
+  'Noah Andersen <noah@example.com>',
+  'Olivia Singh <olivia@example.com>',
+];
+
+// ── Builder class ────────────────────────────────────────────────────────
+class AudienceBuilder {
+  constructor(container, context) {
+    this.container = container;
+    this.context = context;
+    this.included = new Set();
+    this.excluded = new Set();
+    this.includedPeople = [];
+    this.excludedPeople = [];
+    this.collapsedCats = new Set();
+    // All categories collapsed by default in advanced
+    for (const cat of CATEGORIES) {
+      this.collapsedCats.add(cat.id);
+    }
+    // First category expanded
+    if (CATEGORIES.length > 0) this.collapsedCats.delete(CATEGORIES[0].id);
+    this.collapsedCats.add('people');
+    this.filterText = '';
+    this.showResolved = false;
+    this.excludeMode = false;
+    this.advancedOpen = false;
+    this.expanded = false;
+    this.render();
+    this._bindClickOutside();
+  }
+
+  _bindClickOutside() {
+    document.addEventListener('click', (e) => {
+      // Close people dropdown when clicking outside it
+      const dd = document.getElementById(`people-dropdown-${this.context}`);
+      const input = document.getElementById(`people-search-${this.context}`);
+      if (dd && input && !dd.contains(e.target) && e.target !== input) {
+        dd.classList.add('hidden');
+      }
+      // Collapse audience builder when clicking outside
+      if (this.expanded && !this.container.contains(e.target)) {
+        this.collapse();
+      }
+    });
+  }
+
+  expand() {
+    if (this.expanded) return;
+    this.expanded = true;
+    this.container.classList.add('is-expanded');
+  }
+
+  collapse() {
+    if (!this.expanded) return;
+    this.expanded = false;
+    this.container.classList.remove('is-expanded');
+  }
+
+  getCount() {
+    let total = 0;
+    for (const itemId of this.included) {
+      const item = this.findItem(itemId);
+      if (item) total += item.count;
+    }
+    for (const itemId of this.excluded) {
+      const item = this.findItem(itemId);
+      if (item) total -= item.count;
+    }
+    total += this.includedPeople.length;
+    total -= this.excludedPeople.length;
+    return Math.max(0, total);
+  }
+
+  findItem(id) {
+    for (const cat of CATEGORIES) {
+      for (const item of cat.items) {
+        if (item.id === id) return item;
+      }
+    }
+    return null;
+  }
+
+  getFrequentPills() {
+    return FREQUENT_PILLS[this.context] || FREQUENT_PILLS.meeting;
+  }
+
+  isQuickPillActive(pill) {
+    return pill.ids.every(id => this.included.has(id));
+  }
+
+  toggleQuickPill(pillIndex) {
+    const pills = this.getFrequentPills();
+    const pill = pills[pillIndex];
+    if (this.isQuickPillActive(pill)) {
+      pill.ids.forEach(id => this.included.delete(id));
+    } else {
+      pill.ids.forEach(id => this.included.add(id));
+    }
+    this.render();
+  }
+
+  toggleItem(id) {
+    const set = this.excludeMode ? this.excluded : this.included;
+    if (set.has(id)) set.delete(id);
+    else set.add(id);
+    this.render();
+  }
+
+  removeIncluded(id) {
+    this.included.delete(id);
+    this.render();
+  }
+
+  removeExcluded(id) {
+    this.excluded.delete(id);
+    this.render();
+  }
+
+  toggleCollapse(catId) {
+    if (this.collapsedCats.has(catId)) this.collapsedCats.delete(catId);
+    else this.collapsedCats.add(catId);
+    this.render();
+  }
+
+  matchesFilter(label) {
+    if (!this.filterText) return true;
+    return label.toLowerCase().includes(this.filterText.toLowerCase());
+  }
+
+  addPerson(person) {
+    const list = this.excludeMode ? this.excludedPeople : this.includedPeople;
+    if (!list.find(p => p.id === person.id)) {
+      list.push(person);
+      this.render();
+    }
+  }
+
+  removePerson(personId, fromExcluded) {
+    if (fromExcluded) {
+      this.excludedPeople = this.excludedPeople.filter(p => p.id !== personId);
+    } else {
+      this.includedPeople = this.includedPeople.filter(p => p.id !== personId);
+    }
+    this.render();
+  }
+
+  clearAll() {
+    this.included.clear();
+    this.excluded.clear();
+    this.includedPeople = [];
+    this.excludedPeople = [];
+    this.showResolved = false;
+    this.advancedOpen = false;
+    this.excludeMode = false;
+    this.render();
+  }
+
+  toggleAdvanced() {
+    this.advancedOpen = !this.advancedOpen;
+    this.render();
+  }
+
+  toggleExcludeMode() {
+    this.excludeMode = !this.excludeMode;
+    this.render();
+  }
+
+  // ── Render ──
+  render() {
+    const uid = this.context;
+    const count = this.getCount();
+    const hasIncluded = this.included.size > 0 || this.includedPeople.length > 0;
+    const hasExcluded = this.excluded.size > 0 || this.excludedPeople.length > 0;
+    const hasAnything = hasIncluded || hasExcluded;
+    const pills = this.getFrequentPills();
+
+    let html = '';
+
+    // ── Collapsed view (always rendered, hidden via CSS when expanded) ──
+    html += `<div class="audience-collapsed" onclick="builders['${uid}'].expand()">`;
+    if (hasAnything) {
+      for (const id of this.included) {
+        const item = this.findItem(id);
+        if (item) html += `<span class="token-pill">${item.label} <span class="text-slate-400">(${item.count})</span><button class="remove-btn" onclick="event.stopPropagation();builders['${uid}'].removeIncluded('${item.id}')">&times;</button></span>`;
+      }
+      for (const p of this.includedPeople) {
+        html += `<span class="token-pill">${this.escHtml(p.name)}<button class="remove-btn" onclick="event.stopPropagation();builders['${uid}'].removePerson('${p.id}',false)">&times;</button></span>`;
+      }
+      for (const id of this.excluded) {
+        const item = this.findItem(id);
+        if (item) html += `<span class="token-pill exclude">NOT ${item.label} <span style="text-decoration:line-through">(${item.count})</span><button class="remove-btn" onclick="event.stopPropagation();builders['${uid}'].removeExcluded('${item.id}')">&times;</button></span>`;
+      }
+      for (const p of this.excludedPeople) {
+        html += `<span class="token-pill exclude">NOT ${this.escHtml(p.name)}<button class="remove-btn" onclick="event.stopPropagation();builders['${uid}'].removePerson('${p.id}',true)">&times;</button></span>`;
+      }
+      if (count > 0) {
+        html += `<span class="count-label">~${count} recipient${count !== 1 ? 's' : ''}</span>`;
+      }
+    } else {
+      html += `<span class="placeholder">Choose audience...</span>`;
+    }
+    html += `</div>`;
+
+    // ── Expandable content wrapper ──
+    html += `<div class="audience-expandable">`;
+
+    // ── Selected pills summary or placeholder (inside expanded view) ──
+    html += `<div class="px-3 pt-3 pb-1">`;
+    if (hasAnything) {
+      html += `<div class="flex flex-wrap gap-1 items-center">`;
+      for (const id of this.included) {
+        const item = this.findItem(id);
+        if (item) html += `<span class="token-pill">${item.label} <span class="text-slate-400">(${item.count})</span><button class="remove-btn" onclick="builders['${uid}'].removeIncluded('${item.id}')">&times;</button></span>`;
+      }
+      for (const p of this.includedPeople) {
+        html += `<span class="token-pill">${this.escHtml(p.name)}<button class="remove-btn" onclick="builders['${uid}'].removePerson('${p.id}',false)">&times;</button></span>`;
+      }
+      for (const id of this.excluded) {
+        const item = this.findItem(id);
+        if (item) html += `<span class="token-pill exclude">NOT ${item.label} <span style="text-decoration:line-through">(${item.count})</span><button class="remove-btn" onclick="builders['${uid}'].removeExcluded('${item.id}')">&times;</button></span>`;
+      }
+      for (const p of this.excludedPeople) {
+        html += `<span class="token-pill exclude">NOT ${this.escHtml(p.name)}<button class="remove-btn" onclick="builders['${uid}'].removePerson('${p.id}',true)">&times;</button></span>`;
+      }
+      html += `</div>`;
+    } else {
+      html += `<div class="text-sm text-slate-400">Choose audience...</div>`;
+    }
+    html += `</div>`;
+
+    // ── Frequently used pills ──
+    html += `<div class="px-3 pt-2 pb-2">
+      <div class="flex items-center gap-2 mb-1.5">
+        <span class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Frequently used</span>
+        <span class="text-[10px] text-slate-300 cursor-help" data-tip="Adapts to your usage over time. Shows the audiences you select most often.">&#9432;</span>
+      </div>
+      <div class="flex flex-wrap gap-1.5">`;
+    pills.forEach((pill, i) => {
+      const active = this.isQuickPillActive(pill);
+      html += `<button class="quick-pill${active ? ' active' : ''}" onclick="builders['${uid}'].toggleQuickPill(${i})">${pill.label} <span class="pill-count">(${pill.count})</span></button>`;
+    });
+    html += `</div>
+    </div>`;
+
+    // ── Recipient count + controls row ──
+    html += `<div class="px-3 pb-2">
+      <div class="flex items-center gap-3 text-xs">`;
+    if (count > 0) {
+      html += `<span class="font-medium text-slate-700">~${count} recipient${count !== 1 ? 's' : ''}</span>`;
+      html += `<button onclick="builders['${uid}'].showResolved=!builders['${uid}'].showResolved;builders['${uid}'].render()"
+        class="text-blue-500 hover:text-blue-700 transition-colors flex items-center gap-0.5">
+        <svg class="h-3 w-3 transition-transform ${this.showResolved ? 'rotate-180' : ''}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        ${this.showResolved ? 'Hide list' : 'Show list'}
+      </button>`;
+    } else {
+      html += `<span class="text-slate-400">No recipients selected</span>`;
+    }
+    html += `<span class="flex-1"></span>`;
+    // More audiences expander
+    html += `<button class="expander-link" onclick="builders['${uid}'].toggleAdvanced()">
+      <svg class="h-3 w-3 chevron ${this.advancedOpen ? '' : 'collapsed'}" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      ${this.advancedOpen ? 'Fewer options' : 'More audiences...'}
+    </button>`;
+    if (hasAnything) {
+      html += `<button onclick="builders['${uid}'].clearAll()" class="text-slate-400 hover:text-rose-500 transition-colors ml-1">Clear</button>`;
+    }
+    html += `</div>`;
+
+    // Resolved list
+    if (this.showResolved && count > 0) {
+      html += `<div class="mt-2 border border-slate-200 rounded-lg overflow-hidden max-h-[140px] overflow-y-auto audience-scroll">`;
+      const showCount = Math.min(count, RESOLVED_LIST.length);
+      for (let i = 0; i < showCount; i++) {
+        html += `<div class="resolved-row">
+          <span class="w-5 text-[10px] text-slate-300 tabular-nums">${i + 1}</span>
+          ${RESOLVED_LIST[i]}
+        </div>`;
+      }
+      if (count > showCount) {
+        html += `<div class="resolved-row text-slate-400 italic">...and ${count - showCount} more</div>`;
+      }
+      html += `</div>`;
+    }
+
+    html += `</div>`;
+
+    // ── Advanced builder (collapsible) ──
+    if (this.advancedOpen) {
+      html += `<div class="border-t border-slate-200">`;
+
+      // Search filter + exclude toggle
+      html += `<div class="px-3 pt-2 pb-1 flex items-center gap-2">
+        <div class="relative flex-1">
+          <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input
+            type="text"
+            class="search-box"
+            placeholder="Search audiences..."
+            value="${this.escHtml(this.filterText)}"
+            oninput="builders['${uid}'].filterText=this.value;builders['${uid}'].render()"
+          />
+        </div>
+        <button onclick="builders['${uid}'].toggleExcludeMode()"
+          class="text-xs px-2 py-1 rounded-md border transition-colors whitespace-nowrap ${this.excludeMode
+            ? 'bg-rose-50 border-rose-200 text-rose-600 font-medium'
+            : 'border-slate-200 text-slate-400 hover:text-slate-600 hover:border-slate-300'}">
+          ${this.excludeMode ? 'Excluding' : 'Exclude...'}
+        </button>
+      </div>`;
+
+      // Categories list
+      const maxH = this.context === 'meeting' ? '300px' : '360px';
+      html += `<div class="audience-scroll overflow-y-auto ${this.excludeMode ? 'exclude-mode' : ''}" style="max-height:${maxH}">`;
+
+      let anyVisible = false;
+      for (const cat of CATEGORIES) {
+        const visibleItems = cat.items.filter(i => this.matchesFilter(i.label) || this.matchesFilter(i.desc || ''));
+        if (visibleItems.length === 0) continue;
+        anyVisible = true;
+
+        const collapsed = this.collapsedCats.has(cat.id);
+        const set = this.excludeMode ? this.excluded : this.included;
+
+        html += `<div class="border-b border-slate-100 last:border-b-0">`;
+        html += `<div class="cat-header" onclick="builders['${uid}'].toggleCollapse('${cat.id}')">
+          <div class="flex items-center gap-2">
+            <svg class="h-3 w-3 text-slate-400 chevron ${collapsed ? 'collapsed' : ''}" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            <h3>${cat.label}</h3>
+            <span class="text-[10px] text-slate-300 font-normal">${visibleItems.length}</span>
+          </div>
+        </div>`;
+
+        if (!collapsed) {
+          html += `<div class="pb-1">`;
+          for (const item of visibleItems) {
+            const checked = set.has(item.id);
+            const descHtml = item.desc
+              ? `<span class="desc-text text-[11px] text-slate-400 ml-1" title="${this.escHtml(item.desc)}">${this.escHtml(item.desc)}</span>`
+              : '';
+            html += `<label class="cb-label">
+              <input type="checkbox" ${checked ? 'checked' : ''} onchange="builders['${uid}'].toggleItem('${item.id}')" />
+              <span class="flex items-baseline gap-1 min-w-0 overflow-hidden">
+                <span class="whitespace-nowrap flex-shrink-0">${item.label} <span class="text-slate-400 text-[11px]">(${item.count})</span></span>
+                ${descHtml}
+              </span>
+            </label>`;
+          }
+          html += `</div>`;
+        }
+        html += `</div>`;
+      }
+
+      // Individual People section
+      const peopleMatch = this.matchesFilter('individual') || this.matchesFilter('people') || this.matchesFilter('person') || !this.filterText;
+      if (peopleMatch) {
+        anyVisible = true;
+        const collapsed = this.collapsedCats.has('people');
+        const currentPeople = this.excludeMode ? this.excludedPeople : this.includedPeople;
+        html += `<div class="border-b border-slate-100">`;
+        html += `<div class="cat-header" onclick="builders['${uid}'].toggleCollapse('people')">
+          <div class="flex items-center gap-2">
+            <svg class="h-3 w-3 text-slate-400 chevron ${collapsed ? 'collapsed' : ''}" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            <h3>Individual People</h3>
+          </div>
+        </div>`;
+        if (!collapsed) {
+          html += `<div class="px-3 pb-2">
+            <div class="relative mb-2">
+              <input
+                type="text"
+                id="people-search-${uid}"
+                class="search-box"
+                style="padding-left:10px"
+                placeholder="Search by name or email..."
+                oninput="builders['${uid}'].showPeopleDropdown(this.value,'${uid}')"
+                onfocus="builders['${uid}'].showPeopleDropdown(this.value,'${uid}')"
+                autocomplete="off"
+              />
+              <div id="people-dropdown-${uid}" class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-10 hidden max-h-[140px] overflow-y-auto"></div>
+            </div>`;
+          if (currentPeople.length > 0) {
+            html += `<div class="flex flex-wrap gap-1">`;
+            for (const p of currentPeople) {
+              html += `<span class="person-pill ${this.excludeMode ? 'excluded' : ''}">
+                ${this.escHtml(p.name)}
+                <button onclick="builders['${uid}'].removePerson('${p.id}',${this.excludeMode})">&times;</button>
+              </span>`;
+            }
+            html += `</div>`;
+          }
+          html += `</div>`;
+        }
+        html += `</div>`;
+      }
+
+      if (!anyVisible) {
+        html += `<div class="py-6 text-center text-sm text-slate-400">No audiences match your search.</div>`;
+      }
+
+      html += `</div>`; // end scroll area
+      html += `</div>`; // end advanced builder
+    }
+
+    html += `</div>`; // end audience-expandable
+
+    this.container.innerHTML = html;
+
+    // Re-apply expanded state after re-render
+    if (this.expanded) {
+      this.container.classList.add('is-expanded');
+    } else {
+      this.container.classList.remove('is-expanded');
+    }
+
+  }
+
+  showPeopleDropdown(query, uid) {
+    const dd = document.getElementById(`people-dropdown-${uid}`);
+    if (!dd) return;
+    const currentList = this.excludeMode ? this.excludedPeople : this.includedPeople;
+    const filtered = SAMPLE_PEOPLE.filter(p => {
+      if (currentList.find(cp => cp.id === p.id)) return false;
+      if (!query) return true;
+      const q = query.toLowerCase();
+      return p.name.toLowerCase().includes(q) || p.email.toLowerCase().includes(q);
+    });
+    if (filtered.length === 0) {
+      dd.classList.add('hidden');
+      return;
+    }
+    dd.classList.remove('hidden');
+    dd.innerHTML = filtered.map(p => `
+      <button
+        class="w-full text-left px-3 py-2 text-sm hover:bg-slate-50 flex justify-between items-center"
+        onmousedown="event.preventDefault();builders['${uid}'].addPerson({id:'${p.id}',name:'${p.name}',email:'${p.email}'});document.getElementById('people-search-${uid}').value=''"
+      >
+        <span class="text-slate-700">${p.name}</span>
+        <span class="text-slate-400 text-xs">${p.email}</span>
+      </button>
+    `).join('');
+  }
+
+  escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+}
+
+// ── Initialize builders ──────────────────────────────────────────────────
+const builders = {};
+document.querySelectorAll('.audience-builder-container').forEach(el => {
+  const ctx = el.dataset.context;
+  builders[ctx] = new AudienceBuilder(el, ctx);
+});
+</script>
+
+</body>
+</html>

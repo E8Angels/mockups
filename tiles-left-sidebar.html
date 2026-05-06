@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investor Portal - Left Sidebar Tiles</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            padding: 24px 16px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 280px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .tile {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            padding: 16px;
+        }
+
+        /* ============ TILE 1: MY PROFILE ============ */
+        .profile-header {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .profile-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-text h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+
+        .profile-text p {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 2px;
+        }
+
+        .profile-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        .tile-subheader {
+            font-size: 10px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 14px;
+            margin-bottom: 8px;
+        }
+
+        .investment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .investment-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .investment-logo {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .investment-name {
+            font-weight: 500;
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .investment-right {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .investment-amount {
+            font-weight: 500;
+            color: #64748b;
+            white-space: nowrap;
+        }
+
+        .investment-date {
+            font-size: 11px;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+
+        .tile-link {
+            font-size: 12px;
+            color: #2563eb;
+            text-decoration: none;
+            margin-top: 8px;
+            display: inline-block;
+            transition: color 0.2s;
+        }
+
+        .tile-link:hover {
+            color: #1d4ed8;
+        }
+
+        .interest-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+
+        .interest-logo {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .interest-name {
+            font-weight: 500;
+            color: #0f172a;
+            flex: 1;
+        }
+
+        .badge {
+            font-size: 10px;
+            font-weight: 500;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .badge-teal {
+            background: #f0fdfa;
+            color: #0d9488;
+            border: 0.5px solid #ccf0ee;
+        }
+
+        .badge-amber {
+            background: #fffbeb;
+            color: #d97706;
+            border: 0.5px solid #fef3c7;
+        }
+
+        /* ============ TILE 2: ALGAFILM DILIGENCE TEAM ============ */
+        .team-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .team-title-row h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .team-logo {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .avatars-row {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 8px;
+            margin-left: -8px;
+        }
+
+        .avatar-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid white;
+            overflow: hidden;
+            margin-left: -8px;
+            flex-shrink: 0;
+            background: white;
+        }
+
+        .avatar-circle:first-child {
+            margin-left: 0;
+        }
+
+        .avatar-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .team-names {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .team-detail {
+            font-size: 12px;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+
+        /* ============ TILE 3: SCREENING QUEUE ============ */
+        .screening-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .screening-header h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .count-badge {
+            width: 20px;
+            height: 20px;
+            background: #2563eb;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .queue-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            height: 26px;
+            padding: 0;
+        }
+
+        .queue-company {
+            color: #0f172a;
+            font-weight: 500;
+        }
+
+        .queue-status {
+            width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ============ TILE 4: REFER A COMPANY ============ */
+        .refer-card {
+            background: #eff6ff;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .refer-card h3 {
+            font-size: 13px;
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .refer-button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 9999px;
+            padding: 6px 16px;
+            font-size: 12px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: inline-block;
+        }
+
+        .refer-button:hover {
+            background: #1d4ed8;
+        }
+
+        /* ============ TILE 5: KEY DOCUMENTS ============ */
+        .documents-header {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 12px;
+        }
+
+        .doc-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            height: 28px;
+            color: #0f172a;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .doc-row:hover {
+            color: #2563eb;
+        }
+
+        .doc-icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .doc-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        /* ============ TILE 6: MEMBER DIRECTORY ============ */
+        .directory-header {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 32px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 12px;
+            padding: 6px 8px 6px 28px;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: white;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="%2394a3b8" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>');
+            background-repeat: no-repeat;
+            background-position: 6px center;
+            color: #0f172a;
+        }
+
+        .search-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        .member-count {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 8px;
+            margin-bottom: 10px;
+        }
+
+        .members-grid {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .member-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .member-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- TILE 1: MY PROFILE -->
+        <div class="tile">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=88&h=88&fit=crop&crop=face" alt="Jordan Schwartz">
+                </div>
+                <div class="profile-text">
+                    <h2>Jordan Schwartz</h2>
+                    <p>jordan@hive-mind.com</p>
+                    <p>Member since January 2023</p>
+                </div>
+            </div>
+
+            <div class="tile-subheader">Recent Investments</div>
+
+            <div class="investment-item">
+                <div class="investment-left">
+                    <div class="investment-logo">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <rect x="2" y="2" width="14" height="14" rx="2" stroke="#0d9488" stroke-width="1.5" fill="none"/>
+                            <circle cx="5" cy="5" r="1" fill="#0d9488"/>
+                            <path d="M8 8l2-2 3 3" stroke="#0d9488" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <span class="investment-name">Ateios Systems</span>
+                </div>
+                <div class="investment-right">
+                    <div class="investment-amount">$25,000</div>
+                    <div class="investment-date">Mar 4, 2026</div>
+                </div>
+            </div>
+
+            <div class="investment-item">
+                <div class="investment-left">
+                    <div class="investment-logo">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <circle cx="9" cy="9" r="7" stroke="#0d9488" stroke-width="1.5" fill="none"/>
+                            <path d="M7 5c0 0-1 1-1 3c0 2 1 3 1 3" stroke="#0d9488" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                            <path d="M11 5c0 0 1 1 1 3c0 2-1 3-1 3" stroke="#0d9488" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                            <line x1="9" y1="14" x2="9" y2="15.5" stroke="#0d9488" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <span class="investment-name">TalkingHeads Wireless</span>
+                </div>
+                <div class="investment-right">
+                    <div class="investment-amount">$10,000</div>
+                    <div class="investment-date">Jan 31, 2026</div>
+                </div>
+            </div>
+
+            <div class="investment-item">
+                <div class="investment-left">
+                    <div class="investment-logo">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <path d="M4 9C4 6.24 6.24 4 9 4C11.76 4 14 6.24 14 9" stroke="#2563eb" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                            <path d="M9 14V16M6 16H12" stroke="#2563eb" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                            <circle cx="9" cy="9" r="1.5" fill="#2563eb"/>
+                        </svg>
+                    </div>
+                    <span class="investment-name">Steelhead Composites</span>
+                </div>
+                <div class="investment-right">
+                    <div class="investment-amount">$2,500</div>
+                    <div class="investment-date">Dec 15, 2025</div>
+                </div>
+            </div>
+
+            <a href="#" class="tile-link">View all investments →</a>
+
+            <div class="tile-subheader">Investment Interest</div>
+
+            <div class="interest-item">
+                <div class="interest-logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <path d="M3 9L9 3L15 9V15C15 15.828 14.328 16.5 13.5 16.5H4.5C3.672 16.5 3 15.828 3 15Z" stroke="#0d9488" stroke-width="1.5" fill="none"/>
+                        <path d="M9 3L12 6L9 9L6 6Z" stroke="#0d9488" stroke-width="1.5" fill="none"/>
+                    </svg>
+                </div>
+                <span class="interest-name">Algafilm</span>
+                <span class="badge badge-teal">In Diligence</span>
+            </div>
+
+            <div class="interest-item">
+                <div class="interest-logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <rect x="2" y="4" width="14" height="10" rx="1" stroke="#d97706" stroke-width="1.5" fill="none"/>
+                        <path d="M2 6H16M6 9H12M6 12H10" stroke="#d97706" stroke-width="1" fill="none" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <span class="interest-name">EELI Technology</span>
+                <span class="badge badge-amber">Balloting</span>
+            </div>
+
+            <a href="#" class="tile-link">View interest forms →</a>
+        </div>
+
+        <!-- TILE 2: ALGAFILM DILIGENCE TEAM -->
+        <div class="tile">
+            <div class="team-title-row">
+                <svg class="team-logo" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="#16a34a" stroke-width="1.5" fill="none"/>
+                    <path d="M12 6V12L16 14" stroke="#16a34a" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8 10L10 8L12 10" stroke="#16a34a" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <h3>AlgaFilm Diligence Team</h3>
+            </div>
+
+            <div class="avatars-row">
+                <div class="avatar-circle">
+                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face" alt="John Smith">
+                </div>
+                <div class="avatar-circle">
+                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&crop=face" alt="Jane Smith">
+                </div>
+                <div class="avatar-circle">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&h=60&fit=crop&crop=face" alt="Michael Chen">
+                </div>
+                <div class="avatar-circle">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&h=60&fit=crop&crop=face" alt="Sarah Park">
+                </div>
+                <div class="avatar-circle">
+                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=60&h=60&fit=crop&crop=face" alt="David Kumar">
+                </div>
+            </div>
+
+            <div class="team-names">John Smith, Jane Smith, Michael Chen, Sarah Park, David Kumar</div>
+
+            <div class="team-detail">Target Completion: December 30, 2026</div>
+            <div class="team-detail">Round Close: January 1, 2027</div>
+
+            <a href="#" class="tile-link">Go to Diligence Workspace →</a>
+        </div>
+
+        <!-- TILE 3: SCREENING QUEUE -->
+        <div class="tile">
+            <div class="screening-header">
+                <h3>Screening Queue</h3>
+                <div class="count-badge">4</div>
+            </div>
+
+            <div class="queue-row">
+                <span class="queue-company">CleanGrid Solutions</span>
+                <div class="queue-status">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M2 7L6 11L12 3" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="queue-row">
+                <span class="queue-company">Verdant Energy</span>
+                <div class="queue-status">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M2 7L6 11L12 3" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="queue-row">
+                <span class="queue-company">AquaPure Tech</span>
+                <div class="queue-status">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <line x1="2" y1="7" x2="12" y2="7" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="queue-row">
+                <span class="queue-company">SolarWeave</span>
+                <div class="queue-status">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <line x1="2" y1="7" x2="12" y2="7" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+            </div>
+
+            <a href="#" class="tile-link">Go to Screening →</a>
+        </div>
+
+        <!-- TILE 4: REFER A COMPANY -->
+        <div class="refer-card">
+            <h3>Know a great climate startup?</h3>
+            <button class="refer-button">Refer a Company →</button>
+        </div>
+
+        <!-- TILE 5: KEY DOCUMENTS -->
+        <div class="tile">
+            <div class="documents-header">Key Documents</div>
+
+            <div class="doc-row">
+                <div class="doc-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M3 2C2.44772 2 2 2.44772 2 3V13C2 13.5523 2.44772 14 3 14H13C13.5523 14 14 13.5523 14 13V5C14 4.44772 13.5523 4 13 4H10C9.44772 4 9 3.55228 9 3V2" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                        <line x1="5" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                        <line x1="5" y1="9" x2="11" y2="9" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                        <line x1="5" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <span class="doc-name">Membership Guide</span>
+            </div>
+
+            <div class="doc-row">
+                <div class="doc-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2Z" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                        <path d="M6 8L7.5 9.5L11 5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </svg>
+                </div>
+                <span class="doc-name">Investment Policy</span>
+            </div>
+
+            <div class="doc-row">
+                <div class="doc-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <circle cx="8" cy="8" r="4.5" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                        <path d="M11.5 11.5L14 14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+                        <path d="M6.5 8H9.5M8 6.5V9.5" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <span class="doc-name">DD Handbook</span>
+            </div>
+
+            <div class="doc-row">
+                <div class="doc-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M5 8C5 8.55228 5.44772 9 6 9H10C10.5523 9 11 8.55228 11 8C11 7.44772 10.5523 7 10 7H6C5.44772 7 5 7.44772 5 8Z" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+                        <path d="M3 4C2.44772 4 2 4.44772 2 5V11C2 11.5523 2.44772 12 3 12H13C13.5523 12 14 11.5523 14 11V5C14 4.44772 13.5523 4 13 4H3Z" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <span class="doc-name">Fund Agreement</span>
+            </div>
+
+            <a href="#" class="tile-link">All documents →</a>
+        </div>
+
+        <!-- TILE 6: MEMBER DIRECTORY -->
+        <div class="tile">
+            <div class="documents-header">Member Directory</div>
+
+            <input type="text" class="search-input" placeholder="Search by name or email...">
+
+            <div class="member-count">247 active members</div>
+
+            <div class="members-grid">
+                <div class="member-avatar">
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=64&h=64&fit=crop&crop=face" alt="Member">
+                </div>
+                <div class="member-avatar">
+                    <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=64&h=64&fit=crop&crop=face" alt="Member">
+                </div>
+                <div class="member-avatar">
+                    <img src="https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=64&h=64&fit=crop&crop=face" alt="Member">
+                </div>
+                <div class="member-avatar">
+                    <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=64&h=64&fit=crop&crop=face" alt="Member">
+                </div>
+                <div class="member-avatar">
+                    <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=64&h=64&fit=crop&crop=face" alt="Member">
+                </div>
+                <div class="member-avatar">
+                    <img src="https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=64&h=64&fit=crop&crop=face" alt="Member">
+                </div>
+            </div>
+
+            <a href="#" class="tile-link">Browse full directory →</a>
+        </div>
+    </div>
+</body>
+</html>

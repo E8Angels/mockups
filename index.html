@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>E8 · Mockups</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; color: #0f172a; line-height: 1.5; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  .sub { color: #64748b; margin-bottom: 28px; font-size: 14px; }
+  ul { list-style: none; padding: 0; margin: 0; }
+  li { border-bottom: 1px solid #e2e8f0; }
+  li:first-child { border-top: 1px solid #e2e8f0; }
+  a { display: flex; align-items: baseline; gap: 12px; padding: 10px 4px; color: #0f172a; text-decoration: none; }
+  a:hover { background: #f8fafc; }
+  .name { font-weight: 500; }
+  .file { color: #94a3b8; font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin-left: auto; }
+  .note { background: #fef9c3; border: 1px solid #fde68a; padding: 10px 14px; border-radius: 6px; font-size: 13px; color: #713f12; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+  <h1>E8 · Mockups</h1>
+  <div class="sub">Static prototypes and design explorations. Click to open.</div>
+  <div class="note">All seed data is fictional. Names, companies, dollar amounts, and dates are placeholders for design review only.</div>
+  <ul id="list"></ul>
+<script>
+  const FILES = [
+    { f: 'sponsors-prototype.html',                 n: 'Sponsors — CRM prototype' },
+    { f: 'admin-calendar-view.html',                n: 'Admin calendar view' },
+    { f: 'audience-builder.html',                   n: 'Audience builder' },
+    { f: 'deal-terms-wizard.html',                  n: 'Deal terms wizard' },
+    { f: 'diligence-tab.html',                      n: 'Diligence tab' },
+    { f: 'fund-tile-thermometer.html',              n: 'Fund tile — thermometer' },
+    { f: 'fund-tile-thermometer-v2.html',           n: 'Fund tile — thermometer v2' },
+    { f: 'fund-tile-vote-thresholds.html',          n: 'Fund tile — vote thresholds' },
+    { f: 'fund-tile-vote-visuals.html',             n: 'Fund tile — vote visuals' },
+    { f: 'help-widget.html',                        n: 'Help widget' },
+    { f: 'homepage-nav-v1-v2.html',                 n: 'Homepage nav (v1 vs v2)' },
+    { f: 'homepage-option-1-hero-feed.html',        n: 'Homepage option 1 — hero feed' },
+    { f: 'homepage-option-2-action-dashboard.html', n: 'Homepage option 2 — action dashboard' },
+    { f: 'homepage-option-3-editorial.html',        n: 'Homepage option 3 — editorial' },
+    { f: 'homepage-option-4-you-community.html',    n: 'Homepage option 4 — you + community' },
+    { f: 'investments-redesign.html',               n: 'Investments redesign' },
+    { f: 'meeting-creation-dialog.html',            n: 'Meeting creation dialog' },
+    { f: 'member-calendar.html',                    n: 'Member calendar' },
+    { f: 'mockup-news-approval.html',               n: 'News approval flow' },
+    { f: 'pitch-video-recorder.html',               n: 'Pitch video recorder' },
+    { f: 'recurring-email-manager.html',            n: 'Recurring email manager' },
+    { f: 'screening-committee-dashboard.html',      n: 'Screening committee dashboard' },
+    { f: 'screening-committee-documents.html',      n: 'Screening committee documents' },
+    { f: 'screening-committee-note-editor.html',    n: 'Screening committee note editor' },
+    { f: 'tiles-left-sidebar.html',                 n: 'Home tiles — left sidebar' },
+    { f: 'tiles-right-sidebar.html',                n: 'Home tiles — right sidebar' },
+  ];
+  const ul = document.getElementById('list');
+  FILES.sort((a,b)=>a.n.localeCompare(b.n)).forEach(({f,n}) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<a href="${f}"><span class="name">${n}</span><span class="file">${f}</span></a>`;
+    ul.appendChild(li);
+  });
+</script>
+</body>
+</html>

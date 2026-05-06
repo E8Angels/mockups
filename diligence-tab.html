@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Diligence tab — interactive mockup</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: #f8fafc; }
+
+  /* Page width cap — matches plan: 1800px max, px-6 gutters */
+  .page-cap { max-width: 1800px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
+
+  /* People pill — matches src/islands/ContactPillsEditor.jsx */
+  .pill-person {
+    display:inline-flex; align-items:center; gap:4px;
+    border:1px solid #bfdbfe; background:#eff6ff; color:#1d4ed8;
+    border-radius:9999px; padding:2px 4px 2px 6px;
+    font-size:12px; font-weight:500; line-height:1; white-space:nowrap;
+    position:relative;
+  }
+  .pill-person.lead { border-color:#1d4ed8; box-shadow: inset 0 0 0 1px rgba(29,78,216,.15); }
+  .pill-person .grip { color:#94a3b8; cursor:grab; opacity:0; transition:opacity .12s; padding-right:2px; margin-left:-2px; }
+  .pill-person:hover .grip { opacity:1; }
+  .pill-person .x, .pill-person .mail { color:#2563eb; padding:2px; border-radius:9999px; }
+  .pill-person .x:hover, .pill-person .mail:hover { background:#dbeafe; }
+  .pill-being-dragged { opacity:.4; }
+
+  /* Tab underline */
+  .tab-active { border-bottom:2px solid #0f172a; color:#0f172a; font-weight:600; }
+  .tab-idle   { border-bottom:2px solid transparent; color:#64748b; font-weight:500; }
+  .tab-idle:hover { color:#0f172a; }
+
+  /* Section header — flat, columnar */
+  .sec-header {
+    display:grid;
+    grid-template-columns: 24px 200px 1fr auto;
+    align-items:center; gap:14px;
+    background:#f8fafc; border-bottom:1px solid #e2e8f0;
+    padding:9px 24px; cursor:pointer;
+    transition: background .12s;
+  }
+  .sec-header:hover { background:#f1f5f9; }
+  .sec-header.is-open { background:#f1f5f9; }
+  .sec-title { font-weight:600; font-size:13px; color:#0f172a; text-transform:uppercase; letter-spacing:.025em; white-space:nowrap; }
+  .sec-pills { display:flex; align-items:center; gap:6px; flex-wrap:wrap; min-width:0; }
+  .sec-actions { display:flex; align-items:center; gap:4px; }
+  .owner-empty { font-size:11px; color:#94a3b8; font-weight:500; text-transform:uppercase; letter-spacing:.05em; display:inline-flex; align-items:center; gap:6px; }
+
+  /* Section body */
+  .sec-body { background:white; }
+  .sec-subtabs { display:flex; align-items:center; gap:24px; border-bottom:1px solid #e2e8f0; padding:0 24px; }
+  .sec-subtab { height:42px; display:inline-flex; align-items:center; gap:8px; font-size:13px; cursor:pointer; }
+
+  /* Slider */
+  .slider-track {
+    height:6px; border-radius:9999px; position:relative;
+    background:linear-gradient(to right,#ef4444 0%,#f59e0b 50%,#10b981 100%);
+  }
+  .slider-thumb {
+    position:absolute; top:-5px; width:16px; height:16px;
+    border-radius:9999px; background:#0f172a;
+    box-shadow:0 1px 3px rgba(0,0,0,.25), 0 0 0 3px white;
+  }
+
+  /* Right panels */
+  .panel { background:#ffffff; border-left:1px solid #e2e8f0; display:flex; flex-direction:column; min-width:0; }
+  .panel-collapsed { width:36px; min-width:36px; max-width:36px; cursor:pointer; }
+  .panel-collapsed:hover { background:#f1f5f9; }
+  .panel-rail-text { writing-mode:vertical-rl; transform:rotate(180deg); font-size:11px; font-weight:600; color:#475569; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; }
+
+  /* Avatar */
+  .avatar {
+    width:24px; height:24px; border-radius:9999px; color:white; font-size:10px; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center;
+    border:2px solid white; box-shadow:0 0 0 1px rgba(15,23,42,.06);
+  }
+  .avatar-stack > * + * { margin-left:-8px; }
+  .avatar-sm { width:20px; height:20px; font-size:9px; }
+  .avatar-c1 { background:#0ea5e9; }
+  .avatar-c2 { background:#f97316; }
+  .avatar-c3 { background:#8b5cf6; }
+  .avatar-c4 { background:#10b981; }
+  .avatar-c5 { background:#ec4899; }
+
+  /* Buttons */
+  .btn { display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 10px; border-radius:6px; border:1px solid #e2e8f0; background:white; font-size:13px; color:#475569; transition:background .12s; }
+  .btn:hover { background:#f8fafc; }
+  .btn-icon { width:32px; padding:0; justify-content:center; }
+  .btn-split-l { border-radius:6px 0 0 6px; }
+  .btn-split-r { border-radius:0 6px 6px 0; padding:0 4px; margin-left:-1px; }
+  .btn-primary { background:#2563eb; color:white; border-color:#2563eb; font-weight:500; }
+  .btn-primary:hover { background:#1d4ed8; }
+  .btn-ghost { border:none; color:#64748b; }
+  .btn-ghost:hover { background:#f1f5f9; color:#0f172a; }
+
+  /* Mode switcher — prominent, centered */
+  .mode-switcher { display:inline-flex; gap:6px; padding:6px; background:#f1f5f9; border-radius:12px; border:1px solid #e2e8f0; }
+  .mode-switcher button {
+    display:inline-flex; align-items:center; gap:8px;
+    height:40px; padding:0 18px;
+    font-size:13.5px; font-weight:500; color:#475569;
+    border-radius:8px; transition:all .15s; white-space:nowrap;
+  }
+  .mode-switcher button:hover { color:#0f172a; background:white; }
+  .mode-switcher button.is-active { background:white; color:#0f172a; font-weight:600; box-shadow:0 1px 3px rgba(15,23,42,.08), 0 0 0 1px rgba(15,23,42,.04); }
+  .mode-switcher button.is-active .lucide-md { color:#2563eb; }
+
+  /* Sliver count badge */
+  .sliver-badge {
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:18px; height:18px; padding:0 5px;
+    border-radius:9999px; font-size:10px; font-weight:700; color:white;
+    box-shadow:0 1px 2px rgba(15,23,42,.15);
+  }
+  .sliver-badge-blue { background:#2563eb; }
+  .sliver-badge-emerald { background:#10b981; }
+
+  /* Narrow-viewport responsive */
+  @media (max-width: 1279px) {
+    .sec-header { grid-template-columns: 24px 200px 1fr auto; }
+    .sec-pills { flex-wrap:wrap; }
+  }
+  @media (max-width: 1023px) {
+    .sec-header {
+      grid-template-columns: 24px 1fr auto;
+      grid-template-areas: "chev title actions" ". pills pills";
+      row-gap:6px;
+    }
+    .sec-header > .chev { grid-area: chev; }
+    .sec-header > .sec-title { grid-area: title; }
+    .sec-header > .sec-pills { grid-area: pills; }
+    .sec-header > .sec-actions { grid-area: actions; }
+  }
+  @media (max-width: 767px) {
+    .page-cap { padding-left:12px; padding-right:12px; }
+    .sec-header { padding-left:12px; padding-right:12px; }
+  }
+
+  /* TipTap toolbar */
+  .tt-toolbar { display:flex; align-items:center; gap:2px; flex-wrap:wrap; padding:6px 8px; background:#f8fafc; border-bottom:1px solid #e2e8f0; }
+  .tt-btn { width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; color:#475569; cursor:pointer; }
+  .tt-btn:hover { background:#e2e8f0; color:#0f172a; }
+  .tt-btn.is-active { background:#e2e8f0; color:#0f172a; }
+  .tt-divider { width:1px; height:18px; background:#cbd5e1; margin:0 4px; }
+  .tt-body {
+    padding:18px 24px;
+    min-height:240px; max-height:70vh;
+    overflow:auto;
+    resize:vertical;          /* user can drag the bottom edge */
+  }
+  .tt-body p { margin:0 0 .65em 0; line-height:1.55; color:#334155; font-size:14px; }
+  .tt-body h2 { font-size:16px; font-weight:700; margin:.6em 0 .3em; color:#0f172a; }
+  .tt-body ul { padding-left:22px; margin:0 0 .65em 0; }
+  .tt-body li { font-size:14px; line-height:1.55; color:#334155; margin-bottom:2px; list-style:disc; }
+  .tt-body strong { color:#0f172a; font-weight:600; }
+  .tt-cursor { display:inline-block; width:2px; height:1em; background:#f97316; vertical-align:middle; animation:blink 1.05s steps(2,start) infinite; margin-left:1px; }
+  .tt-author-tag { display:inline-block; font-size:10px; padding:1px 6px; background:#f97316; color:white; border-radius:3px; margin-left:4px; vertical-align:middle; }
+  .tt-resize-affordance {
+    display:flex; align-items:center; justify-content:center;
+    height:14px; background:linear-gradient(to bottom, transparent, #f8fafc);
+    color:#94a3b8; pointer-events:none;
+  }
+  @keyframes blink { to { visibility:hidden; } }
+
+  /* Popover */
+  .pop {
+    position:absolute; z-index:50; background:white; border:1px solid #e2e8f0;
+    border-radius:8px; box-shadow:0 12px 32px rgba(15,23,42,.14), 0 1px 2px rgba(15,23,42,.04);
+    padding:6px; min-width:180px;
+  }
+  .pop-item { display:flex; align-items:center; gap:8px; padding:7px 10px; border-radius:5px; font-size:13px; color:#334155; cursor:pointer; }
+  .pop-item:hover { background:#f1f5f9; color:#0f172a; }
+  .pop-item-danger { color:#dc2626; }
+  .pop-item-danger:hover { background:#fef2f2; color:#dc2626; }
+  .pop-divider { height:1px; background:#e2e8f0; margin:4px 0; }
+
+  /* Doc row */
+  .doc-row { display:grid; grid-template-columns: 22px 1fr auto auto; gap:8px; align-items:center; padding:7px 10px; border-radius:5px; min-width:0; cursor:default; }
+  .doc-row:hover { background:#f8fafc; }
+  .doc-name { font-size:13px; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; font-weight:500; }
+  .doc-sub  { font-size:11px; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .doc-date { font-size:11px; color:#64748b; white-space:nowrap; }
+  .doc-row .row-action { opacity:0; transition:opacity .1s; }
+  .doc-row:hover .row-action, .doc-row.row-open .row-action { opacity:1; }
+
+  /* Meeting note row */
+  .mn-row { display:flex; align-items:flex-start; justify-content:space-between; gap:6px; padding:8px 10px; border-radius:5px; cursor:pointer; }
+  .mn-row:hover { background:#f8fafc; }
+  .mn-row .row-action { opacity:0; transition:opacity .1s; }
+  .mn-row:hover .row-action, .mn-row.row-open .row-action { opacity:1; }
+  .mn-title { font-size:13px; font-weight:500; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .mn-date { font-size:11px; color:#64748b; }
+
+  .scrollbar-thin::-webkit-scrollbar { width:6px; height:6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
+
+  .lucide { width:14px; height:14px; flex-shrink:0; }
+  .lucide-md { width:16px; height:16px; }
+  .lucide-lg { width:18px; height:18px; }
+</style>
+</head>
+<body class="text-slate-900 min-h-screen">
+
+<!-- ===================== TOP NAV ===================== -->
+<header class="sticky top-0 z-30 w-full border-b border-slate-200 bg-white shadow-[0_1px_2px_rgba(0,0,0,.05)]">
+  <div class="page-cap flex h-[52px] items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="#" class="inline-flex items-center gap-2">
+        <div class="h-5 w-5 rounded-full bg-gradient-to-br from-sky-500 to-blue-700"></div>
+        <span class="text-base font-semibold">E8 Portal</span>
+      </a>
+      <nav class="flex items-center gap-5 ml-8 text-[13px] text-slate-600">
+        <a href="#" class="hover:text-slate-900">Home</a>
+        <a href="#" class="hover:text-slate-900 inline-flex items-center gap-1">Pipeline <i data-lucide="chevron-down" class="lucide"></i></a>
+        <a href="#" class="hover:text-slate-900">Recordings</a>
+        <a href="#" class="hover:text-slate-900">E8 Fund</a>
+        <a href="#" class="hover:text-slate-900">Portfolio News</a>
+        <a href="#" class="hover:text-slate-900 inline-flex items-center gap-1">Explore <i data-lucide="chevron-down" class="lucide"></i></a>
+        <a href="#" class="hover:text-slate-900 inline-flex items-center gap-1">Committees <i data-lucide="chevron-down" class="lucide"></i></a>
+        <a href="#" class="hover:text-slate-900 inline-flex items-center gap-1">Manage <i data-lucide="chevron-down" class="lucide"></i></a>
+      </nav>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="relative">
+        <i data-lucide="search" class="lucide absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <input class="h-8 w-64 rounded-md border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-slate-300" placeholder="Search companies…" />
+      </div>
+      <div class="avatar avatar-c1">JS</div>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== APPLICATION CARD ===================== -->
+<div class="bg-white">
+  <div class="page-cap pt-5 pb-4 flex items-start gap-4">
+    <div class="h-14 w-14 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-700 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">a</div>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2 flex-wrap">
+        <h1 class="text-lg font-bold">agapyo</h1>
+        <span class="text-slate-400 text-sm">·</span>
+        <a href="#" class="text-sm text-slate-500 hover:text-slate-700">agapyo.com</a>
+        <span class="ml-2 inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-cyan-50 border border-cyan-200 text-cyan-800">Sustainable Materials</span>
+        <button class="text-slate-400 hover:text-slate-600" title="Edit"><i data-lucide="pencil" class="lucide"></i></button>
+      </div>
+      <p class="mt-1 text-sm text-slate-600 max-w-3xl">Agapyo has invented a polymer resin that helps the plastic industry meet cost-parity, quality, and sustainability goals.</p>
+      <div class="mt-1 text-xs text-slate-500">Stage: <span class="font-medium text-slate-700">Diligence</span></div>
+    </div>
+    <div class="flex items-center gap-1.5 flex-shrink-0">
+      <button class="btn btn-icon" title="Copy share link"><i data-lucide="link-2" class="lucide-md"></i></button>
+      <button class="btn btn-icon relative" title="Recommended deals">
+        <i data-lucide="shopping-cart" class="lucide-md"></i>
+        <span class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">1</span>
+      </button>
+      <button class="btn btn-icon relative" title="My checklist">
+        <i data-lucide="list-checks" class="lucide-md"></i>
+        <span class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">8</span>
+      </button>
+      <button class="btn btn-icon" title="Open in Dealum"><div class="w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-sm flex items-center justify-center">d</div></button>
+    </div>
+  </div>
+
+  </div>
+</div>
+
+<!-- ===================== STICKY TABS + ACTIONS ===================== -->
+<div class="sticky top-[52px] z-20 bg-white border-y border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,.03)]">
+  <div class="page-cap flex items-center justify-between">
+    <div class="flex items-center gap-7">
+      <a class="h-12 inline-flex items-center gap-2 text-sm tab-idle">Application</a>
+      <a class="h-12 inline-flex items-center gap-2 text-sm tab-active">Diligence</a>
+      <a class="h-12 inline-flex items-center gap-2 text-sm tab-idle">
+        <i data-lucide="bot" class="lucide-md"></i>Ask the AI
+      </a>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <button class="btn" title="Provision Diligence Team"><i data-lucide="layout-grid" class="lucide-md"></i><span class="hidden xl:inline">Provision</span></button>
+      <div class="flex relative">
+        <button class="btn btn-split-l" title="View Team"><i data-lucide="users" class="lucide-md"></i>Team</button>
+        <button class="btn btn-split-r" title="Team menu" onclick="togglePopover('team-menu', event)"><i data-lucide="chevron-down" class="lucide"></i></button>
+        <div id="team-menu" class="pop hidden" style="top:36px; right:0;">
+          <div class="pop-item"><i data-lucide="users" class="lucide"></i>View team</div>
+          <div class="pop-item"><i data-lucide="mail" class="lucide"></i>Email team</div>
+        </div>
+      </div>
+      <a class="btn" href="#" title="Open Diligence Folder in Drive"><i data-lucide="folder" class="lucide-md"></i>Folder</a>
+      <div class="flex relative">
+        <button class="btn btn-split-l btn-primary" title="Generate report from latest section drafts"><i data-lucide="file-text" class="lucide-md"></i>Report</button>
+        <button class="btn btn-split-r btn-primary" title="Report menu" onclick="togglePopover('report-menu', event)"><i data-lucide="chevron-down" class="lucide" style="color:white"></i></button>
+        <div id="report-menu" class="pop hidden" style="top:36px; right:0;">
+          <div class="pop-item"><i data-lucide="refresh-cw" class="lucide"></i>Update report</div>
+          <div class="pop-item"><i data-lucide="file-text" class="lucide"></i>View report</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== BODY ===================== -->
+<div class="page-cap" style="padding-left:0; padding-right:0;">
+<div class="flex w-full" id="body-grid" style="background:white;">
+
+  <!-- ───── WORK AREA ───── -->
+  <div class="flex-1 min-w-0">
+
+    <div class="px-6 pt-3 pb-2 text-[11px] text-slate-400 italic flex items-center gap-2">
+      <i data-lucide="mouse-pointer-click" class="lucide"></i>
+      Interactive — click any section header to expand. Click the <code class="px-1 bg-slate-100 rounded">»</code> in a panel header to collapse it.
+    </div>
+
+    <div id="sections" class="border-t border-slate-200">
+
+      <!-- ───── Investment Offer ───── -->
+      <div class="section" data-section="offer">
+        <div class="sec-header" onclick="toggleSection('offer')">
+          <i data-lucide="chevron-right" class="lucide chev"></i>
+          <span class="sec-title">Investment Offer</span>
+          <div class="sec-pills">
+            <span class="pill-person lead" title="Drag to reorder. The first person leads this section."><i data-lucide="grip-vertical" class="lucide grip"></i><span>Jordan S.</span><button class="mail" title="Email Jordan"><i data-lucide="mail" style="width:11px;height:11px;"></i></button><button class="x" title="Remove"><i data-lucide="x" style="width:11px;height:11px;"></i></button></span>
+            <button class="text-slate-400 hover:text-slate-600 p-1" title="Add owner" onclick="event.stopPropagation();"><i data-lucide="plus-circle" class="lucide"></i></button>
+          </div>
+          <div class="sec-actions">
+            <button class="btn-ghost btn btn-icon" title="Section notes" onclick="event.stopPropagation();"><i data-lucide="message-square" class="lucide-md"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ───── Market ───── -->
+      <div class="section" data-section="market">
+        <div class="sec-header" onclick="toggleSection('market')">
+          <i data-lucide="chevron-right" class="lucide chev"></i>
+          <span class="sec-title">Market</span>
+          <div class="sec-pills">
+            <span class="pill-person lead" title="Lead — drag to reorder"><i data-lucide="grip-vertical" class="lucide grip"></i><span>Devon T.</span><button class="mail"><i data-lucide="mail" style="width:11px;height:11px;"></i></button><button class="x"><i data-lucide="x" style="width:11px;height:11px;"></i></button></span>
+            <span class="pill-person" title="Drag to reorder"><i data-lucide="grip-vertical" class="lucide grip"></i><span>Susan W.</span><button class="x"><i data-lucide="x" style="width:11px;height:11px;"></i></button></span>
+            <span class="pill-person" title="Drag to reorder"><i data-lucide="grip-vertical" class="lucide grip"></i><span>Kenny D.</span><button class="x"><i data-lucide="x" style="width:11px;height:11px;"></i></button></span>
+            <button class="text-slate-400 hover:text-slate-600 p-1" title="Add person" onclick="event.stopPropagation();"><i data-lucide="plus-circle" class="lucide"></i></button>
+          </div>
+          <div class="sec-actions">
+            <span class="inline-flex items-center gap-1 text-[12px] text-emerald-600 font-medium px-1" title="Approved by Devon T."><i data-lucide="check" class="lucide" style="width:13px;height:13px;"></i>Approved</span>
+            <button class="btn-ghost btn btn-icon" title="Section notes (3)" onclick="event.stopPropagation();"><i data-lucide="message-square" class="lucide-md"></i><span class="text-[10px] font-bold text-slate-500">3</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ───── Technology — OPEN ───── -->
+      <div class="section is-open" data-section="tech">
+        <div class="sec-header is-open" onclick="toggleSection('tech')">
+          <i data-lucide="chevron-down" class="lucide chev"></i>
+          <span class="sec-title">Technology</span>
+          <div class="sec-pills">
+            <span class="pill-person lead" title="Lead — drag to reorder"><i data-lucide="grip-vertical" class="lucide grip"></i><span>Jordan S.</span><button class="mail"><i data-lucide="mail" style="width:11px;height:11px;"></i></button><button class="x"><i data-lucide="x" style="width:11px;height:11px;"></i></button></span>
+            <span class="pill-person" title="Drag to reorder"><i data-lucide="grip-vertical" class="lucide grip"></i><span>Devon T.</span><button class="x"><i data-lucide="x" style="width:11px;height:11px;"></i></button></span>
+            <span class="pill-person" title="Drag to reorder"><i data-lucide="grip-vertical" class="lucide grip"></i><span>Maria A.</span><button class="x"><i data-lucide="x" style="width:11px;height:11px;"></i></button></span>
+            <button class="text-slate-400 hover:text-slate-600 p-1" title="Add person" onclick="event.stopPropagation();"><i data-lucide="plus-circle" class="lucide"></i></button>
+          </div>
+          <div class="sec-actions">
+            <!-- Presence: stacked avatars + popover (open by default in mockup) -->
+            <div class="relative" onclick="event.stopPropagation();">
+              <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-slate-200/60" title="2 people viewing now — click to see who" onclick="togglePopover('presence-tech', event)">
+                <div class="avatar-stack flex items-center">
+                  <div class="avatar avatar-sm avatar-c2">DT</div>
+                  <div class="avatar avatar-sm avatar-c3">MA</div>
+                </div>
+              </button>
+              <div id="presence-tech" class="pop" style="top:34px; right:0; min-width:240px;">
+                <div class="px-2 pt-1.5 pb-2 text-[11px] uppercase tracking-wider text-slate-500 font-bold">Editing now</div>
+                <div class="pop-item"><div class="avatar avatar-sm avatar-c2">DT</div><div><div class="text-[12.5px] font-medium">Devon Thompson</div><div class="text-[10.5px] text-slate-500">Editing scratchpad · cursor on line 5</div></div></div>
+                <div class="pop-item"><div class="avatar avatar-sm avatar-c3">MA</div><div><div class="text-[12.5px] font-medium">Maria Alvarez</div><div class="text-[10.5px] text-slate-500">Viewing · idle 32s</div></div></div>
+              </div>
+            </div>
+            <button class="inline-flex items-center gap-1 px-2 py-1 rounded text-[12px] text-slate-500 hover:text-slate-900 hover:bg-slate-200/60" title="Mark this section approved" onclick="event.stopPropagation();">
+              <i data-lucide="circle" class="lucide" style="width:13px;height:13px;"></i>Approve
+            </button>
+            <button class="btn-ghost btn btn-icon" title="Section notes" onclick="event.stopPropagation();"><i data-lucide="message-square" class="lucide-md"></i></button>
+          </div>
+        </div>
+
+        <!-- BODY -->
+        <div class="sec-body">
+          <div class="sec-subtabs">
+            <a class="sec-subtab tab-idle" onclick="switchSubtab('tech','instructions')" data-subtab="tech-instructions">Instructions</a>
+            <a class="sec-subtab tab-active" onclick="switchSubtab('tech','scratchpad')" data-subtab="tech-scratchpad">Scratchpad</a>
+            <a class="sec-subtab tab-idle" onclick="switchSubtab('tech','report')" data-subtab="tech-report">Report</a>
+          </div>
+
+          <!-- Instructions -->
+          <div data-pane="tech-instructions" class="hidden px-6 py-5 max-w-3xl">
+            <p class="text-[14px] leading-6 text-slate-700">Evaluate the company's product and technology. Confirm the underlying tech is sound and sufficiently de-risked for the company's stage. Look for: defensibility (IP, know-how), readiness (TRL / MRL), reliability under real-world conditions, and the team's ability to continue building.</p>
+            <p class="text-[14px] leading-6 text-slate-700 mt-3">Don't pad — flag the 2–3 things that would change a reasonable investor's mind, not everything you noticed.</p>
+          </div>
+
+          <!-- Scratchpad -->
+          <div data-pane="tech-scratchpad" class="block">
+            <div class="tt-toolbar">
+              <button class="tt-btn" title="Undo"><i data-lucide="undo-2" class="lucide-md"></i></button>
+              <button class="tt-btn" title="Redo"><i data-lucide="redo-2" class="lucide-md"></i></button>
+              <span class="tt-divider"></span>
+              <button class="tt-btn is-active" title="Bold (⌘B)"><i data-lucide="bold" class="lucide-md"></i></button>
+              <button class="tt-btn" title="Italic (⌘I)"><i data-lucide="italic" class="lucide-md"></i></button>
+              <button class="tt-btn" title="Underline (⌘U)"><i data-lucide="underline" class="lucide-md"></i></button>
+              <button class="tt-btn" title="Strikethrough"><i data-lucide="strikethrough" class="lucide-md"></i></button>
+              <span class="tt-divider"></span>
+              <button class="tt-btn" title="Heading 1"><i data-lucide="heading-1" class="lucide-md"></i></button>
+              <button class="tt-btn" title="Heading 2"><i data-lucide="heading-2" class="lucide-md"></i></button>
+              <span class="tt-divider"></span>
+              <button class="tt-btn" title="Bullet list"><i data-lucide="list" class="lucide-md"></i></button>
+              <button class="tt-btn" title="Numbered list"><i data-lucide="list-ordered" class="lucide-md"></i></button>
+              <button class="tt-btn" title="Quote"><i data-lucide="quote" class="lucide-md"></i></button>
+              <button class="tt-btn" title="Code"><i data-lucide="code" class="lucide-md"></i></button>
+              <span class="tt-divider"></span>
+              <button class="tt-btn" title="Link"><i data-lucide="link" class="lucide-md"></i></button>
+              <div class="flex-1"></div>
+              <span class="text-[10.5px] text-slate-400 italic mr-1" title="Saves debounce ~3s after last keystroke; status updates every minute.">Saved 12s ago</span>
+            </div>
+
+            <div class="tt-body">
+              <p>Stack is mostly proven components — ROS2 + Nav2 on the controller, custom firmware for the gripper. CTO walked me through the safety-stop architecture: redundant sensors, dual-loop verification, ISO 13849 PLd target.</p>
+              <h2>Open questions</h2>
+              <ul>
+                <li>Failover behavior if the LIDAR drops out mid-task. Devon to follow up.</li>
+                <li>Confirm IP position — are the ML models trained in-house or fine-tuned from a vendor base?<span class="tt-cursor"></span><span class="tt-author-tag">Devon</span></li>
+              </ul>
+              <p>One concrete green flag: a recent customer ran the system in a refrigerated facility for 6 weeks straight with no manual intervention.</p>
+            </div>
+            <div class="tt-resize-affordance" title="Drag the bottom edge to resize">
+              <i data-lucide="grip-horizontal" class="lucide" style="opacity:.6;"></i>
+            </div>
+          </div>
+
+          <!-- Report -->
+          <div data-pane="tech-report" class="hidden">
+            <!-- Mode switcher — centered, prominent -->
+            <div class="px-6 pt-6 pb-3 flex flex-col items-center gap-2">
+              <div class="mode-switcher" role="tablist" aria-label="Report mode">
+                <button class="is-active" onclick="switchMode(this)" title="Use the AI to draft this section from scratch">
+                  <i data-lucide="sparkles" class="lucide-md"></i>Create from scratch
+                </button>
+                <!-- Iterate hidden because no draft exists yet -->
+                <button onclick="switchMode(this)" title="Write manually with no AI assistance">
+                  <i data-lucide="pen-line" class="lucide-md"></i>Blank slate
+                </button>
+              </div>
+              <span class="text-[11px] text-slate-400 italic">No draft yet — Iterate becomes available after the first generation.</span>
+            </div>
+
+            <div class="px-6 py-4 space-y-5">
+              <p class="text-[13px] text-slate-500 italic">The Diligence Assistant will draft from the application data, the documents in this section, and the section scratchpads. Use the scales below to guide its analysis.</p>
+
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-5 bg-slate-50 border border-slate-100 rounded-lg p-5">
+                <div class="space-y-1.5">
+                  <div class="flex justify-between items-center"><label class="text-[13px] font-semibold">Addresses a real, important problem</label><span class="text-xs font-bold bg-white border border-slate-200 rounded px-1.5 py-0.5">9</span></div>
+                  <div class="slider-track"><div class="slider-thumb" style="left:88%"></div></div>
+                  <div class="flex justify-between text-[10px] uppercase tracking-wider font-bold text-slate-500"><span>Disagree</span><span>Agree</span></div>
+                </div>
+                <div class="space-y-1.5">
+                  <div class="flex justify-between items-center"><label class="text-[13px] font-semibold">Product / tech sufficiently de-risked for stage</label><span class="text-xs font-bold bg-white border border-slate-200 rounded px-1.5 py-0.5">6</span></div>
+                  <div class="slider-track"><div class="slider-thumb" style="left:58%"></div></div>
+                  <div class="flex justify-between text-[10px] uppercase tracking-wider font-bold text-slate-500"><span>Disagree</span><span>Agree</span></div>
+                </div>
+                <div class="space-y-1.5">
+                  <div class="flex justify-between items-center"><label class="text-[13px] font-semibold">Clear customer interest / early traction</label><span class="text-xs font-bold bg-white border border-slate-200 rounded px-1.5 py-0.5">9</span></div>
+                  <div class="slider-track"><div class="slider-thumb" style="left:88%"></div></div>
+                  <div class="flex justify-between text-[10px] uppercase tracking-wider font-bold text-slate-500"><span>Disagree</span><span>Agree</span></div>
+                </div>
+                <div class="space-y-1.5">
+                  <div class="flex justify-between items-center"><label class="text-[13px] font-semibold">Business model / financial path plausible</label><span class="text-xs font-bold bg-white border border-slate-200 rounded px-1.5 py-0.5">7</span></div>
+                  <div class="slider-track"><div class="slider-thumb" style="left:68%"></div></div>
+                  <div class="flex justify-between text-[10px] uppercase tracking-wider font-bold text-slate-500"><span>Disagree</span><span>Agree</span></div>
+                </div>
+                <div class="space-y-1.5 lg:col-span-2">
+                  <div class="flex justify-between items-center"><label class="text-[13px] font-semibold">Overall opportunity compelling vs. risks identified</label><span class="text-xs font-bold bg-white border border-slate-200 rounded px-1.5 py-0.5">9</span></div>
+                  <div class="slider-track"><div class="slider-thumb" style="left:88%"></div></div>
+                  <div class="flex justify-between text-[10px] uppercase tracking-wider font-bold text-slate-500"><span>Disagree</span><span>Agree</span></div>
+                </div>
+              </div>
+
+              <div class="flex justify-end items-center gap-2">
+                <button class="btn" title="Edit the prompt template for this section"><i data-lucide="settings-2" class="lucide-md"></i>Edit prompt</button>
+                <div class="flex relative">
+                  <button class="btn btn-split-l btn-primary" title="Run the AI to draft this section"><i data-lucide="sparkles" class="lucide-md"></i>Generate draft</button>
+                  <button class="btn btn-split-r btn-primary" title="Generation options" onclick="togglePopover('gen-menu', event)"><i data-lucide="chevron-down" class="lucide" style="color:white"></i></button>
+                  <div id="gen-menu" class="pop hidden" style="top:34px; right:0;">
+                    <div class="pop-item"><i data-lucide="git-compare" class="lucide"></i>Compare models…</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ───── Business Model ───── -->
+      <div class="section" data-section="biz">
+        <div class="sec-header" onclick="toggleSection('biz')">
+          <i data-lucide="chevron-right" class="lucide chev"></i>
+          <span class="sec-title">Business Model</span>
+          <div class="sec-pills">
+            <span class="pill-person lead" title="Lead — drag to reorder"><i data-lucide="grip-vertical" class="lucide grip"></i><span>Susan W.</span><button class="mail"><i data-lucide="mail" style="width:11px;height:11px;"></i></button><button class="x"><i data-lucide="x" style="width:11px;height:11px;"></i></button></span>
+            <span class="pill-person" title="Drag to reorder"><i data-lucide="grip-vertical" class="lucide grip"></i><span>Kenny D.</span><button class="x"><i data-lucide="x" style="width:11px;height:11px;"></i></button></span>
+            <button class="text-slate-400 hover:text-slate-600 p-1" title="Add person" onclick="event.stopPropagation();"><i data-lucide="plus-circle" class="lucide"></i></button>
+          </div>
+          <div class="sec-actions">
+            <button class="inline-flex items-center gap-1 px-2 py-1 rounded text-[12px] text-slate-500 hover:text-slate-900 hover:bg-slate-200/60" title="Mark approved" onclick="event.stopPropagation();"><i data-lucide="circle" class="lucide" style="width:13px;height:13px;"></i>Approve</button>
+            <button class="btn-ghost btn btn-icon" title="Section notes" onclick="event.stopPropagation();"><i data-lucide="message-square" class="lucide-md"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ───── Customer Interest — empty owner ───── -->
+      <div class="section" data-section="cust">
+        <div class="sec-header" onclick="toggleSection('cust')">
+          <i data-lucide="chevron-right" class="lucide chev"></i>
+          <span class="sec-title">Customer Interest</span>
+          <div class="sec-pills">
+            <span class="owner-empty">Owner: <button class="text-slate-400 hover:text-slate-600 p-1" title="Assign owner" onclick="event.stopPropagation();"><i data-lucide="plus-circle" class="lucide"></i></button></span>
+          </div>
+          <div class="sec-actions">
+            <button class="inline-flex items-center gap-1 px-2 py-1 rounded text-[12px] text-slate-500 hover:text-slate-900 hover:bg-slate-200/60" title="Mark approved" onclick="event.stopPropagation();"><i data-lucide="circle" class="lucide" style="width:13px;height:13px;"></i>Approve</button>
+            <button class="btn-ghost btn btn-icon" title="Section notes" onclick="event.stopPropagation();"><i data-lucide="message-square" class="lucide-md"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ───── Sources ───── -->
+      <div class="section" data-section="sources">
+        <div class="sec-header" onclick="toggleSection('sources')">
+          <i data-lucide="chevron-right" class="lucide chev"></i>
+          <span class="sec-title">Sources</span>
+          <div class="sec-pills">
+            <span class="owner-empty">Owner: <button class="text-slate-400 hover:text-slate-600 p-1" title="Assign owner" onclick="event.stopPropagation();"><i data-lucide="plus-circle" class="lucide"></i></button></span>
+          </div>
+          <div class="sec-actions">
+            <button class="btn-ghost btn btn-icon" title="Section notes" onclick="event.stopPropagation();"><i data-lucide="message-square" class="lucide-md"></i></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ───── RIGHT PANELS ───── -->
+  <!-- Order: Supporting Documents (inside, next to work area) → Meeting Notes (outside) -->
+  <div id="right-rail" class="flex" style="min-height:600px; flex-direction:row-reverse;">
+
+    <!-- Meeting Notes (outer / right-most after row-reverse) -->
+    <div id="panel-notes" class="panel" style="width:300px; min-width:280px;">
+      <div class="flex items-center justify-between px-4 py-2.5 border-b border-slate-200">
+        <div class="flex items-center gap-2">
+          <i data-lucide="notebook-pen" class="lucide-md text-slate-500"></i>
+          <span class="text-sm font-semibold">Meeting Notes</span>
+          <span class="text-xs text-slate-400">3</span>
+        </div>
+        <div class="flex items-center gap-0.5">
+          <button class="btn-ghost btn btn-icon" title="New meeting note"><i data-lucide="plus" class="lucide-md"></i></button>
+          <button class="btn-ghost btn btn-icon" title="Hide Meeting Notes panel" onclick="collapsePanel('notes')"><i data-lucide="chevrons-right" class="lucide-md"></i></button>
+        </div>
+      </div>
+      <div class="px-2 py-2 space-y-0.5 overflow-auto scrollbar-thin">
+        <div class="mn-row" onclick="alert('Would window.open() the meeting note in a popout — see scene further down.')">
+          <div class="min-w-0 flex-1">
+            <div class="mn-title">Initial founder call</div>
+            <div class="mn-date">May 2, 2026</div>
+          </div>
+          <div class="row-action relative">
+            <button class="btn-ghost btn btn-icon" title="More actions" onclick="event.stopPropagation(); togglePopover('mn-kebab-1', event)"><i data-lucide="more-horizontal" class="lucide-md"></i></button>
+            <div id="mn-kebab-1" class="pop hidden" style="top:34px; right:0;">
+              <div class="pop-item"><i data-lucide="pencil" class="lucide"></i>Rename / change date</div>
+              <div class="pop-item"><i data-lucide="external-link" class="lucide"></i>Open in new window</div>
+              <div class="pop-divider"></div>
+              <div class="pop-item pop-item-danger"><i data-lucide="trash-2" class="lucide"></i>Delete note</div>
+            </div>
+          </div>
+        </div>
+        <div class="mn-row">
+          <div class="min-w-0 flex-1">
+            <div class="mn-title">Tech deep-dive with CTO</div>
+            <div class="mn-date">Apr 28, 2026</div>
+          </div>
+          <div class="row-action">
+            <button class="btn-ghost btn btn-icon" title="More actions" onclick="event.stopPropagation();"><i data-lucide="more-horizontal" class="lucide-md"></i></button>
+          </div>
+        </div>
+        <div class="mn-row">
+          <div class="min-w-0 flex-1">
+            <div class="mn-title">Customer reference — Beta Co.</div>
+            <div class="mn-date">Apr 22, 2026</div>
+          </div>
+          <div class="row-action">
+            <button class="btn-ghost btn btn-icon" title="More actions" onclick="event.stopPropagation();"><i data-lucide="more-horizontal" class="lucide-md"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-notes-rail" class="panel panel-collapsed hidden flex flex-col items-center justify-between py-3 border-l border-slate-200" onclick="expandPanel('notes')" title="Open Meeting Notes">
+      <i data-lucide="chevron-left" class="lucide-md text-slate-500"></i>
+      <span class="panel-rail-text">Meeting Notes</span>
+      <span class="sliver-badge sliver-badge-emerald" title="3 notes">3</span>
+      <i data-lucide="notebook-pen" class="lucide-md text-slate-500"></i>
+    </div>
+
+    <!-- Supporting Documents -->
+    <div id="panel-docs" class="panel" style="width:340px; min-width:320px;">
+      <div class="flex items-center justify-between px-4 py-2.5 border-b border-slate-200">
+        <div class="flex items-center gap-2">
+          <i data-lucide="files" class="lucide-md text-slate-500"></i>
+          <span class="text-sm font-semibold">Supporting Documents</span>
+          <span class="text-xs text-slate-400">22</span>
+        </div>
+        <div class="flex items-center gap-0.5">
+          <button class="btn-ghost btn btn-icon" title="Upload file"><i data-lucide="upload" class="lucide-md"></i></button>
+          <button class="btn-ghost btn btn-icon" title="Hide Supporting Documents panel" onclick="collapsePanel('docs')"><i data-lucide="chevrons-right" class="lucide-md"></i></button>
+        </div>
+      </div>
+      <div class="px-3 py-2 text-[11.5px] text-slate-500 leading-snug border-b border-slate-100">
+        Documents added here are searchable by the AI. When it drafts a section, it pulls the most relevant pieces — you don't need to attach them to a specific section.
+      </div>
+      <div class="px-2 py-2 space-y-0.5 overflow-auto scrollbar-thin">
+        <!-- Row 1: kebab open by default to expose menu -->
+        <div class="doc-row row-open">
+          <i data-lucide="file" class="lucide-md text-orange-500"></i>
+          <div class="min-w-0">
+            <div class="doc-name" title="Slides for E8 Deep Dive.pptx">Slides for E8 Deep Dive.pptx</div>
+            <div class="doc-sub">Company-provided · Devon T.</div>
+          </div>
+          <span class="doc-date">Mar 19</span>
+          <div class="row-action relative">
+            <button class="btn-ghost btn btn-icon" title="More actions" onclick="event.stopPropagation(); togglePopover('doc-kebab-1', event)"><i data-lucide="more-horizontal" class="lucide-md"></i></button>
+            <div id="doc-kebab-1" class="pop" style="top:34px; right:0;">
+              <div class="pop-item"><i data-lucide="eye" class="lucide"></i>Open document</div>
+              <div class="pop-item"><i data-lucide="sparkles" class="lucide"></i>Preview AI summary</div>
+              <div class="pop-item"><i data-lucide="external-link" class="lucide"></i>Open in Drive</div>
+              <div class="pop-item"><i data-lucide="pencil" class="lucide"></i>Edit name &amp; type</div>
+              <div class="pop-item"><i data-lucide="download" class="lucide"></i>Download</div>
+              <div class="pop-divider"></div>
+              <div class="pop-item pop-item-danger"><i data-lucide="trash-2" class="lucide"></i>Delete</div>
+            </div>
+          </div>
+        </div>
+        <div class="doc-row">
+          <i data-lucide="table" class="lucide-md text-emerald-600"></i>
+          <div class="min-w-0">
+            <div class="doc-name" title="Cost & Mass Balance March 13 2026.xlsx">Cost &amp; Mass Balance March 13 2026.xlsx</div>
+            <div class="doc-sub">Financial spreadsheet · Devon T.</div>
+          </div>
+          <span class="doc-date">Mar 19</span>
+          <div class="row-action"><button class="btn-ghost btn btn-icon" title="More actions" onclick="event.stopPropagation();"><i data-lucide="more-horizontal" class="lucide-md"></i></button></div>
+        </div>
+        <div class="doc-row">
+          <i data-lucide="file-text" class="lucide-md text-rose-600"></i>
+          <div class="min-w-0">
+            <div class="doc-name" title="Pitch Deck.pdf">Pitch Deck.pdf</div>
+            <div class="doc-sub">System · Auto-imported</div>
+          </div>
+          <span class="doc-date">Mar 19</span>
+          <div class="row-action"><button class="btn-ghost btn btn-icon" title="More actions" onclick="event.stopPropagation();"><i data-lucide="more-horizontal" class="lucide-md"></i></button></div>
+        </div>
+        <div class="doc-row">
+          <i data-lucide="file-text" class="lucide-md text-blue-600"></i>
+          <div class="min-w-0">
+            <div class="doc-name" title="Key Insights — Agapyo Internal Call (March 20).docx">Key Insights — Agapyo Internal Call (March 20).docx</div>
+            <div class="doc-sub">Meeting notes · Jordan S.</div>
+          </div>
+          <span class="doc-date">Mar 25</span>
+          <div class="row-action"><button class="btn-ghost btn btn-icon" title="More actions" onclick="event.stopPropagation();"><i data-lucide="more-horizontal" class="lucide-md"></i></button></div>
+        </div>
+        <div class="doc-row">
+          <i data-lucide="file-text" class="lucide-md text-blue-600"></i>
+          <div class="min-w-0">
+            <div class="doc-name" title="Notes from the Costing call with Agapyo March 27.docx">Notes from the Costing call with Agapyo March 27.docx</div>
+            <div class="doc-sub">Meeting notes · Susan W.</div>
+          </div>
+          <span class="doc-date">Mar 29</span>
+          <div class="row-action"><button class="btn-ghost btn btn-icon" title="More actions" onclick="event.stopPropagation();"><i data-lucide="more-horizontal" class="lucide-md"></i></button></div>
+        </div>
+        <div class="doc-row">
+          <i data-lucide="table" class="lucide-md text-emerald-600"></i>
+          <div class="min-w-0">
+            <div class="doc-name" title="Agapyo DD — marketplace competition analysis.xlsx">Agapyo DD — marketplace competition analysis.xlsx</div>
+            <div class="doc-sub">Competitor spreadsheet · Kenny D.</div>
+          </div>
+          <span class="doc-date">Apr 2</span>
+          <div class="row-action"><button class="btn-ghost btn btn-icon" title="More actions" onclick="event.stopPropagation();"><i data-lucide="more-horizontal" class="lucide-md"></i></button></div>
+        </div>
+        <div class="doc-row">
+          <i data-lucide="file-text" class="lucide-md text-rose-600"></i>
+          <div class="min-w-0">
+            <div class="doc-name" title="CA3164516A1.pdf">CA3164516A1.pdf</div>
+            <div class="doc-sub">Technology patent · Devon T.</div>
+          </div>
+          <span class="doc-date">Apr 5</span>
+          <div class="row-action"><button class="btn-ghost btn btn-icon" title="More actions" onclick="event.stopPropagation();"><i data-lucide="more-horizontal" class="lucide-md"></i></button></div>
+        </div>
+        <div class="text-[11.5px] text-slate-400 italic px-2 pt-2">15 more · drag a file onto this panel to upload</div>
+      </div>
+    </div>
+
+    <div id="panel-docs-rail" class="panel panel-collapsed hidden flex flex-col items-center justify-between py-3 border-l border-slate-200" onclick="expandPanel('docs')" title="Open Supporting Documents">
+      <i data-lucide="chevron-left" class="lucide-md text-slate-500"></i>
+      <span class="panel-rail-text">Supporting Docs</span>
+      <span class="sliver-badge sliver-badge-blue" title="22 documents">22</span>
+      <i data-lucide="files" class="lucide-md text-slate-500"></i>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ===================== POPOUT WINDOW SCENE ===================== -->
+<div class="bg-slate-50 border-t border-slate-200 mt-4">
+  <div class="page-cap py-8">
+    <div class="text-[11px] uppercase tracking-widest text-slate-500 font-bold mb-3">Reference scene · Meeting note popout window</div>
+    <div class="mx-auto rounded-lg border border-slate-200 bg-white shadow-lg" style="width:880px; max-width:100%; height:520px; display:flex; flex-direction:column;">
+      <div class="h-9 bg-slate-100 rounded-t-lg flex items-center px-3 gap-2 border-b border-slate-200">
+        <span class="w-3 h-3 rounded-full bg-rose-400"></span>
+        <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+        <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+        <span class="text-[11px] text-slate-600 ml-2">agapyo · Initial founder call</span>
+      </div>
+      <div class="px-6 py-4 border-b border-slate-200 flex items-end justify-between gap-4">
+        <div class="space-y-1 flex-1 min-w-0">
+          <input value="Initial founder call" class="text-lg font-bold w-full bg-transparent outline-none border-b border-transparent focus:border-slate-300" />
+          <div class="flex items-center gap-3 text-xs text-slate-500">
+            <span class="inline-flex items-center gap-1.5"><i data-lucide="calendar" class="lucide"></i><input type="date" value="2026-05-02" class="bg-transparent outline-none border border-slate-200 rounded px-1.5 py-0.5" /></span>
+            <span class="text-slate-400 italic">Saved 8s ago</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="avatar-stack flex items-center" title="2 viewing — click to see who">
+            <div class="avatar avatar-sm avatar-c1">JS</div>
+            <div class="avatar avatar-sm avatar-c4">DT</div>
+          </div>
+        </div>
+      </div>
+      <div class="tt-toolbar">
+        <button class="tt-btn" title="Undo"><i data-lucide="undo-2" class="lucide-md"></i></button>
+        <button class="tt-btn" title="Redo"><i data-lucide="redo-2" class="lucide-md"></i></button>
+        <span class="tt-divider"></span>
+        <button class="tt-btn" title="Bold"><i data-lucide="bold" class="lucide-md"></i></button>
+        <button class="tt-btn" title="Italic"><i data-lucide="italic" class="lucide-md"></i></button>
+        <button class="tt-btn" title="Underline"><i data-lucide="underline" class="lucide-md"></i></button>
+        <span class="tt-divider"></span>
+        <button class="tt-btn" title="Heading 1"><i data-lucide="heading-1" class="lucide-md"></i></button>
+        <button class="tt-btn" title="Heading 2"><i data-lucide="heading-2" class="lucide-md"></i></button>
+        <span class="tt-divider"></span>
+        <button class="tt-btn" title="Bullet list"><i data-lucide="list" class="lucide-md"></i></button>
+        <button class="tt-btn" title="Numbered list"><i data-lucide="list-ordered" class="lucide-md"></i></button>
+        <button class="tt-btn" title="Quote"><i data-lucide="quote" class="lucide-md"></i></button>
+        <span class="tt-divider"></span>
+        <button class="tt-btn" title="Link"><i data-lucide="link" class="lucide-md"></i></button>
+      </div>
+      <div class="tt-body flex-1 overflow-auto" style="resize:none; max-height:none;">
+        <p><strong>Attendees:</strong> Jordan, Devon, Maria (CEO), Liam (CTO)</p>
+        <p>Maria walked through the founder story — left a research role at MIT in 2023 to commercialize the warehouse-handling stack she'd been working on. Liam joined from Boston Dynamics in early 2024.</p>
+        <ul>
+          <li>~$1.4M ARR, growing 15% MoM since pilot conversion in Q1.</li>
+          <li>Two LOIs in the pipeline that could roughly double ARR if signed by Q3.</li>
+        </ul>
+        <p>Next step: schedule reference calls with the two pilot customers; Devon to coordinate.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="text-center text-xs text-slate-500 py-6">
+  Static interactive mockup — no backend wiring. Plan: <a class="underline text-blue-600" href="../plans/diligence-tab-redesign.md">docs/plans/diligence-tab-redesign.md</a>
+</footer>
+
+<script>
+  function toggleSection(id) {
+    const sections = document.querySelectorAll('#sections .section');
+    const target = document.querySelector(`.section[data-section="${id}"]`);
+    const wasOpen = target.classList.contains('is-open');
+    sections.forEach(s => {
+      s.classList.remove('is-open');
+      const h = s.querySelector('.sec-header'); h.classList.remove('is-open');
+      const chev = h.querySelector('.chev'); chev.setAttribute('data-lucide', 'chevron-right');
+      const body = s.querySelector('.sec-body'); if (body) body.style.display = 'none';
+    });
+    if (!wasOpen) {
+      target.classList.add('is-open');
+      const h = target.querySelector('.sec-header'); h.classList.add('is-open');
+      const chev = h.querySelector('.chev'); chev.setAttribute('data-lucide', 'chevron-down');
+      const body = target.querySelector('.sec-body'); if (body) body.style.display = '';
+    }
+    lucide.createIcons();
+  }
+
+  function switchSubtab(sectionId, name) {
+    const tabs = document.querySelectorAll(`[data-subtab^="${sectionId}-"]`);
+    tabs.forEach(t => {
+      const isActive = t.dataset.subtab === `${sectionId}-${name}`;
+      t.classList.toggle('tab-active', isActive);
+      t.classList.toggle('tab-idle', !isActive);
+    });
+    const panes = document.querySelectorAll(`[data-pane^="${sectionId}-"]`);
+    panes.forEach(p => p.classList.toggle('hidden', p.dataset.pane !== `${sectionId}-${name}`));
+  }
+
+  function switchMode(btn) {
+    const seg = btn.parentElement;
+    seg.querySelectorAll('button').forEach(b => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+  }
+
+  function collapsePanel(name) {
+    document.getElementById(`panel-${name}`).classList.add('hidden');
+    document.getElementById(`panel-${name}-rail`).classList.remove('hidden');
+    lucide.createIcons();
+  }
+  function expandPanel(name) {
+    document.getElementById(`panel-${name}`).classList.remove('hidden');
+    document.getElementById(`panel-${name}-rail`).classList.add('hidden');
+    lucide.createIcons();
+  }
+
+  let openPop = null;
+  function togglePopover(id, evt) {
+    if (evt) evt.stopPropagation();
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (openPop && openPop !== el) openPop.classList.add('hidden');
+    el.classList.toggle('hidden');
+    openPop = el.classList.contains('hidden') ? null : el;
+  }
+  document.addEventListener('click', () => {
+    if (openPop) { openPop.classList.add('hidden'); openPop = null; }
+  });
+
+  lucide.createIcons();
+</script>
+
+</body>
+</html>

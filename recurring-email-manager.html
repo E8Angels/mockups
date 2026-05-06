@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recurring Email Manager — UX Mockup</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .screen { display: none; animation: fadeIn 0.15s ease-in; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .nav-screen-indicator { position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
+  .nav-screen-indicator .inner { max-width: 1600px; margin: 0 auto; padding: 8px 16px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .mock-input { font-size: 13px; height: 30px; padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: white; }
+  .mock-input:focus { outline: 2px solid #2563eb; outline-offset: -1px; }
+  .mock-input.short { width: 150px; }
+  .mock-input.medium { width: 280px; }
+  .mock-input.full { width: 100%; }
+  .mock-select { font-size: 13px; height: 30px; padding: 4px 24px 4px 8px; border: 1px solid #cbd5e1; border-radius: 6px; background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%2364748b" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>') no-repeat right 6px center; appearance: none; }
+  .mock-label { font-size: 13px; color: #334155; font-weight: 500; }
+  .mock-help { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .mock-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 9999px; }
+  .pill-green { background: #dcfce7; color: #166534; }
+  .pill-amber { background: #fef3c7; color: #92400e; }
+  .pill-red { background: #fee2e2; color: #991b1b; }
+  .pill-slate { background: #f1f5f9; color: #475569; }
+  .pill-blue { background: #dbeafe; color: #1e40af; }
+  .pill-violet { background: #ede9fe; color: #5b21b6; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: #475569; font-weight: 600; padding: 8px 12px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; text-align: left; }
+  td { font-size: 13px; color: #1e293b; padding: 8px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+  tr.row-clickable:hover td { background: #f8fafc; cursor: pointer; }
+  .kbd { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 11px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; border: 1px solid #cbd5e1; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; font-size: 13px; font-weight: 500; border-radius: 6px; border: 1px solid transparent; cursor: pointer; }
+  .btn-primary { background: #0f172a; color: white; }
+  .btn-primary:hover { background: #1e293b; }
+  .btn-secondary { background: white; color: #334155; border-color: #cbd5e1; }
+  .btn-secondary:hover { background: #f8fafc; }
+  .btn-ghost { background: transparent; color: #475569; }
+  .btn-ghost:hover { background: #f1f5f9; }
+  .btn-danger { background: white; color: #dc2626; border-color: #fecaca; }
+  .btn-danger:hover { background: #fef2f2; }
+  .btn-sm { height: 28px; font-size: 12px; padding: 0 10px; }
+  .icon { width: 14px; height: 14px; flex-shrink: 0; }
+  .icon-sm { width: 12px; height: 12px; flex-shrink: 0; }
+  .form-row { display: grid; grid-template-columns: 180px 1fr; gap: 16px; align-items: start; padding: 10px 0; }
+  .form-row > label { padding-top: 7px; }
+  .form-row.multi-line > label { padding-top: 7px; }
+  .panel { background: white; border: 1px solid #e2e8f0; border-radius: 8px; }
+  .panel-pad { padding: 16px 20px; }
+  .panel-header { padding: 12px 20px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; }
+  .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #64748b; }
+  .breadcrumb a { color: #2563eb; }
+  .tab { font-size: 13px; font-weight: 500; padding: 8px 14px; border-bottom: 2px solid transparent; color: #64748b; cursor: pointer; }
+  .tab.active { color: #0f172a; border-bottom-color: #0f172a; }
+  .kebab-menu { position: absolute; right: 8px; top: 100%; z-index: 30; min-width: 180px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); padding: 4px; }
+  .kebab-item { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 6px 10px; border-radius: 4px; cursor: pointer; color: #334155; }
+  .kebab-item:hover { background: #f1f5f9; }
+  .kebab-item.danger { color: #dc2626; }
+  .kebab-item.danger:hover { background: #fef2f2; }
+  .kebab-sep { height: 1px; background: #e2e8f0; margin: 4px 0; }
+  .drawer-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 40; }
+  .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 720px; max-width: 100vw; background: white; z-index: 50; box-shadow: -10px 0 40px rgba(0,0,0,0.12); display: flex; flex-direction: column; }
+  .drawer-header { padding: 14px 20px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; }
+  .drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
+  .drawer-footer { padding: 12px 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 8px; background: #f8fafc; }
+  .preview-email { border: 1px solid #e2e8f0; border-radius: 6px; background: white; }
+  .preview-email-header { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; font-size: 12px; }
+  .preview-email-body { padding: 16px 18px; font-size: 13px; line-height: 1.6; color: #1e293b; }
+  .token { background: #fef3c7; color: #92400e; padding: 1px 4px; border-radius: 3px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .stat-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; }
+  .stat-label { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 600; letter-spacing: 0.04em; }
+  .stat-value { font-size: 22px; font-weight: 600; color: #0f172a; margin-top: 4px; }
+  .toggle { width: 32px; height: 18px; background: #cbd5e1; border-radius: 9999px; position: relative; cursor: pointer; transition: background 0.15s; }
+  .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: white; border-radius: 50%; transition: transform 0.15s; }
+  .toggle.on { background: #16a34a; }
+  .toggle.on::after { transform: translateX(14px); }
+  .empty-cap { font-size: 11px; color: #94a3b8; }
+  details > summary { cursor: pointer; list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  .conditional-block { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px 14px; margin-top: 6px; }
+  /* TipTap-ish toolbar for template editor */
+  .tt-toolbar { display: flex; gap: 1px; padding: 6px 8px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; flex-wrap: wrap; }
+  .tt-toolbar button { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 4px; border: none; background: transparent; cursor: pointer; color: #64748b; }
+  .tt-toolbar button:hover { background: #e2e8f0; color: #334155; }
+  .tt-toolbar .sep { width: 1px; height: 18px; background: #e2e8f0; margin: 5px 4px; }
+  .nav-app { background: #0f172a; color: white; padding: 0 20px; height: 48px; display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .nav-app a { padding: 6px 10px; border-radius: 4px; color: #cbd5e1; }
+  .nav-app a:hover { background: #1e293b; color: white; }
+  .nav-app a.active { color: white; background: #1e293b; }
+</style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+<!-- Screen Navigation Bar -->
+<div class="nav-screen-indicator bg-slate-900 text-white">
+  <div class="inner">
+    <span class="text-xs font-semibold text-slate-400 shrink-0 mr-2">RECURRING EMAIL MANAGER MOCKUP:</span>
+    <button onclick="showScreen('s1')" data-nav="s1" class="text-xs px-2 py-1 rounded hover:bg-slate-700 transition whitespace-nowrap">1. Entry point</button>
+    <button onclick="showScreen('s2')" data-nav="s2" class="text-xs px-2 py-1 rounded hover:bg-slate-700 transition whitespace-nowrap">2. Rules list</button>
+    <button onclick="showScreen('s3')" data-nav="s3" class="text-xs px-2 py-1 rounded hover:bg-slate-700 transition whitespace-nowrap">3. Kebab open</button>
+    <button onclick="showScreen('s4')" data-nav="s4" class="text-xs px-2 py-1 rounded hover:bg-slate-700 transition whitespace-nowrap">4. Edit rule</button>
+    <button onclick="showScreen('s5')" data-nav="s5" class="text-xs px-2 py-1 rounded hover:bg-slate-700 transition whitespace-nowrap">5. New rule</button>
+    <button onclick="showScreen('s6')" data-nav="s6" class="text-xs px-2 py-1 rounded hover:bg-slate-700 transition whitespace-nowrap">6. Cadence variants</button>
+    <button onclick="showScreen('s7')" data-nav="s7" class="text-xs px-2 py-1 rounded hover:bg-slate-700 transition whitespace-nowrap">7. Preview drawer</button>
+    <button onclick="showScreen('s8')" data-nav="s8" class="text-xs px-2 py-1 rounded hover:bg-slate-700 transition whitespace-nowrap">8. Edit template drawer</button>
+    <button onclick="showScreen('s9')" data-nav="s9" class="text-xs px-2 py-1 rounded hover:bg-slate-700 transition whitespace-nowrap">9. Run history</button>
+    <button onclick="showScreen('s10')" data-nav="s10" class="text-xs px-2 py-1 rounded hover:bg-slate-700 transition whitespace-nowrap">10. Run detail</button>
+    <button onclick="showScreen('s11')" data-nav="s11" class="text-xs px-2 py-1 rounded hover:bg-slate-700 transition whitespace-nowrap">11. Recipients</button>
+    <button onclick="showScreen('s12')" data-nav="s12" class="text-xs px-2 py-1 rounded hover:bg-slate-700 transition whitespace-nowrap">12. Run-now confirm</button>
+    <button onclick="showScreen('s13')" data-nav="s13" class="text-xs px-2 py-1 rounded hover:bg-slate-700 transition whitespace-nowrap">13. Survey rule edit</button>
+    <button onclick="showScreen('s14')" data-nav="s14" class="text-xs px-2 py-1 rounded hover:bg-slate-700 transition whitespace-nowrap">14. New cycle prompt</button>
+  </div>
+</div>
+
+<div class="pt-12">
+
+<!-- ============================================================================ -->
+<!-- SCREEN 1: Entry point — Membership dashboard with Broadcast dropdown open    -->
+<!-- ============================================================================ -->
+<div id="s1" class="screen active">
+  <div class="nav-app">
+    <a>Pipeline</a>
+    <a class="active">Membership</a>
+    <a>Funds</a>
+    <a>Diligence</a>
+    <a>Admin</a>
+    <div class="ml-auto text-xs text-slate-400">jordan@hive-mind.com</div>
+  </div>
+  <div class="max-w-[1400px] mx-auto p-6">
+    <div class="mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mockup screen 1</span>
+      <h2 class="text-base font-semibold text-slate-800 mt-1">Entry point — "Recurring Emails..." item added to existing Broadcast dropdown</h2>
+      <p class="text-sm text-slate-500 mt-1">No new top-level nav. New entry sits in the Membership dashboard's existing Broadcast dropdown (people grid toolbar).</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="flex items-center gap-2">
+          <span class="text-base font-semibold text-slate-800">People</span>
+          <span class="text-sm text-slate-500">2,431 people</span>
+        </div>
+        <div class="flex items-center gap-2 relative">
+          <input type="text" placeholder="Find a member…" class="mock-input medium">
+          <button class="btn btn-secondary btn-sm">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+            Filter
+          </button>
+          <button class="btn btn-secondary btn-sm">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            New
+          </button>
+          <!-- Broadcast dropdown (open) -->
+          <div class="relative">
+            <button class="btn btn-primary btn-sm">
+              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              Broadcast
+              <svg class="icon-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="kebab-menu" style="top: calc(100% + 4px); right: 0; min-width: 240px;">
+              <div class="kebab-item">
+                <svg class="icon text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Blank Template
+              </div>
+              <div class="kebab-item">
+                <svg class="icon text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                Investment Confirmation
+              </div>
+              <div class="kebab-item">
+                <svg class="icon text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                Investment Confirmation Reminder
+              </div>
+              <div class="kebab-sep"></div>
+              <div class="kebab-item" onclick="showScreen('s2')">
+                <svg class="icon text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Recurring Emails...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-12 text-center text-slate-400 text-sm">
+        (Members table — out of scope for this mockup)
+      </div>
+    </div>
+    <p class="text-xs text-slate-500 mt-3">↑ Click "Recurring Emails..." to continue</p>
+  </div>
+</div>
+
+
+<!-- ============================================================================ -->
+<!-- SCREEN 2: Rules list                                                          -->
+<!-- ============================================================================ -->
+<div id="s2" class="screen">
+  <div class="nav-app">
+    <a>Pipeline</a>
+    <a class="active">Membership</a>
+    <a>Funds</a>
+    <a>Diligence</a>
+    <a>Admin</a>
+    <div class="ml-auto text-xs text-slate-400">jordan@hive-mind.com</div>
+  </div>
+  <div class="max-w-[1400px] mx-auto p-6">
+    <div class="mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mockup screen 2</span>
+      <h2 class="text-base font-semibold text-slate-800 mt-1">Recurring emails — list of rules</h2>
+    </div>
+
+    <div class="breadcrumb mb-3">
+      <a>Membership</a>
+      <span>›</span>
+      <span class="text-slate-700 font-medium">Recurring emails</span>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <input type="text" placeholder="Search rules…" class="mock-input medium">
+        <button class="btn btn-primary btn-sm" onclick="showScreen('s5')">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          New rule
+        </button>
+      </div>
+      <table class="w-full" style="border-collapse: collapse;">
+        <colgroup>
+          <col style="width: 32%;">
+          <col style="width: 22%;">
+          <col style="width: 18%;">
+          <col style="width: 14%;">
+          <col style="width: 130px;">
+          <col style="width: 60px;">
+          <col style="width: 40px;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Audience</th>
+            <th>Template</th>
+            <th>Cadence</th>
+            <th class="whitespace-nowrap">Last run</th>
+            <th class="text-center">On</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-clickable" onclick="showScreen('s4')">
+            <td class="font-medium">Membership Renewal Invitation</td>
+            <td>Members up for renewal in 30 days</td>
+            <td>Membership Renewal Invitation</td>
+            <td>Daily 6:55 AM</td>
+            <td class="whitespace-nowrap text-sm">Apr 27 6:55am</td>
+            <td class="text-center"><div class="toggle on mx-auto"></div></td>
+            <td class="text-center text-slate-400">⋮</td>
+          </tr>
+          <tr class="row-clickable">
+            <td class="font-medium">Membership Dues Reminder (14 days)</td>
+            <td>Members whose dues are due in 14 days</td>
+            <td>Membership Renewal Reminder</td>
+            <td>Daily 6:35 AM</td>
+            <td class="whitespace-nowrap text-sm">Apr 27 6:35am</td>
+            <td class="text-center"><div class="toggle on mx-auto"></div></td>
+            <td class="text-center text-slate-400">⋮</td>
+          </tr>
+          <tr class="row-clickable">
+            <td class="font-medium">Membership Dues Reminder (3 days)</td>
+            <td>Members whose dues are due in 3 days</td>
+            <td>Membership Renewal Reminder</td>
+            <td>Daily 6:35 AM</td>
+            <td class="whitespace-nowrap text-sm">Apr 27 6:35am</td>
+            <td class="text-center"><div class="toggle on mx-auto"></div></td>
+            <td class="text-center text-slate-400">⋮</td>
+          </tr>
+          <tr class="row-clickable">
+            <td class="font-medium">Membership Dues Overdue</td>
+            <td>Members overdue by 2, 4, 6... weeks</td>
+            <td>Membership Payment Overdue</td>
+            <td>Daily 6:35 AM</td>
+            <td class="whitespace-nowrap text-sm">Apr 27 6:35am</td>
+            <td class="text-center"><div class="toggle on mx-auto"></div></td>
+            <td class="text-center text-slate-400">⋮</td>
+          </tr>
+          <tr class="row-clickable">
+            <td class="font-medium">New Prospect Welcome Email</td>
+            <td>Queued new prospects</td>
+            <td>New Prospect Welcome</td>
+            <td>Mon-Fri 9:23 AM</td>
+            <td class="whitespace-nowrap text-sm">Apr 27 9:23am</td>
+            <td class="text-center"><div class="toggle on mx-auto"></div></td>
+            <td class="text-center text-slate-400">⋮</td>
+          </tr>
+          <tr class="row-clickable">
+            <td class="font-medium">Annual Member Survey Reminder</td>
+            <td>People sent the annual survey but haven't responded</td>
+            <td>Annual Member Survey Reminder</td>
+            <td>Every 14 days, max 4</td>
+            <td class="whitespace-nowrap text-sm">Apr 26 9:00am</td>
+            <td class="text-center"><div class="toggle on mx-auto"></div></td>
+            <td class="text-center text-slate-400">⋮</td>
+          </tr>
+          <tr class="row-clickable">
+            <td class="font-medium">New Member Survey Reminder</td>
+            <td>People sent the new-member survey but haven't responded</td>
+            <td>New Member Survey Reminder</td>
+            <td>Every 21 days, max 3</td>
+            <td class="whitespace-nowrap text-sm">Apr 20 9:00am</td>
+            <td class="text-center"><div class="toggle on mx-auto"></div></td>
+            <td class="text-center text-slate-400">⋮</td>
+          </tr>
+          <tr class="row-clickable">
+            <td class="font-medium opacity-60">Investment Survey Confirmation Reminder</td>
+            <td class="opacity-60">Members with no confirmation in 6+ months</td>
+            <td class="opacity-60">Investment Survey Confirmation Reminder</td>
+            <td class="opacity-60">Monthly</td>
+            <td class="whitespace-nowrap text-sm text-slate-400">—</td>
+            <td class="text-center"><div class="toggle mx-auto"></div></td>
+            <td class="text-center text-slate-400">⋮</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text-xs text-slate-500 mt-3">Try: click any row → edit rule. Click ⋮ → screen 3 (kebab open).</p>
+  </div>
+</div>
+
+
+<!-- ============================================================================ -->
+<!-- SCREEN 3: Kebab menu open on a row                                            -->
+<!-- ============================================================================ -->
+<div id="s3" class="screen">
+  <div class="nav-app">
+    <a>Pipeline</a>
+    <a class="active">Membership</a>
+    <a>Funds</a>
+    <a>Diligence</a>
+    <a>Admin</a>
+  </div>
+  <div class="max-w-[1400px] mx-auto p-6">
+    <div class="mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mockup screen 3</span>
+      <h2 class="text-base font-semibold text-slate-800 mt-1">Row kebab menu — actions per rule</h2>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <input type="text" placeholder="Search rules…" class="mock-input medium">
+        <button class="btn btn-primary btn-sm">+ New rule</button>
+      </div>
+      <table class="w-full" style="border-collapse: collapse;">
+        <colgroup>
+          <col style="width: 32%;"><col style="width: 22%;"><col style="width: 18%;"><col style="width: 14%;"><col style="width: 130px;"><col style="width: 60px;"><col style="width: 40px;">
+        </colgroup>
+        <thead>
+          <tr><th>Name</th><th>Audience</th><th>Template</th><th>Cadence</th><th class="whitespace-nowrap">Last run</th><th class="text-center">On</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="font-medium">Membership Renewal Invitation</td><td>Members up for renewal in 30 days</td><td>Membership Renewal Invitation</td><td>Daily 6:55 AM</td><td class="whitespace-nowrap text-sm">Apr 27 6:55am</td><td class="text-center"><div class="toggle on mx-auto"></div></td><td class="text-slate-400 text-center">⋮</td></tr>
+          <tr style="position: relative;">
+            <td class="font-medium">Membership Dues Overdue</td><td>Members overdue by 2, 4, 6... weeks</td><td>Membership Payment Overdue</td><td>Daily 6:35 AM</td><td class="whitespace-nowrap text-sm">Apr 27 6:35am</td>
+            <td class="text-center"><div class="toggle on mx-auto"></div></td>
+            <td class="text-center" style="position: relative;">
+              <span class="text-slate-700 font-bold">⋮</span>
+              <div class="kebab-menu">
+                <div class="kebab-item" onclick="showScreen('s4')">
+                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  Edit rule
+                </div>
+                <div class="kebab-item" onclick="showScreen('s12')">
+                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><circle cx="12" cy="12" r="9"/></svg>
+                  Run now...
+                </div>
+                <div class="kebab-item" onclick="showScreen('s7')">
+                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                  Preview audience
+                </div>
+                <div class="kebab-item" onclick="showScreen('s9')">
+                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  View run history
+                </div>
+                <div class="kebab-item" onclick="showScreen('s11')">
+                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                  View recipients
+                </div>
+                <div class="kebab-sep"></div>
+                <div class="kebab-item">
+                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  Pause
+                </div>
+                <div class="kebab-item">
+                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
+                  Duplicate
+                </div>
+                <div class="kebab-sep"></div>
+                <div class="kebab-item danger">
+                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a2 2 0 012-2h2a2 2 0 012 2v3"/></svg>
+                  Delete…
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr><td colspan="7" class="text-slate-400 text-xs text-center py-3">(remaining rows)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================================ -->
+<!-- SCREEN 4: Edit rule (existing — Membership renewal 30d)                       -->
+<!-- ============================================================================ -->
+<div id="s4" class="screen">
+  <div class="nav-app">
+    <a>Pipeline</a>
+    <a class="active">Membership</a>
+    <a>Funds</a>
+    <a>Diligence</a>
+    <a>Admin</a>
+  </div>
+  <div class="max-w-[1100px] mx-auto p-6">
+    <div class="mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mockup screen 4</span>
+      <h2 class="text-base font-semibold text-slate-800 mt-1">Edit rule — existing rule, all fields populated</h2>
+    </div>
+
+    <div class="breadcrumb mb-3">
+      <a onclick="showScreen('s2')">Recurring emails</a>
+      <span>›</span>
+      <span class="text-slate-700 font-medium">Membership Renewal Invitation</span>
+    </div>
+
+    <div class="flex items-center gap-2 mb-3">
+      <button class="tab active">Configuration</button>
+      <button class="tab" onclick="showScreen('s9')">Run history</button>
+      <button class="tab" onclick="showScreen('s11')">Recipients</button>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4">
+      <div class="col-span-2 panel panel-pad">
+
+        <div class="form-row">
+          <label class="mock-label">Name</label>
+          <div>
+            <input type="text" value="Membership Renewal Invitation" class="mock-input full">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="mock-label">Key</label>
+          <div>
+            <input type="text" value="membership_renewal_reminder" class="mock-input medium" style="font-family: ui-monospace, monospace;">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="mock-label">Description</label>
+          <div>
+            <textarea class="mock-input full" rows="2" style="height: auto;" placeholder="(optional)"></textarea>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="mock-label">Enabled</label>
+          <div class="flex items-center gap-3 pt-2">
+            <div class="toggle on"></div>
+            <span class="text-sm text-slate-600">On</span>
+          </div>
+        </div>
+
+        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-1 border-t pt-4">Audience</h3>
+
+        <div class="form-row">
+          <label class="mock-label">Recipients</label>
+          <div>
+            <select class="mock-select" style="width: 380px;">
+              <option selected>Members up for renewal</option>
+              <option>Members overdue on dues</option>
+              <option>Members with invoice due soon</option>
+              <option>Queued new prospects</option>
+              <option>Members with unconfirmed transactions for the year</option>
+              <option>Members with join anniversary today</option>
+              <option>Recently joined members missing a survey response</option>
+              <option>Active members missing a survey response</option>
+            </select>
+            <div class="conditional-block">
+              <label class="mock-label block mb-1">Days before Paid Through</label>
+              <input type="number" value="30" class="mock-input short">
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-1 border-t pt-4">Cadence</h3>
+
+        <div class="form-row">
+          <label class="mock-label">Frequency</label>
+          <div>
+            <select class="mock-select" style="width: 280px;">
+              <option>Once per person</option>
+              <option>Every time they qualify</option>
+              <option selected>Every N days after qualifying</option>
+              <option>On a weekday every N weeks</option>
+              <option>On the anniversary of a date</option>
+            </select>
+            <div class="conditional-block">
+              <div class="form-row" style="grid-template-columns: 140px 1fr; padding: 4px 0;">
+                <label class="mock-label">Interval</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" value="14" class="mock-input short">
+                  <span class="text-sm text-slate-600">days</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="mock-label">Check schedule</label>
+          <div>
+            <select class="mock-select" style="width: 280px;">
+              <option selected>Daily at 6:55 AM</option>
+              <option>Daily at 9:00 AM</option>
+              <option>Hourly</option>
+              <option>Custom cron...</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="mock-label">Stop after</label>
+          <div class="flex items-center gap-2">
+            <input type="number" value="1" class="mock-input short">
+            <span class="text-sm text-slate-600">sends per person</span>
+            <span class="text-xs text-slate-400 ml-3">(blank = unlimited)</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="mock-label">End date</label>
+          <div>
+            <input type="date" class="mock-input" style="width: 150px;">
+            <span class="text-xs text-slate-400 ml-3">(blank = no end)</span>
+          </div>
+        </div>
+
+        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-1 border-t pt-4">Email</h3>
+
+        <div class="form-row">
+          <label class="mock-label">Template</label>
+          <div>
+            <div class="flex items-center gap-2">
+              <select class="mock-select" style="width: 280px;">
+                <option>Membership Renewal Invitation</option>
+                <option>Membership Payment Overdue</option>
+                <option>Annual Member Survey Reminder</option>
+                <option>New Member Survey Reminder</option>
+                <option>New Prospect Welcome</option>
+                <option>Investment Survey Confirmation Reminder</option>
+              </select>
+              <button class="btn btn-secondary btn-sm" onclick="showScreen('s8')">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Edit template
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="mock-label">Send from</label>
+          <div>
+            <select class="mock-select" style="width: 320px;">
+              <optgroup label="Gmail">
+                <option>Karin Kidder &lt;director@e8angels.com&gt;</option>
+                <option selected>Maya Chen &lt;maya@e8network.com&gt;</option>
+                <option>Jordan Schwartz &lt;jordan@hive-mind.com&gt;</option>
+                <option>Devon Reyes &lt;devon@e8network.com&gt;</option>
+              </optgroup>
+              <optgroup label="System">
+                <option>Custom From / Reply-To…</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-span-1 space-y-3">
+        <div class="panel panel-pad">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-semibold text-slate-700">Live audience</h3>
+            <button class="text-xs text-blue-600">Refresh</button>
+          </div>
+          <div class="text-3xl font-semibold text-slate-900">3</div>
+          <div class="text-xs text-slate-500">people qualify right now</div>
+          <button class="btn btn-secondary btn-sm mt-3 w-full justify-center" onclick="showScreen('s7')">Preview email + recipients</button>
+        </div>
+
+        <div class="panel panel-pad">
+          <h3 class="text-sm font-semibold text-slate-700 mb-2">Last 5 runs</h3>
+          <div class="space-y-1.5 text-xs">
+            <div class="flex items-center justify-between"><span class="text-slate-600">Apr 27 6:55am</span><span class="mock-pill pill-green">3 sent</span></div>
+            <div class="flex items-center justify-between"><span class="text-slate-600">Apr 26 6:55am</span><span class="mock-pill pill-slate">0 sent</span></div>
+            <div class="flex items-center justify-between"><span class="text-slate-600">Apr 14 6:00am</span><span class="mock-pill pill-green">2 sent</span></div>
+            <div class="flex items-center justify-between"><span class="text-slate-600">Apr 13 6:00am</span><span class="mock-pill pill-green">5 sent</span></div>
+            <div class="flex items-center justify-between"><span class="text-slate-600">Apr 12 6:00am</span><span class="mock-pill pill-slate">0 sent</span></div>
+          </div>
+          <button class="text-xs text-blue-600 mt-2" onclick="showScreen('s9')">View full history →</button>
+        </div>
+
+        <div class="panel panel-pad">
+          <h3 class="text-sm font-semibold text-slate-700 mb-2">Danger zone</h3>
+          <button class="btn btn-danger btn-sm w-full justify-center">Delete rule…</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 flex items-center justify-end gap-2">
+      <button class="btn btn-ghost" onclick="showScreen('s2')">Cancel</button>
+      <button class="btn btn-secondary" onclick="showScreen('s12')">Run now...</button>
+      <button class="btn btn-primary">Save changes</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================================ -->
+<!-- SCREEN 5: New rule — empty state with placeholder copy                        -->
+<!-- ============================================================================ -->
+<div id="s5" class="screen">
+  <div class="nav-app">
+    <a>Pipeline</a>
+    <a class="active">Membership</a>
+    <a>Funds</a>
+    <a>Diligence</a>
+    <a>Admin</a>
+  </div>
+  <div class="max-w-[1100px] mx-auto p-6">
+    <div class="mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mockup screen 5</span>
+      <h2 class="text-base font-semibold text-slate-800 mt-1">New rule — empty state</h2>
+    </div>
+    <div class="breadcrumb mb-3">
+      <a onclick="showScreen('s2')">Recurring emails</a>
+      <span>›</span>
+      <span class="text-slate-700 font-medium">New rule</span>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4">
+      <div class="col-span-2 panel panel-pad">
+
+        <div class="form-row">
+          <label class="mock-label">Name</label>
+          <div><input type="text" placeholder="e.g. Annual survey reminder" class="mock-input full"></div>
+        </div>
+
+        <div class="form-row">
+          <label class="mock-label">Key</label>
+          <div>
+            <input type="text" placeholder="annual_survey_reminder" class="mock-input medium" style="font-family: ui-monospace, monospace;">
+          </div>
+        </div>
+
+        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-1 border-t pt-4">Audience</h3>
+
+        <div class="form-row">
+          <label class="mock-label">Recipients</label>
+          <div>
+            <select class="mock-select" style="width: 380px;">
+              <option>Choose audience…</option>
+              <option>Members up for renewal</option>
+              <option>Members overdue on dues</option>
+              <option>Members with invoice due soon</option>
+              <option>Queued new prospects</option>
+              <option>Members with unconfirmed transactions for the year</option>
+              <option>Members with join anniversary today</option>
+              <option>Recently joined members missing a survey response</option>
+              <option>Active members missing a survey response</option>
+            </select>
+          </div>
+        </div>
+
+        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-1 border-t pt-4">Cadence</h3>
+
+        <div class="form-row">
+          <label class="mock-label">Frequency</label>
+          <div>
+            <select class="mock-select" style="width: 280px;">
+              <option>Choose…</option>
+              <option>Once per person</option>
+              <option>Every time they qualify</option>
+              <option>Every N days after qualifying</option>
+              <option>On a weekday every N weeks</option>
+              <option>On the anniversary of a date</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="mock-label">Stop after</label>
+          <div class="flex items-center gap-2">
+            <input type="number" placeholder="(unlimited)" class="mock-input short">
+            <span class="text-sm text-slate-600">sends per person</span>
+          </div>
+        </div>
+
+        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-1 border-t pt-4">Email</h3>
+
+        <div class="form-row">
+          <label class="mock-label">Template</label>
+          <div class="flex items-center gap-2">
+            <select class="mock-select" style="width: 280px;">
+              <option>Choose template…</option>
+            </select>
+            <button class="btn btn-secondary btn-sm">
+              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Create new
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="mock-label">Send from</label>
+          <div>
+            <select class="mock-select" style="width: 320px;">
+              <option>Choose sender…</option>
+              <optgroup label="Gmail">
+                <option>Karin Kidder &lt;director@e8angels.com&gt;</option>
+                <option>Maya Chen &lt;maya@e8network.com&gt;</option>
+                <option>Jordan Schwartz &lt;jordan@hive-mind.com&gt;</option>
+                <option>Devon Reyes &lt;devon@e8network.com&gt;</option>
+              </optgroup>
+              <optgroup label="System">
+                <option>Custom From / Reply-To…</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-span-1">
+        <div class="panel panel-pad text-center text-slate-400 text-sm">
+          <svg class="icon mx-auto mb-2" style="width: 32px; height: 32px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          <div class="text-sm">Pick an audience to preview</div>
+          <div class="text-xs text-slate-400 mt-1">The live count and sample recipients appear here once an audience is selected.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 flex items-center justify-end gap-2">
+      <button class="btn btn-ghost" onclick="showScreen('s2')">Cancel</button>
+      <button class="btn btn-primary">Create rule</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================================ -->
+<!-- SCREEN 6: Cadence variants — show every cadence type's conditional block      -->
+<!-- ============================================================================ -->
+<div id="s6" class="screen">
+  <div class="nav-app">
+    <a>Pipeline</a>
+    <a class="active">Membership</a>
+    <a>Funds</a>
+    <a>Diligence</a>
+    <a>Admin</a>
+  </div>
+  <div class="max-w-[1100px] mx-auto p-6">
+    <div class="mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mockup screen 6</span>
+      <h2 class="text-base font-semibold text-slate-800 mt-1">Cadence types — what each option exposes</h2>
+      <p class="text-sm text-slate-500 mt-1">Reference view. The form shows only one of these blocks at a time.</p>
+    </div>
+
+    <div class="space-y-3">
+
+      <div class="panel panel-pad">
+        <div class="text-sm font-semibold mb-2">Once per person</div>
+        <p class="text-xs text-slate-600">No options. The first time someone shows up in the audience, they get the email and never get it again from this rule.</p>
+      </div>
+
+      <div class="panel panel-pad">
+        <div class="text-sm font-semibold mb-2">Every time they qualify</div>
+        <div class="form-row" style="padding: 4px 0;">
+          <label class="mock-label">Re-send window</label>
+          <div class="flex items-center gap-2">
+            <input type="number" value="14" class="mock-input short">
+            <span class="text-sm text-slate-600">days</span>
+          </div>
+        </div>
+        <p class="text-xs text-slate-600 mt-2">Sends each time the rule runs, but never twice to the same person within the window.</p>
+      </div>
+
+      <div class="panel panel-pad">
+        <div class="text-sm font-semibold mb-2">Every N days after qualifying</div>
+        <div class="form-row" style="padding: 4px 0;">
+          <label class="mock-label">Interval</label>
+          <div class="flex items-center gap-2">
+            <input type="number" value="14" class="mock-input short">
+            <span class="text-sm text-slate-600">days</span>
+          </div>
+        </div>
+        <p class="text-xs text-slate-600 mt-2">Counted from the day each person first qualified, not the calendar.</p>
+      </div>
+
+      <div class="panel panel-pad">
+        <div class="text-sm font-semibold mb-2">On a weekday every N weeks</div>
+        <div class="form-row" style="padding: 4px 0;">
+          <label class="mock-label">Day of week</label>
+          <div>
+            <select class="mock-select" style="width: 140px;">
+              <option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" style="padding: 4px 0;">
+          <label class="mock-label">Every</label>
+          <div class="flex items-center gap-2">
+            <input type="number" value="2" class="mock-input short">
+            <span class="text-sm text-slate-600">weeks</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-pad">
+        <div class="text-sm font-semibold mb-2">On the anniversary of a date</div>
+        <div class="form-row" style="padding: 4px 0;">
+          <label class="mock-label">Date field</label>
+          <div>
+            <select class="mock-select" style="width: 200px;">
+              <option>Join date</option>
+              <option>Paid Through</option>
+              <option>Last investment date</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================================ -->
+<!-- SCREEN 7: Preview drawer — audience + rendered email                          -->
+<!-- ============================================================================ -->
+<div id="s7" class="screen">
+  <div class="nav-app">
+    <a>Pipeline</a>
+    <a class="active">Membership</a>
+    <a>Funds</a>
+    <a>Diligence</a>
+    <a>Admin</a>
+  </div>
+  <div class="max-w-[1100px] mx-auto p-6 relative">
+    <div class="mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mockup screen 7</span>
+      <h2 class="text-base font-semibold text-slate-800 mt-1">Preview drawer — opens over edit screen</h2>
+    </div>
+
+    <div class="panel panel-pad text-slate-400 text-sm h-[600px] flex items-center justify-center">
+      (Edit-rule screen behind the drawer — see screen 4)
+    </div>
+
+    <div class="drawer-backdrop"></div>
+    <div class="drawer">
+      <div class="drawer-header">
+        <div>
+          <div class="text-base font-semibold">Preview · Membership Renewal Invitation</div>
+          <div class="text-xs text-slate-500">Audience resolved Apr 27, 2026 2:32 PM · live, not sent</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="showScreen('s4')">×</button>
+      </div>
+      <div class="drawer-body">
+
+        <div class="grid grid-cols-3 gap-3 mb-4">
+          <div class="stat-card">
+            <div class="stat-label">Qualifying now</div>
+            <div class="stat-value">3</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Already sent within window</div>
+            <div class="stat-value text-slate-500">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Capped (max reached)</div>
+            <div class="stat-value text-slate-500">0</div>
+          </div>
+        </div>
+
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">Recipients</h3>
+        <div class="panel mb-4">
+          <table class="w-full" style="border-collapse: collapse;">
+            <thead>
+              <tr><th>Person</th><th>Email</th><th>Paid Through</th><th>Last sent</th><th class="text-right">Sends</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><a class="text-blue-600 hover:underline" href="#" title="Open person record">Alice Nakamura</a></td><td>alice@example.com</td><td>May 16, 2026</td><td><span class="empty-cap">never</span></td><td class="text-right tabular-nums">0</td></tr>
+              <tr><td><a class="text-blue-600 hover:underline" href="#" title="Open person record">Marcus Bell</a></td><td>marcus@example.org</td><td>May 16, 2026</td><td><span class="empty-cap">never</span></td><td class="text-right tabular-nums">0</td></tr>
+              <tr><td><a class="text-blue-600 hover:underline" href="#" title="Open person record">Priya Singh</a></td><td>priya@example.io</td><td>May 16, 2026</td><td><span class="empty-cap">never</span></td><td class="text-right tabular-nums">0</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">Email preview <span class="text-xs text-slate-500 font-normal">(rendered for <a class="text-blue-600 hover:underline" href="#">Alice Nakamura</a>)</span></h3>
+        <div class="preview-email">
+          <div class="preview-email-header">
+            <div><span class="text-slate-500">From:</span> Maya Chen &lt;maya@e8network.com&gt;</div>
+            <div><span class="text-slate-500">To:</span> Alice Nakamura &lt;alice@example.com&gt;</div>
+            <div><span class="text-slate-500">Subject:</span> Your E8 membership renews May 16</div>
+          </div>
+          <div class="preview-email-body">
+            <p>Hi Alice,</p>
+            <p>Your E8 membership is up for renewal on <strong>May 16, 2026</strong>. We've prepared a Stripe invoice for you here:</p>
+            <p><a class="text-blue-600 underline">https://invoice.stripe.com/i/acct_xxx/test_xxx</a></p>
+            <p>If you have any questions, just reply to this email.</p>
+            <p>— Maya<br><span class="text-slate-500 text-xs">E8 Membership</span></p>
+          </div>
+        </div>
+
+      </div>
+      <div class="drawer-footer">
+        <button class="btn btn-ghost btn-sm">Send test to me</button>
+        <button class="btn btn-secondary btn-sm" onclick="showScreen('s4')">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================================ -->
+<!-- SCREEN 8: Edit template drawer — opens over edit-rule                         -->
+<!-- ============================================================================ -->
+<div id="s8" class="screen">
+  <div class="nav-app">
+    <a>Pipeline</a>
+    <a class="active">Membership</a>
+    <a>Funds</a>
+    <a>Diligence</a>
+    <a>Admin</a>
+  </div>
+  <div class="max-w-[1100px] mx-auto p-6 relative">
+    <div class="mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mockup screen 8</span>
+      <h2 class="text-base font-semibold text-slate-800 mt-1">Edit template drawer — same editor as /admin/templates, opened in-context</h2>
+    </div>
+
+    <div class="panel panel-pad text-slate-400 text-sm h-[600px] flex items-center justify-center">
+      (Edit-rule screen behind the drawer — see screen 4)
+    </div>
+
+    <div class="drawer-backdrop"></div>
+    <div class="drawer" style="width: 820px;">
+      <div class="drawer-header">
+        <div>
+          <div class="text-base font-semibold">Membership Renewal Invitation</div>
+          <div class="text-xs text-slate-500">v6 · last edited Mar 12, 2026 by jordan@hive-mind.com</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="btn btn-secondary btn-sm">View versions</button>
+          <button class="btn btn-ghost btn-sm" onclick="showScreen('s4')">×</button>
+        </div>
+      </div>
+      <div class="drawer-body">
+
+        <div class="form-row" style="grid-template-columns: 100px 1fr; padding: 6px 0;">
+          <label class="mock-label">Name</label>
+          <div><input type="text" value="Membership Renewal Invitation" class="mock-input full"></div>
+        </div>
+        <div class="form-row" style="grid-template-columns: 100px 1fr; padding: 6px 0;">
+          <label class="mock-label">Subject</label>
+          <div><input type="text" value="Your E8 membership renews {{paidThrough}}" class="mock-input full"></div>
+        </div>
+        <div class="form-row" style="grid-template-columns: 100px 1fr; padding: 6px 0;">
+          <label class="mock-label">To</label>
+          <div><input type="text" value="{{to}}" class="mock-input medium" style="font-family: ui-monospace, monospace;"></div>
+        </div>
+        <div class="form-row" style="grid-template-columns: 100px 1fr; padding: 6px 0;">
+          <label class="mock-label">CC</label>
+          <div><input type="text" placeholder="(optional)" class="mock-input medium"></div>
+        </div>
+
+        <label class="mock-label block mt-3 mb-1">Body</label>
+        <div class="border border-slate-200 rounded-md overflow-hidden">
+          <!-- Toolbar matches src/components/tiptap/EditorToolbar.jsx (send-mail style) -->
+          <div class="border-b border-slate-100 bg-slate-50 p-1 flex flex-wrap items-center gap-1 min-h-[40px] shrink-0">
+            <button title="Bold" class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-200 text-slate-600">
+              <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z"/></svg>
+            </button>
+            <button title="Italic" class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-200 text-slate-600">
+              <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
+            </button>
+            <div class="w-px h-5 bg-slate-200 mx-0.5"></div>
+            <button title="Heading 1" class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-200 text-slate-600">
+              <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12h8M4 18V6M12 18V6M17 12l3-2v8"/></svg>
+            </button>
+            <button title="Heading 2" class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-200 text-slate-600">
+              <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12h8M4 18V6M12 18V6M21 18h-4c0-4 4-3 4-6 0-1.5-2-2.5-4-1"/></svg>
+            </button>
+            <button title="Heading 3" class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-200 text-slate-600">
+              <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12h8M4 18V6M12 18V6M17.5 10.5c1.7-1 3.5 0 3.5 1.5a2 2 0 01-2 2M21 16.5c0 1-1 1.5-3 1.5"/></svg>
+            </button>
+            <div class="w-px h-5 bg-slate-200 mx-0.5"></div>
+            <button title="Align Left" class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-200 text-slate-600">
+              <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+            </button>
+            <button title="Align Center" class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-200 text-slate-600">
+              <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="10" x2="6" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="18" y1="18" x2="6" y2="18"/></svg>
+            </button>
+            <div class="w-px h-5 bg-slate-200 mx-0.5"></div>
+            <button title="Link" class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-200 text-slate-600">
+              <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+            </button>
+            <div class="w-px h-5 bg-slate-200 mx-0.5"></div>
+            <button title="Bullet List" class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-200 text-slate-600">
+              <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            </button>
+            <button title="Numbered List" class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-200 text-slate-600">
+              <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+            </button>
+          </div>
+          <div class="p-4 text-sm leading-relaxed bg-white" style="min-height: 240px;">
+            <p class="mb-2">Hi <span class="token">{{firstName}}</span>,</p>
+            <p class="mb-2">Your E8 membership is up for renewal on <strong><span class="token">{{paidThrough}}</span></strong>. We've prepared a Stripe invoice for you here:</p>
+            <p class="mb-2"><span class="token">{{invoiceUrl}}</span></p>
+            <p class="mb-2">If you have any questions, just reply to this email.</p>
+            <p>— <span class="token">{{senderFirstName}}</span><br><span class="text-slate-500 text-xs">E8 Membership</span></p>
+          </div>
+        </div>
+
+      </div>
+      <div class="drawer-footer">
+        <button class="btn btn-ghost btn-sm">Send test to me</button>
+        <button class="btn btn-secondary btn-sm" onclick="showScreen('s4')">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="showScreen('s4')">Save new version</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================================ -->
+<!-- SCREEN 9: Run history list                                                    -->
+<!-- ============================================================================ -->
+<div id="s9" class="screen">
+  <div class="nav-app">
+    <a>Pipeline</a>
+    <a class="active">Membership</a>
+    <a>Funds</a>
+    <a>Diligence</a>
+    <a>Admin</a>
+  </div>
+  <div class="max-w-[1200px] mx-auto p-6">
+    <div class="mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mockup screen 9</span>
+      <h2 class="text-base font-semibold text-slate-800 mt-1">Run history — table of every dispatcher tick for this rule</h2>
+    </div>
+
+    <div class="breadcrumb mb-3">
+      <a onclick="showScreen('s2')">Recurring emails</a>
+      <span>›</span>
+      <a onclick="showScreen('s4')">Membership Renewal Invitation</a>
+      <span>›</span>
+      <span class="text-slate-700 font-medium">Run history</span>
+    </div>
+
+    <div class="flex items-center gap-2 mb-3">
+      <button class="tab" onclick="showScreen('s4')">Configuration</button>
+      <button class="tab active">Run history</button>
+      <button class="tab" onclick="showScreen('s11')">Recipients</button>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="flex items-center gap-2">
+          <input type="date" class="mock-input">
+          <span class="text-sm text-slate-500">to</span>
+          <input type="date" class="mock-input">
+          <select class="mock-select" style="width: 130px;"><option>All statuses</option><option>Success</option><option>Errors</option></select>
+        </div>
+      </div>
+      <table class="w-full" style="border-collapse: collapse;">
+        <colgroup>
+          <col style="width: 200px;">
+          <col style="width: 100px;">
+          <col style="width: 80px;">
+          <col style="width: 80px;">
+          <col>
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Started</th>
+            <th>Status</th>
+            <th class="text-right">Sent</th>
+            <th class="text-right">Errors</th>
+            <th>Triggered by</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-clickable" onclick="showScreen('s10')">
+            <td class="whitespace-nowrap">Apr 27, 2026 6:55 AM</td>
+            <td><span class="mock-pill pill-green">Success</span></td>
+            <td class="text-right tabular-nums font-semibold">3</td>
+            <td class="text-right tabular-nums text-slate-400">0</td>
+            <td>Scheduled</td>
+          </tr>
+          <tr class="row-clickable">
+            <td class="whitespace-nowrap">Apr 26, 2026 2:11 PM</td>
+            <td><span class="mock-pill pill-green">Success</span></td>
+            <td class="text-right tabular-nums font-semibold">0</td>
+            <td class="text-right tabular-nums text-slate-400">0</td>
+            <td>Manual · jordan@hive-mind.com</td>
+          </tr>
+          <tr class="row-clickable">
+            <td class="whitespace-nowrap">Apr 26, 2026 6:55 AM</td>
+            <td><span class="mock-pill pill-slate">No-op</span></td>
+            <td class="text-right tabular-nums">0</td>
+            <td class="text-right tabular-nums text-slate-400">0</td>
+            <td>Scheduled</td>
+          </tr>
+          <tr class="row-clickable">
+            <td class="whitespace-nowrap">Apr 14, 2026 6:00 AM</td>
+            <td><span class="mock-pill pill-green">Success</span></td>
+            <td class="text-right tabular-nums font-semibold">2</td>
+            <td class="text-right tabular-nums text-slate-400">0</td>
+            <td>Scheduled</td>
+          </tr>
+          <tr class="row-clickable">
+            <td class="whitespace-nowrap">Apr 13, 2026 6:00 AM</td>
+            <td><span class="mock-pill pill-amber">Partial</span></td>
+            <td class="text-right tabular-nums font-semibold">4</td>
+            <td class="text-right tabular-nums text-amber-700">1</td>
+            <td>Scheduled</td>
+          </tr>
+          <tr class="row-clickable">
+            <td class="whitespace-nowrap">Apr 12, 2026 6:00 AM</td>
+            <td><span class="mock-pill pill-red">Error</span></td>
+            <td class="text-right tabular-nums">0</td>
+            <td class="text-right tabular-nums text-red-700">4</td>
+            <td>Scheduled</td>
+          </tr>
+          <tr><td colspan="5" class="text-slate-400 text-xs text-center py-3">(81 more)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text-xs text-slate-500 mt-3">Click any row → run detail (screen 10), which shows the per-recipient breakdown and skipped counts.</p>
+  </div>
+</div>
+
+
+<!-- ============================================================================ -->
+<!-- SCREEN 10: Run detail — sent recipients + skipped counts                      -->
+<!-- ============================================================================ -->
+<div id="s10" class="screen">
+  <div class="nav-app">
+    <a>Pipeline</a>
+    <a class="active">Membership</a>
+    <a>Funds</a>
+    <a>Diligence</a>
+    <a>Admin</a>
+  </div>
+  <div class="max-w-[1200px] mx-auto p-6">
+    <div class="mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mockup screen 10</span>
+      <h2 class="text-base font-semibold text-slate-800 mt-1">Run detail — single dispatch tick</h2>
+    </div>
+
+    <div class="breadcrumb mb-3">
+      <a onclick="showScreen('s2')">Recurring emails</a>
+      <span>›</span>
+      <a onclick="showScreen('s4')">Membership Renewal Invitation</a>
+      <span>›</span>
+      <a onclick="showScreen('s9')">Run history</a>
+      <span>›</span>
+      <span class="text-slate-700 font-medium">Apr 27, 2026 6:55 AM</span>
+    </div>
+
+    <div class="grid grid-cols-4 gap-3 mb-4">
+      <div class="stat-card">
+        <div class="stat-label">Status</div>
+        <div class="stat-value text-green-700 text-base mt-1">Success</div>
+        <div class="text-xs text-slate-500 mt-1">Scheduled</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Qualified</div>
+        <div class="stat-value">3</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Sent</div>
+        <div class="stat-value text-green-700">3</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Skipped</div>
+        <div class="stat-value text-slate-500">0</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4">
+      <div class="col-span-2 panel">
+        <div class="panel-header">
+          <span class="text-sm font-semibold text-slate-700">Sent recipients</span>
+          <span class="text-xs text-slate-500">3 emails delivered</span>
+        </div>
+        <table class="w-full" style="border-collapse: collapse;">
+          <colgroup><col><col><col style="width: 110px;"><col style="width: 90px;"></colgroup>
+          <thead>
+            <tr><th>Person</th><th>Subject (rendered)</th><th>Sender</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr class="row-clickable">
+              <td>
+                <div class="font-medium"><a class="text-blue-600 hover:underline" href="#" title="Open person record">Alice Nakamura</a></td>
+                <div class="text-xs text-slate-500">alice@example.com · Member</div>
+              </td>
+              <td class="text-sm">Your E8 membership renews May 16</td>
+              <td class="text-xs">maya@e8network.com</td>
+              <td class="text-right"><a class="text-xs text-blue-600">View email →</a></td>
+            </tr>
+            <tr class="row-clickable">
+              <td>
+                <div class="font-medium"><a class="text-blue-600 hover:underline" href="#" title="Open person record">Marcus Bell</a></td>
+                <div class="text-xs text-slate-500">marcus@example.org · Member</div>
+              </td>
+              <td class="text-sm">Your E8 membership renews May 16</td>
+              <td class="text-xs">maya@e8network.com</td>
+              <td class="text-right"><a class="text-xs text-blue-600">View email →</a></td>
+            </tr>
+            <tr class="row-clickable">
+              <td>
+                <div class="font-medium"><a class="text-blue-600 hover:underline" href="#" title="Open person record">Priya Singh</a></td>
+                <div class="text-xs text-slate-500">priya@example.io · Corporate Member</div>
+              </td>
+              <td class="text-sm">Your E8 membership renews May 16</td>
+              <td class="text-xs">maya@e8network.com</td>
+              <td class="text-right"><a class="text-xs text-blue-600">View email →</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col-span-1 space-y-3">
+        <div class="panel panel-pad">
+          <h3 class="text-sm font-semibold text-slate-700 mb-2">Skipped (counts only)</h3>
+          <div class="space-y-1.5 text-xs">
+            <div class="flex items-center justify-between"><span class="text-slate-600">Capped (max sends reached)</span><span class="tabular-nums">0</span></div>
+            <div class="flex items-center justify-between"><span class="text-slate-600">Already sent within window</span><span class="tabular-nums">0</span></div>
+            <div class="flex items-center justify-between"><span class="text-slate-600">Suppressed</span><span class="tabular-nums">0</span></div>
+            <div class="flex items-center justify-between"><span class="text-slate-600">No email on file</span><span class="tabular-nums">0</span></div>
+          </div>
+          <p class="text-xs text-slate-500 mt-3 leading-relaxed">Skipped recipients aren't enumerated — the universe can be very large. To see who's currently suppressed or capped, use the <a class="text-blue-600" onclick="showScreen('s11')">Recipients tab</a>.</p>
+        </div>
+
+        <div class="panel panel-pad">
+          <h3 class="text-sm font-semibold text-slate-700 mb-2">Errors</h3>
+          <div class="text-xs text-slate-500">No errors.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================================ -->
+<!-- SCREEN 11: Recipients view — per-rule recipient_state list                    -->
+<!-- ============================================================================ -->
+<div id="s11" class="screen">
+  <div class="nav-app">
+    <a>Pipeline</a>
+    <a class="active">Membership</a>
+    <a>Funds</a>
+    <a>Diligence</a>
+    <a>Admin</a>
+  </div>
+  <div class="max-w-[1300px] mx-auto p-6">
+    <div class="mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mockup screen 11</span>
+      <h2 class="text-base font-semibold text-slate-800 mt-1">Recipients tab — everyone this rule has interacted with</h2>
+      <p class="text-sm text-slate-500 mt-1">Switching to a survey-reminder rule for variety.</p>
+    </div>
+
+    <div class="breadcrumb mb-3">
+      <a onclick="showScreen('s2')">Recurring emails</a>
+      <span>›</span>
+      <a>Annual Member Survey Reminder</a>
+      <span>›</span>
+      <span class="text-slate-700 font-medium">Recipients</span>
+    </div>
+
+    <div class="flex items-center gap-2 mb-3">
+      <button class="tab" onclick="showScreen('s4')">Configuration</button>
+      <button class="tab" onclick="showScreen('s9')">Run history</button>
+      <button class="tab active">Recipients</button>
+    </div>
+
+    <div class="grid grid-cols-4 gap-3 mb-4">
+      <div class="stat-card">
+        <div class="stat-label">Total recipients</div>
+        <div class="stat-value">203</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Active in cadence</div>
+        <div class="stat-value text-green-700">147</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Capped (max reached)</div>
+        <div class="stat-value text-slate-500">38</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Suppressed / left audience</div>
+        <div class="stat-value text-slate-500">18</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="flex items-center gap-2">
+          <input type="text" placeholder="Find a person…" class="mock-input medium">
+          <select class="mock-select" style="width: 160px;">
+            <option>All statuses</option>
+            <option>Active in cadence</option>
+            <option>Capped</option>
+            <option>Suppressed</option>
+            <option>Left audience</option>
+          </select>
+        </div>
+        <span class="text-sm text-slate-500">203 recipients</span>
+      </div>
+      <table class="w-full" style="border-collapse: collapse;">
+        <colgroup>
+          <col><col style="width: 130px;"><col style="width: 130px;"><col style="width: 130px;"><col style="width: 80px;"><col style="width: 110px;"><col style="width: 60px;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Person</th>
+            <th>First qualified</th>
+            <th>Last sent</th>
+            <th>Next eligible</th>
+            <th class="text-right">Sends</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="font-medium"><a class="text-blue-600 hover:underline" href="#">Tomás Ortega</a></div>
+              <div class="text-xs text-slate-500">tomas@example.com</div>
+            </td>
+            <td class="whitespace-nowrap">Feb 15, 2026</td>
+            <td class="whitespace-nowrap">Apr 12, 2026</td>
+            <td class="whitespace-nowrap">Apr 26, 2026</td>
+            <td class="text-right tabular-nums">3</td>
+            <td><span class="mock-pill pill-green">Active</span></td>
+            <td class="text-center text-slate-400">⋮</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="font-medium"><a class="text-blue-600 hover:underline" href="#">Yuki Tanaka</a></div>
+              <div class="text-xs text-slate-500">yuki@example.org</div>
+            </td>
+            <td class="whitespace-nowrap">Feb 15, 2026</td>
+            <td class="whitespace-nowrap">Apr 5, 2026</td>
+            <td><span class="empty-cap">—</span></td>
+            <td class="text-right tabular-nums">4</td>
+            <td><span class="mock-pill pill-slate">Capped</span></td>
+            <td class="text-center text-slate-400">⋮</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="font-medium"><a class="text-blue-600 hover:underline" href="#">Lina Costa</a></div>
+              <div class="text-xs text-slate-500">lina@example.io</div>
+            </td>
+            <td class="whitespace-nowrap">Feb 22, 2026</td>
+            <td class="whitespace-nowrap">Mar 8, 2026</td>
+            <td><span class="empty-cap">—</span></td>
+            <td class="text-right tabular-nums">2</td>
+            <td><span class="mock-pill pill-amber" title="No longer in audience — completed the survey">Left audience</span></td>
+            <td class="text-center text-slate-400">⋮</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="font-medium"><a class="text-blue-600 hover:underline" href="#">Reza Habibi</a></div>
+              <div class="text-xs text-slate-500">reza@example.com</div>
+            </td>
+            <td class="whitespace-nowrap">Mar 1, 2026</td>
+            <td class="whitespace-nowrap">Apr 12, 2026</td>
+            <td class="whitespace-nowrap">Apr 26, 2026</td>
+            <td class="text-right tabular-nums">2</td>
+            <td><span class="mock-pill pill-green">Active</span></td>
+            <td class="text-center text-slate-400">⋮</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="font-medium"><a class="text-blue-600 hover:underline" href="#">Sam Whitfield</a></div>
+              <div class="text-xs text-slate-500">sam@example.com</div>
+            </td>
+            <td class="whitespace-nowrap">Feb 15, 2026</td>
+            <td class="whitespace-nowrap">Mar 15, 2026</td>
+            <td><span class="empty-cap">—</span></td>
+            <td class="text-right tabular-nums">2</td>
+            <td><span class="mock-pill pill-red" title="Manually suppressed by jordan@hive-mind.com on Mar 20, 2026">Suppressed</span></td>
+            <td class="text-center" style="position: relative;">
+              <span class="text-slate-700 font-bold">⋮</span>
+              <div class="kebab-menu" style="min-width: 180px;">
+                <div class="kebab-item">Resume cadence</div>
+                <div class="kebab-item">Reset send count</div>
+                <div class="kebab-item">View communications</div>
+              </div>
+            </td>
+          </tr>
+          <tr><td colspan="7" class="text-slate-400 text-xs text-center py-3">(198 more)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================================ -->
+<!-- SCREEN 12: Run-now confirmation dialog                                        -->
+<!-- ============================================================================ -->
+<div id="s12" class="screen">
+  <div class="nav-app">
+    <a>Pipeline</a>
+    <a class="active">Membership</a>
+    <a>Funds</a>
+    <a>Diligence</a>
+    <a>Admin</a>
+  </div>
+  <div class="max-w-[1100px] mx-auto p-6 relative">
+    <div class="mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mockup screen 12</span>
+      <h2 class="text-base font-semibold text-slate-800 mt-1">Run-now confirmation — explicit gate before sending real email</h2>
+    </div>
+
+    <div class="panel panel-pad text-slate-400 text-sm h-[400px] flex items-center justify-center">
+      (Edit-rule screen behind the dialog)
+    </div>
+
+    <div class="drawer-backdrop"></div>
+    <div class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none pt-12">
+      <div class="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full pointer-events-auto">
+        <h3 class="text-lg font-semibold text-slate-900 mb-1">Run "Membership Renewal Invitation" now?</h3>
+        <p class="text-sm text-slate-600 mb-4">
+          Resolves the audience right now and sends emails to <strong>3 people</strong> who qualify and aren't already capped or in the cadence window.
+        </p>
+        <div class="bg-slate-50 border border-slate-200 rounded-md p-3 mb-4 space-y-1 text-xs">
+          <div class="flex justify-between"><span class="text-slate-500">Will send</span><span class="font-semibold tabular-nums">3</span></div>
+          <div class="flex justify-between"><span class="text-slate-500">Already sent within window</span><span class="tabular-nums text-slate-500">0</span></div>
+          <div class="flex justify-between"><span class="text-slate-500">Capped</span><span class="tabular-nums text-slate-500">0</span></div>
+          <div class="flex justify-between"><span class="text-slate-500">Sender</span><span>maya@e8network.com</span></div>
+        </div>
+        <label class="flex items-center gap-2 text-sm text-slate-700 mb-4">
+          <input type="checkbox" class="w-4 h-4">
+          <span>Test mode — write to log only, don't actually send</span>
+        </label>
+        <div class="flex justify-end gap-2">
+          <button class="btn btn-ghost" onclick="showScreen('s4')">Cancel</button>
+          <button class="btn btn-primary" onclick="showScreen('s10')">Send 3 emails</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================================ -->
+<!-- SCREEN 13: Edit annual survey reminder — survey picker visible                -->
+<!-- ============================================================================ -->
+<div id="s13" class="screen">
+  <div class="nav-app">
+    <a>Pipeline</a>
+    <a class="active">Membership</a>
+    <a>Funds</a>
+    <a>Diligence</a>
+    <a>Admin</a>
+  </div>
+  <div class="max-w-[1100px] mx-auto p-6">
+    <div class="mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mockup screen 13</span>
+      <h2 class="text-base font-semibold text-slate-800 mt-1">Edit rule — survey-based audience with Survey picker</h2>
+      <p class="text-sm text-slate-500 mt-1">Annual Survey Reminder. Same rule edited each year — admin updates the Survey and End date when a new yearly cycle starts. No slugs visible anywhere in the UI.</p>
+    </div>
+
+    <div class="breadcrumb mb-3">
+      <a onclick="showScreen('s2')">Recurring emails</a>
+      <span>›</span>
+      <span class="text-slate-700 font-medium">Annual Survey Reminder</span>
+    </div>
+
+    <div class="flex items-center gap-2 mb-3">
+      <button class="tab active">Configuration</button>
+      <button class="tab" onclick="showScreen('s9')">Run history</button>
+      <button class="tab" onclick="showScreen('s11')">Recipients</button>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4">
+      <div class="col-span-2 panel panel-pad">
+
+        <div class="form-row">
+          <label class="mock-label">Name</label>
+          <div><input type="text" value="Annual Survey Reminder" class="mock-input full"></div>
+        </div>
+
+        <div class="form-row">
+          <label class="mock-label">Enabled</label>
+          <div class="flex items-center gap-3 pt-2">
+            <div class="toggle on"></div>
+            <span class="text-sm text-slate-600">On</span>
+          </div>
+        </div>
+
+        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-1 border-t pt-4">Audience</h3>
+
+        <div class="form-row">
+          <label class="mock-label">Recipients</label>
+          <div>
+            <select class="mock-select" style="width: 380px;">
+              <option>Members up for renewal</option>
+              <option>Members overdue on dues</option>
+              <option>Members with invoice due soon</option>
+              <option>Queued new prospects</option>
+              <option>Members with unconfirmed transactions for the year</option>
+              <option>Members with join anniversary today</option>
+              <option>Recently joined members missing a survey response</option>
+              <option selected>Active members missing a survey response</option>
+            </select>
+            <div class="conditional-block">
+              <div class="form-row" style="grid-template-columns: 140px 1fr; padding: 4px 0;">
+                <label class="mock-label">Survey</label>
+                <div>
+                  <select class="mock-select" style="width: 280px;" onchange="showScreen('s14')">
+                    <option selected>E8 Annual Survey 2026</option>
+                    <option>E8 Annual Survey 2027</option>
+                    <option>E8 New Member Survey</option>
+                  </select>
+                  <div class="text-xs text-slate-400 mt-1">Pick the survey from the Surveys admin. To use a brand new survey for next year's cycle, create it first under Membership → Surveys, then come back here.</div>
+                </div>
+              </div>
+              <div class="form-row" style="grid-template-columns: 140px 1fr; padding: 4px 0;">
+                <label class="mock-label">Roles</label>
+                <div>
+                  <div class="flex items-center gap-1 flex-wrap">
+                    <span class="mock-pill" style="background: #e0e7ff; color: #3730a3;">Member ×</span>
+                    <span class="mock-pill" style="background: #e0e7ff; color: #3730a3;">Additional Member ×</span>
+                    <button class="text-xs text-blue-600 ml-1">+ Add role</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-1 border-t pt-4">Cadence</h3>
+
+        <div class="form-row">
+          <label class="mock-label">Frequency</label>
+          <div>
+            <select class="mock-select" style="width: 280px;">
+              <option>Once per person</option>
+              <option>Every time they qualify</option>
+              <option selected>Every N days after qualifying</option>
+              <option>On a weekday every N weeks</option>
+              <option>On the anniversary of a date</option>
+            </select>
+            <div class="conditional-block">
+              <div class="form-row" style="grid-template-columns: 140px 1fr; padding: 4px 0;">
+                <label class="mock-label">Interval</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" value="14" class="mock-input short">
+                  <span class="text-sm text-slate-600">days</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="mock-label">Stop after</label>
+          <div class="flex items-center gap-2">
+            <input type="number" placeholder="(unlimited)" class="mock-input short">
+            <span class="text-sm text-slate-600">sends per person</span>
+            <span class="text-xs text-slate-400 ml-3">(blank = unlimited)</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="mock-label">End date</label>
+          <div>
+            <input type="date" value="2026-05-31" class="mock-input" style="width: 150px;">
+            <span class="text-xs text-slate-400 ml-3">Hard stop — no emails sent after this date</span>
+          </div>
+        </div>
+
+        <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-4 mb-1 border-t pt-4">Email</h3>
+
+        <div class="form-row">
+          <label class="mock-label">Template</label>
+          <div class="flex items-center gap-2">
+            <select class="mock-select" style="width: 280px;">
+              <option selected>Annual Member Survey Reminder</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="showScreen('s8')">
+              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              Edit template
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="mock-label">Send from</label>
+          <div>
+            <select class="mock-select" style="width: 320px;">
+              <optgroup label="Gmail">
+                <option selected>Maya Chen &lt;maya@e8network.com&gt;</option>
+                <option>Karin Kidder &lt;director@e8angels.com&gt;</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-span-1">
+        <div class="panel panel-pad">
+          <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Audience preview</div>
+          <div class="text-2xl font-semibold text-slate-800 tabular-nums">47</div>
+          <div class="text-xs text-slate-500 mb-3">members and additional members haven't responded to E8 Annual Survey 2026</div>
+          <button class="btn btn-secondary btn-sm w-full justify-center" onclick="showScreen('s7')">Preview email + recipients</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 flex items-center justify-between">
+      <div class="text-xs text-slate-400">Tip: when next year's survey is ready, change the Survey field above and update the End date — you'll be asked whether to start fresh.</div>
+      <div class="flex items-center gap-2">
+        <button class="btn btn-ghost" onclick="showScreen('s2')">Cancel</button>
+        <button class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================================ -->
+<!-- SCREEN 14: New survey cycle confirmation prompt                               -->
+<!-- ============================================================================ -->
+<div id="s14" class="screen">
+  <div class="nav-app">
+    <a>Pipeline</a>
+    <a class="active">Membership</a>
+    <a>Funds</a>
+    <a>Diligence</a>
+    <a>Admin</a>
+  </div>
+  <div class="max-w-[1100px] mx-auto p-6 relative">
+    <div class="mb-3">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Mockup screen 14</span>
+      <h2 class="text-base font-semibold text-slate-800 mt-1">Survey was changed — ask whether this is a new yearly cycle</h2>
+      <p class="text-sm text-slate-500 mt-1">Triggers automatically when admin picks a different survey on a survey-based rule. Plain language only — no jargon, no "cadence", no "state".</p>
+    </div>
+
+    <div class="panel panel-pad text-slate-400 text-sm h-[400px] flex items-center justify-center">
+      (Edit-rule screen behind the dialog — Survey field just changed from "E8 Annual Survey 2026" to "E8 Annual Survey 2027")
+    </div>
+
+    <div class="drawer-backdrop"></div>
+    <div class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none pt-12">
+      <div class="bg-white rounded-lg shadow-2xl p-6 max-w-lg w-full pointer-events-auto">
+        <h3 class="text-lg font-semibold text-slate-900 mb-2">Is this a new yearly cycle?</h3>
+        <p class="text-sm text-slate-700 mb-3">
+          You picked a different survey: <strong>E8 Annual Survey 2027</strong>.
+        </p>
+        <p class="text-sm text-slate-700 mb-3">
+          If this is a new yearly cycle, we should forget who has already been reminded for the old survey. That way everyone who hasn't answered the new survey will be reminded fresh — even people who were reminded last year.
+        </p>
+        <div class="bg-slate-50 border border-slate-200 rounded-md p-3 mb-4 text-sm text-slate-700">
+          <div class="font-medium mb-1">Two choices:</div>
+          <ul class="list-disc list-inside space-y-1 text-xs text-slate-600">
+            <li><strong>Start fresh</strong> — best for a new yearly survey. Everyone who hasn't responded to E8 Annual Survey 2027 will get reminders.</li>
+            <li><strong>Keep history</strong> — best if you're just fixing a typo or you picked the wrong survey by accident. We won't re-remind people who were already reminded.</li>
+          </ul>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button class="btn btn-ghost" onclick="showScreen('s13')">Keep history</button>
+          <button class="btn btn-primary" onclick="showScreen('s13')">Start fresh</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+<script>
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('[data-nav]').forEach(b => {
+      if (b.dataset.nav === id) b.classList.add('bg-slate-700');
+      else b.classList.remove('bg-slate-700');
+    });
+    window.scrollTo(0, 0);
+  }
+  // Keyboard nav
+  document.addEventListener('keydown', e => {
+    const screens = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13','s14'];
+    const current = document.querySelector('.screen.active').id;
+    const idx = screens.indexOf(current);
+    if (e.key === 'ArrowRight' && idx < screens.length - 1) showScreen(screens[idx + 1]);
+    if (e.key === 'ArrowLeft' && idx > 0) showScreen(screens[idx - 1]);
+  });
+  // initial nav highlight
+  showScreen('s1');
+</script>
+
+</body>
+</html>

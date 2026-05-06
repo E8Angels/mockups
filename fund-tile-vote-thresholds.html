@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fund Tile — Threshold-aware Vote Visuals</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: #f1f5f9;
+    color: #0f172a;
+    padding: 40px 32px 100px;
+  }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  .page-sub {
+    color: #64748b; font-size: 13px; margin-bottom: 6px;
+    max-width: 820px; line-height: 1.55;
+  }
+  .page-note {
+    color: #475569; font-size: 12.5px; max-width: 820px;
+    line-height: 1.55;
+    background: #ecfdf5; border-left: 3px solid #10b981;
+    padding: 12px 14px; border-radius: 4px; margin-bottom: 32px;
+  }
+  .page-note b { color: #065f46; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 28px;
+    max-width: 1500px;
+  }
+  .variant {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 20px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .variant-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #7c3aed;
+  }
+  .variant-title { font-size: 15px; font-weight: 700; margin: -6px 0 0; }
+  .variant-rationale {
+    font-size: 12px; color: #475569; line-height: 1.55; margin: 0;
+  }
+
+  /* Card chrome */
+  .card {
+    border: 1px solid #fde68a;
+    background: linear-gradient(180deg, #fffbeb 0%, #fff 100%);
+    border-radius: 8px; padding: 16px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .eyebrow {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #b45309;
+  }
+  .card-title { font-size: 14px; font-weight: 700; line-height: 1.3; }
+  .deadline { font-size: 11px; font-weight: 600; color: #dc2626; }
+  .btn {
+    display: inline-block; padding: 6px 14px; font-size: 11px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    background: #f59e0b; color: #fff; border-radius: 6px;
+    text-decoration: none; align-self: flex-start;
+  }
+
+  :root {
+    --c-no:   #ef4444;
+    --c-125:  #22c55e;
+    --c-175:  #3b82f6;
+    --c-225:  #8b5cf6;
+    --c-pass: #0f172a;
+  }
+
+  /* ---------- V1: Annotated bar with alternating leader callouts ---------- */
+  .v1-wrap {
+    position: relative;
+    padding: 62px 0 62px;  /* room for callouts above/below */
+  }
+  .v1-bar {
+    width: 100%; height: 26px; border-radius: 5px;
+    display: flex; overflow: hidden; position: relative;
+    background: #f1f5f9;
+    box-shadow: inset 0 0 0 1px #e2e8f0;
+  }
+  .v1-seg { height: 100%; position: relative; transition: filter .15s; }
+  .v1-seg:hover { filter: brightness(1.12); }
+  /* threshold lines */
+  .v1-threshold {
+    position: absolute; top: -6px; bottom: -6px;
+    width: 0; border-left: 2px dashed #0f172a;
+    pointer-events: none;
+  }
+  .v1-threshold .t-label {
+    position: absolute;
+    left: 50%; transform: translateX(-50%);
+    background: #0f172a; color: #fff;
+    font-size: 10px; font-weight: 700;
+    padding: 2px 6px; border-radius: 3px;
+    white-space: nowrap;
+    top: -20px;
+  }
+  .v1-threshold.t-51 { left: 51%; }
+  .v1-threshold.t-67 { left: 67%; }
+  .v1-threshold.t-67 { border-left-color: #16a34a; }
+  .v1-threshold.t-67 .t-label { background: #16a34a; }
+
+  /* leader callouts — absolute, with leader lines */
+  .v1-callout {
+    position: absolute;
+    font-size: 10.5px; line-height: 1.3;
+    color: #0f172a;
+  }
+  .v1-callout .c-box {
+    background: #fff; border: 1px solid #e2e8f0;
+    border-radius: 4px; padding: 5px 8px;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .v1-callout .c-box b { font-weight: 700; }
+  .v1-callout .c-line {
+    position: absolute; left: 50%; width: 0;
+    border-left: 1px solid #cbd5e1;
+  }
+  .v1-callout.above { bottom: calc(100% - 0px); }
+  .v1-callout.above .c-line { top: 100%; height: 14px; }
+  .v1-callout.above .c-box { margin-bottom: 14px; transform: translateX(-50%); }
+  .v1-callout.below { top: calc(100% + 0px); }
+  .v1-callout.below .c-line { bottom: 100%; height: 14px; }
+  .v1-callout.below .c-box { margin-top: 14px; transform: translateX(-50%); }
+
+  .v1-callout .c-swatch {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 2px; margin-right: 5px; vertical-align: middle;
+  }
+  .v1-axis {
+    display: flex; justify-content: space-between;
+    font-size: 10px; color: #94a3b8;
+    font-variant-numeric: tabular-nums;
+    margin-top: -48px;
+  }
+  .v1-status {
+    background: #f0fdf4; border: 1px solid #bbf7d0;
+    padding: 8px 10px; border-radius: 6px;
+    font-size: 11.5px; color: #065f46;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .v1-status .num { font-weight: 800; font-size: 14px; color: #065f46; }
+
+  /* ---------- V2: Cumulative rung chart ---------- */
+  .v2-wrap { display: flex; flex-direction: column; gap: 10px; }
+  .v2-legend-thresh {
+    position: relative; height: 18px;
+    font-size: 10px; color: #64748b;
+  }
+  .v2-legend-thresh .mark {
+    position: absolute; top: 0;
+    padding: 2px 6px; border-radius: 3px;
+    font-weight: 700; font-size: 9.5px;
+    transform: translateX(-50%);
+  }
+  .v2-legend-thresh .mark.m51 { left: 51%; background: #fde68a; color: #92400e; }
+  .v2-legend-thresh .mark.m67 { left: 67%; background: #bbf7d0; color: #065f46; }
+  .v2-rung {
+    display: grid;
+    grid-template-columns: 120px 1fr 70px;
+    gap: 12px;
+    align-items: center;
+    font-size: 12px;
+  }
+  .v2-rung .label { font-weight: 600; color: #0f172a; }
+  .v2-rung .label .sub { display: block; font-size: 10px; color: #64748b; font-weight: 500; }
+  .v2-rung .count { text-align: right; font-size: 11px; color: #475569; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .v2-track {
+    position: relative; height: 16px;
+    background: #f1f5f9; border-radius: 4px;
+    overflow: visible;
+  }
+  .v2-fill {
+    height: 100%; border-radius: 4px;
+    position: relative; transition: filter .15s;
+  }
+  .v2-rung:hover .v2-fill { filter: brightness(1.08); }
+  .v2-track .tline {
+    position: absolute; top: -3px; bottom: -3px;
+    width: 0; border-left: 2px dashed #1e293b;
+    z-index: 2;
+  }
+  .v2-track .tline.t51 { left: 51%; border-color: #f59e0b; }
+  .v2-track .tline.t67 { left: 67%; border-color: #16a34a; }
+  .v2-verdict {
+    font-size: 11px; padding: 6px 10px;
+    border-radius: 6px; font-weight: 600;
+    display: flex; gap: 6px; align-items: center;
+  }
+  .v2-verdict.yes  { background: #dcfce7; color: #065f46; }
+  .v2-verdict.near { background: #fef3c7; color: #92400e; }
+  .v2-verdict.no   { background: #fee2e2; color: #991b1b; }
+
+  /* ---------- V3: Thermometer ---------- */
+  .v3-layout { display: grid; grid-template-columns: 90px 1fr; gap: 18px; align-items: stretch; }
+  .v3-therm {
+    position: relative;
+    width: 48px; height: 240px;
+    background: #f1f5f9;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    margin: 10px auto;
+  }
+  .v3-fill {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    display: flex; flex-direction: column-reverse;
+    width: 100%;
+  }
+  .v3-fill > div { width: 100%; transition: filter .15s; }
+  .v3-fill > div:hover { filter: brightness(1.12); }
+  .v3-tick {
+    position: absolute; left: -8px; right: -8px;
+    height: 0; border-top: 2px dashed #0f172a;
+    pointer-events: none;
+  }
+  .v3-tick.t51 { bottom: 51%; border-color: #f59e0b; }
+  .v3-tick.t67 { bottom: 67%; border-color: #16a34a; }
+  .v3-tick .lbl {
+    position: absolute; left: calc(100% + 6px);
+    top: 50%; transform: translateY(-50%);
+    font-size: 10px; font-weight: 700;
+    white-space: nowrap;
+    padding: 2px 5px; border-radius: 3px;
+    background: #fff; border: 1px solid currentColor;
+  }
+  .v3-tick.t51 .lbl { color: #b45309; }
+  .v3-tick.t67 .lbl { color: #15803d; }
+  .v3-legend { display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+  .v3-legend .item {
+    display: grid;
+    grid-template-columns: 14px 1fr 30px;
+    gap: 8px; align-items: center;
+    font-size: 11.5px;
+  }
+  .v3-legend .sw { width: 12px; height: 12px; border-radius: 3px; }
+  .v3-legend .nm { font-weight: 600; }
+  .v3-legend .nm .sub { display: block; font-size: 9.5px; color: #94a3b8; font-weight: 500; }
+  .v3-legend .ct { text-align: right; font-weight: 600; color: #475569; font-variant-numeric: tabular-nums; }
+
+  /* ---------- V4: Hover-callout bar (keep current, enrich hover) ---------- */
+  .v4-intro { font-size: 11px; color: #64748b; }
+  .v4-bar {
+    position: relative;
+    height: 22px; width: 100%;
+    border-radius: 5px; display: flex; overflow: visible;
+    background: #f1f5f9;
+    box-shadow: inset 0 0 0 1px #e2e8f0;
+  }
+  .v4-seg {
+    height: 100%; position: relative; cursor: default;
+    transition: filter .15s;
+  }
+  .v4-seg:first-child { border-radius: 5px 0 0 5px; }
+  .v4-seg:last-child  { border-radius: 0 5px 5px 0; }
+  .v4-seg:hover { filter: brightness(1.15); }
+  .v4-seg .pop {
+    position: absolute;
+    left: 50%; transform: translateX(-50%);
+    min-width: 180px;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 11px;
+    box-shadow: 0 6px 20px rgba(15,23,42,0.15);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .15s;
+    z-index: 10;
+    line-height: 1.45;
+  }
+  .v4-seg:nth-child(odd)  .pop { bottom: calc(100% + 14px); }
+  .v4-seg:nth-child(even) .pop { top: calc(100% + 14px); }
+  .v4-seg .pop::before {
+    content: ''; position: absolute;
+    left: 50%; transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+  }
+  .v4-seg:nth-child(odd) .pop::before {
+    top: 100%; border-top: 6px solid #cbd5e1;
+  }
+  .v4-seg:nth-child(even) .pop::before {
+    bottom: 100%; border-bottom: 6px solid #cbd5e1;
+  }
+  .v4-seg .leader {
+    position: absolute; left: 50%;
+    width: 0; border-left: 1px dashed #94a3b8;
+    opacity: 0; transition: opacity .15s;
+  }
+  .v4-seg:nth-child(odd) .leader  { bottom: 100%; height: 14px; }
+  .v4-seg:nth-child(even) .leader { top: 100%;    height: 14px; }
+  .v4-seg:hover .pop,
+  .v4-seg:hover .leader { opacity: 1; }
+  .v4-seg .pop h4 {
+    margin: 0 0 4px; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .v4-seg .pop h4 .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .v4-seg .pop .row {
+    display: flex; justify-content: space-between;
+    color: #475569;
+  }
+  .v4-seg .pop .row b { color: #0f172a; }
+  .v4-seg .pop .expl {
+    margin-top: 6px; padding-top: 6px;
+    border-top: 1px dashed #e2e8f0;
+    color: #334155; font-size: 10.5px;
+  }
+  .v4-thresholds {
+    position: absolute; inset: 0;
+    pointer-events: none;
+  }
+  .v4-thresholds .line {
+    position: absolute; top: -4px; bottom: -4px;
+    width: 0; border-left: 2px dashed #0f172a;
+  }
+  .v4-thresholds .line.l51 { left: 51%; border-color: #f59e0b; }
+  .v4-thresholds .line.l67 { left: 67%; border-color: #16a34a; }
+  .v4-thresholds .line .lbl {
+    position: absolute; top: -18px;
+    left: 50%; transform: translateX(-50%);
+    font-size: 9.5px; font-weight: 700;
+    padding: 1px 5px; border-radius: 3px;
+    white-space: nowrap;
+  }
+  .v4-thresholds .line.l51 .lbl { background: #fef3c7; color: #92400e; }
+  .v4-thresholds .line.l67 .lbl { background: #dcfce7; color: #065f46; }
+  .v4-wrap { position: relative; padding-top: 28px; padding-bottom: 6px; }
+  .v4-hint {
+    font-size: 10.5px; color: #94a3b8; font-style: italic;
+    text-align: center;
+  }
+
+  /* ---------- V5: Outcome-first ---------- */
+  .v5-headline {
+    display: flex; align-items: center; gap: 14px;
+    padding: 4px 0;
+  }
+  .v5-headline .outcome {
+    font-size: 13px; color: #64748b; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .v5-headline .amt {
+    font-size: 30px; font-weight: 800; letter-spacing: -0.02em;
+    color: #22c55e;
+  }
+  .v5-headline .amt.pending { color: #f59e0b; }
+  .v5-gauges { display: flex; flex-direction: column; gap: 10px; }
+  .v5-gauge {
+    display: grid;
+    grid-template-columns: 130px 1fr 60px;
+    gap: 10px; align-items: center;
+    font-size: 11px;
+  }
+  .v5-gauge .name { font-weight: 600; color: #0f172a; }
+  .v5-gauge .name .sub { font-size: 10px; color: #94a3b8; display: block; font-weight: 500; }
+  .v5-gauge .track {
+    position: relative;
+    height: 12px; background: #f1f5f9;
+    border-radius: 6px; overflow: hidden;
+  }
+  .v5-gauge .fill {
+    height: 100%; border-radius: 6px;
+  }
+  .v5-gauge .marker {
+    position: absolute; top: -3px; bottom: -3px;
+    width: 0; border-left: 2px solid #0f172a;
+    z-index: 2;
+  }
+  .v5-gauge .pct {
+    text-align: right;
+    font-size: 11px; font-weight: 700;
+    color: #475569; font-variant-numeric: tabular-nums;
+  }
+  .v5-gauge.passed .pct { color: #16a34a; }
+  .v5-gauge .pass-tag {
+    display: inline-block;
+    background: #dcfce7; color: #166534;
+    font-size: 9px; font-weight: 700;
+    padding: 1px 4px; border-radius: 3px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .v5-gauge .miss-tag {
+    display: inline-block;
+    background: #fee2e2; color: #991b1b;
+    font-size: 9px; font-weight: 700;
+    padding: 1px 4px; border-radius: 3px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .v5-rules {
+    font-size: 10.5px; color: #64748b;
+    padding: 6px 8px;
+    background: #f8fafc; border-radius: 4px;
+    line-height: 1.5;
+  }
+
+</style>
+</head>
+<body>
+
+<h1>Fund tile — vote visuals that show the <em>thresholds</em></h1>
+<p class="page-sub">
+  Key reframe: the stacked bar is a <strong>cumulative progress bar</strong>. Segments are ordered
+  largest-check → smallest so each tier's share adds into the tiers below it. Two
+  thresholds matter:
+  <b>51% to fund</b> (at the highest check size where the cumulative share crosses it) and
+  <b>67% to pass at all</b>.
+</p>
+<div class="page-note">
+  <b>Data used on this page:</b> 6 No (30%), 8 $125K (40%), 4 $175K (20%), 2 $225K (10%) — 20 votes
+  of 40 cast.<br>
+  Cumulative totals: <b>$225K = 10%</b> · <b>$225K + $175K = 30%</b> ·
+  <b>$225K + $175K + $125K = 70%</b> (clears 67%, so it passes; at $125K).
+</div>
+
+<div class="grid">
+
+  <!-- ==================== V1 ==================== -->
+  <div class="variant">
+    <div class="variant-label">Option A · annotation-heavy</div>
+    <h2 class="variant-title">Stacked bar + alternating leader callouts + threshold lines</h2>
+    <p class="variant-rationale">
+      Keep the stacked bar exactly as-is. Add two vertical threshold lines (51% / 67%). Callouts
+      above and below alternate so short segments still get labels, with thin leader lines
+      pointing back to the bar. This is the closest to what you sketched.
+    </p>
+    <div class="card">
+      <div class="eyebrow">● Active ballot · EELI Technology</div>
+      <div class="card-title">How much should E8 invest?</div>
+      <div class="deadline">⏱ Closes Mar 29, 10:00 PM PT</div>
+
+      <div class="v1-wrap">
+        <!-- bar -->
+        <div class="v1-bar">
+          <div class="v1-seg" style="width:10%;background:var(--c-225);"></div>
+          <div class="v1-seg" style="width:20%;background:var(--c-175);"></div>
+          <div class="v1-seg" style="width:40%;background:var(--c-125);"></div>
+          <div class="v1-seg" style="width:30%;background:var(--c-no);"></div>
+
+          <!-- threshold lines -->
+          <div class="v1-threshold t-51"><span class="t-label">51% · fund</span></div>
+          <div class="v1-threshold t-67"><span class="t-label">67% · pass</span></div>
+
+          <!-- callouts: alternate above/below -->
+          <div class="v1-callout above" style="left:5%;">
+            <div class="c-box"><span class="c-swatch" style="background:var(--c-225);"></span><b>$225K</b> · 2 votes (10%)</div>
+            <div class="c-line"></div>
+          </div>
+          <div class="v1-callout below" style="left:20%;">
+            <div class="c-box"><span class="c-swatch" style="background:var(--c-175);"></span><b>$175K</b> · 4 votes (20%)</div>
+            <div class="c-line"></div>
+          </div>
+          <div class="v1-callout above" style="left:50%;">
+            <div class="c-box"><span class="c-swatch" style="background:var(--c-125);"></span><b>$125K</b> · 8 votes (40%)</div>
+            <div class="c-line"></div>
+          </div>
+          <div class="v1-callout below" style="left:85%;">
+            <div class="c-box"><span class="c-swatch" style="background:var(--c-no);"></span><b>No invest</b> · 6 votes (30%)</div>
+            <div class="c-line"></div>
+          </div>
+        </div>
+        <div class="v1-axis" style="padding-top:56px;">
+          <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+        </div>
+      </div>
+
+      <div class="v1-status">
+        <span>✅ Passes at <b>$125K</b> · 70% cumulative clears the 67% bar</span>
+        <span class="num">70%</span>
+      </div>
+      <a href="#" class="btn">Cast Your Vote →</a>
+    </div>
+  </div>
+
+  <!-- ==================== V2 ==================== -->
+  <div class="variant">
+    <div class="variant-label">Option B · literal</div>
+    <h2 class="variant-title">Three cumulative "rung" bars, one per check size</h2>
+    <p class="variant-rationale">
+      Make the cumulative math visible: three bars, one per candidate outcome
+      ($225K / $175K / $125K). Each bar shows the share of votes that would support <em>that
+      tier or higher</em>. The 51% and 67% threshold lines sit on every track so you can see at a
+      glance which tier passes. Removes all guesswork.
+    </p>
+    <div class="card">
+      <div class="eyebrow">● Active ballot · EELI Technology</div>
+      <div class="card-title">How much should E8 invest?</div>
+      <div class="deadline">⏱ Closes Mar 29, 10:00 PM PT</div>
+
+      <div class="v2-wrap">
+        <div class="v2-legend-thresh">
+          <span class="mark m51">51% fund</span>
+          <span class="mark m67">67% pass</span>
+        </div>
+
+        <div class="v2-rung">
+          <div class="label">Fund $225K<span class="sub">$225K votes only</span></div>
+          <div class="v2-track">
+            <div class="tline t51"></div>
+            <div class="tline t67"></div>
+            <div class="v2-fill" style="width:10%;background:var(--c-225);"></div>
+          </div>
+          <div class="count">10%</div>
+        </div>
+
+        <div class="v2-rung">
+          <div class="label">Fund $175K<span class="sub">$225K + $175K</span></div>
+          <div class="v2-track">
+            <div class="tline t51"></div>
+            <div class="tline t67"></div>
+            <div class="v2-fill" style="width:30%;background:var(--c-175);"></div>
+          </div>
+          <div class="count">30%</div>
+        </div>
+
+        <div class="v2-rung">
+          <div class="label">Fund $125K<span class="sub">$225K + $175K + $125K</span></div>
+          <div class="v2-track">
+            <div class="tline t51"></div>
+            <div class="tline t67"></div>
+            <div class="v2-fill" style="width:70%;background:var(--c-125);"></div>
+          </div>
+          <div class="count">70%</div>
+        </div>
+
+        <div class="v2-verdict yes">
+          ✅ <b>Passes at $125K</b> — $125K tier cleared 67%. $175K tier would need 21 more points.
+        </div>
+      </div>
+      <a href="#" class="btn">Cast Your Vote →</a>
+    </div>
+  </div>
+
+  <!-- ==================== V3 ==================== -->
+  <div class="variant">
+    <div class="variant-label">Option C · you mentioned it</div>
+    <h2 class="variant-title">Vertical thermometer with threshold ticks</h2>
+    <p class="variant-rationale">
+      Your own suggestion. Stacking is visually "building up" — a thermometer reads as additive in a
+      way a horizontal bar doesn't. 51% and 67% are horizontal tick lines across the tube. Downside:
+      takes more vertical room in the tile, and segments with few votes become tiny slivers.
+    </p>
+    <div class="card">
+      <div class="eyebrow">● Active ballot · EELI Technology</div>
+      <div class="card-title">How much should E8 invest?</div>
+      <div class="deadline">⏱ Closes Mar 29, 10:00 PM PT</div>
+
+      <div class="v3-layout">
+        <div class="v3-therm">
+          <div class="v3-fill">
+            <div style="height:10%;background:var(--c-225);" title="$225K · 10%"></div>
+            <div style="height:20%;background:var(--c-175);" title="$175K · 20%"></div>
+            <div style="height:40%;background:var(--c-125);" title="$125K · 40%"></div>
+            <div style="height:30%;background:var(--c-no);" title="No · 30%"></div>
+          </div>
+          <div class="v3-tick t51"><span class="lbl">51% fund</span></div>
+          <div class="v3-tick t67"><span class="lbl">67% pass</span></div>
+        </div>
+
+        <div class="v3-legend">
+          <div class="item">
+            <div class="sw" style="background:var(--c-225);"></div>
+            <div class="nm">$225K<span class="sub">Max</span></div>
+            <div class="ct">2 (10%)</div>
+          </div>
+          <div class="item">
+            <div class="sw" style="background:var(--c-175);"></div>
+            <div class="nm">$175K<span class="sub">Stretch</span></div>
+            <div class="ct">4 (20%)</div>
+          </div>
+          <div class="item">
+            <div class="sw" style="background:var(--c-125);"></div>
+            <div class="nm">$125K<span class="sub">Base</span></div>
+            <div class="ct">8 (40%)</div>
+          </div>
+          <div class="item">
+            <div class="sw" style="background:var(--c-no);"></div>
+            <div class="nm">No<span class="sub">Decline</span></div>
+            <div class="ct">6 (30%)</div>
+          </div>
+          <div class="item" style="padding-top:6px;border-top:1px dashed #e2e8f0;">
+            <div></div>
+            <div class="nm" style="color:#16a34a;">Passes at $125K</div>
+            <div class="ct" style="color:#16a34a;">70%</div>
+          </div>
+        </div>
+      </div>
+      <a href="#" class="btn">Cast Your Vote →</a>
+    </div>
+  </div>
+
+  <!-- ==================== V4 ==================== -->
+  <div class="variant">
+    <div class="variant-label">Option D · minimal change</div>
+    <h2 class="variant-title">Same stacked bar — hover any segment for a rich callout</h2>
+    <p class="variant-rationale">
+      Closest to today's design. Adds only two things: threshold lines on the bar, and a hover
+      popover with a leader line that explains <em>that segment</em> — its share, the cumulative
+      total it contributes to, and whether that tier currently passes. Popovers alternate
+      above/below so small segments still have room. Hover below to try.
+    </p>
+    <div class="card">
+      <div class="eyebrow">● Active ballot · EELI Technology</div>
+      <div class="card-title">How much should E8 invest?</div>
+      <div class="deadline">⏱ Closes Mar 29, 10:00 PM PT</div>
+      <div class="v4-intro">Votes stack from largest check on the left — hover for details.</div>
+
+      <div class="v4-wrap">
+        <div class="v4-bar">
+          <div class="v4-seg" style="width:10%;background:var(--c-225);">
+            <div class="leader"></div>
+            <div class="pop">
+              <h4><span class="dot" style="background:var(--c-225);"></span>$225K · 2 votes</h4>
+              <div class="row"><span>Share</span><b>10%</b></div>
+              <div class="row"><span>Cumulative at $225K</span><b>10%</b></div>
+              <div class="expl">Would fund at $225K if this alone clears 51%. Currently short by 41 pts.</div>
+            </div>
+          </div>
+          <div class="v4-seg" style="width:20%;background:var(--c-175);">
+            <div class="leader"></div>
+            <div class="pop">
+              <h4><span class="dot" style="background:var(--c-175);"></span>$175K · 4 votes</h4>
+              <div class="row"><span>Share</span><b>20%</b></div>
+              <div class="row"><span>Cumulative at $175K</span><b>30%</b></div>
+              <div class="expl">$225K + $175K together need 51% to fund at $175K. Short by 21 pts.</div>
+            </div>
+          </div>
+          <div class="v4-seg" style="width:40%;background:var(--c-125);">
+            <div class="leader"></div>
+            <div class="pop">
+              <h4><span class="dot" style="background:var(--c-125);"></span>$125K · 8 votes</h4>
+              <div class="row"><span>Share</span><b>40%</b></div>
+              <div class="row"><span>Cumulative at $125K</span><b>70%</b></div>
+              <div class="expl">✅ Cleared 67% — fund passes at $125K.</div>
+            </div>
+          </div>
+          <div class="v4-seg" style="width:30%;background:var(--c-no);">
+            <div class="leader"></div>
+            <div class="pop">
+              <h4><span class="dot" style="background:var(--c-no);"></span>No invest · 6 votes</h4>
+              <div class="row"><span>Share</span><b>30%</b></div>
+              <div class="row"><span>Threshold to block</span><b>&gt;33%</b></div>
+              <div class="expl">If "no" exceeds 33%, the fund can't pass at any tier. Currently 30%.</div>
+            </div>
+          </div>
+          <div class="v4-thresholds">
+            <div class="line l51"><span class="lbl">51% fund</span></div>
+            <div class="line l67"><span class="lbl">67% pass</span></div>
+          </div>
+        </div>
+        <div class="v4-hint">Hover segments — popovers alternate above/below for tight bars.</div>
+      </div>
+      <a href="#" class="btn">Cast Your Vote →</a>
+    </div>
+  </div>
+
+  <!-- ==================== V5 ==================== -->
+  <div class="variant">
+    <div class="variant-label">Option E · outcome-first</div>
+    <h2 class="variant-title">Lead with "passes at $X"; three gauges as evidence</h2>
+    <p class="variant-rationale">
+      The tile's real question is "what's going to happen?" — so say it. Headline shows the current
+      winning amount. Below, three mini gauges show each tier's cumulative progress toward 51%,
+      with a "✓ pass" tag when cleared. If someone wants more detail they can click in; the tile
+      itself never forces them to decode a stacked chart.
+    </p>
+    <div class="card">
+      <div class="eyebrow">● Active ballot · EELI Technology</div>
+      <div class="card-title">EELI Technology</div>
+      <div class="deadline">⏱ Closes Mar 29, 10:00 PM PT</div>
+
+      <div class="v5-headline">
+        <div>
+          <div class="outcome">Currently passes at</div>
+          <div class="amt">$125,000</div>
+        </div>
+      </div>
+
+      <div class="v5-gauges">
+        <div class="v5-gauge">
+          <div class="name">$225K tier<span class="sub">needs 51% of $225K</span></div>
+          <div class="track">
+            <div class="fill" style="width:10%;background:var(--c-225);"></div>
+            <div class="marker" style="left:51%;"></div>
+          </div>
+          <div class="pct">10%<span class="miss-tag">short</span></div>
+        </div>
+
+        <div class="v5-gauge">
+          <div class="name">$175K tier<span class="sub">needs 51% of $225+$175</span></div>
+          <div class="track">
+            <div class="fill" style="width:30%;background:var(--c-175);"></div>
+            <div class="marker" style="left:51%;"></div>
+          </div>
+          <div class="pct">30%<span class="miss-tag">short</span></div>
+        </div>
+
+        <div class="v5-gauge passed">
+          <div class="name">$125K tier<span class="sub">needs 67% of all $ votes</span></div>
+          <div class="track">
+            <div class="fill" style="width:70%;background:var(--c-125);"></div>
+            <div class="marker" style="left:67%;"></div>
+          </div>
+          <div class="pct">70%<span class="pass-tag">✓ pass</span></div>
+        </div>
+      </div>
+
+      <div class="v5-rules">
+        Fund passes at the <b>highest tier</b> whose cumulative support clears its threshold.
+        "No" votes above ~33% block all tiers.
+      </div>
+      <a href="#" class="btn">Cast Your Vote →</a>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

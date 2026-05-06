@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fund Tile — Thermometer at actual tile size</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 40px 32px 80px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: #f1f5f9; color: #0f172a;
+  }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  .page-sub { color: #64748b; font-size: 13px; max-width: 900px; line-height: 1.55; margin-bottom: 8px; }
+
+  /* Simulate real homepage: 1200px wrapper, 16px padding, 4-col grid, 12px gap */
+  .page-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    padding: 20px 16px;
+    margin-top: 24px;
+  }
+  .ruler {
+    font-size: 10px; color: #94a3b8;
+    margin-bottom: 10px; letter-spacing: 0.04em;
+  }
+  .attention-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .sibling {
+    background: #f8fafc;
+    border: 1px dashed #e2e8f0;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 11px;
+    color: #94a3b8;
+    min-height: 220px;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* ======================= BALLOT CARD ======================= */
+  .ballot {
+    border-radius: 10px;
+    padding: 14px 14px 16px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    display: flex; flex-direction: column; gap: 10px;
+    position: relative;
+  }
+
+  .fund-heading {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: #0B3D8A;
+  }
+  .title {
+    font-size: 13px; font-weight: 700; line-height: 1.3;
+    color: #0f172a;
+  }
+  .deadline {
+    font-size: 10.5px; font-weight: 500; color: #94a3b8;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* Thermometer + bars layout */
+  :root {
+    --c-no:   #9ca3af;
+    --c-125:  #22c55e;
+    --c-175:  #3b82f6;
+    --c-225:  #8b5cf6;
+    --brand:  #0B3D8A;
+  }
+  .viz {
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  /* Thermometer */
+  .therm {
+    position: relative;
+    width: 34px;
+    height: 168px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 17px;
+    overflow: hidden;
+  }
+  .therm-stack {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column-reverse;
+  }
+  .seg { width: 100%; transition: filter .15s; }
+  .seg:hover { filter: brightness(1.12); }
+  .tick {
+    position: absolute; left: -6px; right: -6px;
+    height: 0; pointer-events: none; z-index: 3;
+  }
+  .tick::before {
+    content: ''; position: absolute;
+    left: 0; right: 0; top: 0;
+    border-top: 1.5px dashed currentColor;
+  }
+  .tick.t51 { bottom: 51%; color: #b45309; }
+  .tick.t67 { bottom: 67%; color: #15803d; }
+
+  /* Tier bars (side) */
+  .tiers {
+    display: flex; flex-direction: column;
+    justify-content: center;
+    gap: 18px;
+    padding: 12px 0;
+  }
+  .tier {
+    display: grid;
+    grid-template-columns: 10px 38px 1fr 28px;
+    gap: 6px;
+    align-items: center;
+    font-size: 10.5px;
+  }
+  .tier .sw { width: 10px; height: 10px; border-radius: 2px; }
+  .tier .nm { font-weight: 600; color: #0f172a; font-variant-numeric: tabular-nums; }
+  .tier .bar-wrap {
+    height: 6px; background: #f1f5f9;
+    border-radius: 3px; overflow: hidden;
+  }
+  .tier .bar { height: 100%; border-radius: 3px; }
+  .tier .pct {
+    text-align: right;
+    font-weight: 700; color: #475569;
+    font-variant-numeric: tabular-nums;
+    font-size: 10px;
+  }
+
+  /* Threshold legend strip under viz */
+  .thresh-legend {
+    font-size: 9.5px; color: #64748b;
+    font-weight: 500;
+    line-height: 1.35;
+    margin-top: -2px;
+  }
+  .thresh-legend .l51 { color: #b45309; font-weight: 700; }
+  .thresh-legend .l67 { color: #15803d; font-weight: 700; }
+
+  /* Quorum / turnout strip */
+  .quorum {
+    border-top: 1px dashed #e2e8f0;
+    padding-top: 8px;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .quorum-head {
+    font-size: 9.5px;
+    color: #64748b;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .quorum-row {
+    display: flex; justify-content: space-between;
+    align-items: baseline;
+    font-size: 10.5px;
+    color: #475569;
+  }
+  .quorum-row b { color: #0f172a; font-variant-numeric: tabular-nums; font-weight: 700; }
+  .quorum-row .status {
+    font-size: 9.5px; font-weight: 700;
+  }
+  .quorum-row .status.met  { color: #15803d; }
+  .quorum-row .status.miss { color: #dc2626; }
+  .quorum-track {
+    position: relative;
+    height: 6px;
+    background: #f1f5f9;
+    border-radius: 3px;
+    overflow: visible;
+  }
+  .quorum-fill {
+    height: 100%;
+    background: #0f172a;
+    border-radius: 2px;
+  }
+  .quorum-mark {
+    position: absolute; left: 25%;
+    top: -3px; bottom: -3px;
+    width: 0;
+    border-left: 2px solid #dc2626;
+  }
+
+  /* Verdict */
+  .verdict {
+    padding: 7px 9px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex; justify-content: space-between; align-items: center;
+    line-height: 1.2;
+    gap: 6px;
+  }
+  .verdict .left { display: flex; align-items: center; gap: 6px; }
+  .verdict.pass {
+    background: #dcfce7;
+    color: #065f46;
+    border: 1px solid #86efac;
+  }
+  .verdict.fail {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+  }
+  .verdict.early {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+  }
+  .verdict .big { font-size: 13px; font-weight: 800; }
+  .verdict svg {
+    width: 13px; height: 13px;
+    flex-shrink: 0;
+  }
+
+  /* Button — brand blue */
+  .btn {
+    display: inline-block;
+    padding: 7px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--brand);
+    color: #fff;
+    border-radius: 4px;
+    text-decoration: none;
+    align-self: flex-start;
+    border: none;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .btn:hover { background: #072d6b; }
+
+  /* Variant label above each tile */
+  .state-label {
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: #7c3aed;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  .section-h {
+    margin: 32px 0 6px;
+    font-size: 14px;
+    color: #0f172a;
+    font-weight: 700;
+  }
+
+  /* ─── Closed / final ballot states ─── */
+  .ballot.closed {
+    position: relative;
+  }
+  .ballot.closed.passed {
+    background: linear-gradient(180deg, #f0fdf4 0%, #fff 42%);
+    border-color: #86efac;
+    border-left: 4px solid #16a34a;
+  }
+  .ballot.closed.failed {
+    background: linear-gradient(180deg, #fef2f2 0%, #fff 42%);
+    border-color: #fca5a5;
+    border-left: 4px solid #dc2626;
+  }
+  .final-badge {
+    position: absolute;
+    top: 12px; right: 12px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 3px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .final-badge svg { width: 10px; height: 10px; }
+  .ballot.closed.passed .final-badge {
+    background: #16a34a; color: #fff;
+  }
+  .ballot.closed.failed .final-badge {
+    background: #dc2626; color: #fff;
+  }
+  .final-deadline {
+    font-size: 10.5px; color: #94a3b8;
+    font-weight: 500;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .verdict.final-pass {
+    background: #16a34a;
+    color: #fff;
+    border: 1px solid #15803d;
+  }
+  .verdict.final-fail {
+    background: #dc2626;
+    color: #fff;
+    border: 1px solid #b91c1c;
+  }
+</style>
+</head>
+<body>
+
+<h1>Fund tile — three states at actual tile size</h1>
+<p class="page-sub">
+  Rendered inside a simulated homepage grid: 1200px wrapper, 4 columns, 12px gap → each tile is
+  ~283px wide. Yellow background removed, brand blue button, lucide icons, quorum block rewritten.
+</p>
+
+<h3 class="section-h">Three live states, same ballot</h3>
+<div class="page-wrapper">
+  <div class="ruler">1200px wrapper · 4-col grid · 12px gap · tile ≈ 283px</div>
+  <div class="attention-grid">
+
+    <!-- ── State 1: Passing ── -->
+    <div>
+      <div class="state-label">Passing · 50% turnout</div>
+      <div class="ballot">
+        <div class="fund-heading">E8 Fund 2026</div>
+        <div class="title">EELI Technology</div>
+        <div class="viz">
+          <div class="therm">
+            <div class="therm-stack">
+              <div class="seg" style="height:10%;background:var(--c-225);"></div>
+              <div class="seg" style="height:20%;background:var(--c-175);"></div>
+              <div class="seg" style="height:40%;background:var(--c-125);"></div>
+              <div class="seg" style="height:30%;background:var(--c-no);"></div>
+            </div>
+            <div class="tick t51"></div>
+            <div class="tick t67"></div>
+          </div>
+
+          <div class="tiers">
+            <div class="tier">
+              <div class="sw" style="background:var(--c-no);"></div>
+              <div class="nm">No</div>
+              <div class="bar-wrap"><div class="bar" style="width:30%;background:var(--c-no);"></div></div>
+              <div class="pct">30%</div>
+            </div>
+            <div class="tier">
+              <div class="sw" style="background:var(--c-125);"></div>
+              <div class="nm">$125K</div>
+              <div class="bar-wrap"><div class="bar" style="width:40%;background:var(--c-125);"></div></div>
+              <div class="pct">40%</div>
+            </div>
+            <div class="tier">
+              <div class="sw" style="background:var(--c-175);"></div>
+              <div class="nm">$175K</div>
+              <div class="bar-wrap"><div class="bar" style="width:20%;background:var(--c-175);"></div></div>
+              <div class="pct">20%</div>
+            </div>
+            <div class="tier">
+              <div class="sw" style="background:var(--c-225);"></div>
+              <div class="nm">$225K</div>
+              <div class="bar-wrap"><div class="bar" style="width:10%;background:var(--c-225);"></div></div>
+              <div class="pct">10%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="thresh-legend">
+          <span>Thresholds: 67% to approve, 51% for funding level</span>
+        </div>
+
+        <div class="quorum">
+          <div class="quorum-head">Turnout</div>
+          <div class="quorum-track">
+            <div class="quorum-fill" style="width:50%;"></div>
+            <div class="quorum-mark"></div>
+          </div>
+          <div class="quorum-row">
+            <span><b>50%</b> of voting units</span>
+            <span class="status met">Quorum met</span>
+          </div>
+        </div>
+
+        <div class="verdict pass">
+          <span class="left">
+            <!-- lucide: check-circle-2 -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Passing at
+          </span>
+          <span class="big">$125,000</span>
+        </div>        <div class="deadline">
+          <!-- lucide: clock -->
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Closes Mar 29, 10:00 PM PT
+        </div>
+
+
+
+        <a href="#" class="btn">Cast your vote</a>
+      </div>
+    </div>
+
+    <!-- ── State 2: Not passing ── -->
+    <div>
+      <div class="state-label">Not passing · 75% turnout</div>
+      <div class="ballot">
+        <div class="fund-heading">E8 Fund 2026</div>
+        <div class="title">EELI Technology</div>
+        <div class="viz">
+          <div class="therm">
+            <div class="therm-stack">
+              <div class="seg" style="height:7%;background:var(--c-225);"></div>
+              <div class="seg" style="height:13%;background:var(--c-175);"></div>
+              <div class="seg" style="height:20%;background:var(--c-125);"></div>
+              <div class="seg" style="height:60%;background:var(--c-no);"></div>
+            </div>
+            <div class="tick t51"></div>
+            <div class="tick t67"></div>
+          </div>
+
+          <div class="tiers">
+            <div class="tier">
+              <div class="sw" style="background:var(--c-no);"></div>
+              <div class="nm">No</div>
+              <div class="bar-wrap"><div class="bar" style="width:60%;background:var(--c-no);"></div></div>
+              <div class="pct">60%</div>
+            </div>
+            <div class="tier">
+              <div class="sw" style="background:var(--c-125);"></div>
+              <div class="nm">$125K</div>
+              <div class="bar-wrap"><div class="bar" style="width:20%;background:var(--c-125);"></div></div>
+              <div class="pct">20%</div>
+            </div>
+            <div class="tier">
+              <div class="sw" style="background:var(--c-175);"></div>
+              <div class="nm">$175K</div>
+              <div class="bar-wrap"><div class="bar" style="width:13%;background:var(--c-175);"></div></div>
+              <div class="pct">13%</div>
+            </div>
+            <div class="tier">
+              <div class="sw" style="background:var(--c-225);"></div>
+              <div class="nm">$225K</div>
+              <div class="bar-wrap"><div class="bar" style="width:7%;background:var(--c-225);"></div></div>
+              <div class="pct">7%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="thresh-legend">
+          <span>Thresholds: 67% to approve, 51% for funding level</span>
+        </div>
+
+        <div class="quorum">
+          <div class="quorum-head">Turnout</div>
+          <div class="quorum-track">
+            <div class="quorum-fill" style="width:75%;"></div>
+            <div class="quorum-mark"></div>
+          </div>
+          <div class="quorum-row">
+            <span><b>75%</b> of voting units</span>
+            <span class="status met">Quorum met</span>
+          </div>
+        </div>
+
+        <div class="verdict fail">
+          <span class="left">
+            <!-- lucide: x-circle -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            Not passing
+          </span>
+          <span class="big">40%</span>
+        </div>        <div class="deadline">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Closes Mar 29, 10:00 PM PT
+        </div>
+
+
+
+        <a href="#" class="btn">Cast your vote</a>
+      </div>
+    </div>
+
+    <!-- ── State 3: Early / below quorum ── -->
+    <div>
+      <div class="state-label">Early · below quorum</div>
+      <div class="ballot">
+        <div class="fund-heading">E8 Fund 2026</div>
+        <div class="title">EELI Technology</div>
+        <div class="viz">
+          <div class="therm">
+            <div class="therm-stack">
+              <div class="seg" style="height:22%;background:var(--c-225);"></div>
+              <div class="seg" style="height:22%;background:var(--c-175);"></div>
+              <div class="seg" style="height:23%;background:var(--c-125);"></div>
+              <div class="seg" style="height:33%;background:var(--c-no);"></div>
+            </div>
+            <div class="tick t51"></div>
+            <div class="tick t67"></div>
+          </div>
+
+          <div class="tiers">
+            <div class="tier">
+              <div class="sw" style="background:var(--c-no);"></div>
+              <div class="nm">No</div>
+              <div class="bar-wrap"><div class="bar" style="width:33%;background:var(--c-no);"></div></div>
+              <div class="pct">33%</div>
+            </div>
+            <div class="tier">
+              <div class="sw" style="background:var(--c-125);"></div>
+              <div class="nm">$125K</div>
+              <div class="bar-wrap"><div class="bar" style="width:23%;background:var(--c-125);"></div></div>
+              <div class="pct">23%</div>
+            </div>
+            <div class="tier">
+              <div class="sw" style="background:var(--c-175);"></div>
+              <div class="nm">$175K</div>
+              <div class="bar-wrap"><div class="bar" style="width:22%;background:var(--c-175);"></div></div>
+              <div class="pct">22%</div>
+            </div>
+            <div class="tier">
+              <div class="sw" style="background:var(--c-225);"></div>
+              <div class="nm">$225K</div>
+              <div class="bar-wrap"><div class="bar" style="width:22%;background:var(--c-225);"></div></div>
+              <div class="pct">22%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="thresh-legend">
+          <span>Thresholds: 67% to approve, 51% for funding level</span>
+        </div>
+
+        <div class="quorum">
+          <div class="quorum-head">Turnout</div>
+          <div class="quorum-track">
+            <div class="quorum-fill" style="width:12%;"></div>
+            <div class="quorum-mark"></div>
+          </div>
+          <div class="quorum-row">
+            <span><b>12%</b> of voting units</span>
+            <span class="status miss">Below 25% quorum</span>
+          </div>
+        </div>
+
+        <div class="verdict early">
+          <span class="left">
+            <!-- lucide: loader -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
+            Too early to call
+          </span>
+        </div>        <div class="deadline">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Closes Mar 29, 10:00 PM PT
+        </div>
+
+
+
+        <a href="#" class="btn">Cast your vote</a>
+      </div>
+    </div>
+
+    <div class="sibling">
+      Sibling tile<br>
+      <span style="opacity:0.7;">(AlgaFilm DD, interest form, etc.)</span>
+    </div>
+  </div>
+</div>
+
+<h3 class="section-h">Closed ballots · final results</h3>
+<div class="page-wrapper">
+  <div class="ruler">same grid · closed ballot tiles</div>
+  <div class="attention-grid">
+
+    <!-- Closed · passed -->
+    <div>
+      <div class="state-label">Closed · passed</div>
+      <div class="ballot closed passed">
+        <div class="final-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Final
+        </div>
+        <div class="fund-heading">E8 Fund 2026</div>
+        <div class="title">EELI Technology</div>
+        <div class="viz">
+          <div class="therm">
+            <div class="therm-stack">
+              <div class="seg" style="height:10%;background:var(--c-225);"></div>
+              <div class="seg" style="height:20%;background:var(--c-175);"></div>
+              <div class="seg" style="height:40%;background:var(--c-125);"></div>
+              <div class="seg" style="height:30%;background:var(--c-no);"></div>
+            </div>
+            <div class="tick t51"></div>
+            <div class="tick t67"></div>
+          </div>
+          <div class="tiers">
+            <div class="tier">
+              <div class="sw" style="background:var(--c-no);"></div>
+              <div class="nm">No</div>
+              <div class="bar-wrap"><div class="bar" style="width:30%;background:var(--c-no);"></div></div>
+              <div class="pct">30%</div>
+            </div>
+            <div class="tier">
+              <div class="sw" style="background:var(--c-125);"></div>
+              <div class="nm">$125K</div>
+              <div class="bar-wrap"><div class="bar" style="width:40%;background:var(--c-125);"></div></div>
+              <div class="pct">40%</div>
+            </div>
+            <div class="tier">
+              <div class="sw" style="background:var(--c-175);"></div>
+              <div class="nm">$175K</div>
+              <div class="bar-wrap"><div class="bar" style="width:20%;background:var(--c-175);"></div></div>
+              <div class="pct">20%</div>
+            </div>
+            <div class="tier">
+              <div class="sw" style="background:var(--c-225);"></div>
+              <div class="nm">$225K</div>
+              <div class="bar-wrap"><div class="bar" style="width:10%;background:var(--c-225);"></div></div>
+              <div class="pct">10%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="thresh-legend">
+          <span>Thresholds: 67% to approve, 51% for funding level</span>
+        </div>
+
+        <div class="quorum">
+          <div class="quorum-head">Final turnout</div>
+          <div class="quorum-track">
+            <div class="quorum-fill" style="width:65%;"></div>
+            <div class="quorum-mark"></div>
+          </div>
+          <div class="quorum-row">
+            <span><b>65%</b> of voting units</span>
+            <span class="status met">Quorum met</span>
+          </div>
+        </div>
+
+        <div class="verdict final-pass">
+          <span class="left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Passed at
+          </span>
+          <span class="big">$125,000</span>
+        </div>
+        <div class="final-deadline">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Closed Mar 29, 2026
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Closed · did not pass -->
+    <div>
+      <div class="state-label">Closed · did not pass</div>
+      <div class="ballot closed failed">
+        <div class="final-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Final
+        </div>
+        <div class="fund-heading">E8 Fund 2026</div>
+        <div class="title">EELI Technology</div>
+        <div class="viz">
+          <div class="therm">
+            <div class="therm-stack">
+              <div class="seg" style="height:7%;background:var(--c-225);"></div>
+              <div class="seg" style="height:13%;background:var(--c-175);"></div>
+              <div class="seg" style="height:20%;background:var(--c-125);"></div>
+              <div class="seg" style="height:60%;background:var(--c-no);"></div>
+            </div>
+            <div class="tick t51"></div>
+            <div class="tick t67"></div>
+          </div>
+          <div class="tiers">
+            <div class="tier">
+              <div class="sw" style="background:var(--c-no);"></div>
+              <div class="nm">No</div>
+              <div class="bar-wrap"><div class="bar" style="width:60%;background:var(--c-no);"></div></div>
+              <div class="pct">60%</div>
+            </div>
+            <div class="tier">
+              <div class="sw" style="background:var(--c-125);"></div>
+              <div class="nm">$125K</div>
+              <div class="bar-wrap"><div class="bar" style="width:20%;background:var(--c-125);"></div></div>
+              <div class="pct">20%</div>
+            </div>
+            <div class="tier">
+              <div class="sw" style="background:var(--c-175);"></div>
+              <div class="nm">$175K</div>
+              <div class="bar-wrap"><div class="bar" style="width:13%;background:var(--c-175);"></div></div>
+              <div class="pct">13%</div>
+            </div>
+            <div class="tier">
+              <div class="sw" style="background:var(--c-225);"></div>
+              <div class="nm">$225K</div>
+              <div class="bar-wrap"><div class="bar" style="width:7%;background:var(--c-225);"></div></div>
+              <div class="pct">7%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="thresh-legend">
+          <span>Thresholds: 67% to approve, 51% for funding level</span>
+        </div>
+
+        <div class="quorum">
+          <div class="quorum-head">Final turnout</div>
+          <div class="quorum-track">
+            <div class="quorum-fill" style="width:72%;"></div>
+            <div class="quorum-mark"></div>
+          </div>
+          <div class="quorum-row">
+            <span><b>72%</b> of voting units</span>
+            <span class="status met">Quorum met</span>
+          </div>
+        </div>
+
+        <div class="verdict final-fail">
+          <span class="left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            Did not pass
+          </span>
+          <span class="big">40%</span>
+        </div>
+        <div class="final-deadline">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Closed Mar 29, 2026
+        </div>
+
+      </div>
+    </div>
+
+    <div class="sibling">
+      Sibling tile
+    </div>
+    <div class="sibling">
+      Sibling tile
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pitch Video Recorder — UX Mockup</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f1f5f9; color: #0f172a; margin: 0; }
+
+  /* Screen switcher */
+  .screen-nav { position: sticky; top: 0; z-index: 50; background: #0f172a; color: #fff; padding: 10px 16px; display: flex; gap: 4px; align-items: center; font-size: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.1); flex-wrap: wrap; }
+  .screen-nav .label { font-weight: 600; margin-right: 12px; letter-spacing: .02em; font-size: 13px; }
+  .screen-nav .divider { width: 1px; height: 20px; background: #334155; margin: 0 4px; }
+  .screen-nav button { background: transparent; color: #cbd5e1; border: 1px solid #334155; border-radius: 6px; padding: 5px 10px; cursor: pointer; font-size: 11px; transition: all .12s; }
+  .screen-nav button:hover { background: #1e293b; color: #fff; }
+  .screen-nav button.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+  .screen-nav .group-label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: .06em; padding: 0 6px 0 4px; }
+
+  .screen { display: none; min-height: calc(100vh - 50px); }
+  .screen.active { display: block; }
+  .screen.padded { padding: 24px 20px; }
+
+  .container-lg { max-width: 1200px; margin: 0 auto; }
+  .container-md { max-width: 860px; margin: 0 auto; }
+  .container-xl { max-width: 1400px; margin: 0 auto; }
+
+  /* ===== Applicant dashboard w/ sidebar (mirrors real app) ===== */
+  .e8-dashboard-shell { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 50px); background: #f8fafc; }
+  .e8-dashboard-sidebar { background: #0f172a; color: #fff; display: flex; flex-direction: column; padding: 16px 12px; }
+  .e8-sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px 14px; }
+  .e8-sidebar-logo { width: 34px; height: 34px; background: linear-gradient(135deg, #0B3D8A 0%, #1e40af 100%); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; }
+  .e8-sidebar-brand-title { font-size: 14px; font-weight: 700; }
+  .e8-sidebar-brand-sub { font-size: 10px; color: rgba(255,255,255,.5); }
+  .e8-sidebar-nav { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; }
+  .e8-sidebar-link { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; font-size: 13px; color: rgba(255,255,255,.7); cursor: pointer; border: none; background: transparent; text-align: left; }
+  .e8-sidebar-link:hover { background: rgba(255,255,255,.05); color: #fff; }
+  .e8-sidebar-link.active { background: rgba(59,130,246,.2); color: #fff; }
+  .e8-sidebar-link .badge { margin-left: auto; background: #dc2626; color: #fff; border-radius: 10px; padding: 0 6px; font-size: 10px; font-weight: 600; }
+  .e8-sidebar-footer { margin-top: auto; border-top: 1px solid rgba(255,255,255,.08); padding-top: 10px; }
+  .e8-sidebar-profile { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+  .e8-sidebar-profile:hover { background: rgba(255,255,255,.05); }
+  .e8-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 600; }
+
+  .e8-dashboard-main { padding: 22px 28px; overflow-x: hidden; }
+  .e8-dashboard-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+  .e8-company-card { display: flex; align-items: flex-start; gap: 16px; padding: 16px 20px; }
+  .e8-company-logo { width: 48px; height: 48px; border-radius: 6px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; flex-shrink: 0; }
+  .e8-company-name { font-size: 15px; font-weight: 600; }
+  .e8-company-meta { font-size: 13px; color: #64748b; margin-top: 1px; }
+  .e8-tag { display: inline-block; background: #e8f0fb; color: #0B3D8A; border: 1px solid #c7d8f1; border-radius: 10px; padding: 1px 8px; font-size: 11px; font-weight: 500; }
+  .e8-tag.muted { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
+  .e8-section-label { font-size: 10px; font-weight: 600; letter-spacing: .16em; color: #94a3b8; text-transform: uppercase; }
+  .e8-badge { display: inline-block; background: #e8f0fb; color: #0B3D8A; border: 1px solid #c7d8f1; border-radius: 4px; padding: 1px 8px; font-size: 11px; font-weight: 500; }
+  .e8-badge.draft { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+  .e8-badge.pipeline { background: #e8f0fb; color: #0B3D8A; border-color: #c7d8f1; }
+  .e8-primary-btn { background: #0B3D8A; color: #fff; font-size: 13px; font-weight: 500; padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .e8-primary-btn:hover { background: #082d68; }
+  .e8-outline-btn { background: #fff; color: #0f172a; border: 1px solid #cbd5e1; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+  .e8-outline-btn:hover { background: #f8fafc; }
+
+  /* Distinct Record Pitch button — amber/sunrise treatment so it doesn't get lost */
+  .record-pitch-btn { background: linear-gradient(135deg, #f59e0b 0%, #dc2626 100%); color: #fff; font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 6px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; box-shadow: 0 2px 6px rgba(220, 38, 38, .25); transition: all .12s; }
+  .record-pitch-btn:hover { box-shadow: 0 4px 12px rgba(220, 38, 38, .4); transform: translateY(-1px); }
+
+  .timeline-step { display: flex; gap: 10px; padding: 2px 0; align-items: center; }
+  .timeline-dot { width: 16px; height: 16px; border-radius: 50%; background: #e2e8f0; border: 2px solid #cbd5e1; flex-shrink: 0; position: relative; }
+  .timeline-dot.done { background: #0B3D8A; border-color: #0B3D8A; }
+  .timeline-dot.current { background: #fff; border-color: #0B3D8A; }
+  .timeline-dot.current::after { content: ''; position: absolute; inset: 3px; border-radius: 50%; background: #0B3D8A; }
+  .timeline-connector { width: 2px; background: #e2e8f0; margin-left: 7px; height: 14px; }
+  .timeline-connector.done { background: #0B3D8A; }
+  .timeline-label { font-size: 13px; color: #475569; }
+  .timeline-label.current { color: #0B3D8A; font-weight: 600; }
+
+  /* ===== Shared UI ===== */
+  .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; }
+  .btn { padding: 7px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all .12s; display: inline-flex; align-items: center; gap: 6px; background: #fff; }
+  .btn-primary { background: #0f172a; color: #fff; border-color: #0f172a; }
+  .btn-primary:hover { background: #1e293b; }
+  .btn-primary.blue { background: #0B3D8A; border-color: #0B3D8A; }
+  .btn-primary.blue:hover { background: #082d68; }
+  .btn-danger { background: #dc2626; color: #fff; border-color: #dc2626; }
+  .btn-outline { background: #fff; color: #0f172a; border-color: #cbd5e1; font-size: 13px; height: 32px; padding: 0 10px; }
+  .btn-outline:hover { background: #f8fafc; }
+  .btn-ghost { background: transparent; color: #64748b; border-color: transparent; }
+  .btn-ghost:hover { background: #f1f5f9; color: #334155; }
+  .icon-btn { height: 36px; width: 36px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; display: inline-flex; align-items: center; justify-content: center; color: #475569; cursor: pointer; }
+  .icon-btn:hover { background: #f8fafc; color: #0f172a; }
+
+  /* ===== Setup, record, review shared ===== */
+  .setup-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 20px; }
+  .deck-option { border: 2px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; cursor: pointer; background: #fff; margin-bottom: 10px; }
+  .deck-option.selected { border-color: #0f172a; background: #f8fafc; }
+  .deck-title { font-size: 13px; font-weight: 600; }
+  .deck-meta { font-size: 12px; color: #64748b; margin-top: 2px; }
+  .preview-box { aspect-ratio: 16 / 9; background: linear-gradient(135deg, #475569 0%, #1e293b 100%); border-radius: 8px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-size: 12px; }
+  .vu-meter { display: flex; gap: 2px; height: 10px; margin-top: 6px; }
+  .vu-bar { flex: 1; background: #e2e8f0; border-radius: 1px; transition: background .08s; }
+  .vu-bar.on { background: #10b981; }
+  .vu-bar.on.loud { background: #f59e0b; }
+  .vu-bar.on.peak { background: #dc2626; }
+  .device-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }
+  .device-row label { width: 70px; color: #64748b; }
+  .device-row select { flex: 1; height: 30px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 8px; font-size: 13px; background: #fff; }
+  .permission-banner { background: #d1fae5; border: 1px solid #10b981; border-radius: 6px; padding: 8px 12px; font-size: 12px; color: #065f46; margin-bottom: 14px; display: flex; gap: 8px; align-items: flex-start; }
+  .checklist { list-style: none; padding: 0; margin: 0; font-size: 13px; }
+  .checklist li { display: flex; align-items: center; gap: 8px; padding: 3px 0; color: #475569; }
+  .checklist li .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #cbd5e1; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; }
+  .checklist li.ok .dot { background: #10b981; border-color: #10b981; }
+  .checklist li.ok { color: #0f172a; }
+
+  .cam-face { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); display: flex; align-items: center; justify-content: center; font-size: 28px; color: #fff; font-weight: 600; }
+  .cam-face.sm { width: 50px; height: 50px; font-size: 20px; }
+
+  /* Recording stage */
+  .rec-stage { background: #0f172a; min-height: calc(100vh - 50px); padding: 18px 24px; display: flex; flex-direction: column; align-items: center; color: #fff; }
+  .rec-topbar { width: 100%; max-width: 1080px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 13px; }
+  .rec-status { display: flex; align-items: center; gap: 8px; color: #cbd5e1; }
+  .rec-dot { width: 10px; height: 10px; border-radius: 50%; background: #dc2626; animation: pulse 1.4s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+  .cam-dock { width: 300px; height: 170px; background: #1e293b; border-radius: 8px; border: 2px solid #475569; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+  .cam-dock.sm { width: 210px; height: 118px; }
+  .cam-dock.lg { width: 400px; height: 224px; }
+  .cam-size-toggle { position: absolute; top: 4px; right: 4px; display: flex; gap: 2px; background: rgba(15,23,42,.7); border-radius: 4px; padding: 2px; }
+  .cam-size-toggle button { width: 22px; height: 22px; background: transparent; border: none; color: #cbd5e1; font-size: 11px; cursor: pointer; border-radius: 3px; }
+  .cam-size-toggle button.active { background: #3b82f6; color: #fff; }
+  .slide-stage { width: 100%; max-width: 1080px; aspect-ratio: 16 / 9; background: #fff; border-radius: 8px; position: relative; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; }
+  .slide-stage h2 { font-size: 34px; font-weight: 700; margin: 0 0 14px; color: #0f172a; }
+  .slide-stage p { font-size: 15px; color: #64748b; margin: 0; }
+  .slide-num { position: absolute; bottom: 10px; right: 14px; font-size: 11px; color: #94a3b8; }
+  .rec-controls { display: flex; align-items: center; gap: 10px; margin-top: 16px; background: rgba(15,23,42,.6); padding: 10px 14px; border-radius: 50px; border: 1px solid #334155; }
+  .rec-btn { width: 42px; height: 42px; border-radius: 50%; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; background: #1e293b; color: #fff; }
+  .rec-btn.stop { background: #fff; color: #0f172a; }
+  .rec-slide-info { font-size: 13px; color: #cbd5e1; padding: 0 10px; border-left: 1px solid #334155; border-right: 1px solid #334155; min-width: 100px; text-align: center; }
+  .kbd { display: inline-block; background: #1e293b; color: #cbd5e1; border: 1px solid #334155; border-radius: 3px; padding: 1px 5px; font-size: 10px; font-family: ui-monospace, monospace; }
+
+  /* Review */
+  .review-player { background: #0f172a; border-radius: 10px; padding: 14px; }
+  .review-stage { width: 100%; aspect-ratio: 16 / 9; background: #fff; border-radius: 6px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .review-cam-top { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 160px; height: 90px; background: #1e293b; border: 2px solid rgba(255,255,255,.15); border-radius: 6px; display: flex; align-items: center; justify-content: center; z-index: 2; }
+  .scrubber-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; color: #cbd5e1; font-size: 12px; font-variant-numeric: tabular-nums; }
+  .scrubber { flex: 1; height: 6px; background: #334155; border-radius: 3px; position: relative; cursor: pointer; }
+  .scrubber .played { width: 38%; height: 100%; background: #3b82f6; border-radius: 3px; }
+  .scrubber .marker { position: absolute; top: -2px; width: 2px; height: 10px; background: #fbbf24; }
+  .scrubber .thumb { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: #fff; border-radius: 50%; border: 2px solid #3b82f6; }
+
+  /* ===== Email modal ===== */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.55); display: flex; align-items: center; justify-content: center; z-index: 60; padding: 20px; }
+  .modal { background: #fff; border-radius: 10px; width: 760px; max-height: 92vh; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0,0,0,.3); overflow: hidden; }
+  .modal-header { padding: 14px 20px; border-bottom: 1px solid #e2e8f0; }
+  .modal-header h2 { font-size: 15px; font-weight: 600; margin: 0; }
+  .modal-header p { font-size: 12px; color: #64748b; margin: 3px 0 0; }
+  .modal-body { padding: 14px 20px; overflow-y: auto; }
+  .modal-footer { padding: 10px 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
+  .info-strip { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 8px 10px; font-size: 12px; color: #1e3a8a; margin-bottom: 12px; display: flex; gap: 8px; align-items: flex-start; }
+
+  .field-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+  .field-row label { width: 70px; color: #64748b; font-size: 12px; flex-shrink: 0; }
+  .field-row .field-static { color: #475569; }
+  .field-row input { flex: 1; border: none; outline: none; font-size: 13px; color: #0f172a; background: transparent; padding: 2px 0; }
+  .field-row input:focus { border-bottom: 1px solid #3b82f6; }
+
+  .tiptap-toolbar { display: flex; gap: 2px; padding: 6px; border: 1px solid #e2e8f0; border-bottom: none; border-radius: 6px 6px 0 0; background: #f8fafc; }
+  .tiptap-toolbar button { width: 28px; height: 28px; border-radius: 4px; border: none; background: transparent; color: #475569; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .tiptap-toolbar button:hover { background: #e2e8f0; color: #0f172a; }
+  .tiptap-toolbar button.active { background: #0f172a; color: #fff; }
+  .tiptap-toolbar .sep { width: 1px; background: #e2e8f0; margin: 2px 4px; }
+  .tiptap-editor { border: 1px solid #e2e8f0; border-radius: 0 0 6px 6px; padding: 12px 14px; min-height: 160px; font-size: 13px; line-height: 1.5; outline: none; }
+  .tiptap-editor p { margin: 0 0 8px; }
+  .tiptap-editor .token { background: #fef3c7; color: #92400e; border-radius: 3px; padding: 0 4px; font-size: 12px; font-family: ui-monospace, monospace; }
+
+  .email-locked-region { margin-top: 14px; padding: 14px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; font-size: 13px; color: #475569; }
+  .email-locked-label { font-size: 10px; font-weight: 700; color: #94a3b8; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+  .email-btn-preview { display: inline-block; background: #0B3D8A; color: #fff; padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; }
+  .email-btn-preview.secondary { background: #fff; color: #0B3D8A; border: 1px solid #0B3D8A; }
+  .email-btn-row { display: flex; justify-content: center; gap: 10px; margin: 12px 0 10px; }
+
+  /* ===== Screening page (mirrors real app) ===== */
+  .sr-page { background: #fff; }
+  .sr-header { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 18px 24px; }
+  .sr-header-row { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; }
+  .sr-title { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
+  .sr-action-row { display: flex; gap: 8px; }
+  .sr-sort-row { display: flex; align-items: center; gap: 16px; max-width: 1400px; margin: 12px auto 0; flex-wrap: wrap; }
+  .sr-sort-label { font-size: 13px; color: #64748b; font-weight: 500; }
+  .sr-sort-select { height: 32px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0 28px 0 10px; font-size: 13px; background: #fff; }
+  .sr-filter-chip { height: 28px; padding: 0 12px; border-radius: 14px; border: 1px solid #e2e8f0; background: #fff; font-size: 12px; color: #64748b; cursor: pointer; }
+  .sr-filter-chip.active { background: #1e293b; color: #fff; border-color: #1e293b; }
+
+  .sr-list { padding: 16px 24px 40px; max-width: 1400px; margin: 0 auto; }
+  .sr-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+  .sr-card-header { background: #f8f9fa; border-bottom: 1px solid #e2e8f0; padding: 16px 19px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+  .sr-card-left { display: flex; gap: 14px; align-items: flex-start; min-width: 0; }
+  .sr-card-logo { width: 56px; height: 56px; border-radius: 8px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600; flex-shrink: 0; }
+  .sr-card-name { font-size: 21px; font-weight: 650; line-height: 1.1; }
+  .sr-card-web { font-size: 14px; color: #64748b; margin-left: 6px; font-weight: 400; }
+  .sr-card-tagline { font-size: 13px; color: #475569; margin-top: 4px; }
+  .sr-card-pills { display: inline-flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .sr-card-actions { display: inline-flex; gap: 6px; align-items: center; }
+  .rate-btn { height: 36px; padding: 0 12px; border-radius: 6px; background: #0B3D8A; color: #fff; border: none; font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .rate-btn:hover { background: #082d68; }
+
+  .sr-card-body { padding: 20px 24px; background: #fff; }
+  .sr-expandable-section { margin-bottom: 22px; }
+  .sr-section-title { font-size: 14px; font-weight: 600; color: #0f172a; margin: 0 0 10px; display: flex; justify-content: space-between; align-items: center; }
+  .sr-section-title .title-actions { display: flex; gap: 6px; align-items: center; }
+
+  /* Viewer inside the expanded card */
+  .viewer-wrap { background: #0f172a; border-radius: 8px; padding: 12px; }
+  .viewer-stage { width: 100%; aspect-ratio: 16 / 9; background: #fff; border-radius: 6px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .viewer-cam-top { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 160px; height: 90px; background: #1e293b; border: 2px solid rgba(255,255,255,.15); border-radius: 6px; display: flex; align-items: center; justify-content: center; z-index: 2; }
+  .viewer-cam-float { position: absolute; bottom: 14px; right: 14px; width: 170px; height: 96px; background: #1e293b; border: 2px solid rgba(255,255,255,.4); border-radius: 6px; display: flex; align-items: center; justify-content: center; z-index: 3; box-shadow: 0 8px 20px rgba(0,0,0,.4); cursor: move; }
+  .viewer-mode-toggle { display: inline-flex; background: rgba(15,23,42,.6); border: 1px solid #334155; border-radius: 6px; padding: 2px; gap: 2px; }
+  .viewer-mode-toggle button { background: transparent; border: none; color: #cbd5e1; font-size: 11px; padding: 4px 10px; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+  .viewer-mode-toggle button.active { background: #3b82f6; color: #fff; }
+  .slide-strip { display: flex; gap: 6px; padding: 8px 4px 4px; overflow-x: auto; }
+  .slide-thumb { flex-shrink: 0; width: 78px; aspect-ratio: 16/9; background: #1e293b; border: 2px solid #334155; border-radius: 3px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-size: 10px; cursor: pointer; position: relative; }
+  .slide-thumb.current { border-color: #3b82f6; }
+  .slide-thumb .idx { position: absolute; bottom: 2px; right: 4px; font-size: 9px; color: #94a3b8; }
+
+  .transcript-panel { background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; max-height: 380px; overflow-y: auto; font-size: 13px; line-height: 1.55; }
+  .transcript-segment { padding: 5px 0; border-bottom: 1px solid #f1f5f9; cursor: pointer; display: flex; gap: 10px; }
+  .transcript-segment.current { background: #eff6ff; border-left: 3px solid #3b82f6; padding-left: 8px; margin-left: -10px; }
+  .transcript-time { font-size: 11px; color: #94a3b8; font-variant-numeric: tabular-nums; flex-shrink: 0; width: 44px; }
+  .transcript-text { color: #334155; }
+  .transcript-text mark { background: #fef3c7; padding: 0 2px; border-radius: 2px; }
+
+  /* Pitch video status pill on Request Recording icon button */
+  .video-icon-btn { position: relative; }
+  .video-icon-btn.received::after { content: ''; position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: #10b981; border-radius: 50%; border: 2px solid #fff; }
+  .video-icon-btn.sent::after { content: ''; position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: #f59e0b; border-radius: 50%; border: 2px solid #fff; }
+
+  /* Notes */
+  .notes { background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 20px 24px; }
+  .notes h2 { font-size: 14px; font-weight: 600; color: #fbbf24; margin: 0 0 10px; letter-spacing: .04em; text-transform: uppercase; }
+  .notes h3 { font-size: 13px; font-weight: 600; color: #fff; margin: 14px 0 6px; }
+  .notes p, .notes li { font-size: 13px; line-height: 1.55; color: #cbd5e1; }
+  .notes code { background: #1e293b; padding: 1px 5px; border-radius: 3px; font-size: 12px; color: #fbbf24; }
+  .notes .decision { background: #1e293b; border-left: 3px solid #3b82f6; padding: 10px 12px; border-radius: 4px; margin: 8px 0; font-size: 12px; }
+  .notes .decision b { color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="screen-nav">
+  <span class="label">Pitch Video Recorder</span>
+  <span class="group-label">Applicant</span>
+  <button onclick="showScreen(1)" class="active" id="nav-1">1. Dashboard</button>
+  <button onclick="showScreen(2)" id="nav-2">2. Setup</button>
+  <button onclick="showScreen(3)" id="nav-3">3. Record</button>
+  <button onclick="showScreen(4)" id="nav-4">4. Review</button>
+  <button onclick="showScreen(5)" id="nav-5">5. Submitted</button>
+  <span class="divider"></span>
+  <span class="group-label">Admin</span>
+  <button onclick="showScreen(6)" id="nav-6">6. Screening page</button>
+  <button onclick="showScreen(7)" id="nav-7">7. Request modal</button>
+  <button onclick="showScreen(8)" id="nav-8">8. Committee viewer</button>
+  <span class="divider"></span>
+  <button onclick="showScreen(9)" id="nav-9">Notes</button>
+</div>
+
+<!-- ====================================================== -->
+<!-- SCREEN 1: Applicant dashboard (real sidebar + layout) -->
+<!-- ====================================================== -->
+<div id="screen-1" class="screen active">
+  <div class="e8-dashboard-shell">
+    <aside class="e8-dashboard-sidebar">
+      <div class="e8-sidebar-brand">
+        <div class="e8-sidebar-logo">E8</div>
+        <div>
+          <div class="e8-sidebar-brand-title">E8</div>
+          <div class="e8-sidebar-brand-sub">Entrepreneur Portal</div>
+        </div>
+      </div>
+      <nav class="e8-sidebar-nav">
+        <button class="e8-sidebar-link active">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          <span>Overview</span>
+        </button>
+        <button class="e8-sidebar-link">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Messages</span>
+          <span class="badge">2</span>
+        </button>
+        <button class="e8-sidebar-link">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg>
+          <span>Company News</span>
+        </button>
+      </nav>
+      <div class="e8-sidebar-footer">
+        <div class="e8-sidebar-profile">
+          <div class="e8-avatar">JS</div>
+          <div style="min-width: 0;">
+            <div style="font-size: 12px; font-weight: 500;">Jordan Schwartz</div>
+            <div style="font-size: 10px; color: rgba(255,255,255,.4);">My profile</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="e8-dashboard-main">
+      <section class="e8-dashboard-card e8-company-card">
+        <div class="e8-company-logo">AC</div>
+        <div style="flex: 1; min-width: 0;">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="e8-company-name">Acme Corp</div>
+              <div class="e8-company-meta">Seattle, WA · acmecorp.com</div>
+            </div>
+            <button class="e8-outline-btn">✎ Edit</button>
+          </div>
+          <div style="margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap;">
+            <span class="e8-tag">Climate Tech</span>
+            <span class="e8-tag">Hardware</span>
+            <span class="e8-tag muted">C-Corp</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Current Application card with Record Pitch CTA inline -->
+      <section class="e8-dashboard-card" style="margin-top: 14px;">
+        <div class="flex items-center justify-between" style="border-bottom: 1px solid #f1f5f9; padding: 12px 18px;">
+          <div class="e8-section-label">Current Application</div>
+          <span class="e8-badge pipeline">Screening</span>
+        </div>
+        <div style="padding: 16px 18px; display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: flex-start;">
+          <!-- Timeline -->
+          <div>
+            <div class="timeline-step"><div class="timeline-dot done"></div><div class="timeline-label">Application Submitted</div></div>
+            <div class="timeline-connector done"></div>
+            <div class="timeline-step"><div class="timeline-dot done"></div><div class="timeline-label">Initial Review</div></div>
+            <div class="timeline-connector done"></div>
+            <div class="timeline-step"><div class="timeline-dot current"></div><div class="timeline-label current">Screening Committee</div></div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-step"><div class="timeline-dot"></div><div class="timeline-label">Live Pitch</div></div>
+          </div>
+          <!-- Actions stacked -->
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px; max-width: 320px;">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
+              <button class="e8-primary-btn">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                View Application
+              </button>
+              <button class="record-pitch-btn" onclick="showScreen(2)">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                Record Pitch
+              </button>
+            </div>
+            <div style="font-size: 12px; color: #475569; text-align: right; line-height: 1.45; max-width: 300px;">
+              You've been invited to record a 10-minute pitch video. The E8 Screening Committee will review it before deciding which companies present live on <b>May 14</b>. Due <b>May 2</b>.
+            </div>
+            <div style="font-size: 11px; color: #94a3b8;">Submitted April 12, 2026</div>
+          </div>
+        </div>
+      </section>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; margin: 20px 0 8px;">
+        <h2 style="font-size: 15px; font-weight: 600; margin: 0;">Applications</h2>
+      </div>
+      <div class="e8-dashboard-card">
+        <table style="width: 100%; font-size: 13px;">
+          <thead>
+            <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+              <th style="padding: 8px 16px; text-align: left; width: 60px;"></th>
+              <th style="padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; color: #64748b;">Application Date</th>
+              <th style="padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; color: #64748b;">Status</th>
+              <th style="padding: 8px 12px; text-align: right; font-size: 11px; font-weight: 600; text-transform: uppercase; color: #64748b;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding: 12px 16px;"><span class="e8-badge">E8</span></td>
+              <td style="padding: 12px;">April 12, 2026</td>
+              <td style="padding: 12px;"><span class="e8-badge pipeline">Screening</span></td>
+              <td style="padding: 12px; text-align: right;"><button class="e8-primary-btn" style="font-size: 12px; padding: 3px 10px;">Edit application</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top: 24px; padding: 10px 14px; background: #fffbeb; border: 1px solid #fbbf24; border-radius: 6px; font-size: 12px; color: #78350f;">
+        <b>Integration note:</b> Record Pitch button sits inside the existing Current Application card, next to View Application. It only renders when <code>pitch_video_invited = true</code> for that specific application. No "NEW" pill — the amber→red gradient treatment on the button itself is how it stands out. Instructional copy sits directly below the button stack so it reads in context.
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ====================================================== -->
+<!-- SCREEN 2: Setup / sound check -->
+<!-- ====================================================== -->
+<div id="screen-2" class="screen padded">
+  <div class="container-lg">
+    <button class="btn btn-ghost" onclick="showScreen(1)" style="padding-left: 0;">← Back to dashboard</button>
+    <h1 style="font-size: 20px; font-weight: 600; margin: 4px 0 2px;">Set up your recording</h1>
+    <p style="font-size: 13px; color: #64748b; margin: 0 0 18px;">Choose your deck, then check your camera and microphone before you start.</p>
+
+    <div class="setup-grid">
+      <div class="card">
+        <h2 style="font-size: 14px; font-weight: 600; margin: 0 0 4px;">1. Pitch deck</h2>
+        <p style="font-size: 12px; color: #64748b; margin: 0 0 14px;">Use the deck you submitted with your application, or upload a new PDF.</p>
+
+        <div class="deck-option selected">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="deck-title">Use existing deck</div>
+              <div class="deck-meta">Acme Corp Pitch Deck.pdf · 14 slides · uploaded Apr 12</div>
+            </div>
+            <svg width="18" height="18" fill="none" stroke="#0f172a" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+        </div>
+
+        <div class="deck-option">
+          <div class="deck-title">Upload a different deck</div>
+          <div class="deck-meta">PDF up to 50 MB</div>
+          <div style="margin-top: 10px; border: 2px dashed #cbd5e1; border-radius: 6px; padding: 14px; text-align: center; font-size: 12px; color: #64748b;">Drag a file here or <span style="color: #3b82f6; text-decoration: underline; cursor: pointer;">browse</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 style="font-size: 14px; font-weight: 600; margin: 0 0 4px;">2. Camera &amp; microphone</h2>
+        <p style="font-size: 12px; color: #64748b; margin: 0 0 12px;">Your browser will ask for permission to use your webcam and mic. Nothing is recorded until you press Record.</p>
+
+        <div class="permission-banner">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-top: 2px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <div>Camera and mic access granted.</div>
+        </div>
+
+        <div class="preview-box" style="margin-bottom: 10px;">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <div class="cam-face">JS</div>
+            <div style="font-size: 11px;">Live camera preview</div>
+          </div>
+          <div style="position: absolute; top: 8px; left: 8px; background: rgba(15,23,42,.7); color: #fff; padding: 3px 8px; border-radius: 3px; font-size: 10px;">● LIVE</div>
+        </div>
+
+        <div class="device-row"><label>Camera</label><select><option>FaceTime HD Camera</option><option>Logitech C920</option></select></div>
+        <div class="device-row"><label>Microphone</label><select><option>MacBook Pro Microphone</option><option>AirPods Pro</option></select></div>
+
+        <div style="margin-top: 10px;">
+          <div class="flex justify-between" style="font-size: 12px; color: #475569;">
+            <span>Mic level — say a few words</span>
+            <span style="color: #10b981; font-weight: 500;">✓ Sounds good</span>
+          </div>
+          <div class="vu-meter" id="vu-static">
+            <div class="vu-bar on"></div><div class="vu-bar on"></div><div class="vu-bar on"></div><div class="vu-bar on"></div>
+            <div class="vu-bar on"></div><div class="vu-bar on"></div><div class="vu-bar on loud"></div><div class="vu-bar on loud"></div>
+            <div class="vu-bar"></div><div class="vu-bar"></div><div class="vu-bar"></div><div class="vu-bar"></div>
+          </div>
+        </div>
+
+        <div style="margin-top: 12px; padding: 10px 12px; background: #f8fafc; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 12px; color: #475569;"><b style="color: #0f172a;">Playback test</b> — record 5 seconds and play it back.</div>
+          <button class="btn btn-outline" style="padding: 3px 8px; font-size: 11px; height: auto;">Test (5s)</button>
+        </div>
+
+        <h3 style="font-size: 13px; font-weight: 600; margin: 14px 0 6px;">Before you record</h3>
+        <ul class="checklist">
+          <li class="ok"><span class="dot">✓</span> Camera and microphone working</li>
+          <li class="ok"><span class="dot">✓</span> Pitch deck loaded (14 slides)</li>
+          <li><span class="dot"></span> Quiet room, good lighting, water within reach</li>
+          <li><span class="dot"></span> Target: <b>10 minutes</b>. Hard cap: <b>12 minutes</b>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px; text-align: right;">
+      <button class="btn btn-ghost" onclick="showScreen(1)">Cancel</button>
+      <button class="btn btn-primary blue" onclick="showScreen(3)">Continue to recording →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================== -->
+<!-- SCREEN 3: Recording -->
+<!-- ====================================================== -->
+<div id="screen-3" class="screen">
+  <div class="rec-stage">
+    <div class="rec-topbar">
+      <div class="rec-status"><span class="rec-dot"></span><span>Recording</span></div>
+      <div style="font-variant-numeric: tabular-nums;"><span>03:42</span><span style="color: #64748b;"> / 12:00 (target 10:00)</span></div>
+      <button class="btn btn-ghost" style="color: #cbd5e1;">Discard &amp; exit</button>
+    </div>
+
+    <div class="cam-dock" id="cam-dock">
+      <div class="cam-face">JS</div>
+      <div class="cam-size-toggle">
+        <button onclick="setCamSize('sm')" id="sz-sm">S</button>
+        <button onclick="setCamSize('md')" class="active" id="sz-md">M</button>
+        <button onclick="setCamSize('lg')" id="sz-lg">L</button>
+      </div>
+    </div>
+
+    <div class="slide-stage">
+      <div style="text-align: center; padding: 40px;">
+        <h2>Market Opportunity</h2>
+        <p>$42B TAM growing at 18% CAGR. We're targeting the underserved mid-market.</p>
+      </div>
+      <div class="slide-num">Slide 4 of 14</div>
+    </div>
+
+    <div class="rec-controls">
+      <button class="rec-btn"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+      <div class="rec-slide-info">Slide 4 / 14</div>
+      <button class="rec-btn"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+      <div style="width: 1px; height: 20px; background: #334155; margin: 0 4px;"></div>
+      <button class="rec-btn stop" onclick="showScreen(4)"><div style="width: 12px; height: 12px; background: #dc2626; border-radius: 2px;"></div></button>
+    </div>
+
+    <div style="margin-top: 12px; font-size: 11px; color: #64748b;">
+      <span class="kbd">←</span> <span class="kbd">→</span> Change slide &nbsp;·&nbsp; <span class="kbd">Space</span> Next &nbsp;·&nbsp; <span class="kbd">Esc</span> Stop
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================== -->
+<!-- SCREEN 4: Review -->
+<!-- ====================================================== -->
+<div id="screen-4" class="screen padded">
+  <div class="container-lg">
+    <h1 style="font-size: 20px; font-weight: 600; margin: 0 0 2px;">Review your recording</h1>
+    <p style="font-size: 13px; color: #64748b; margin: 0 0 16px;">Watch it back. Submit when you're happy, save a draft, or re-record.</p>
+
+    <div class="review-player">
+      <div class="review-stage">
+        <div class="review-cam-top"><div class="cam-face sm">JS</div></div>
+        <div style="text-align: center; padding: 120px 40px 40px; width: 100%;">
+          <h2 style="font-size: 26px; font-weight: 700; margin: 0 0 10px; color: #0f172a;">Market Opportunity</h2>
+          <p style="font-size: 13px; color: #64748b; margin: 0;">Slide 4 of 14</p>
+        </div>
+      </div>
+
+      <div class="scrubber-row">
+        <span>04:12</span>
+        <div class="scrubber">
+          <div class="played"></div>
+          <div class="marker" style="left: 5%;"></div><div class="marker" style="left: 12%;"></div><div class="marker" style="left: 22%;"></div>
+          <div class="marker" style="left: 38%;"></div><div class="marker" style="left: 47%;"></div><div class="marker" style="left: 55%;"></div>
+          <div class="marker" style="left: 66%;"></div><div class="marker" style="left: 75%;"></div><div class="marker" style="left: 84%;"></div>
+          <div class="marker" style="left: 92%;"></div>
+          <div class="thumb" style="left: 38%;"></div>
+        </div>
+        <span>11:04</span>
+      </div>
+    </div>
+
+    <div style="margin-top: 14px; display: flex; gap: 20px; font-size: 13px; color: #475569;">
+      <div><b style="color: #0f172a;">Length:</b> 11:04</div>
+      <div><b style="color: #0f172a;">Slides:</b> 14</div>
+      <div><b style="color: #0f172a;">Size:</b> 68 MB</div>
+    </div>
+
+    <div style="margin-top: 16px; display: flex; justify-content: space-between;">
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-danger">🗑 Delete</button>
+        <button class="btn btn-outline" onclick="showScreen(3)">↻ Re-record from scratch</button>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-outline">Save draft</button>
+        <button class="btn btn-primary blue" onclick="showScreen(5)">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================== -->
+<!-- SCREEN 5: Submitted -->
+<!-- ====================================================== -->
+<div id="screen-5" class="screen padded">
+  <div class="container-md">
+    <div class="card" style="text-align: center; padding: 36px 24px;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #d1fae5; color: #065f46; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+        <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <h1 style="font-size: 20px; font-weight: 600; margin: 0 0 4px;">Your pitch video is submitted</h1>
+      <p style="font-size: 13px; color: #64748b; margin: 0 0 18px;">The E8 Screening Committee will review your pitch before the May 14 meeting.</p>
+      <div style="background: #f8fafc; border-radius: 8px; padding: 14px; margin: 0 auto 18px; max-width: 400px; text-align: left; font-size: 13px;">
+        <div class="flex justify-between" style="padding: 3px 0;"><span style="color: #64748b;">Submitted</span><b>Apr 19, 2026 · 2:14 PM</b></div>
+        <div class="flex justify-between" style="padding: 3px 0;"><span style="color: #64748b;">Length</span><b>11:04</b></div>
+        <div class="flex justify-between" style="padding: 3px 0;"><span style="color: #64748b;">Status</span><b style="color: #10b981;">Submitted</b></div>
+      </div>
+      <div style="display: flex; gap: 8px; justify-content: center;">
+        <button class="btn btn-outline" onclick="showScreen(4)">View recording</button>
+        <button class="btn btn-ghost">Replace before deadline</button>
+        <button class="btn btn-primary blue" onclick="showScreen(1)">Back to dashboard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================== -->
+<!-- SCREEN 6: Screening page (?stage=Screening) — real context -->
+<!-- ====================================================== -->
+<div id="screen-6" class="screen">
+  <div class="sr-page">
+    <div class="sr-header">
+      <div class="sr-header-row">
+        <h1 class="sr-title">Screening</h1>
+        <div class="sr-action-row">
+          <button class="btn btn-outline">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+            Rate Applications
+          </button>
+          <button class="btn btn-outline">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+            Stack Rank
+          </button>
+          <button class="btn btn-outline">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Release Ratings
+          </button>
+          <!-- NEW BULK BUTTON — sends to all ?stage=Screening companies without a recording yet -->
+          <button class="btn btn-primary blue" onclick="openEmailModal('bulk')">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            Request Recordings
+          </button>
+        </div>
+      </div>
+      <div class="sr-sort-row">
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <span class="sr-sort-label">Sort by:</span>
+          <select class="sr-sort-select"><option>Applied Date</option><option>Alphabetical</option><option>Avg rating</option></select>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <span class="sr-sort-label">Filter:</span>
+          <button class="sr-filter-chip active">All (10)</button>
+          <button class="sr-filter-chip">Undecided</button>
+          <button class="sr-filter-chip">Screen</button>
+          <button class="sr-filter-chip">Hold</button>
+          <button class="sr-filter-chip">Pass</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sr-list">
+      <!-- One expanded card (the rest collapsed) -->
+      <div class="sr-card">
+        <div class="sr-card-header">
+          <div class="sr-card-left">
+            <div class="sr-card-logo">AC</div>
+            <div style="min-width: 0;">
+              <div>
+                <span class="sr-card-name">Acme Corp</span>
+                <span class="sr-card-web">· acmecorp.com</span>
+              </div>
+              <div class="sr-card-tagline">Predictive maintenance for mid-market manufacturers.</div>
+              <div class="sr-card-pills">
+                <span class="e8-tag">Climate Tech</span>
+                <span class="e8-tag">Hardware</span>
+              </div>
+            </div>
+          </div>
+          <div class="sr-card-actions">
+            <button class="rate-btn">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15 9 22 10 17 15 18 22 12 19 6 22 7 15 2 10 9 9 12 2"/></svg>
+              Rate Acme
+            </button>
+            <!-- Notes icon -->
+            <button class="icon-btn" title="Notes">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </button>
+            <!-- Refer out -->
+            <button class="icon-btn" title="Refer Out">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            </button>
+            <!-- Pitch deck -->
+            <button class="icon-btn" title="Pitch Deck">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </button>
+            <!-- NEW: Request Recording — sent state -->
+            <button class="icon-btn video-icon-btn sent" title="Request Recording — sent Apr 16 (no reply yet)" onclick="openEmailModal('single')">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Body of expanded card: sections (Q1, team, investment, pitch deck inline, etc.) -->
+        <div class="sr-card-body">
+          <!-- Example existing section -->
+          <div class="sr-expandable-section">
+            <h3 class="sr-section-title">
+              <span>About the Company</span>
+            </h3>
+            <div style="font-size: 13px; color: #475569; line-height: 1.55; background: #f8fafc; padding: 10px 12px; border-radius: 6px;">
+              Acme Corp builds a predictive-maintenance platform for mid-market manufacturers. The company was founded in 2023...
+            </div>
+          </div>
+
+          <!-- NEW: Pitch Video section inline (committee viewer) -->
+          <div class="sr-expandable-section">
+            <h3 class="sr-section-title">
+              <span>Pitch Video <span style="font-size: 11px; font-weight: 400; color: #64748b; margin-left: 6px;">· submitted Apr 19 · 11:04</span></span>
+              <div class="title-actions">
+                <span style="font-size: 11px; color: #64748b;">Layout:</span>
+                <div class="viewer-mode-toggle">
+                  <button class="active" onclick="setViewerMode('top')">Video over deck</button>
+                  <button onclick="setViewerMode('float')">Floating</button>
+                  <button onclick="setViewerMode('side')">Side by side</button>
+                </div>
+                <button class="btn btn-outline" style="font-size: 11px; padding: 0 8px; height: 28px;">⛶ Fullscreen</button>
+                <button class="btn btn-outline" style="font-size: 11px; padding: 0 8px; height: 28px;" onclick="toggleTranscript()" id="transcript-btn">Hide transcript</button>
+              </div>
+            </h3>
+
+            <div id="viewer-layout" style="display: grid; grid-template-columns: 1.45fr 1fr; gap: 12px; align-items: start;">
+              <div>
+                <div class="viewer-wrap">
+                  <div class="viewer-stage">
+                    <div class="viewer-cam-top" id="cam-top"><div class="cam-face sm">JS</div></div>
+                    <div class="viewer-cam-float" id="cam-float" style="display: none;"><div class="cam-face sm" style="width: 42px; height: 42px; font-size: 16px;">JS</div></div>
+                    <div style="text-align: center; padding: 110px 40px 40px; width: 100%;">
+                      <h2 style="font-size: 24px; font-weight: 700; margin: 0 0 8px; color: #0f172a;">Market Opportunity</h2>
+                      <p style="font-size: 13px; color: #64748b; margin: 0;">$42B TAM growing at 18% CAGR</p>
+                    </div>
+                  </div>
+
+                  <div class="scrubber-row">
+                    <span>04:12</span>
+                    <div class="scrubber">
+                      <div class="played"></div>
+                      <div class="marker" style="left: 5%;"></div><div class="marker" style="left: 12%;"></div><div class="marker" style="left: 22%;"></div>
+                      <div class="marker" style="left: 38%;"></div><div class="marker" style="left: 47%;"></div><div class="marker" style="left: 55%;"></div>
+                      <div class="marker" style="left: 66%;"></div><div class="marker" style="left: 75%;"></div><div class="marker" style="left: 84%;"></div>
+                      <div class="marker" style="left: 92%;"></div>
+                      <div class="thumb" style="left: 38%;"></div>
+                    </div>
+                    <span>11:04</span>
+                  </div>
+
+                  <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
+                    <button class="rec-btn" style="background: #1e293b; width: 32px; height: 32px; font-size: 13px;">▶</button>
+                    <span style="color: #cbd5e1; font-size: 11px;">1× speed</span>
+                  </div>
+
+                  <div class="slide-strip">
+                    <div class="slide-thumb">1<div class="idx">0:00</div></div>
+                    <div class="slide-thumb">2<div class="idx">0:42</div></div>
+                    <div class="slide-thumb">3<div class="idx">1:28</div></div>
+                    <div class="slide-thumb current">4<div class="idx">4:00</div></div>
+                    <div class="slide-thumb">5<div class="idx">5:12</div></div>
+                    <div class="slide-thumb">6<div class="idx">5:48</div></div>
+                    <div class="slide-thumb">7<div class="idx">6:28</div></div>
+                    <div class="slide-thumb">8<div class="idx">7:22</div></div>
+                    <div class="slide-thumb">9<div class="idx">8:14</div></div>
+                    <div class="slide-thumb">10<div class="idx">9:00</div></div>
+                    <div class="slide-thumb">11<div class="idx">9:45</div></div>
+                    <div class="slide-thumb">12<div class="idx">10:12</div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="transcript-col">
+                <div style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                  <span>Transcript</span>
+                  <input placeholder="Search..." style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-size: 11px; width: 120px; font-weight: 400; text-transform: none; letter-spacing: 0;" />
+                </div>
+                <div class="transcript-panel">
+                  <div class="transcript-segment"><span class="transcript-time">0:00</span><span class="transcript-text">Hi everyone, I'm Jordan, founder and CEO of Acme Corp.</span></div>
+                  <div class="transcript-segment"><span class="transcript-time">0:42</span><span class="transcript-text">Every year, mid-market manufacturers waste billions in unplanned downtime because their monitoring tools were built for enterprises...</span></div>
+                  <div class="transcript-segment"><span class="transcript-time">1:28</span><span class="transcript-text">We built Acme to solve this. Our platform plugs into existing sensors and uses lightweight ML to predict failures 48 hours in advance.</span></div>
+                  <div class="transcript-segment current"><span class="transcript-time">4:00</span><span class="transcript-text">Looking at the <mark>market</mark>, this is a $42 billion opportunity growing at 18% per year. The mid-market is underserved.</span></div>
+                  <div class="transcript-segment"><span class="transcript-time">5:12</span><span class="transcript-text">Our traction has been strong. 14 paying customers, $180K in ARR, growing 20% month over month.</span></div>
+                  <div class="transcript-segment"><span class="transcript-time">6:28</span><span class="transcript-text">The team is myself and three co-founders. 40 years in industrial automation between us.</span></div>
+                  <div class="transcript-segment"><span class="transcript-time">9:00</span><span class="transcript-text">We're raising $2 million on a $10 million pre-money cap.</span></div>
+                  <div class="transcript-segment"><span class="transcript-time">10:12</span><span class="transcript-text">Thanks for watching. Happy to answer any questions.</span></div>
+                </div>
+                <div style="margin-top: 8px; font-size: 11px; color: #64748b;">Click a segment to jump the video there.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Placeholder rest of existing sections -->
+          <div class="sr-expandable-section">
+            <h3 class="sr-section-title"><span>Team</span></h3>
+            <div style="font-size: 13px; color: #475569; background: #f8fafc; padding: 10px 12px; border-radius: 6px;">Jordan Schwartz (CEO), Dana Lee (CTO), ...</div>
+          </div>
+          <div class="sr-expandable-section">
+            <h3 class="sr-section-title"><span>Investment Details</span></h3>
+            <div style="font-size: 13px; color: #475569; background: #f8fafc; padding: 10px 12px; border-radius: 6px;">Raising $2M on $10M pre-money cap. SAFE.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collapsed cards -->
+      <div class="sr-card" style="opacity: .7;">
+        <div class="sr-card-header">
+          <div class="sr-card-left">
+            <div class="sr-card-logo" style="background: linear-gradient(135deg, #10b981 0%, #065f46 100%);">HL</div>
+            <div>
+              <div><span class="sr-card-name">Helios Labs</span> <span class="sr-card-web">· helioslabs.com</span></div>
+              <div class="sr-card-tagline">Grid-scale solar + storage for rural utilities.</div>
+            </div>
+          </div>
+          <div class="sr-card-actions">
+            <button class="rate-btn">Rate Helios</button>
+            <button class="icon-btn"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></button>
+            <button class="icon-btn"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></button>
+            <button class="icon-btn video-icon-btn received" title="Pitch video received" onclick="openEmailModal('single')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sr-card" style="opacity: .7;">
+        <div class="sr-card-header">
+          <div class="sr-card-left">
+            <div class="sr-card-logo" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);">TW</div>
+            <div>
+              <div><span class="sr-card-name">Tidewater Inc</span> <span class="sr-card-web">· tidewater.com</span></div>
+              <div class="sr-card-tagline">Municipal water leak detection via acoustic sensors.</div>
+            </div>
+          </div>
+          <div class="sr-card-actions">
+            <button class="rate-btn">Rate Tidewater</button>
+            <button class="icon-btn"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></button>
+            <button class="icon-btn"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></button>
+            <button class="icon-btn video-icon-btn" title="Not yet requested" onclick="openEmailModal('single')"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="max-width: 1400px; margin: 16px auto 40px; padding: 0 24px;">
+      <div style="padding: 10px 14px; background: #fffbeb; border: 1px solid #fbbf24; border-radius: 6px; font-size: 12px; color: #78350f;">
+        <b>Per-card Request Recording:</b> video icon button in the existing card action row (next to Notes / Refer Out / Pitch Deck). Indicator dot shows state — amber = request sent, green = video received, empty = not requested. Click opens the request modal for that single applicant.
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="email-modal">
+    <!-- Modal markup shared across screens via JS — see showModal() -->
+  </div>
+</div>
+
+<!-- ====================================================== -->
+<!-- SCREEN 7: Request modal (standalone view) -->
+<!-- ====================================================== -->
+<div id="screen-7" class="screen padded">
+  <div class="container-lg" style="padding-top: 20px;">
+    <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;">Shows the modal in isolation so design can be reviewed. Two variants: <b>single</b> (opened from per-card video icon) and <b>bulk</b> (opened from header "Request Recordings").</p>
+    <div style="display: flex; gap: 14px; margin-bottom: 20px;">
+      <button class="btn btn-outline" onclick="renderStandaloneModal('single')">Show: Single</button>
+      <button class="btn btn-outline" onclick="renderStandaloneModal('bulk')">Show: Bulk</button>
+    </div>
+    <div id="standalone-modal-mount"></div>
+  </div>
+</div>
+
+<!-- ====================================================== -->
+<!-- SCREEN 8: Committee viewer (in context — same as Screen 6 section, zoomed) -->
+<!-- ====================================================== -->
+<div id="screen-8" class="screen padded">
+  <div class="container-xl">
+    <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">The committee viewer lives inline inside the expanded Screening-list card — see Screen 6 for full page context. This screen zooms in on the viewer itself.</p>
+    <div class="sr-card" style="margin: 0;">
+      <div class="sr-card-header">
+        <div class="sr-card-left">
+          <div class="sr-card-logo">AC</div>
+          <div>
+            <div><span class="sr-card-name">Acme Corp</span> <span class="sr-card-web">· acmecorp.com</span></div>
+            <div class="sr-card-tagline">Predictive maintenance for mid-market manufacturers.</div>
+          </div>
+        </div>
+      </div>
+      <div class="sr-card-body">
+        <div class="sr-expandable-section">
+          <h3 class="sr-section-title">
+            <span>Pitch Video <span style="font-size: 11px; font-weight: 400; color: #64748b; margin-left: 6px;">· submitted Apr 19 · 11:04</span></span>
+            <div class="title-actions">
+              <span style="font-size: 11px; color: #64748b;">Layout:</span>
+              <div class="viewer-mode-toggle">
+                <button class="active" onclick="setViewerMode2('top')">Video over deck</button>
+                <button onclick="setViewerMode2('float')">Floating</button>
+                <button onclick="setViewerMode2('side')">Side by side</button>
+              </div>
+              <button class="btn btn-outline" style="font-size: 11px; padding: 0 8px; height: 28px;">⛶ Fullscreen</button>
+            </div>
+          </h3>
+
+          <div style="display: grid; grid-template-columns: 1.45fr 1fr; gap: 12px; align-items: start;">
+            <div class="viewer-wrap">
+              <div class="viewer-stage" style="height: 480px; aspect-ratio: auto;">
+                <div class="viewer-cam-top" id="cam-top-2"><div class="cam-face sm">JS</div></div>
+                <div class="viewer-cam-float" id="cam-float-2" style="display: none;"><div class="cam-face sm" style="width: 42px; height: 42px; font-size: 16px;">JS</div></div>
+                <div style="text-align: center; padding: 130px 40px 40px; width: 100%;">
+                  <h2 style="font-size: 30px; font-weight: 700; margin: 0 0 10px; color: #0f172a;">Market Opportunity</h2>
+                  <p style="font-size: 14px; color: #64748b; margin: 0;">$42B TAM growing at 18% CAGR</p>
+                </div>
+              </div>
+              <div class="scrubber-row">
+                <span>04:12</span>
+                <div class="scrubber">
+                  <div class="played"></div>
+                  <div class="marker" style="left: 12%;"></div><div class="marker" style="left: 22%;"></div><div class="marker" style="left: 38%;"></div>
+                  <div class="marker" style="left: 55%;"></div><div class="marker" style="left: 75%;"></div>
+                  <div class="thumb" style="left: 38%;"></div>
+                </div>
+                <span>11:04</span>
+              </div>
+              <div class="slide-strip">
+                <div class="slide-thumb">1<div class="idx">0:00</div></div>
+                <div class="slide-thumb">2<div class="idx">0:42</div></div>
+                <div class="slide-thumb current">4<div class="idx">4:00</div></div>
+                <div class="slide-thumb">5<div class="idx">5:12</div></div>
+                <div class="slide-thumb">6<div class="idx">5:48</div></div>
+                <div class="slide-thumb">9<div class="idx">8:14</div></div>
+                <div class="slide-thumb">12<div class="idx">10:12</div></div>
+              </div>
+            </div>
+            <div class="transcript-panel">
+              <div class="transcript-segment current"><span class="transcript-time">4:00</span><span class="transcript-text">Looking at the market, this is a $42 billion opportunity growing at 18% per year.</span></div>
+              <div class="transcript-segment"><span class="transcript-time">5:12</span><span class="transcript-text">Our traction has been strong. 14 paying customers, $180K in ARR.</span></div>
+              <div class="transcript-segment"><span class="transcript-time">6:28</span><span class="transcript-text">The team is myself and three co-founders.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 16px; padding: 10px 14px; background: #fffbeb; border: 1px solid #fbbf24; border-radius: 6px; font-size: 12px; color: #78350f;">
+      <b>Placement:</b> the viewer is a new inline section inside the expanded screening-list card — it sits alongside existing sections like Company, Team, Investment Details. No new tab. No new page. Committee members who click "Expand" on Acme's card in the Screening list see the pitch video right there.
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================== -->
+<!-- SCREEN 9: Notes -->
+<!-- ====================================================== -->
+<div id="screen-9" class="screen padded">
+  <div class="container-md">
+    <div class="notes">
+      <h2>Updated decisions</h2>
+      <div class="decision"><b>Applicant dashboard.</b> "Record Pitch" button sits inside the Current Application card, next to "View Application". Amber→red gradient button treatment (it pops without needing a "NEW" pill). Instructional copy ("10-minute pitch... due May 2") appears below the button stack. Only renders when <code>applications.pitch_video_invited = true</code>.</div>
+
+      <div class="decision"><b>Screening page.</b> Request Recording entry points live where the real Screening page already puts actions: (1) Per-card icon button in the card action row (alongside Notes, Refer Out, Pitch Deck). Dot indicator: empty = not requested, amber = sent, green = received. (2) Header-level <i>Request Recordings</i> button next to Rate / Stack Rank / Release Ratings. Implicitly applies to everyone currently in <code>?stage=Screening</code> — modal copy says so. No explicit row-selection UI.</div>
+
+      <div class="decision"><b>Committee viewer.</b> New inline <i>Pitch Video</i> section inside the expanded screening-list card (where you already see About the Company / Team / Investment Details). Not a new tab or page. Three layout modes (video-over-deck / floating PiP / side-by-side). Fullscreen button. Transcript panel on the right, searchable, click-to-jump. Slide strip below the player.</div>
+
+      <div class="decision"><b>No "Folder / Team / Emails" tabs.</b> Those belong to the diligence application-review context, not screening. The screening page is a list-of-expandable-cards with inline section rendering — our mockup now matches.</div>
+
+      <div class="decision"><b>No bulk row-selection UI.</b> Clarified per Jordan: <i>Request Recordings</i> from <code>?stage=Screening</code> implicitly applies to all companies currently in that stage. Modal copy calls this out. Skips anyone already sent-to / received-from.</div>
+
+      <h3>Unchanged from previous plan</h3>
+      <ul>
+        <li>Storage: raw camera video + deck PDF + sidecar JSON + transcript JSON. No stitched MP4 in v1.</li>
+        <li>PDF only (no PPTX in v1).</li>
+        <li>Cloudflare Stream for hot storage → Drive for cold archive after the screening meeting.</li>
+        <li>10-min target, 12-min hard cap.</li>
+        <li>Two email templates: <code>request_recording</code>, <code>pitch_video_reminder</code>. Seed script supports <code>--env=prod</code>.</li>
+        <li>Whisper transcript on submit.</li>
+        <li>Upload-as-you-go for crash safety.</li>
+        <li>Schema sketch: new <code>pitch_video_recordings</code> table + <code>applications.pitch_video_invited</code> column.</li>
+      </ul>
+
+      <p>Plan doc (updated): <code>docs/pitch-video-plan.md</code></p>
+    </div>
+  </div>
+</div>
+
+<!-- Shared request modal markup, mounted via JS -->
+<template id="email-modal-template">
+  <div class="modal" data-variant="">
+    <div class="modal-header">
+      <h2 data-title>Request pitch video recording</h2>
+      <p data-sub>Emails the entrepreneur with a magic link to the recording page. The screening committee is notified when the video is submitted.</p>
+    </div>
+    <div class="modal-body">
+      <div class="info-strip" data-bulk-notice style="display: none;">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink: 0; margin-top: 1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <div>This will send <b>one individualized email</b> to every applicant currently in the Screening stage that hasn't already been sent a request or submitted a video. <b data-count>8 recipients</b>. Tokens (<code>{{first_name}}</code>, <code>{{company_name}}</code>) are substituted per recipient.</div>
+      </div>
+      <div class="field-row" data-field-from><label>From</label><span class="field-static">"E8 Screening Committee" &lt;no-reply@e8angels.com&gt;</span></div>
+      <div class="field-row" data-field-to><label>To</label><span class="field-static" data-to-val>Jordan Schwartz &lt;jordan@acmecorp.com&gt;</span></div>
+      <div class="field-row"><label>Subject</label><input value="E8 Angels — Please record your pitch video" /></div>
+
+      <div style="margin-top: 14px;">
+        <div class="tiptap-toolbar">
+          <button title="Bold" class="active"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg></button>
+          <button title="Italic"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg></button>
+          <div class="sep"></div>
+          <button title="Bullet list"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg></button>
+          <button title="Numbered list"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></button>
+        </div>
+        <div class="tiptap-editor" contenteditable="true">
+          <p>Hi <span class="token">{{first_name}}</span>,</p>
+          <p>Congratulations — <span class="token">{{company_name}}</span> has been selected for E8 screening review for the May 14 meeting. As part of that, we'd love for you to submit a short video pitch.</p>
+          <p>Please record a <b>10-minute video</b> presentation of your deck. The screening committee will watch it alongside your application before choosing three companies to present live to the full membership.</p>
+          <p>You can record it in your browser — no software to install. Click the button below when you're ready.</p>
+        </div>
+        <div class="email-locked-region">
+          <div class="email-locked-label">Fixed footer (not editable)</div>
+          <div class="email-btn-row">
+            <a class="email-btn-preview">🎥 Record your pitch video</a>
+            <a class="email-btn-preview secondary">💬 Ask questions</a>
+          </div>
+          <div style="font-size: 12px; color: #475569; text-align: center;">Link includes an authentication token that expires in 14 days. Do not reply to this email. If you have questions, use the "Ask questions" link above.</div>
+          <div style="font-size: 12px; color: #475569; margin-top: 8px; text-align: center;">— E8 Screening Committee</div>
+        </div>
+        <div style="margin-top: 10px; font-size: 11px; color: #64748b;">
+          Tokens: <code>{{first_name}}</code> <code>{{full_name}}</code> <code>{{company_name}}</code>. Template: <code>email_templates.template_key = 'request_recording'</code>.
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div style="font-size: 11px; color: #64748b;">Sent via Mailgun · entrepreneur template</div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-ghost" onclick="closeEmailModal()">Cancel</button>
+        <button class="btn btn-primary blue" data-send-label>Send request</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  function showScreen(n) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.screen-nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById('screen-' + n).classList.add('active');
+    document.getElementById('nav-' + n).classList.add('active');
+    window.scrollTo({top: 0, behavior: 'instant'});
+    closeEmailModal();
+    if (n === 7) renderStandaloneModal('bulk');
+  }
+
+  function setCamSize(size) {
+    const dock = document.getElementById('cam-dock');
+    dock.classList.remove('sm', 'lg');
+    if (size === 'sm') dock.classList.add('sm');
+    if (size === 'lg') dock.classList.add('lg');
+    ['sm','md','lg'].forEach(s => document.getElementById('sz-' + s).classList.remove('active'));
+    document.getElementById('sz-' + size).classList.add('active');
+  }
+
+  function renderModalInto(targetEl, variant) {
+    const tpl = document.getElementById('email-modal-template');
+    targetEl.innerHTML = '';
+    const clone = tpl.content.cloneNode(true);
+    const root = clone.querySelector('.modal');
+    const bulkNotice = root.querySelector('[data-bulk-notice]');
+    const fieldTo = root.querySelector('[data-field-to]');
+    const fieldFrom = root.querySelector('[data-field-from]');
+    const title = root.querySelector('[data-title]');
+    const sub = root.querySelector('[data-sub]');
+    const sendLabel = root.querySelector('[data-send-label]');
+    if (variant === 'bulk') {
+      bulkNotice.style.display = 'flex';
+      fieldTo.style.display = 'none';
+      title.textContent = 'Request pitch video recordings';
+      sub.textContent = 'Emails every applicant currently in the Screening stage who hasn\'t already been sent a request.';
+      sendLabel.textContent = 'Send 8 emails';
+    } else {
+      sendLabel.textContent = 'Send request';
+    }
+    targetEl.appendChild(clone);
+  }
+
+  function openEmailModal(variant) {
+    const overlay = document.getElementById('email-modal');
+    renderModalInto(overlay, variant || 'single');
+    overlay.style.display = 'flex';
+  }
+  function closeEmailModal() {
+    const overlay = document.getElementById('email-modal');
+    if (overlay) { overlay.style.display = 'none'; overlay.innerHTML = ''; }
+  }
+  function renderStandaloneModal(variant) {
+    const mount = document.getElementById('standalone-modal-mount');
+    mount.style.background = 'rgba(15,23,42,.08)';
+    mount.style.padding = '20px';
+    mount.style.borderRadius = '10px';
+    mount.style.display = 'flex';
+    mount.style.justifyContent = 'center';
+    renderModalInto(mount, variant || 'single');
+  }
+
+  function setViewerMode(mode) {
+    document.querySelectorAll('#screen-6 .viewer-mode-toggle button').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    const top = document.getElementById('cam-top');
+    const float = document.getElementById('cam-float');
+    top.style.display = 'none'; float.style.display = 'none';
+    if (mode === 'top' || mode === 'side') top.style.display = 'flex';
+    if (mode === 'float') float.style.display = 'flex';
+  }
+  function setViewerMode2(mode) {
+    document.querySelectorAll('#screen-8 .viewer-mode-toggle button').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    const top = document.getElementById('cam-top-2');
+    const float = document.getElementById('cam-float-2');
+    top.style.display = 'none'; float.style.display = 'none';
+    if (mode === 'top' || mode === 'side') top.style.display = 'flex';
+    if (mode === 'float') float.style.display = 'flex';
+  }
+  function toggleTranscript() {
+    const col = document.getElementById('transcript-col');
+    const layout = document.getElementById('viewer-layout');
+    const btn = document.getElementById('transcript-btn');
+    if (col.style.display === 'none') {
+      col.style.display = 'block';
+      layout.style.gridTemplateColumns = '1.45fr 1fr';
+      btn.textContent = 'Hide transcript';
+    } else {
+      col.style.display = 'none';
+      layout.style.gridTemplateColumns = '1fr';
+      btn.textContent = 'Show transcript';
+    }
+  }
+
+  setInterval(() => {
+    const bars = document.querySelectorAll('#vu-static .vu-bar');
+    const level = 4 + Math.floor(Math.random() * 6);
+    bars.forEach((bar, i) => {
+      bar.classList.remove('on', 'loud', 'peak');
+      if (i < level) { bar.classList.add('on'); if (i >= 8) bar.classList.add('loud'); if (i >= 10) bar.classList.add('peak'); }
+    });
+  }, 140);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screening Committee Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f8fafc;
+            min-height: 100vh;
+            color: #0f172a;
+        }
+
+        .page-header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .page-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .page-header h1 { font-size: 20px; font-weight: 700; }
+
+        .committee-badge {
+            font-size: 12px;
+            font-weight: 500;
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 4px 12px;
+            border-radius: 9999px;
+        }
+
+        .header-links {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .slack-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748b;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.15s;
+        }
+
+        .slack-link:hover { background: #f8fafc; border-color: #cbd5e1; color: #0f172a; }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 32px;
+            display: grid;
+            grid-template-columns: 7fr 3fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .left-col {
+            display: grid;
+            grid-template-columns: 5fr 4fr;
+            gap: 24px;
+        }
+
+        .left-col-top { display: contents; }
+        .grid-metrics  { grid-column: 1 / -1; }
+
+        .right-col {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .tile {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .tile-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .tile-head h2 {
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tile-head-icon { width: 18px; height: 18px; color: #64748b; flex-shrink: 0; }
+
+        .tile-action {
+            font-size: 13px;
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+
+        .tile-action:hover { color: #1d4ed8; }
+
+        .tile-body { padding: 14px 20px 20px; }
+
+        /* Meeting Notes */
+        .meeting-notes-list { list-style: none; }
+
+        .meeting-note {
+            display: flex;
+            gap: 16px;
+            padding: 14px 0;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: background 0.1s;
+            margin: 0 -20px;
+            padding-left: 20px;
+            padding-right: 20px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .meeting-note:hover { background: #f8fafc; }
+        .meeting-note:last-child { border-bottom: none; }
+
+        .note-date {
+            flex-shrink: 0;
+            width: 56px;
+            text-align: center;
+            padding-top: 2px;
+        }
+
+        .note-date-month {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #2563eb;
+            line-height: 1;
+        }
+
+        .note-date-day {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .note-date-year { font-size: 11px; color: #94a3b8; }
+
+        .note-content { flex: 1; min-width: 0; }
+
+        .note-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .note-badge-new {
+            font-size: 10px;
+            font-weight: 600;
+            background: #dcfce7;
+            color: #16a34a;
+            padding: 2px 6px;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+
+        .note-preview {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .note-meta { font-size: 12px; color: #94a3b8; margin-top: 5px; }
+
+        .new-note-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.15s;
+            text-decoration: none;
+        }
+
+        .new-note-btn:hover { background: #1d4ed8; }
+
+        .load-more-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: none;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748b;
+            font-family: inherit;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.15s;
+        }
+
+        .load-more-btn:hover { background: #f8fafc; border-color: #cbd5e1; color: #0f172a; }
+
+        /* Members */
+        .members-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            max-height: 360px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+
+        .members-grid::-webkit-scrollbar { width: 4px; }
+        .members-grid::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+
+        .member-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 14px 7px 7px;
+            border: 1px solid #e2e8f0;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: white;
+        }
+
+        .member-badge:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        }
+
+        .member-badge img {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .member-badge-name { font-size: 13px; font-weight: 500; white-space: nowrap; }
+        .member-badge-role { font-size: 11px; color: #94a3b8; white-space: nowrap; }
+        .member-badge-info { display: flex; flex-direction: column; line-height: 1.3; }
+
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: white;
+            color: #2563eb;
+            border: 1px solid #2563eb;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .contact-btn:hover { background: #eff6ff; }
+
+        /* Documents */
+        .drive-link {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            color: #64748b;
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+        .drive-link:hover { background: #f8fafc; color: #0f172a; }
+
+        .search-input {
+            width: 100%;
+            height: 34px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 13px;
+            padding: 0 10px 0 32px;
+            font-family: inherit;
+            color: #0f172a;
+            margin-bottom: 14px;
+            background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="%2394a3b8" stroke-width="1.5"><circle cx="6" cy="6" r="4"/><path d="M9.5 9.5l2.5 2.5"/></svg>') no-repeat 10px center;
+        }
+
+        .search-input::placeholder { color: #94a3b8; }
+        .search-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
+
+        .pinned-table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+        .pinned-table tr { cursor: pointer; transition: background 0.1s; }
+        .pinned-table tr:hover { background: #f8fafc; }
+        .pinned-table td { padding: 9px 0; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+        .pinned-table tr:last-child td { border-bottom: 1px solid #f1f5f9; }
+
+        .doc-name-cell { display: flex; align-items: center; gap: 10px; }
+
+        .doc-type-icon {
+            width: 28px; height: 28px;
+            border-radius: 5px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            font-size: 9px; font-weight: 700; color: white;
+        }
+
+        .doc-type-gdoc { background: #4285f4; }
+        .doc-type-pdf { background: #ea4335; }
+        .doc-type-sheet { background: #34a853; }
+        .doc-type-slide { background: #fbbc04; color: #0f172a; }
+
+        .doc-name-text { font-size: 13px; font-weight: 500; }
+
+        .doc-pin-icon { width: 12px; height: 12px; color: #f59e0b; flex-shrink: 0; margin-right: 4px; }
+
+        .doc-date-cell { font-size: 12px; color: #94a3b8; text-align: right; white-space: nowrap; padding-left: 12px; }
+
+        .folder-tree { margin-top: 4px; }
+        .folder-section { margin-bottom: 2px; }
+
+        .folder-header {
+            display: flex; align-items: center; gap: 8px;
+            padding: 9px 0; cursor: pointer; user-select: none; transition: color 0.15s;
+        }
+
+        .folder-header:hover { color: #2563eb; }
+
+        .folder-chevron { width: 12px; height: 12px; color: #94a3b8; flex-shrink: 0; transition: transform 0.15s; }
+        .folder-chevron.open { transform: rotate(90deg); }
+        .folder-icon-img { width: 20px; height: 20px; flex-shrink: 0; }
+        .folder-label { font-size: 13px; font-weight: 600; flex: 1; }
+        .folder-count { font-size: 11px; color: #94a3b8; background: #f1f5f9; padding: 2px 7px; border-radius: 8px; }
+
+        .folder-children { padding-left: 20px; }
+        .folder-children table { width: 100%; border-collapse: collapse; }
+        .folder-children tr { cursor: pointer; transition: background 0.1s; }
+        .folder-children tr:hover { background: #f8fafc; }
+        .folder-children td { padding: 7px 0; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+        .folder-children tr:last-child td { border-bottom: none; }
+
+        .child-name-cell { display: flex; align-items: center; gap: 8px; }
+
+        .child-type-icon {
+            width: 22px; height: 22px; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; font-size: 8px; font-weight: 700; color: white;
+        }
+
+        .child-name { font-size: 13px; font-weight: 500; color: #475569; }
+        .child-date { font-size: 12px; color: #94a3b8; text-align: right; white-space: nowrap; padding-left: 12px; }
+
+        /* Metrics */
+        .metrics-tabs {
+            display: flex; gap: 0; border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto; scrollbar-width: none;
+        }
+        .metrics-tabs::-webkit-scrollbar { display: none; }
+
+        .metrics-tab {
+            font-size: 13px; font-weight: 500; color: #94a3b8;
+            padding: 12px 16px; border: none; background: none;
+            cursor: pointer; white-space: nowrap;
+            border-bottom: 2px solid transparent; font-family: inherit; transition: color 0.15s;
+        }
+        .metrics-tab:hover { color: #64748b; }
+        .metrics-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+
+        .metrics-body { padding: 20px; }
+
+        .metrics-kpi-row { display: flex; gap: 16px; margin-bottom: 18px; }
+
+        .kpi-card { flex: 1; padding: 12px 14px; background: #f8fafc; border-radius: 8px; }
+        .kpi-label { font-size: 11px; font-weight: 500; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 3px; }
+        .kpi-value { font-size: 22px; font-weight: 700; }
+        .kpi-delta { font-size: 11px; font-weight: 500; }
+        .kpi-delta.up { color: #16a34a; }
+        .kpi-delta.down { color: #dc2626; }
+
+        .chart-placeholder { background: #f8fafc; border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; }
+        .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 160px; padding: 12px 16px 0; }
+        .chart-bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .chart-bar { width: 100%; max-width: 28px; border-radius: 3px 3px 0 0; }
+        .chart-bar.primary { background: #2563eb; }
+        .chart-bar.secondary { background: #93c5fd; }
+        .chart-x-labels { display: flex; gap: 6px; padding: 8px 16px; }
+        .chart-x-label { flex: 1; font-size: 10px; color: #94a3b8; text-align: center; }
+        .chart-legend { display: flex; gap: 16px; padding: 10px 16px; }
+        .chart-legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #64748b; }
+        .chart-legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+        /* Donut chart */
+        .donut-chart-wrap { display: flex; align-items: center; gap: 24px; padding: 8px 0; }
+        .donut-legend { display: flex; flex-direction: column; gap: 8px; }
+        .donut-legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #334155; }
+        .donut-legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+        .donut-legend-val { font-weight: 600; margin-left: auto; min-width: 32px; text-align: right; }
+
+        /* Horizontal bar chart */
+        .hbar-chart { display: flex; flex-direction: column; gap: 12px; padding: 4px 0; }
+        .hbar-row { display: flex; align-items: center; gap: 12px; }
+        .hbar-label { width: 72px; font-size: 12px; color: #64748b; text-align: right; flex-shrink: 0; }
+        .hbar-track { flex: 1; height: 22px; background: #f1f5f9; border-radius: 4px; overflow: hidden; position: relative; }
+        .hbar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; }
+        .hbar-val { font-size: 11px; font-weight: 600; color: white; }
+
+        /* Line chart area */
+        .line-chart-wrap { padding: 4px 0; }
+
+        /* Sector stacked bar */
+        .sector-stack { display: flex; height: 28px; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+        .sector-stack-seg { transition: width 0.3s; }
+        .sector-legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+
+        .metrics-pane { display: none; }
+        .metrics-pane.active { display: block; }
+
+        .metrics-nav { display: flex; align-items: center; gap: 2px; }
+        .metrics-nav button {
+            width: 26px; height: 26px; border: 1px solid #e2e8f0; border-radius: 5px;
+            background: white; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #64748b; transition: all 0.15s;
+        }
+        .metrics-nav button:hover { background: #f8fafc; border-color: #cbd5e1; }
+
+        /* Calendar */
+        .cal-list { list-style: none; }
+
+        .cal-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .cal-item:last-child { border-bottom: none; }
+
+        .cal-date-box {
+            width: 42px;
+            text-align: center;
+            flex-shrink: 0;
+            padding-top: 1px;
+        }
+
+        .cal-date-dow {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #94a3b8;
+            line-height: 1;
+        }
+
+        .cal-date-day {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.3;
+        }
+
+        .cal-item.today .cal-date-day {
+            color: white;
+            background: #2563eb;
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .cal-item.today .cal-date-dow { color: #2563eb; }
+
+        .cal-detail { flex: 1; min-width: 0; }
+
+        .cal-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+
+        .cal-meta {
+            font-size: 12px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cal-meta svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+        .cal-attendees {
+            display: flex;
+            align-items: center;
+            margin-top: 6px;
+        }
+
+        .cal-att-img {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1.5px solid white;
+            margin-left: -5px;
+        }
+
+        .cal-att-img:first-child { margin-left: 0; }
+
+        .cal-att-more {
+            font-size: 10px;
+            font-weight: 500;
+            color: #94a3b8;
+            margin-left: 4px;
+        }
+
+        /* RSVP avatars */
+        .cal-rsvp {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+            position: relative;
+        }
+
+        .rsvp-group {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .rsvp-group-imgs {
+            display: flex;
+            align-items: center;
+        }
+
+        .rsvp-av {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-left: -6px;
+            border: 2px solid white;
+        }
+
+        .rsvp-av:first-child { margin-left: 0; }
+
+        .rsvp-group-label {
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-left: 4px;
+        }
+
+        .rsvp-label-yes   { color: #16a34a; }
+        .rsvp-label-maybe { color: #a16207; }
+        .rsvp-label-no    { color: #dc2626; }
+        .rsvp-label-pending { color: #94a3b8; }
+
+        .rsvp-sep {
+            width: 1px;
+            height: 14px;
+            background: #e2e8f0;
+        }
+
+        /* RSVP popover */
+        .rsvp-popover {
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            padding: 8px 0;
+            min-width: 160px;
+            z-index: 20;
+        }
+
+        .rsvp-group:hover .rsvp-popover { display: block; }
+
+        .rsvp-popover-head {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #94a3b8;
+            padding: 2px 12px 6px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .rsvp-popover-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 12px;
+        }
+
+        .rsvp-popover-item img {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .rsvp-popover-item span {
+            font-size: 12px;
+            color: #0f172a;
+        }
+
+        /* Hover actions on calendar items */
+        .cal-actions {
+            display: flex;
+            gap: 4px;
+            margin-top: 6px;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .cal-item:hover .cal-actions { opacity: 1; }
+
+        .cal-action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #64748b;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            padding: 3px 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+
+        .cal-action-btn:hover { background: #f1f5f9; border-color: #cbd5e1; color: #0f172a; }
+        .cal-action-btn.zoom { color: #2563eb; }
+        .cal-action-btn.zoom:hover { background: #eff6ff; border-color: #bfdbfe; }
+
+        .cal-action-btn svg { width: 12px; height: 12px; }
+
+        /* Recordings link */
+        .recordings-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+            text-decoration: none;
+            padding: 10px;
+            border-top: 1px solid #f1f5f9;
+            transition: all 0.15s;
+        }
+
+        .recordings-link:hover { color: #2563eb; background: #f8fafc; }
+        .recordings-link svg { width: 14px; height: 14px; }
+
+        @media (max-width: 1100px) {
+            .dashboard { grid-template-columns: 1fr; padding: 16px; }
+            .left-col { grid-template-columns: 1fr 1fr; }
+            .right-col { display: grid; grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 700px) {
+            .left-col { grid-template-columns: 1fr; }
+            .grid-metrics { grid-column: auto; }
+            .right-col { grid-template-columns: 1fr; }
+            .page-header { padding: 12px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Screening Committee</h1>
+        <span class="committee-badge">8 Members</span>
+    </div>
+    <div class="header-links">
+        <a class="slack-link" href="#">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <path d="M3.5 9.5a1.5 1.5 0 1 1 0-3h3v3a1.5 1.5 0 0 1-3 0z" fill="#E01E5A"/>
+                <path d="M6.5 3.5a1.5 1.5 0 1 1 3 0v3h-3a1.5 1.5 0 0 1 0-3z" fill="#36C5F0"/>
+                <path d="M12.5 6.5a1.5 1.5 0 1 1 0 3h-3v-3a1.5 1.5 0 0 1 3 0z" fill="#2EB67D"/>
+                <path d="M9.5 12.5a1.5 1.5 0 1 1-3 0v-3h3a1.5 1.5 0 0 1 0 3z" fill="#ECB22E"/>
+            </svg>
+            #screening-committee
+        </a>
+    </div>
+</div>
+
+<div class="dashboard">
+    <div class="left-col">
+
+    <!-- ═══ NOTES ═══ -->
+        <div class="tile">
+            <div class="tile-head">
+                <h2>
+                    <svg class="tile-head-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="1.5" width="12" height="13" rx="1.5"/><path d="M5 1.5V3.5M11 1.5V3.5M2 5.5H14M5 8H11M5 10.5H9"/></svg>
+                    Meeting Notes
+                </h2>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <a class="tile-action" href="#">View all</a>
+                    <a class="new-note-btn" href="screening-committee-note-editor.html">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2v8M2 6h8"/></svg>
+                        New Note
+                    </a>
+                </div>
+            </div>
+            <div class="tile-body">
+                <ul class="meeting-notes-list">
+                    <li><a class="meeting-note" href="screening-committee-note-editor.html">
+                        <div class="note-date">
+                            <div class="note-date-month">Apr</div>
+                            <div class="note-date-day">7</div>
+                            <div class="note-date-year">2026</div>
+                        </div>
+                        <div class="note-content">
+                            <div class="note-title">Weekly Screening Call <span class="note-badge-new">New</span></div>
+                            <div class="note-preview">Reviewed three new applications: CleanGrid Solutions (solar micro-inverters, Series A, $12M raise), BioChar Systems (carbon removal, seed), and TerraFlow (water purification membranes). Voted to advance CleanGrid and BioChar to diligence...</div>
+                            <div class="note-meta">12 items discussed &middot; 6 attendees</div>
+                        </div>
+                    </a></li>
+                    <li><a class="meeting-note" href="screening-committee-note-editor.html">
+                        <div class="note-date">
+                            <div class="note-date-month">Apr</div>
+                            <div class="note-date-day">2</div>
+                            <div class="note-date-year">2026</div>
+                        </div>
+                        <div class="note-content">
+                            <div class="note-title">Monthly Check-in Minutes</div>
+                            <div class="note-preview">Full committee monthly sync. Reviewed Q1 metrics — 142 applications received, 18% pass rate, average 12 days to decision. Discussed capacity planning for Q2 and potential addition of two new committee members...</div>
+                            <div class="note-meta">8 items discussed &middot; 8 attendees</div>
+                        </div>
+                    </a></li>
+                    <li><a class="meeting-note" href="screening-committee-note-editor.html">
+                        <div class="note-date">
+                            <div class="note-date-month">Mar</div>
+                            <div class="note-date-day">28</div>
+                            <div class="note-date-year">2026</div>
+                        </div>
+                        <div class="note-content">
+                            <div class="note-title">Event Sub-Committee Minutes</div>
+                            <div class="note-preview">Planning for the May Investor Showcase. Confirmed venue (The Foundry, SF), budget of $15K approved. Discussed speaker lineup: 3 portfolio companies presenting, plus keynote from climate fund partner...</div>
+                            <div class="note-meta">5 items discussed &middot; 4 attendees</div>
+                        </div>
+                    </a></li>
+                    <li><a class="meeting-note" href="screening-committee-note-editor.html">
+                        <div class="note-date">
+                            <div class="note-date-month">Mar</div>
+                            <div class="note-date-day">24</div>
+                            <div class="note-date-year">2026</div>
+                        </div>
+                        <div class="note-content">
+                            <div class="note-title">Location Scouting Report</div>
+                            <div class="note-preview">Visited three potential venues for quarterly events. The Foundry has the best AV setup and capacity (120 seated). Mission Bay Conference Center is backup. Oakland Greenhaus rejected — parking concerns...</div>
+                            <div class="note-meta">3 locations reviewed &middot; 2 attendees</div>
+                        </div>
+                    </a></li>
+                    <li><a class="meeting-note" href="screening-committee-note-editor.html">
+                        <div class="note-date">
+                            <div class="note-date-month">Mar</div>
+                            <div class="note-date-day">17</div>
+                            <div class="note-date-year">2026</div>
+                        </div>
+                        <div class="note-content">
+                            <div class="note-title">Weekly Screening Call</div>
+                            <div class="note-preview">SolarWeave and Verdant Energy presentations. Both companies presented to the committee. SolarWeave founder presented strong IP portfolio but revenue traction was questioned...</div>
+                            <div class="note-meta">6 items discussed &middot; 5 attendees</div>
+                        </div>
+                    </a></li>
+                </ul>
+                <button class="load-more-btn">Load more notes...</button>
+            </div>
+        </div>
+
+    <!-- ═══ DOCUMENTS ═══ -->
+        <div class="tile">
+            <div class="tile-head">
+                <h2>
+                    <svg class="tile-head-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 1.5H3.5A1.5 1.5 0 0 0 2 3v10a1.5 1.5 0 0 0 1.5 1.5h9A1.5 1.5 0 0 0 14 13V6.5L9 1.5z"/><path d="M9 1.5V6.5H14"/></svg>
+                    Documents
+                </h2>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <a class="drive-link" href="#">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4.9 2L1 8.5l1.95 3.5h3.9" stroke="#4285f4" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.1 2L5 8.5 6.85 12h5.2L14 8.5" stroke="#34a853" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.9 2h4.2L13 8.5H5" stroke="#fbbc04" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Drive
+                    </a>
+                    <a class="tile-action" href="screening-committee-documents.html">Manage</a>
+                </div>
+            </div>
+            <div class="tile-body">
+                <input type="text" class="search-input" placeholder="Search documents..." autocomplete="off" data-lpignore="true" data-form-type="other">
+
+                <!-- Pinned -->
+                <table class="pinned-table">
+                    <tr><td><div class="doc-name-cell"><svg class="doc-pin-icon" viewBox="0 0 12 12" fill="#f59e0b"><path d="M6 1l.9 1.8L9 3.1l-1.5 1.5.4 2.2L6 5.8 4.1 6.8l.4-2.2L3 3.1l2.1-.3z"/></svg><div class="doc-type-icon doc-type-gdoc">DOC</div><span class="doc-name-text">Screening Rubric v2</span></div></td><td class="doc-date-cell">04/08/26</td></tr>
+                    <tr><td><div class="doc-name-cell"><svg class="doc-pin-icon" viewBox="0 0 12 12" fill="#f59e0b"><path d="M6 1l.9 1.8L9 3.1l-1.5 1.5.4 2.2L6 5.8 4.1 6.8l.4-2.2L3 3.1l2.1-.3z"/></svg><div class="doc-type-icon doc-type-gdoc">DOC</div><span class="doc-name-text">Committee Charter</span></div></td><td class="doc-date-cell">03/12/26</td></tr>
+                    <tr><td><div class="doc-name-cell"><svg class="doc-pin-icon" viewBox="0 0 12 12" fill="#f59e0b"><path d="M6 1l.9 1.8L9 3.1l-1.5 1.5.4 2.2L6 5.8 4.1 6.8l.4-2.2L3 3.1l2.1-.3z"/></svg><div class="doc-type-icon doc-type-gdoc">DOC</div><span class="doc-name-text">Investment Thesis Template</span></div></td><td class="doc-date-cell">02/20/26</td></tr>
+                </table>
+
+                <!-- Folder tree -->
+                <div class="folder-tree">
+                    <div class="folder-section">
+                        <div class="folder-header">
+                            <svg class="folder-chevron open" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4.5 2.5L8 6l-3.5 3.5"/></svg>
+                            <svg class="folder-icon-img" viewBox="0 0 20 20" fill="none" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 5.5A1.5 1.5 0 0 1 4 4h3l1.5 1.5H16A1.5 1.5 0 0 1 17.5 7v7a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 14z" fill="#fef3c7"/></svg>
+                            <span class="folder-label">Company Materials</span>
+                            <span class="folder-count">12</span>
+                        </div>
+                        <div class="folder-children">
+                            <table>
+                                <tr><td><div class="child-name-cell"><div class="child-type-icon doc-type-pdf">PDF</div><span class="child-name">CleanGrid — Pitch Deck</span></div></td><td class="child-date">04/07/26</td></tr>
+                                <tr><td><div class="child-name-cell"><div class="child-type-icon doc-type-gdoc">DOC</div><span class="child-name">CleanGrid — Pre-Screen Summary</span></div></td><td class="child-date">04/07/26</td></tr>
+                                <tr><td><div class="child-name-cell"><div class="child-type-icon doc-type-slide" style="color:#0f172a">SLD</div><span class="child-name">BioChar — Founder Presentation</span></div></td><td class="child-date">04/01/26</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="folder-section">
+                        <div class="folder-header">
+                            <svg class="folder-chevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4.5 2.5L8 6l-3.5 3.5"/></svg>
+                            <svg class="folder-icon-img" viewBox="0 0 20 20" fill="none" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 5.5A1.5 1.5 0 0 1 4 4h3l1.5 1.5H16A1.5 1.5 0 0 1 17.5 7v7a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 14z" fill="#fef3c7"/></svg>
+                            <span class="folder-label">Meeting Agendas</span>
+                            <span class="folder-count">8</span>
+                        </div>
+                    </div>
+                    <div class="folder-section">
+                        <div class="folder-header">
+                            <svg class="folder-chevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4.5 2.5L8 6l-3.5 3.5"/></svg>
+                            <svg class="folder-icon-img" viewBox="0 0 20 20" fill="none" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 5.5A1.5 1.5 0 0 1 4 4h3l1.5 1.5H16A1.5 1.5 0 0 1 17.5 7v7a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 14z" fill="#fef3c7"/></svg>
+                            <span class="folder-label">Templates &amp; Guides</span>
+                            <span class="folder-count">5</span>
+                        </div>
+                    </div>
+
+                    <!-- Top-level (unfiled) -->
+                    <div class="folder-children" style="padding-left:0; margin-top:4px; border-top:1px solid #f1f5f9; padding-top:4px;">
+                        <table>
+                            <tr><td><div class="child-name-cell"><div class="child-type-icon doc-type-sheet">XLS</div><span class="child-name">Q1 Pipeline Tracker</span></div></td><td class="child-date">04/03/26</td></tr>
+                            <tr><td><div class="child-name-cell"><div class="child-type-icon doc-type-gdoc">DOC</div><span class="child-name">Q1 Screening Summary</span></div></td><td class="child-date">03/31/26</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- ═══ METRICS — spans full width of left-col ═══ -->
+        <div class="tile grid-metrics">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 20px;">
+                <div class="metrics-tabs">
+                    <button class="metrics-tab active" onclick="switchTab(this,'pane-pipeline')">Pipeline</button>
+                    <button class="metrics-tab" onclick="switchTab(this,'pane-decisions')">Decisions</button>
+                    <button class="metrics-tab" onclick="switchTab(this,'pane-sourcing')">Sourcing</button>
+                    <button class="metrics-tab" onclick="switchTab(this,'pane-sectors')">Sectors</button>
+                    <button class="metrics-tab" onclick="switchTab(this,'pane-timing')">Time to Decision</button>
+                </div>
+                <div class="metrics-nav">
+                    <button onclick="prevTab()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7.5 2.5L4 6l3.5 3.5"/></svg></button>
+                    <button onclick="nextTab()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4.5 2.5L8 6l-3.5 3.5"/></svg></button>
+                </div>
+            </div>
+            <div class="metrics-pane active" id="pane-pipeline">
+                <div class="metrics-body">
+                    <div class="metrics-kpi-row">
+                        <div class="kpi-card"><div class="kpi-label">In Review</div><div class="kpi-value">14</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Advanced to DD</div><div class="kpi-value">3 <span class="kpi-delta up">+1</span></div></div>
+                        <div class="kpi-card"><div class="kpi-label">Declined</div><div class="kpi-value">7</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Pending</div><div class="kpi-value">4</div></div>
+                    </div>
+                    <div class="chart-placeholder">
+                        <div class="chart-bars">
+                            <div class="chart-bar-group"><div class="chart-bar primary" style="height:45%"></div><div class="chart-bar secondary" style="height:20%"></div></div>
+                            <div class="chart-bar-group"><div class="chart-bar primary" style="height:65%"></div><div class="chart-bar secondary" style="height:30%"></div></div>
+                            <div class="chart-bar-group"><div class="chart-bar primary" style="height:55%"></div><div class="chart-bar secondary" style="height:40%"></div></div>
+                            <div class="chart-bar-group"><div class="chart-bar primary" style="height:80%"></div><div class="chart-bar secondary" style="height:35%"></div></div>
+                            <div class="chart-bar-group"><div class="chart-bar primary" style="height:70%"></div><div class="chart-bar secondary" style="height:50%"></div></div>
+                            <div class="chart-bar-group"><div class="chart-bar primary" style="height:90%"></div><div class="chart-bar secondary" style="height:45%"></div></div>
+                        </div>
+                        <div class="chart-x-labels"><div class="chart-x-label">Nov</div><div class="chart-x-label">Dec</div><div class="chart-x-label">Jan</div><div class="chart-x-label">Feb</div><div class="chart-x-label">Mar</div><div class="chart-x-label">Apr</div></div>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#2563eb"></div> Reviewed</div>
+                        <div class="chart-legend-item"><div class="chart-legend-dot" style="background:#93c5fd"></div> Advanced</div>
+                    </div>
+                </div>
+            </div>
+            <!-- DECISIONS — donut chart -->
+            <div class="metrics-pane" id="pane-decisions">
+                <div class="metrics-body">
+                    <div class="metrics-kpi-row">
+                        <div class="kpi-card"><div class="kpi-label">Pass Rate</div><div class="kpi-value">18%</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Avg Score</div><div class="kpi-value">6.2</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Unanimous</div><div class="kpi-value">62%</div></div>
+                    </div>
+                    <div class="chart-placeholder" style="padding: 16px 20px;">
+                        <div class="donut-chart-wrap">
+                            <svg width="130" height="130" viewBox="0 0 130 130">
+                                <circle cx="65" cy="65" r="52" fill="none" stroke="#f1f5f9" stroke-width="18"/>
+                                <!-- Advanced 18% -->
+                                <circle cx="65" cy="65" r="52" fill="none" stroke="#2563eb" stroke-width="18"
+                                    stroke-dasharray="58.8 268.0" stroke-dashoffset="81.7" stroke-linecap="round" transform="rotate(-90 65 65)"/>
+                                <!-- Declined 54% -->
+                                <circle cx="65" cy="65" r="52" fill="none" stroke="#f87171" stroke-width="18"
+                                    stroke-dasharray="176.4 150.4" stroke-dashoffset="22.9" stroke-linecap="round" transform="rotate(-90 65 65)"/>
+                                <!-- Pending 28% -->
+                                <circle cx="65" cy="65" r="52" fill="none" stroke="#fbbf24" stroke-width="18"
+                                    stroke-dasharray="91.5 235.3" stroke-dashoffset="-153.5" stroke-linecap="round" transform="rotate(-90 65 65)"/>
+                                <text x="65" y="62" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a" font-family="Inter">28</text>
+                                <text x="65" y="78" text-anchor="middle" font-size="10" fill="#94a3b8" font-family="Inter">decisions</text>
+                            </svg>
+                            <div class="donut-legend">
+                                <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#2563eb"></div> Advanced <span class="donut-legend-val">5</span></div>
+                                <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#f87171"></div> Declined <span class="donut-legend-val">15</span></div>
+                                <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#fbbf24"></div> Pending <span class="donut-legend-val">8</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SOURCING — horizontal bars -->
+            <div class="metrics-pane" id="pane-sourcing">
+                <div class="metrics-body">
+                    <div class="metrics-kpi-row">
+                        <div class="kpi-card"><div class="kpi-label">Total</div><div class="kpi-value">142</div></div>
+                        <div class="kpi-card"><div class="kpi-label">This Month</div><div class="kpi-value">26 <span class="kpi-delta up">+8</span></div></div>
+                        <div class="kpi-card"><div class="kpi-label">Conversion</div><div class="kpi-value">18%</div></div>
+                    </div>
+                    <div class="chart-placeholder" style="padding: 16px 20px;">
+                        <div class="hbar-chart">
+                            <div class="hbar-row"><div class="hbar-label">Inbound</div><div class="hbar-track"><div class="hbar-fill" style="width:73%;background:#2563eb;"><span class="hbar-val">104</span></div></div></div>
+                            <div class="hbar-row"><div class="hbar-label">Referral</div><div class="hbar-track"><div class="hbar-fill" style="width:27%;background:#8b5cf6;"><span class="hbar-val">38</span></div></div></div>
+                            <div class="hbar-row"><div class="hbar-label">Events</div><div class="hbar-track"><div class="hbar-fill" style="width:14%;background:#10b981;"><span class="hbar-val">19</span></div></div></div>
+                            <div class="hbar-row"><div class="hbar-label">Partners</div><div class="hbar-track"><div class="hbar-fill" style="width:9%;background:#f59e0b;"><span class="hbar-val">12</span></div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTORS — stacked bar + legend grid -->
+            <div class="metrics-pane" id="pane-sectors">
+                <div class="metrics-body">
+                    <div class="metrics-kpi-row">
+                        <div class="kpi-card"><div class="kpi-label">Top Sector</div><div class="kpi-value" style="font-size:16px;">Clean Energy</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Sectors</div><div class="kpi-value">6</div></div>
+                        <div class="kpi-card"><div class="kpi-label">New This Q</div><div class="kpi-value">2</div></div>
+                    </div>
+                    <div class="chart-placeholder" style="padding: 16px 20px;">
+                        <div class="sector-stack">
+                            <div class="sector-stack-seg" style="width:32%;background:#2563eb;" title="Clean Energy 32%"></div>
+                            <div class="sector-stack-seg" style="width:22%;background:#8b5cf6;" title="AgTech 22%"></div>
+                            <div class="sector-stack-seg" style="width:18%;background:#10b981;" title="Carbon 18%"></div>
+                            <div class="sector-stack-seg" style="width:12%;background:#f59e0b;" title="Water 12%"></div>
+                            <div class="sector-stack-seg" style="width:9%;background:#f87171;" title="Circular 9%"></div>
+                            <div class="sector-stack-seg" style="width:7%;background:#64748b;" title="Other 7%"></div>
+                        </div>
+                        <div class="sector-legend-grid">
+                            <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#2563eb"></div> Clean Energy <span class="donut-legend-val">32%</span></div>
+                            <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#8b5cf6"></div> AgTech <span class="donut-legend-val">22%</span></div>
+                            <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#10b981"></div> Carbon <span class="donut-legend-val">18%</span></div>
+                            <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#f59e0b"></div> Water <span class="donut-legend-val">12%</span></div>
+                            <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#f87171"></div> Circular <span class="donut-legend-val">9%</span></div>
+                            <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#64748b"></div> Other <span class="donut-legend-val">7%</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TIME TO DECISION — line/area chart -->
+            <div class="metrics-pane" id="pane-timing">
+                <div class="metrics-body">
+                    <div class="metrics-kpi-row">
+                        <div class="kpi-card"><div class="kpi-label">Avg Days</div><div class="kpi-value">12 <span class="kpi-delta down" style="font-size:11px;">-2d</span></div></div>
+                        <div class="kpi-card"><div class="kpi-label">Median</div><div class="kpi-value">9</div></div>
+                        <div class="kpi-card"><div class="kpi-label">Longest</div><div class="kpi-value">34d</div></div>
+                    </div>
+                    <div class="chart-placeholder" style="padding: 0;">
+                        <div class="line-chart-wrap">
+                            <svg width="100%" height="160" viewBox="0 0 480 160" preserveAspectRatio="none">
+                                <!-- Grid lines -->
+                                <line x1="40" y1="20" x2="460" y2="20" stroke="#f1f5f9" stroke-width="1"/>
+                                <line x1="40" y1="55" x2="460" y2="55" stroke="#f1f5f9" stroke-width="1"/>
+                                <line x1="40" y1="90" x2="460" y2="90" stroke="#f1f5f9" stroke-width="1"/>
+                                <line x1="40" y1="125" x2="460" y2="125" stroke="#f1f5f9" stroke-width="1"/>
+                                <!-- Y labels -->
+                                <text x="32" y="24" text-anchor="end" font-size="9" fill="#94a3b8" font-family="Inter">30d</text>
+                                <text x="32" y="59" text-anchor="end" font-size="9" fill="#94a3b8" font-family="Inter">20d</text>
+                                <text x="32" y="94" text-anchor="end" font-size="9" fill="#94a3b8" font-family="Inter">10d</text>
+                                <text x="32" y="129" text-anchor="end" font-size="9" fill="#94a3b8" font-family="Inter">0d</text>
+                                <!-- Area fill -->
+                                <path d="M70,72 L140,62 L210,80 L280,55 L350,48 L420,58 L420,125 L70,125 Z" fill="url(#areaGrad)" opacity="0.3"/>
+                                <!-- Line -->
+                                <polyline points="70,72 140,62 210,80 280,55 350,48 420,58" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <!-- Dots -->
+                                <circle cx="70" cy="72" r="3.5" fill="white" stroke="#2563eb" stroke-width="2"/>
+                                <circle cx="140" cy="62" r="3.5" fill="white" stroke="#2563eb" stroke-width="2"/>
+                                <circle cx="210" cy="80" r="3.5" fill="white" stroke="#2563eb" stroke-width="2"/>
+                                <circle cx="280" cy="55" r="3.5" fill="white" stroke="#2563eb" stroke-width="2"/>
+                                <circle cx="350" cy="48" r="4" fill="#2563eb" stroke="white" stroke-width="2"/>
+                                <circle cx="420" cy="58" r="3.5" fill="white" stroke="#2563eb" stroke-width="2"/>
+                                <!-- X labels -->
+                                <text x="70" y="145" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="Inter">Nov</text>
+                                <text x="140" y="145" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="Inter">Dec</text>
+                                <text x="210" y="145" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="Inter">Jan</text>
+                                <text x="280" y="145" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="Inter">Feb</text>
+                                <text x="350" y="145" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="Inter">Mar</text>
+                                <text x="420" y="145" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="Inter">Apr</text>
+                                <!-- Value label on current -->
+                                <rect x="332" y="30" width="36" height="16" rx="3" fill="#2563eb"/>
+                                <text x="350" y="41" text-anchor="middle" font-size="9" font-weight="600" fill="white" font-family="Inter">9 days</text>
+                                <defs>
+                                    <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#2563eb" stop-opacity="0.3"/>
+                                        <stop offset="100%" stop-color="#2563eb" stop-opacity="0"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- /left-col -->
+
+    <!-- ═══ RIGHT COLUMN: Members + Calendar ═══ -->
+    <div class="right-col">
+
+        <!-- MEMBERS -->
+        <div class="tile">
+            <div class="tile-head">
+                <h2>
+                    <svg class="tile-head-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+                    Committee Members
+                </h2>
+                <button class="contact-btn" title="Email screening-committee@e8partners.com">
+                    <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="12" height="8" rx="1"/><path d="M1 4l6 4 6-4"/></svg>
+                    Contact
+                </button>
+            </div>
+            <div class="tile-body">
+                <div class="members-grid">
+                    <div class="member-badge"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face" alt=""><div class="member-badge-info"><span class="member-badge-name">John Smith</span><span class="member-badge-role">Chair</span></div></div>
+                    <div class="member-badge"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face" alt=""><div class="member-badge-info"><span class="member-badge-name">Sarah Park</span><span class="member-badge-role">Vice Chair</span></div></div>
+                    <div class="member-badge"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=64&h=64&fit=crop&crop=face" alt=""><div class="member-badge-info"><span class="member-badge-name">Michael Chen</span></div></div>
+                    <div class="member-badge"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&h=64&fit=crop&crop=face" alt=""><div class="member-badge-info"><span class="member-badge-name">Lisa Martinez</span></div></div>
+                    <div class="member-badge"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=64&h=64&fit=crop&crop=face" alt=""><div class="member-badge-info"><span class="member-badge-name">David Kumar</span></div></div>
+                    <div class="member-badge"><img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=64&h=64&fit=crop&crop=face" alt=""><div class="member-badge-info"><span class="member-badge-name">Rachel Green</span></div></div>
+                    <div class="member-badge"><img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=64&h=64&fit=crop&crop=face" alt=""><div class="member-badge-info"><span class="member-badge-name">James Wilson</span></div></div>
+                    <div class="member-badge"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=64&h=64&fit=crop&crop=face" alt=""><div class="member-badge-info"><span class="member-badge-name">Amy Torres</span></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UPCOMING MEETINGS -->
+        <div class="tile">
+            <div class="tile-head">
+                <h2>
+                    <svg class="tile-head-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2.5" width="12" height="12" rx="1.5"/><path d="M5 1v3M11 1v3M2 6.5h12"/></svg>
+                    Upcoming Meetings
+                </h2>
+                <a class="tile-action" href="#">View all</a>
+            </div>
+            <div class="tile-body">
+                <ul class="cal-list">
+                    <li class="cal-item today">
+                        <div class="cal-date-box">
+                            <div class="cal-date-dow">Fri</div>
+                            <div class="cal-date-day">11</div>
+                        </div>
+                        <div class="cal-detail">
+                            <div class="cal-title">Weekly Screening Call</div>
+                            <div class="cal-meta">
+                                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 3.5V6l2 1.5"/></svg>
+                                10:00 AM &ndash; 11:30 AM
+                            </div>
+                            <div class="cal-rsvp">
+                                <div class="rsvp-group">
+                                    <div class="rsvp-group-imgs">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=44&h=44&fit=crop&crop=face" alt="">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=44&h=44&fit=crop&crop=face" alt="">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=44&h=44&fit=crop&crop=face" alt="">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=44&h=44&fit=crop&crop=face" alt="">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=44&h=44&fit=crop&crop=face" alt="">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=44&h=44&fit=crop&crop=face" alt="">
+                                    </div>
+                                    <span class="rsvp-group-label rsvp-label-yes">6</span>
+                                    <div class="rsvp-popover">
+                                        <div class="rsvp-popover-head">Accepted</div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" alt=""><span>John Smith</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" alt=""><span>Sarah Park</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face" alt=""><span>Michael Chen</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=40&h=40&fit=crop&crop=face" alt=""><span>Lisa Martinez</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=40&h=40&fit=crop&crop=face" alt=""><span>David Kumar</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=40&h=40&fit=crop&crop=face" alt=""><span>Rachel Green</span></div>
+                                    </div>
+                                </div>
+                                <div class="rsvp-sep"></div>
+                                <div class="rsvp-group">
+                                    <div class="rsvp-group-imgs">
+                                        <img class="rsvp-av" style="opacity:0.7" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=44&h=44&fit=crop&crop=face" alt="">
+                                    </div>
+                                    <span class="rsvp-group-label rsvp-label-maybe">?</span>
+                                    <div class="rsvp-popover">
+                                        <div class="rsvp-popover-head">Maybe</div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=40&h=40&fit=crop&crop=face" alt=""><span>James Wilson</span></div>
+                                    </div>
+                                </div>
+                                <div class="rsvp-sep"></div>
+                                <div class="rsvp-group">
+                                    <div class="rsvp-group-imgs">
+                                        <img class="rsvp-av" style="opacity:0.4" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=44&h=44&fit=crop&crop=face" alt="">
+                                    </div>
+                                    <span class="rsvp-group-label rsvp-label-pending">?</span>
+                                    <div class="rsvp-popover">
+                                        <div class="rsvp-popover-head">Pending</div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=40&h=40&fit=crop&crop=face" alt=""><span>Amy Torres</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cal-actions">
+                                <a class="cal-action-btn zoom" href="#"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="7" height="6" rx="1"/><path d="M8 5l3-1.5v5L8 7"/></svg> Join Zoom</a>
+                                <a class="cal-action-btn" href="#"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="8" height="8" rx="1"/><path d="M4 1v2M8 1v2M2 5h8"/></svg> Add to Cal</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="cal-item">
+                        <div class="cal-date-box">
+                            <div class="cal-date-dow">Tue</div>
+                            <div class="cal-date-day">15</div>
+                        </div>
+                        <div class="cal-detail">
+                            <div class="cal-title">CleanGrid Deep Dive</div>
+                            <div class="cal-meta">
+                                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 3.5V6l2 1.5"/></svg>
+                                2:00 PM &ndash; 3:00 PM
+                            </div>
+                            <div class="cal-rsvp">
+                                <div class="rsvp-group">
+                                    <div class="rsvp-group-imgs">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=44&h=44&fit=crop&crop=face" alt="">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=44&h=44&fit=crop&crop=face" alt="">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=44&h=44&fit=crop&crop=face" alt="">
+                                    </div>
+                                    <span class="rsvp-group-label rsvp-label-yes">3</span>
+                                    <div class="rsvp-popover">
+                                        <div class="rsvp-popover-head">Accepted</div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" alt=""><span>John Smith</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" alt=""><span>Sarah Park</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=40&h=40&fit=crop&crop=face" alt=""><span>David Kumar</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cal-actions">
+                                <a class="cal-action-btn zoom" href="#"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="7" height="6" rx="1"/><path d="M8 5l3-1.5v5L8 7"/></svg> Join Zoom</a>
+                                <a class="cal-action-btn" href="#"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="8" height="8" rx="1"/><path d="M4 1v2M8 1v2M2 5h8"/></svg> Add to Cal</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="cal-item">
+                        <div class="cal-date-box">
+                            <div class="cal-date-dow">Fri</div>
+                            <div class="cal-date-day">18</div>
+                        </div>
+                        <div class="cal-detail">
+                            <div class="cal-title">Weekly Screening Call</div>
+                            <div class="cal-meta">
+                                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 3.5V6l2 1.5"/></svg>
+                                10:00 AM &ndash; 11:30 AM
+                            </div>
+                            <div class="cal-rsvp">
+                                <div class="rsvp-group">
+                                    <div class="rsvp-group-imgs">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=44&h=44&fit=crop&crop=face" alt="">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=44&h=44&fit=crop&crop=face" alt="">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=44&h=44&fit=crop&crop=face" alt="">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=44&h=44&fit=crop&crop=face" alt="">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=44&h=44&fit=crop&crop=face" alt="">
+                                    </div>
+                                    <span class="rsvp-group-label rsvp-label-yes">5</span>
+                                    <div class="rsvp-popover">
+                                        <div class="rsvp-popover-head">Accepted</div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" alt=""><span>John Smith</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" alt=""><span>Sarah Park</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face" alt=""><span>Michael Chen</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=40&h=40&fit=crop&crop=face" alt=""><span>Lisa Martinez</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=40&h=40&fit=crop&crop=face" alt=""><span>Rachel Green</span></div>
+                                    </div>
+                                </div>
+                                <div class="rsvp-sep"></div>
+                                <div class="rsvp-group">
+                                    <div class="rsvp-group-imgs">
+                                        <img class="rsvp-av" style="opacity:0.5;filter:grayscale(1)" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=44&h=44&fit=crop&crop=face" alt="">
+                                    </div>
+                                    <span class="rsvp-group-label rsvp-label-no">No</span>
+                                    <div class="rsvp-popover">
+                                        <div class="rsvp-popover-head">Declined</div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=40&h=40&fit=crop&crop=face" alt=""><span>James Wilson</span></div>
+                                    </div>
+                                </div>
+                                <div class="rsvp-sep"></div>
+                                <div class="rsvp-group">
+                                    <div class="rsvp-group-imgs">
+                                        <img class="rsvp-av" style="opacity:0.4" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=44&h=44&fit=crop&crop=face" alt="">
+                                        <img class="rsvp-av" style="opacity:0.4" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=44&h=44&fit=crop&crop=face" alt="">
+                                    </div>
+                                    <span class="rsvp-group-label rsvp-label-pending">2</span>
+                                    <div class="rsvp-popover">
+                                        <div class="rsvp-popover-head">Pending</div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=40&h=40&fit=crop&crop=face" alt=""><span>Amy Torres</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=40&h=40&fit=crop&crop=face" alt=""><span>David Kumar</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cal-actions">
+                                <a class="cal-action-btn zoom" href="#"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="7" height="6" rx="1"/><path d="M8 5l3-1.5v5L8 7"/></svg> Join Zoom</a>
+                                <a class="cal-action-btn" href="#"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="8" height="8" rx="1"/><path d="M4 1v2M8 1v2M2 5h8"/></svg> Add to Cal</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="cal-item">
+                        <div class="cal-date-box">
+                            <div class="cal-date-dow">Wed</div>
+                            <div class="cal-date-day">23</div>
+                        </div>
+                        <div class="cal-detail">
+                            <div class="cal-title">Monthly Committee Sync</div>
+                            <div class="cal-meta">
+                                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 3.5V6l2 1.5"/></svg>
+                                9:00 AM &ndash; 10:30 AM
+                            </div>
+                            <div class="cal-rsvp">
+                                <div class="rsvp-group">
+                                    <div class="rsvp-group-imgs">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=44&h=44&fit=crop&crop=face" alt="">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=44&h=44&fit=crop&crop=face" alt="">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=44&h=44&fit=crop&crop=face" alt="">
+                                        <img class="rsvp-av" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=44&h=44&fit=crop&crop=face" alt="">
+                                    </div>
+                                    <span class="rsvp-group-label rsvp-label-yes">+3</span>
+                                    <div class="rsvp-popover">
+                                        <div class="rsvp-popover-head">Accepted</div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face" alt=""><span>John Smith</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face" alt=""><span>Sarah Park</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face" alt=""><span>Michael Chen</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=40&h=40&fit=crop&crop=face" alt=""><span>Lisa Martinez</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=40&h=40&fit=crop&crop=face" alt=""><span>David Kumar</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=40&h=40&fit=crop&crop=face" alt=""><span>Rachel Green</span></div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=40&h=40&fit=crop&crop=face" alt=""><span>James Wilson</span></div>
+                                    </div>
+                                </div>
+                                <div class="rsvp-sep"></div>
+                                <div class="rsvp-group">
+                                    <div class="rsvp-group-imgs">
+                                        <img class="rsvp-av" style="opacity:0.4" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=44&h=44&fit=crop&crop=face" alt="">
+                                    </div>
+                                    <span class="rsvp-group-label rsvp-label-pending">?</span>
+                                    <div class="rsvp-popover">
+                                        <div class="rsvp-popover-head">Pending</div>
+                                        <div class="rsvp-popover-item"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=40&h=40&fit=crop&crop=face" alt=""><span>Amy Torres</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cal-actions">
+                                <a class="cal-action-btn zoom" href="#"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="7" height="6" rx="1"/><path d="M8 5l3-1.5v5L8 7"/></svg> Join Zoom</a>
+                                <a class="cal-action-btn" href="#"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="8" height="8" rx="1"/><path d="M4 1v2M8 1v2M2 5h8"/></svg> Add to Cal</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <a class="recordings-link" href="#">
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="6"/><polygon points="5.5,4 10.5,7 5.5,10" fill="currentColor" stroke="none"/></svg>
+                Past Recordings
+            </a>
+        </div>
+    </div><!-- /right-col -->
+</div><!-- /dashboard -->
+
+<script>
+function switchTab(btn, paneId) {
+    document.querySelectorAll('.metrics-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.metrics-pane').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(paneId).classList.add('active');
+}
+function getTabOrder() { return Array.from(document.querySelectorAll('.metrics-tab')); }
+function nextTab() { const t=getTabOrder(), i=t.findIndex(x=>x.classList.contains('active')); t[(i+1)%t.length].click(); }
+function prevTab() { const t=getTabOrder(), i=t.findIndex(x=>x.classList.contains('active')); t[(i-1+t.length)%t.length].click(); }
+</script>
+</body>
+</html>

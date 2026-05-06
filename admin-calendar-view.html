@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Meetings — Calendar View Mockup</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+  /* Tooltip */
+  [data-tip] { position: relative; }
+  [data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%);
+    background: #0f172a; color: #f1f5f9; font-size: 11px; line-height: 1.4;
+    padding: 5px 10px; border-radius: 6px; white-space: normal; max-width: 280px;
+    z-index: 50; pointer-events: none; box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+
+  /* Calendar grid */
+  .cal-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr) 0.6fr;
+    gap: 1px; background: #e2e8f0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;
+  }
+  .cal-header {
+    background: #f8fafc; padding: 6px 8px; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; text-align: center;
+  }
+  .cal-cell {
+    background: #fff; min-height: 110px; padding: 4px; position: relative; cursor: default;
+  }
+  .cal-cell.outside { background: #f8fafc; }
+  .cal-cell.today { background: #eff6ff; }
+  .cal-cell .day-num {
+    font-size: 12px; font-weight: 500; color: #64748b; padding: 2px 4px; line-height: 1;
+  }
+  .cal-cell.today .day-num {
+    background: #3b82f6; color: #fff; border-radius: 9999px;
+    width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px;
+  }
+  .cal-cell.outside .day-num { color: #cbd5e1; }
+
+  /* Weekend stacked cell */
+  .cal-weekend-cell { background: #fff; min-height: 110px; display: flex; flex-direction: column; }
+  .cal-weekend-half { flex: 1; padding: 4px; position: relative; }
+  .cal-weekend-half + .cal-weekend-half { border-top: 1px solid #e2e8f0; }
+  .cal-weekend-half.outside { background: #f8fafc; }
+
+  /* Meeting tile */
+  .meeting-tile {
+    display: flex; align-items: flex-start; gap: 0; margin-top: 3px; border-radius: 4px;
+    overflow: hidden; cursor: pointer; transition: box-shadow 0.1s; border: 1px solid rgba(0,0,0,.06);
+    font-size: 11px; line-height: 1.3;
+  }
+  .meeting-tile:hover { box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+  .meeting-tile.draft { border-style: dashed; opacity: 0.7; }
+  .tile-band { width: 4px; min-height: 100%; flex-shrink: 0; }
+  .tile-body { padding: 3px 5px; flex: 1; min-width: 0; }
+  .tile-time { font-weight: 700; font-size: 10.5px; }
+  .tile-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 10.5px; }
+  .tile-meta { display: flex; align-items: center; gap: 4px; margin-top: 1px; }
+  .tile-zoom {
+    width: 16px; height: 16px; border-radius: 50%; font-size: 8px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; flex-shrink: 0;
+  }
+  .tile-rsvp { font-size: 9.5px; color: #94a3b8; }
+  .tile-status-badge {
+    font-size: 9px; padding: 0 4px; border-radius: 3px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.03em;
+  }
+
+  /* Popover overlay */
+  .popover-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.15); z-index: 100; display: none; }
+  .popover-overlay.open { display: flex; align-items: center; justify-content: center; }
+  .popover-card {
+    background: #fff; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,.18);
+    width: 380px; max-width: 90vw; padding: 0; overflow: hidden;
+  }
+  .popover-band { height: 4px; }
+
+  /* Segmented toggle */
+  .seg-toggle { display: inline-flex; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; }
+  .seg-btn {
+    padding: 5px 14px; font-size: 13px; font-weight: 500; cursor: pointer;
+    background: #fff; color: #64748b; border: none; transition: all .1s;
+  }
+  .seg-btn.active { background: #0f172a; color: #fff; }
+  .seg-btn:not(.active):hover { background: #f1f5f9; }
+
+  /* Table */
+  .meetings-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .meetings-table thead th {
+    text-align: left; padding: 8px 10px; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.04em; color: #64748b;
+    background: #f8fafc; border-bottom: 1px solid #e2e8f0; white-space: nowrap;
+    cursor: pointer; user-select: none;
+  }
+  .meetings-table thead th:hover { color: #334155; }
+  .meetings-table tbody tr { border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: background .1s; }
+  .meetings-table tbody tr:hover { background: #f8fafc; }
+  .meetings-table td { padding: 7px 10px; color: #334155; white-space: nowrap; }
+
+  .type-badge {
+    display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+    border-radius: 9999px; font-size: 11px; font-weight: 600;
+  }
+  .status-badge {
+    display: inline-flex; padding: 2px 8px; border-radius: 9999px;
+    font-size: 11px; font-weight: 600; text-transform: capitalize;
+  }
+
+  /* Search input */
+  .search-wrap { position: relative; }
+  .search-wrap svg { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+  .search-wrap input {
+    padding: 5px 10px 5px 30px; border: 1px solid #e2e8f0; border-radius: 6px;
+    font-size: 13px; width: 180px; outline: none; transition: border-color .15s;
+  }
+  .search-wrap input:focus { border-color: #94a3b8; box-shadow: 0 0 0 2px rgba(148,163,184,.15); }
+
+  .actions-btn {
+    width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 6px; border: 1px solid #e2e8f0; background: #fff; cursor: pointer;
+    color: #64748b; font-size: 16px; font-weight: 700;
+  }
+  .actions-btn:hover { background: #f1f5f9; }
+
+  /* Filter popover */
+  .filter-popover {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 60;
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.12); width: 280px; padding: 12px;
+    display: none;
+  }
+  .filter-popover.open { display: block; }
+  .filter-section-title {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    color: #94a3b8; margin-bottom: 6px;
+  }
+  .filter-check-row {
+    display: flex; align-items: center; gap: 6px; padding: 3px 0; cursor: pointer; font-size: 12px; color: #334155;
+  }
+  .filter-check-row input[type="checkbox"] { width: 14px; height: 14px; accent-color: #0f172a; cursor: pointer; }
+  .filter-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Filter chip (removable) */
+  .filter-active-chip {
+    display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px 2px 6px;
+    border-radius: 9999px; font-size: 11px; font-weight: 500; background: #f1f5f9;
+    color: #475569; border: 1px solid #e2e8f0; cursor: default;
+  }
+  .filter-active-chip button {
+    background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 13px;
+    line-height: 1; padding: 0 0 0 2px; display: flex; align-items: center;
+  }
+  .filter-active-chip button:hover { color: #475569; }
+
+  /* Week view */
+  .week-grid {
+    display: grid; grid-template-columns: 52px repeat(5, 1fr);
+    border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #e2e8f0; gap: 1px;
+  }
+  .week-header {
+    background: #f8fafc; padding: 8px 6px; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.04em; color: #64748b; text-align: center;
+  }
+  .week-header.today-header { color: #3b82f6; }
+  .week-header .day-number {
+    display: block; font-size: 18px; font-weight: 700; line-height: 1.2; letter-spacing: 0;
+    text-transform: none;
+  }
+  .week-header.today-header .day-number {
+    background: #3b82f6; color: #fff; border-radius: 50%; width: 28px; height: 28px;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+  .week-time-label {
+    background: #f8fafc; font-size: 10px; color: #94a3b8; text-align: right;
+    padding: 0 6px; position: relative; height: 60px;
+  }
+  .week-time-label span { position: absolute; top: -6px; right: 6px; }
+  .week-day-col {
+    background: #fff; position: relative; height: 60px; border-top: 1px solid #f1f5f9;
+  }
+  .week-day-col:first-of-type { border-top: none; }
+  .week-block {
+    position: absolute; left: 2px; right: 2px; border-radius: 5px; padding: 4px 6px;
+    font-size: 11px; cursor: pointer; overflow: hidden; z-index: 2;
+    border-left: 3px solid; transition: box-shadow 0.1s;
+  }
+  .week-block:hover { box-shadow: 0 2px 8px rgba(0,0,0,.15); z-index: 3; }
+  .week-block.draft { opacity: 0.65; border-style: dashed; }
+  .week-block-title { font-weight: 600; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .week-block-time { font-size: 10px; color: #475569; }
+  .week-block-meta { display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+</style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+<div class="max-w-[1280px] mx-auto px-6 py-6">
+  <h1 class="text-lg font-semibold text-slate-900 mb-1">Meetings</h1>
+  <p class="text-xs text-slate-500 mb-4">Admin view &mdash; manage member meetings, debriefs, and committee sessions</p>
+
+  <!-- Single container for all views -->
+  <div class="bg-white rounded-lg border border-slate-200 shadow-sm" id="mainContainer">
+    <!-- Controls Bar -->
+    <div class="px-4 py-3 border-b border-slate-100 flex items-center gap-3">
+      <!-- Left side -->
+      <div class="flex items-center gap-3 flex-1 min-w-0">
+        <!-- View toggle -->
+        <div class="seg-toggle">
+          <button class="seg-btn active" data-view="month" onclick="switchView('month')">Month</button>
+          <button class="seg-btn" data-view="week" onclick="switchView('week')">Week</button>
+          <button class="seg-btn" data-view="table" onclick="switchView('table')">Table</button>
+        </div>
+
+        <!-- Filters popover trigger -->
+        <div style="position:relative;" id="filterWrap">
+          <button class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition-colors" id="filterBtn" onclick="toggleFilterPopover()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            <span>Filters</span>
+            <span id="filterCountBadge" class="hidden ml-0.5 px-1.5 py-0 rounded-full text-[10px] font-bold bg-slate-900 text-white leading-4"></span>
+          </button>
+          <div class="filter-popover" id="filterPopover">
+            <div class="mb-3">
+              <div class="flex items-center justify-between mb-1">
+                <div class="filter-section-title" style="margin-bottom:0">Type</div>
+                <div style="display:flex;gap:6px;font-size:10px;">
+                  <button onclick="selectAllTypes()" style="background:none;border:none;cursor:pointer;color:#64748b;font-size:10px;padding:0;font-weight:600;text-decoration:underline;text-underline-offset:2px;">All</button>
+                  <button onclick="selectNoneTypes()" style="background:none;border:none;cursor:pointer;color:#64748b;font-size:10px;padding:0;font-weight:600;text-decoration:underline;text-underline-offset:2px;">None</button>
+                </div>
+              </div>
+              <label class="filter-check-row" data-filter="type" data-value="member"><input type="checkbox" checked onchange="updateFilters()"><span class="filter-dot" style="background:#3b82f6"></span>Member Meeting</label>
+              <label class="filter-check-row" data-filter="type" data-value="learning"><input type="checkbox" checked onchange="updateFilters()"><span class="filter-dot" style="background:#8b5cf6"></span>Learning Lab</label>
+              <label class="filter-check-row" data-filter="type" data-value="dd"><input type="checkbox" checked onchange="updateFilters()"><span class="filter-dot" style="background:#f59e0b"></span>DD Debrief</label>
+              <label class="filter-check-row" data-filter="type" data-value="followup"><input type="checkbox" checked onchange="updateFilters()"><span class="filter-dot" style="background:#10b981"></span>Follow-Up Meeting</label>
+              <label class="filter-check-row" data-filter="type" data-value="diligence"><input type="checkbox" checked onchange="updateFilters()"><span class="filter-dot" style="background:#14b8a6"></span>Diligence Meeting</label>
+              <label class="filter-check-row" data-filter="type" data-value="committee"><input type="checkbox" checked onchange="updateFilters()"><span class="filter-dot" style="background:#64748b"></span>Committee Meeting</label>
+            </div>
+            <div class="mb-3">
+              <div class="flex items-center justify-between mb-1">
+                <div class="filter-section-title" style="margin-bottom:0">Status</div>
+                <div style="display:flex;gap:6px;font-size:10px;">
+                  <button onclick="selectAllStatuses()" style="background:none;border:none;cursor:pointer;color:#64748b;font-size:10px;padding:0;font-weight:600;text-decoration:underline;text-underline-offset:2px;">All</button>
+                  <button onclick="selectNoneStatuses()" style="background:none;border:none;cursor:pointer;color:#64748b;font-size:10px;padding:0;font-weight:600;text-decoration:underline;text-underline-offset:2px;">None</button>
+                </div>
+              </div>
+              <label class="filter-check-row" data-filter="status" data-value="draft"><input type="checkbox" checked onchange="updateFilters()">Draft</label>
+              <label class="filter-check-row" data-filter="status" data-value="scheduled"><input type="checkbox" checked onchange="updateFilters()">Scheduled</label>
+              <label class="filter-check-row" data-filter="status" data-value="sent"><input type="checkbox" checked onchange="updateFilters()">Sent</label>
+              <label class="filter-check-row" data-filter="status" data-value="completed"><input type="checkbox" checked onchange="updateFilters()">Completed</label>
+              <label class="filter-check-row" data-filter="status" data-value="cancelled"><input type="checkbox" checked onchange="updateFilters()">Cancelled</label>
+            </div>
+            <div class="mb-2">
+              <div class="filter-section-title">Other</div>
+              <label class="filter-check-row" data-filter="zoom" data-value="1"><input type="checkbox" onchange="updateFilters()">Has Zoom meeting</label>
+              <label class="filter-check-row" data-filter="recording" data-value="1"><input type="checkbox" onchange="updateFilters()">Has recording</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active filter chips -->
+        <div class="flex items-center gap-1.5 flex-wrap" id="activeFilterChips"></div>
+
+        <!-- Search -->
+        <div class="search-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search meetings..." autocomplete="off" data-lpignore="true" data-form-type="other" id="searchInput" oninput="renderCurrentView()">
+        </div>
+      </div>
+
+      <!-- Right side -->
+      <div class="flex items-center gap-3">
+        <span class="text-xs text-slate-500 font-medium" id="meetingCount">11 meetings</span>
+        <button class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white text-xs font-medium rounded-md hover:bg-slate-800 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Meeting
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation bar (shared by month/week; hidden for table) -->
+    <div class="px-4 py-2.5 flex items-center gap-3 border-b border-slate-100" id="navBar">
+      <button onclick="navPrev()" class="w-7 h-7 inline-flex items-center justify-center rounded-md border border-slate-200 hover:bg-slate-50 text-slate-500">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="text-sm font-semibold text-slate-800 min-w-[180px] text-center" id="navTitle">April 2026</span>
+      <button onclick="navNext()" class="w-7 h-7 inline-flex items-center justify-center rounded-md border border-slate-200 hover:bg-slate-50 text-slate-500">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <button onclick="goToday()" class="text-xs text-slate-500 hover:text-slate-800 font-medium px-2 py-1 rounded border border-slate-200 hover:bg-slate-50 transition-colors">Today</button>
+    </div>
+
+    <!-- Month View -->
+    <div class="p-4 bg-slate-50" id="monthView">
+      <div class="cal-grid" id="calGrid">
+        <div class="cal-header">Mon</div>
+        <div class="cal-header">Tue</div>
+        <div class="cal-header">Wed</div>
+        <div class="cal-header">Thu</div>
+        <div class="cal-header">Fri</div>
+        <div class="cal-header">Sat / Sun</div>
+      </div>
+    </div>
+
+    <!-- Week View -->
+    <div class="p-4 bg-slate-50" id="weekView" style="display:none;">
+      <div class="week-grid" id="weekGrid"></div>
+    </div>
+
+    <!-- Table View -->
+    <div id="tableView" style="display:none;">
+      <div class="overflow-x-hidden">
+        <table class="meetings-table" id="meetingsTable">
+          <colgroup>
+            <col style="width:90px"><col style="width:90px"><col><col style="width:130px">
+            <col style="width:130px"><col style="width:40px"><col style="width:50px">
+            <col style="width:65px"><col style="width:85px"><col style="width:44px">
+          </colgroup>
+          <thead>
+            <tr>
+              <th onclick="sortTable('date')">Date <span class="text-slate-400" id="sortDate">&darr;</span></th>
+              <th>Time</th>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Company</th>
+              <th class="text-center" style="font-size:10px">Rec</th>
+              <th class="text-center">Zoom</th>
+              <th class="text-center">RSVP</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Meeting detail popover -->
+<div class="popover-overlay" id="popoverOverlay" onclick="closePopover()">
+  <div class="popover-card" onclick="event.stopPropagation()">
+    <div class="popover-band" id="popoverBand"></div>
+    <div class="px-5 py-4">
+      <div class="flex items-start justify-between mb-3">
+        <div>
+          <h3 class="text-sm font-semibold text-slate-900" id="popTitle"></h3>
+          <p class="text-xs text-slate-500 mt-0.5" id="popType"></p>
+        </div>
+        <button onclick="closePopover()" class="text-slate-400 hover:text-slate-600">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="space-y-2 text-xs text-slate-600">
+        <div class="flex gap-2"><span class="text-slate-400 w-16 shrink-0">Date</span><span class="font-medium text-slate-800" id="popDate"></span></div>
+        <div class="flex gap-2"><span class="text-slate-400 w-16 shrink-0">Time</span><span class="font-medium text-slate-800" id="popTime"></span></div>
+        <div class="flex gap-2" id="popCompanyRow"><span class="text-slate-400 w-16 shrink-0">Company</span><span class="font-medium text-slate-800" id="popCompany"></span></div>
+        <div class="flex gap-2"><span class="text-slate-400 w-16 shrink-0">Zoom</span><span class="font-medium text-slate-800" id="popZoom"></span></div>
+        <div class="flex gap-2"><span class="text-slate-400 w-16 shrink-0">RSVP</span><span class="font-medium text-slate-800" id="popRsvp"></span></div>
+        <div class="flex gap-2" id="popRecordingRow"><span class="text-slate-400 w-16 shrink-0">Recording</span><span class="font-medium text-blue-600" id="popRecording"></span></div>
+        <div class="flex gap-2"><span class="text-slate-400 w-16 shrink-0">Status</span><span id="popStatus"></span></div>
+      </div>
+      <div class="mt-4 pt-3 border-t border-slate-100 flex justify-end">
+        <button class="px-3 py-1.5 bg-slate-900 text-white text-xs font-medium rounded-md hover:bg-slate-800 transition-colors">Edit Meeting</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Meeting type config ──
+const TYPES = {
+  member:    { label: 'Member Meeting',    color: '#3b82f6', bg: '#dbeafe', dark: '#1e40af' },
+  learning:  { label: 'Learning Lab',      color: '#8b5cf6', bg: '#ede9fe', dark: '#5b21b6' },
+  dd:        { label: 'DD Debrief',        color: '#f59e0b', bg: '#fef3c7', dark: '#92400e' },
+  followup:  { label: 'Follow-Up Meeting', color: '#10b981', bg: '#d1fae5', dark: '#065f46' },
+  diligence: { label: 'Diligence Meeting', color: '#14b8a6', bg: '#ccfbf1', dark: '#0f766e' },
+  committee: { label: 'Committee Meeting', color: '#64748b', bg: '#f1f5f9', dark: '#334155' },
+};
+
+const STATUS_COLORS = {
+  draft:     'background:#fef3c7;color:#92400e;',
+  scheduled: 'background:#dbeafe;color:#1e40af;',
+  sent:      'background:#d1fae5;color:#065f46;',
+  completed: 'background:#f1f5f9;color:#475569;',
+  cancelled: 'background:#fee2e2;color:#991b1b;',
+};
+
+// ── Sample data ──
+const MEETINGS = [
+  { id: 1,  date: '2026-04-03', startHour: 9,  startMin: 0,  endHour: 10, endMin: 0,  time: '9:00a',  endTime: '10:00a', title: 'Screening Committee',       type: 'committee', company: null,             zoom: 'JS', zoomFull: 'Jordan Schwartz', rsvpYes: 8,  rsvpTotal: 8,   status: 'sent',      recording: null },
+  { id: 2,  date: '2026-04-07', startHour: 10, startMin: 0,  endHour: 11, endMin: 0,  time: '10:00a', endTime: '11:00a', title: 'Delta Energy DD Debrief',   type: 'dd',        company: 'Delta Energy',   zoom: 'SS', zoomFull: 'Sarah Schmidt',   rsvpYes: 12, rsvpTotal: 18,  status: 'scheduled', recording: null },
+  { id: 3,  date: '2026-04-08', startHour: 14, startMin: 0,  endHour: 15, endMin: 0,  time: '2:00p',  endTime: '3:00p',  title: 'Acme Corp Follow-Up',      type: 'followup',  company: 'Acme Corp',      zoom: 'JS', zoomFull: 'Jordan Schwartz', rsvpYes: 6,  rsvpTotal: 8,   status: 'scheduled', recording: null },
+  { id: 4,  date: '2026-04-10', startHour: 11, startMin: 30, endHour: 13, endMin: 0,  time: '11:30a', endTime: '1:00p',  title: 'April Member Meeting',     type: 'member',    company: null,             zoom: 'JS', zoomFull: 'Jordan Schwartz', rsvpYes: 89, rsvpTotal: 144, status: 'sent',      recording: 'https://zoom.us/rec/abc' },
+  { id: 5,  date: '2026-04-14', startHour: 12, startMin: 0,  endHour: 13, endMin: 0,  time: '12:00p', endTime: '1:00p',  title: 'AI in Climate Tech',       type: 'learning',  company: null,             zoom: 'AM', zoomFull: 'Alex Martinez',   rsvpYes: 22, rsvpTotal: 52,  status: 'sent',      recording: null },
+  { id: 6,  date: '2026-04-15', startHour: 15, startMin: 0,  endHour: 16, endMin: 0,  time: '3:00p',  endTime: '4:00p',  title: 'Beta Inc Diligence',       type: 'diligence', company: 'Beta Inc',       zoom: 'JS', zoomFull: 'Jordan Schwartz', rsvpYes: 5,  rsvpTotal: 6,   status: 'scheduled', recording: null },
+  { id: 7,  date: '2026-04-17', startHour: 9,  startMin: 0,  endHour: 10, endMin: 30, time: '9:00a',  endTime: '10:30a', title: 'Portfolio Committee',       type: 'committee', company: null,             zoom: 'SS', zoomFull: 'Sarah Schmidt',   rsvpYes: 7,  rsvpTotal: 7,   status: 'sent',      recording: null },
+  { id: 8,  date: '2026-04-21', startHour: 10, startMin: 0,  endHour: 11, endMin: 0,  time: '10:00a', endTime: '11:00a', title: 'Gamma Systems DD Debrief',  type: 'dd',        company: 'Gamma Systems',  zoom: 'AM', zoomFull: 'Alex Martinez',   rsvpYes: 15, rsvpTotal: 20,  status: 'scheduled', recording: null },
+  { id: 9,  date: '2026-04-22', startHour: 14, startMin: 0,  endHour: 15, endMin: 0,  time: '2:00p',  endTime: '3:00p',  title: 'Pipeline Review',          type: 'committee', company: null,             zoom: 'JS', zoomFull: 'Jordan Schwartz', rsvpYes: 0,  rsvpTotal: 0,   status: 'draft',     recording: null },
+  { id: 10, date: '2026-04-24', startHour: 16, startMin: 0,  endHour: 17, endMin: 0,  time: '4:00p',  endTime: '5:00p',  title: 'May Member Meeting Prep',  type: 'followup',  company: null,             zoom: 'JS', zoomFull: 'Jordan Schwartz', rsvpYes: 4,  rsvpTotal: 5,   status: 'scheduled', recording: null },
+  { id: 11, date: '2026-04-25', startHour: 10, startMin: 0,  endHour: 11, endMin: 0,  time: '10:00a', endTime: '11:00a', title: 'Special Session',           type: 'learning',  company: null,             zoom: 'AM', zoomFull: 'Alex Martinez',   rsvpYes: 0,  rsvpTotal: 0,   status: 'draft',     recording: null },
+];
+
+// ── State ──
+let currentView = 'month';
+let currentYear = 2026, currentMonth = 3; // 0-indexed April
+let currentWeekStart = new Date(2026, 2, 30); // Mon Mar 30 (week containing today Apr 3)
+let sortDir = 'asc';
+const TODAY = '2026-04-03';
+
+// ── Filter state ──
+function getActiveFilters() {
+  const filters = { types: [], statuses: [], zoom: false, recording: false };
+  document.querySelectorAll('#filterPopover .filter-check-row').forEach(row => {
+    const cb = row.querySelector('input[type="checkbox"]');
+    const filterType = row.dataset.filter;
+    const value = row.dataset.value;
+    if (cb.checked) {
+      if (filterType === 'type') filters.types.push(value);
+      else if (filterType === 'status') filters.statuses.push(value);
+      else if (filterType === 'zoom') filters.zoom = true;
+      else if (filterType === 'recording') filters.recording = true;
+    }
+  });
+  return filters;
+}
+
+function getFilteredMeetings() {
+  const f = getActiveFilters();
+  const search = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+  return MEETINGS.filter(m => {
+    if (f.types.length < 6 && !f.types.includes(m.type)) return false;
+    if (f.statuses.length < 5 && !f.statuses.includes(m.status)) return false;
+    if (f.zoom && !m.zoom) return false;
+    if (f.recording && !m.recording) return false;
+    if (search && !m.title.toLowerCase().includes(search) && !(m.company || '').toLowerCase().includes(search)) return false;
+    return true;
+  });
+}
+
+function countActiveFilterChanges() {
+  const f = getActiveFilters();
+  let count = 0;
+  if (f.types.length < 6) count++;
+  if (f.statuses.length < 5) count++;
+  if (f.zoom) count++;
+  if (f.recording) count++;
+  return count;
+}
+
+function updateFilters() {
+  const count = countActiveFilterChanges();
+  const badge = document.getElementById('filterCountBadge');
+  if (count > 0) {
+    badge.textContent = count;
+    badge.classList.remove('hidden');
+  } else {
+    badge.classList.add('hidden');
+  }
+  renderActiveChips();
+  renderCurrentView();
+}
+
+function renderActiveChips() {
+  const container = document.getElementById('activeFilterChips');
+  container.innerHTML = '';
+  const f = getActiveFilters();
+
+  // Type chips (only show when not all are selected)
+  if (f.types.length < 6 && f.types.length > 0) {
+    f.types.forEach(t => {
+      const info = TYPES[t];
+      const chip = document.createElement('span');
+      chip.className = 'filter-active-chip';
+      chip.innerHTML = `<span class="filter-dot" style="background:${info.color}"></span>${info.label}<button onclick="removeTypeFilter('${t}')">&times;</button>`;
+      container.appendChild(chip);
+    });
+  }
+
+  // Status chips
+  if (f.statuses.length < 5 && f.statuses.length > 0) {
+    f.statuses.forEach(s => {
+      const chip = document.createElement('span');
+      chip.className = 'filter-active-chip';
+      chip.innerHTML = `${s}<button onclick="removeStatusFilter('${s}')">&times;</button>`;
+      container.appendChild(chip);
+    });
+  }
+
+  if (f.zoom) {
+    const chip = document.createElement('span');
+    chip.className = 'filter-active-chip';
+    chip.innerHTML = `Has Zoom<button onclick="removeOtherFilter('zoom')">&times;</button>`;
+    container.appendChild(chip);
+  }
+  if (f.recording) {
+    const chip = document.createElement('span');
+    chip.className = 'filter-active-chip';
+    chip.innerHTML = `Has recording<button onclick="removeOtherFilter('recording')">&times;</button>`;
+    container.appendChild(chip);
+  }
+}
+
+function removeTypeFilter(type) {
+  const row = document.querySelector(`#filterPopover .filter-check-row[data-filter="type"][data-value="${type}"]`);
+  if (row) row.querySelector('input').checked = false;
+  updateFilters();
+}
+function removeStatusFilter(status) {
+  const row = document.querySelector(`#filterPopover .filter-check-row[data-filter="status"][data-value="${status}"]`);
+  if (row) row.querySelector('input').checked = false;
+  updateFilters();
+}
+function removeOtherFilter(filterName) {
+  const row = document.querySelector(`#filterPopover .filter-check-row[data-filter="${filterName}"]`);
+  if (row) row.querySelector('input').checked = false;
+  updateFilters();
+}
+
+function selectAllTypes() {
+  document.querySelectorAll('#filterPopover .filter-check-row[data-filter="type"] input').forEach(cb => cb.checked = true);
+  updateFilters();
+}
+function selectNoneTypes() {
+  document.querySelectorAll('#filterPopover .filter-check-row[data-filter="type"] input').forEach(cb => cb.checked = false);
+  updateFilters();
+}
+function selectAllStatuses() {
+  document.querySelectorAll('#filterPopover .filter-check-row[data-filter="status"] input').forEach(cb => cb.checked = true);
+  updateFilters();
+}
+function selectNoneStatuses() {
+  document.querySelectorAll('#filterPopover .filter-check-row[data-filter="status"] input').forEach(cb => cb.checked = false);
+  updateFilters();
+}
+
+function toggleFilterPopover() {
+  document.getElementById('filterPopover').classList.toggle('open');
+}
+
+// Close filter popover on outside click
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('filterWrap');
+  if (!wrap.contains(e.target)) {
+    document.getElementById('filterPopover').classList.remove('open');
+  }
+});
+
+// ── View switching ──
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll('.seg-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.view === view);
+  });
+  document.getElementById('monthView').style.display = view === 'month' ? '' : 'none';
+  document.getElementById('weekView').style.display = view === 'week' ? '' : 'none';
+  document.getElementById('tableView').style.display = view === 'table' ? '' : 'none';
+  document.getElementById('navBar').style.display = view === 'table' ? 'none' : '';
+  updateNavTitle();
+  renderCurrentView();
+}
+
+function renderCurrentView() {
+  const filtered = getFilteredMeetings();
+  document.getElementById('meetingCount').textContent = filtered.length + ' meeting' + (filtered.length !== 1 ? 's' : '');
+  if (currentView === 'month') renderCalendar(filtered);
+  else if (currentView === 'week') renderWeek(filtered);
+  else renderTable(filtered);
+}
+
+function updateNavTitle() {
+  const el = document.getElementById('navTitle');
+  if (currentView === 'month') {
+    const d = new Date(currentYear, currentMonth, 1);
+    el.textContent = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  } else if (currentView === 'week') {
+    const d = currentWeekStart;
+    el.textContent = 'Week of ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+}
+
+function navPrev() {
+  if (currentView === 'month') {
+    currentMonth--;
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    renderCurrentView();
+  } else if (currentView === 'week') {
+    currentWeekStart = new Date(currentWeekStart.getFullYear(), currentWeekStart.getMonth(), currentWeekStart.getDate() - 7);
+    renderCurrentView();
+  }
+  updateNavTitle();
+}
+
+function navNext() {
+  if (currentView === 'month') {
+    currentMonth++;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    renderCurrentView();
+  } else if (currentView === 'week') {
+    currentWeekStart = new Date(currentWeekStart.getFullYear(), currentWeekStart.getMonth(), currentWeekStart.getDate() + 7);
+    renderCurrentView();
+  }
+  updateNavTitle();
+}
+
+function goToday() {
+  currentYear = 2026; currentMonth = 3;
+  // Find Monday of the week containing today (Apr 3 = Thursday, so Monday = Mar 30)
+  currentWeekStart = new Date(2026, 2, 30);
+  updateNavTitle();
+  renderCurrentView();
+}
+
+// ── Helpers ──
+function toYmd(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function buildWeeks(monthDate) {
+  const mStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+  const mEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+  const mondayOffset = (mStart.getDay() + 6) % 7;
+  const firstMonday = new Date(mStart);
+  firstMonday.setDate(mStart.getDate() - mondayOffset);
+  const weeks = [];
+  let cursor = new Date(firstMonday);
+  for (let i = 0; i < 6; i++) {
+    const weekdays = [];
+    for (let d = 0; d < 5; d++) {
+      weekdays.push(new Date(cursor));
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    const saturday = new Date(cursor); cursor.setDate(cursor.getDate() + 1);
+    const sunday = new Date(cursor); cursor.setDate(cursor.getDate() + 1);
+    weeks.push({ weekdays, saturday, sunday });
+    if (cursor > mEnd && i >= 3) break;
+  }
+  return weeks;
+}
+
+// ── Month Calendar ──
+function renderCalendar(meetings) {
+  const grid = document.getElementById('calGrid');
+  while (grid.children.length > 6) grid.removeChild(grid.lastChild);
+  const monthDate = new Date(currentYear, currentMonth, 1);
+  const weeks = buildWeeks(monthDate);
+
+  weeks.forEach(week => {
+    week.weekdays.forEach(d => {
+      const ymd = toYmd(d);
+      const inMonth = d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+      const isToday = ymd === TODAY;
+      const cell = document.createElement('div');
+      cell.className = 'cal-cell' + (!inMonth ? ' outside' : '') + (isToday ? ' today' : '');
+      cell.innerHTML = `<div class="day-num">${d.getDate()}</div>`;
+      meetings.filter(m => m.date === ymd).forEach(m => cell.appendChild(makeTile(m)));
+      grid.appendChild(cell);
+    });
+    const weCell = document.createElement('div');
+    weCell.className = 'cal-weekend-cell';
+    [week.saturday, week.sunday].forEach(d => {
+      const ymd = toYmd(d);
+      const inMonth = d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+      const half = document.createElement('div');
+      half.className = 'cal-weekend-half' + (!inMonth ? ' outside' : '');
+      half.innerHTML = `<div class="day-num" style="font-size:10px">${d.getDate()}</div>`;
+      meetings.filter(m => m.date === ymd).forEach(m => half.appendChild(makeTile(m, true)));
+      weCell.appendChild(half);
+    });
+    grid.appendChild(weCell);
+  });
+}
+
+function makeTile(m, compact) {
+  const t = TYPES[m.type];
+  const tile = document.createElement('div');
+  tile.className = 'meeting-tile' + (m.status === 'draft' ? ' draft' : '');
+  tile.style.background = t.bg;
+  tile.onclick = (e) => { e.stopPropagation(); openPopover(m); };
+  tile.setAttribute('data-tip', m.title);
+  tile.innerHTML = `
+    <div class="tile-band" style="background:${t.color}"></div>
+    <div class="tile-body">
+      <div class="tile-time" style="color:${t.dark}">${m.time}</div>
+      <div class="tile-title" style="color:${t.dark}">${m.title}</div>
+      <div class="tile-meta">
+        <span class="tile-zoom" data-tip="${m.zoomFull}" style="border-color:${t.color}40;background:${t.color}18;color:${t.dark}">${m.zoom}</span>
+        <span class="tile-rsvp" style="color:${t.dark}88">${m.rsvpTotal > 0 ? m.rsvpYes + '/' + m.rsvpTotal : ''}</span>
+        ${m.status === 'draft' ? '<span class="tile-status-badge" style="background:#fef3c7;color:#92400e;">Draft</span>' : ''}
+      </div>
+    </div>
+  `;
+  return tile;
+}
+
+// ── Week View ──
+function renderWeek(meetings) {
+  const grid = document.getElementById('weekGrid');
+  grid.innerHTML = '';
+
+  const startHour = 8, endHour = 17;
+  const hours = endHour - startHour; // 9 hours
+  const rowHeight = 60;
+
+  // Header row
+  const cornerCell = document.createElement('div');
+  cornerCell.className = 'week-header';
+  cornerCell.innerHTML = '&nbsp;';
+  grid.appendChild(cornerCell);
+
+  const weekDays = [];
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(currentWeekStart.getFullYear(), currentWeekStart.getMonth(), currentWeekStart.getDate() + i);
+    weekDays.push(d);
+    const hdr = document.createElement('div');
+    const ymd = toYmd(d);
+    const isToday = ymd === TODAY;
+    hdr.className = 'week-header' + (isToday ? ' today-header' : '');
+    const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+    hdr.innerHTML = `${dayName}<span class="day-number">${d.getDate()}</span>`;
+    grid.appendChild(hdr);
+  }
+
+  // Time rows
+  for (let h = startHour; h < endHour; h++) {
+    const label = document.createElement('div');
+    label.className = 'week-time-label';
+    const ampm = h < 12 ? 'AM' : 'PM';
+    const display = h <= 12 ? h : h - 12;
+    label.innerHTML = `<span>${display} ${ampm}</span>`;
+    grid.appendChild(label);
+
+    for (let col = 0; col < 5; col++) {
+      const cell = document.createElement('div');
+      cell.className = 'week-day-col';
+      const ymd = toYmd(weekDays[col]);
+
+      // Only render blocks on the first hour row they appear in
+      if (h === startHour || true) {
+        meetings.filter(m => m.date === ymd).forEach(m => {
+          // Only render if this hour is the start hour for this meeting
+          if (m.startHour !== h) return;
+          // Actually, render in start hour row
+          const t = TYPES[m.type];
+          const topOffset = (m.startMin / 60) * rowHeight;
+          const durationMin = (m.endHour - m.startHour) * 60 + (m.endMin - m.startMin);
+          const height = (durationMin / 60) * rowHeight;
+
+          const block = document.createElement('div');
+          block.className = 'week-block' + (m.status === 'draft' ? ' draft' : '');
+          block.style.cssText = `top:${topOffset}px; height:${height - 2}px; background:${t.bg}; border-left-color:${t.color};`;
+          block.onclick = (e) => { e.stopPropagation(); openPopover(m); };
+          block.innerHTML = `
+            <div class="week-block-title" style="color:${t.dark}">${m.title}</div>
+            <div class="week-block-time">${m.time} - ${m.endTime}</div>
+            <div class="week-block-meta">
+              <span class="tile-zoom" style="border-color:${t.color}40;width:14px;height:14px;font-size:7px;">${m.zoom}</span>
+              ${m.rsvpTotal > 0 ? `<span class="tile-rsvp">${m.rsvpYes}/${m.rsvpTotal}</span>` : ''}
+            </div>
+          `;
+          cell.appendChild(block);
+        });
+      }
+      grid.appendChild(cell);
+    }
+  }
+}
+
+// ── Table View ──
+function renderTable(meetings) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  const sorted = [...meetings].sort((a, b) => {
+    const cmp = a.date.localeCompare(b.date);
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
+  sorted.forEach(m => {
+    const t = TYPES[m.type];
+    const tr = document.createElement('tr');
+    tr.onclick = () => openPopover(m);
+    const dateObj = new Date(m.date + 'T12:00:00');
+    const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+    tr.innerHTML = `
+      <td class="text-xs font-medium">${dateStr}</td>
+      <td class="text-xs text-slate-500">${m.time} - ${m.endTime}</td>
+      <td class="text-xs font-medium text-slate-900" style="white-space:normal;max-width:250px;">${m.title}</td>
+      <td><span class="type-badge" style="background:${t.bg};color:${t.dark}"><span style="width:6px;height:6px;border-radius:50%;background:${t.color};display:inline-block;"></span> ${t.label}</span></td>
+      <td class="text-xs text-slate-500">${m.company || ''}</td>
+      <td class="text-center">${m.recording ? '<span title="Has recording" style="cursor:pointer;">&#127916;</span>' : ''}</td>
+      <td class="text-center"><span class="tile-zoom" data-tip="${m.zoomFull}">${m.zoom}</span></td>
+      <td class="text-xs text-slate-600 text-center">${m.rsvpTotal > 0 ? m.rsvpYes + '/' + m.rsvpTotal : ''}</td>
+      <td><span class="status-badge" style="${STATUS_COLORS[m.status]}">${m.status}</span></td>
+      <td><button class="actions-btn" onclick="event.stopPropagation()">&#8943;</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function sortTable(col) {
+  sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  document.getElementById('sortDate').textContent = sortDir === 'asc' ? '\u2193' : '\u2191';
+  renderCurrentView();
+}
+
+// ── Popover ──
+function openPopover(m) {
+  const t = TYPES[m.type];
+  document.getElementById('popoverBand').style.background = t.color;
+  document.getElementById('popTitle').textContent = m.title;
+  document.getElementById('popType').textContent = t.label;
+  document.getElementById('popDate').textContent = new Date(m.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  document.getElementById('popTime').textContent = m.time + ' - ' + m.endTime + ' PT';
+
+  if (m.company) {
+    document.getElementById('popCompanyRow').style.display = 'flex';
+    document.getElementById('popCompany').textContent = m.company;
+  } else {
+    document.getElementById('popCompanyRow').style.display = 'none';
+  }
+
+  document.getElementById('popZoom').textContent = m.zoomFull;
+  document.getElementById('popRsvp').textContent = m.rsvpTotal > 0 ? `${m.rsvpYes} accepted / ${m.rsvpTotal} invited` : 'No invitations sent';
+
+  if (m.recording) {
+    document.getElementById('popRecordingRow').style.display = 'flex';
+    document.getElementById('popRecording').textContent = 'View recording';
+  } else {
+    document.getElementById('popRecordingRow').style.display = 'none';
+  }
+
+  document.getElementById('popStatus').innerHTML = `<span class="status-badge" style="${STATUS_COLORS[m.status]}">${m.status}</span>`;
+  document.getElementById('popoverOverlay').classList.add('open');
+}
+
+function closePopover() {
+  document.getElementById('popoverOverlay').classList.remove('open');
+}
+
+// ── Init ──
+updateNavTitle();
+renderCurrentView();
+</script>
+</body>
+</html>

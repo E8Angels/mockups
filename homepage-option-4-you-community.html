@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E8 Angels · Option 4 — You + Community</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!--
+        OPTION 4: "YOU + COMMUNITY" SPLIT
+        Two primary columns:
+          Left (~40%): Your Workspace — everything about the logged-in user
+          Right (~60%): Community — shared activity, events, feed, directory
+
+        PORTFOLIO NEWS RATIONALE:
+        Moved off the home page entirely. It is the heaviest-text block but
+        lowest-urgency for most members (portfolio news is informational, not
+        actionable). Members who want it can click through from the pill link.
+        Primary real estate goes to actionable items (ballot, interest forms,
+        DD deadlines) and the live community feed.
+
+        EVENTS-IN-FEED APPROACH:
+        All 5 upcoming events are interleaved into the community feed in
+        chronological order relative to posts. Because all events are future
+        (Mar 30 – Apr 30) and the most recent post is Mar 26, events appear
+        at the very top of the feed (above posts), clustered by date proximity.
+        Each event uses a slim left-border strip card — different visual
+        treatment from posts (no avatar row, no prose body) — with a colored
+        left border (teal for DD debriefs, violet for social, blue for meetings)
+        and an "Add to calendar" micro-link.
+    -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+
+        /* ─── TOP BAR (identical to reference) ─── */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            height: 52px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 0 0 auto;
+        }
+
+        .top-bar-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-circle {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .logo-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .top-bar-nav {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex: 1;
+            margin-left: 32px;
+        }
+
+        .nav-link {
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748b;
+            text-decoration: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            padding-bottom: 2px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-link:hover { color: #1e293b; }
+
+        .nav-link.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+
+        .nav-link.has-dropdown::after {
+            content: '▾';
+            font-size: 10px;
+            margin-left: 4px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+            margin-top: 8px;
+        }
+
+        .dropdown-menu.active { display: block; }
+
+        .dropdown-item {
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #64748b;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 0 0 auto;
+        }
+
+        .search-container {
+            position: relative;
+            width: 200px;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 32px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 6px 12px 6px 32px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .search-input::placeholder { color: #cbd5e1; }
+
+        .search-icon {
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: #94a3b8;
+        }
+
+        .top-bar-links {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .refer-link, .admin-link {
+            font-size: 13px;
+            color: #2563eb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .admin-link {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .profile-photo {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* ─── HERO STRIP (identical to reference) ─── */
+        .hero-strip {
+            height: 52px;
+            background-color: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .stat-pills {
+            display: flex;
+            gap: 8px;
+        }
+
+        .stat-pill {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .pill-teal { background-color: #f0fdfa; color: #0d9488; }
+        .pill-amber { background-color: #fffbeb; color: #d97706; }
+        .pill-blue { background-color: #eff6ff; color: #2563eb; }
+
+        /* ─── MAIN TWO-COLUMN LAYOUT ─── */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 16px;
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 20px;
+            min-height: calc(100vh - 104px);
+        }
+
+        /* ─── SHARED CARD STYLES ─── */
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .card + .card { margin-top: 12px; }
+
+        .card-header {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 12px;
+        }
+
+        .subheader {
+            font-size: 10px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 14px;
+            margin-bottom: 8px;
+        }
+
+        .blue-link {
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 12px;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .blue-link:hover { text-decoration: underline; }
+
+        /* ─── COLUMN LABELS ─── */
+        .column-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .column-label-icon {
+            width: 14px;
+            height: 14px;
+            opacity: 0.6;
+        }
+
+        /* ─── LEFT COLUMN: YOUR WORKSPACE ─── */
+        .col-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Profile mini */
+        .profile-mini {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .profile-photo-med {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .profile-email, .profile-since {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 1px;
+        }
+
+        /* ─── AWAITING ACTION SUBSECTION ─── */
+        .action-subsection {
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 2px;
+        }
+
+        .action-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #92400e;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-item {
+            background: white;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            border: 1px solid #fde68a;
+        }
+
+        .action-item:last-child { margin-bottom: 0; }
+
+        .action-item-icon {
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .action-item-body { flex: 1; min-width: 0; }
+
+        .action-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+
+        .action-meta {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .action-deadline {
+            font-size: 11px;
+            font-weight: 600;
+            color: #dc2626;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            margin-bottom: 6px;
+        }
+
+        .action-btn {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-amber {
+            background-color: #d97706;
+            color: white;
+        }
+
+        .btn-teal {
+            background-color: #0d9488;
+            color: white;
+        }
+
+        .btn-slate {
+            background-color: #64748b;
+            color: white;
+        }
+
+        /* ─── INVESTMENTS ─── */
+        .investment-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .investment-row:last-of-type { border-bottom: none; }
+
+        .investment-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .company-icon {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        .company-name {
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .investment-right {
+            display: flex;
+            gap: 6px;
+            font-size: 11px;
+            color: #64748b;
+            flex-shrink: 0;
+        }
+
+        /* ─── DILIGENCE TEAM ─── */
+        .dd-team-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .avatar-stack {
+            display: flex;
+        }
+
+        .avatar-sm {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid white;
+            margin-right: -6px;
+            flex-shrink: 0;
+        }
+
+        .avatar-sm:last-child { margin-right: 0; }
+
+        /* ─── INTEREST FORMS ─── */
+        .interest-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            font-size: 12px;
+        }
+
+        .interest-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: auto;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .badge-in-diligence { background-color: #f0fdfa; color: #0d9488; }
+        .badge-balloting { background-color: #fffbeb; color: #d97706; }
+
+        /* ─── SCREENING QUEUE ─── */
+        .screening-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 12px;
+            height: 26px;
+        }
+
+        .screening-name {
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .badge-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: #2563eb;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .card-header-with-badge {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        /* ─── DOCUMENTS ─── */
+        .doc-link-list { margin: 0; padding: 0; list-style: none; }
+
+        .doc-link-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 0;
+            font-size: 12px;
+            border-bottom: 1px solid #f8fafc;
+        }
+
+        .doc-link-item:last-child { border-bottom: none; }
+
+        .doc-icon { width: 13px; height: 13px; flex-shrink: 0; color: #94a3b8; }
+
+        .doc-name {
+            color: #1e293b;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .doc-name:hover { color: #2563eb; }
+
+        /* ─── RIGHT COLUMN: COMMUNITY ─── */
+        .col-right {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* Portfolio news pill */
+        .portfolio-news-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 9999px;
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            font-size: 12px;
+            font-weight: 500;
+            color: #2563eb;
+            text-decoration: none;
+            cursor: pointer;
+            align-self: flex-start;
+            margin-bottom: 14px;
+            transition: background-color 0.15s;
+        }
+
+        .portfolio-news-pill:hover { background-color: #e2e8f0; }
+
+        /* ─── COMMUNITY FEED ─── */
+        .feed-wrapper {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .feed-section-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 14px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
+        }
+
+        /* ─── EVENT ROW (inline in feed) ─── */
+        /*
+            Visual treatment: slim card with a 3px colored left border, no avatar,
+            no prose. Reads as a calendar entry — date badge on the left, event name
+            and time in the center, "Add to calendar" micro-link on the right.
+            Kept compact so multiple events don't overwhelm the feed.
+        */
+        .feed-event {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border-left: 3px solid #0d9488;
+            background-color: #f8fafc;
+        }
+
+        .feed-event.event-violet { border-left-color: #7c3aed; }
+        .feed-event.event-blue { border-left-color: #2563eb; }
+
+        .feed-event-date {
+            flex-shrink: 0;
+            text-align: center;
+            width: 36px;
+        }
+
+        .fed-event-month {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #0d9488;
+            line-height: 1;
+        }
+
+        .feed-event.event-violet .fed-event-month { color: #7c3aed; }
+        .feed-event.event-blue .fed-event-month { color: #2563eb; }
+
+        .fed-event-day {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .feed-event-body { flex: 1; min-width: 0; }
+
+        .feed-event-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .feed-event-time {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 1px;
+        }
+
+        .feed-event-action {
+            flex-shrink: 0;
+            font-size: 11px;
+            color: #2563eb;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .feed-event-action:hover { text-decoration: underline; }
+
+        .feed-events-group-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+            margin-top: 4px;
+        }
+
+        /* ─── POSTS ─── */
+        .post {
+            padding: 20px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .post:last-of-type { border-bottom: none; }
+
+        .post-author-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .post-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid #e2e8f0;
+        }
+
+        .post-author-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #0f172a;
+        }
+
+        .post-date {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .post-body {
+            font-size: 13px;
+            line-height: 1.65;
+            color: #1e293b;
+            max-height: 96px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .post-body.expanded { max-height: none; }
+
+        .post-body-gradient {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(transparent, white);
+            pointer-events: none;
+        }
+
+        .post-body.expanded .post-body-gradient { display: none; }
+
+        .post-link {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .post-link:hover { text-decoration: underline; }
+
+        .continue-reading {
+            font-size: 12px;
+            color: #2563eb;
+            cursor: pointer;
+            margin-top: 6px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .continue-reading::after { content: ' →'; }
+
+        .show-less {
+            font-size: 12px;
+            color: #2563eb;
+            cursor: pointer;
+            margin-top: 6px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .show-less::after { content: ' ↑'; }
+
+        .post-attachment {
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .attachment-link {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .attachment-link:hover { text-decoration: underline; }
+
+        .load-more-button {
+            display: block;
+            margin: 16px auto 0;
+            padding: 7px 20px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: white;
+            font-size: 12px;
+            color: #64748b;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .load-more-button:hover { background-color: #f8fafc; }
+
+        /* ─── COMMUNITY SUBSECTIONS ─── */
+        .community-subsections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .community-subsections .card + .card { margin-top: 0; }
+
+        .community-full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* ─── OPEN FOR INVESTMENT ─── */
+        .pulsing-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: #10b981;
+            border-radius: 50%;
+            margin-right: 4px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .invest-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 12px;
+        }
+
+        .invest-item:last-of-type { border-bottom: none; }
+
+        .invest-logo {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .invest-name {
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .invest-desc { color: #64748b; font-size: 11px; }
+
+        .invest-link {
+            margin-left: auto;
+            font-size: 11px;
+            color: #2563eb;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .invest-link:hover { text-decoration: underline; }
+
+        /* ─── RECORDINGS TABS ─── */
+        .tab-header {
+            display: flex;
+            gap: 14px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 10px;
+        }
+
+        .tab-button {
+            padding: 6px 0;
+            border: none;
+            background: none;
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tab-button.active {
+            color: #0f172a;
+            border-bottom-color: #2563eb;
+        }
+
+        .recording-thumb {
+            width: 100%;
+            height: 72px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 7px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recording-thumb::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0);
+            transition: background 0.2s;
+        }
+
+        .recording-thumb:hover::after { background: rgba(0,0,0,0.18); }
+
+        .play-icon {
+            width: 26px;
+            height: 26px;
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .recording-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 3px;
+        }
+
+        .recording-companies {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-bottom: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .recording-watch {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .recording-watch:hover { text-decoration: underline; }
+
+        /* ─── MEMBER DIRECTORY (slim) ─── */
+        .member-search-wrapper { position: relative; margin-bottom: 8px; }
+
+        .member-search {
+            width: 100%;
+            height: 28px;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            padding: 4px 10px 4px 28px;
+            font-size: 12px;
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+        }
+
+        .member-search::placeholder { color: #cbd5e1; }
+
+        .member-search-icon {
+            position: absolute;
+            left: 7px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 13px;
+            height: 13px;
+            color: #94a3b8;
+        }
+
+        .member-count { font-size: 11px; color: #94a3b8; margin-bottom: 8px; }
+
+        .member-avatars { display: flex; gap: 3px; flex-wrap: wrap; }
+
+        .member-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* ─── E8 FUND 2026 ─── */
+        .fund-header {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 10px;
+        }
+
+        .fund-name { font-size: 13px; font-weight: 600; color: #0f172a; }
+
+        .active-vote-box {
+            padding: 10px;
+            background: #f0fdfa;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .vote-deadline {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 11px;
+            color: #dc2626;
+            font-weight: 600;
+            margin: 6px 0;
+        }
+
+        .clock-icon { width: 11px; height: 11px; }
+
+        .vote-bar {
+            width: 100%;
+            height: 16px;
+            border-radius: 9999px;
+            display: flex;
+            overflow: hidden;
+            margin: 6px 0;
+        }
+
+        .vote-segment { flex: 0 0 auto; height: 100%; }
+        .segment-red { background-color: #f87171; }
+        .segment-green { background-color: #4ade80; }
+        .segment-blue { background-color: #60a5fa; }
+        .segment-slate { background-color: #94a3b8; }
+
+        .vote-legend {
+            display: flex;
+            gap: 8px;
+            font-size: 10px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 3px; }
+
+        .legend-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .fund-separator { height: 1px; background-color: #e2e8f0; margin: 10px 0; }
+
+        .fund-subheader {
+            font-size: 10px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 7px;
+        }
+
+        .fund-investment-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 12px;
+            color: #64748b;
+            border-bottom: 1px solid #f8fafc;
+        }
+
+        .fund-investment-row:last-of-type { border-bottom: none; }
+
+        .fund-investment-name { font-weight: 500; color: #1e293b; }
+
+        .fund-checkmark { width: 11px; height: 11px; color: #16a34a; }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .community-subsections {
+                grid-template-columns: 1fr;
+            }
+
+            .top-bar {
+                flex-direction: column;
+                height: auto;
+                padding: 12px 20px;
+                gap: 12px;
+            }
+
+            .top-bar-nav { margin-left: 0; }
+            .top-bar-left { width: 100%; }
+            .top-bar-right { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         TOP BAR — identical to reference
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <div class="top-bar-logo">
+                <div class="logo-circle">E8</div>
+                <div class="logo-text">E8 Angels</div>
+            </div>
+        </div>
+
+        <div class="top-bar-nav">
+            <a href="#" class="nav-link active">Home</a>
+            <a href="#" class="nav-link has-dropdown" data-dropdown="companies">Companies by Stage</a>
+            <div class="dropdown-menu" id="companies">
+                <button class="dropdown-item">Pre-Screening</button>
+                <button class="dropdown-item">Screening</button>
+                <button class="dropdown-item">Pitch</button>
+                <button class="dropdown-item">Pre-Diligence</button>
+                <button class="dropdown-item">In Diligence</button>
+                <button class="dropdown-item">Investment Ready</button>
+            </div>
+            <a href="#" class="nav-link">Recordings</a>
+            <a href="#" class="nav-link">E8 Fund</a>
+            <a href="#" class="nav-link">Portfolio News</a>
+            <a href="#" class="nav-link">Explore</a>
+            <a href="#" class="nav-link">My Investments</a>
+        </div>
+
+        <div class="top-bar-right">
+            <div class="search-container">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" class="search-input" placeholder="Search companies...">
+            </div>
+            <div class="top-bar-links">
+                <a href="#" class="refer-link">Refer a Company</a>
+                <a href="#" class="admin-link">Admin</a>
+            </div>
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face" alt="Profile" class="profile-photo">
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         HERO STRIP — identical to reference
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="hero-strip">
+        <div>Welcome back, Jordan · Monday, March 30, 2026</div>
+        <div class="stat-pills">
+            <div class="stat-pill pill-teal">3 in diligence</div>
+            <div class="stat-pill pill-amber">2 votes open</div>
+            <div class="stat-pill pill-blue">Next meeting: Apr 30</div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         MAIN — TWO COLUMNS
+    ═══════════════════════════════════════════════════════════ -->
+    <div class="main-container">
+
+        <!-- ══════════════════════════════════
+             LEFT COLUMN: YOUR WORKSPACE
+        ══════════════════════════════════ -->
+        <div class="col-left">
+            <div class="column-label">
+                <svg class="column-label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="4"></circle>
+                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"></path>
+                </svg>
+                Your Workspace
+            </div>
+
+            <!-- PROFILE + AWAITING ACTION card -->
+            <div class="card">
+                <!-- Profile mini -->
+                <div class="profile-mini">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=88&h=88&fit=crop&crop=face" alt="Jordan" class="profile-photo-med">
+                    <div>
+                        <div class="profile-name">Jordan Schwartz</div>
+                        <div class="profile-email">jordan@hive-mind.com</div>
+                        <div class="profile-since">Member since January 2023</div>
+                    </div>
+                </div>
+
+                <!-- Awaiting Action subsection — loud, urgent -->
+                <div class="action-subsection">
+                    <div class="action-label">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2.5">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        Awaiting Your Action
+                    </div>
+
+                    <!-- EELI ballot -->
+                    <div class="action-item">
+                        <svg class="action-item-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+                            <rect x="4" y="6" width="16" height="12" rx="2"></rect>
+                            <path d="M8 10h8M8 14h4"></path>
+                        </svg>
+                        <div class="action-item-body">
+                            <div class="action-title">EELI Technology — Fund Ballot</div>
+                            <div class="action-deadline">
+                                <svg class="clock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                Closes March 29, 10:00 PM PT
+                            </div>
+                            <button class="action-btn btn-amber">Cast vote →</button>
+                        </div>
+                    </div>
+
+                    <!-- AlgaFilm interest form pending -->
+                    <div class="action-item">
+                        <svg class="action-item-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+                            <path d="M12 2c1.1 0 2 .9 2 2 0 .55-.22 1.05-.59 1.41L7.41 10c-.37.37-.86.59-1.41.59H4c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h2.59c.55 0 1.04-.22 1.41-.59L12 2z"/>
+                        </svg>
+                        <div class="action-item-body">
+                            <div class="action-title">AlgaFilm — Interest Form Pending</div>
+                            <div class="action-meta">Submit your investment interest before round closes</div>
+                            <button class="action-btn btn-teal">Fill out form →</button>
+                        </div>
+                    </div>
+
+                    <!-- EELI interest form pending -->
+                    <div class="action-item">
+                        <svg class="action-item-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+                            <rect x="5" y="8" width="14" height="8" rx="1"></rect>
+                            <rect x="7" y="4" width="10" height="4" rx="1"></rect>
+                        </svg>
+                        <div class="action-item-body">
+                            <div class="action-title">EELI Technology — Interest Form Pending</div>
+                            <div class="action-meta">Ballot closes soon — submit interest now</div>
+                            <button class="action-btn btn-teal">Fill out form →</button>
+                        </div>
+                    </div>
+
+                    <!-- AlgaFilm DD deadline -->
+                    <div class="action-item">
+                        <svg class="action-item-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <div class="action-item-body">
+                            <div class="action-title">AlgaFilm DD Team — Target Deadline</div>
+                            <div class="action-deadline">
+                                <svg class="clock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                Completion: December 30, 2026
+                            </div>
+                            <button class="action-btn btn-slate">Go to workspace →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MY RECENT INVESTMENTS -->
+            <div class="card">
+                <div class="card-header">My Recent Investments</div>
+                <div class="investment-row">
+                    <div class="investment-left">
+                        <svg class="company-icon" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2">
+                            <circle cx="12" cy="12" r="1"></circle>
+                            <circle cx="19" cy="12" r="1"></circle>
+                            <circle cx="5" cy="12" r="1"></circle>
+                            <path d="M12 7v10M12 7a5 5 0 0 0-5 5M12 7a5 5 0 0 1 5 5"></path>
+                        </svg>
+                        <span class="company-name">Ateios Systems</span>
+                    </div>
+                    <div class="investment-right">
+                        <span style="font-weight:500;">$25,000</span>
+                        <span>·</span>
+                        <span>Mar 2026</span>
+                    </div>
+                </div>
+                <div class="investment-row">
+                    <div class="investment-left">
+                        <svg class="company-icon" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2">
+                            <path d="M8 12h8M12 8v8"></path>
+                            <circle cx="12" cy="12" r="9"></circle>
+                        </svg>
+                        <span class="company-name">TalkingHeads Wireless</span>
+                    </div>
+                    <div class="investment-right">
+                        <span style="font-weight:500;">$10,000</span>
+                        <span>·</span>
+                        <span>Jan 2026</span>
+                    </div>
+                </div>
+                <div class="investment-row">
+                    <div class="investment-left">
+                        <svg class="company-icon" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+                            <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                            <path d="M8 8h8v8H8z"></path>
+                        </svg>
+                        <span class="company-name">Steelhead Composites</span>
+                    </div>
+                    <div class="investment-right">
+                        <span style="font-weight:500;">$2,500</span>
+                        <span>·</span>
+                        <span>Dec 2025</span>
+                    </div>
+                </div>
+                <a href="#" class="blue-link">View all investments →</a>
+            </div>
+
+            <!-- MY DILIGENCE TEAMS -->
+            <div class="card">
+                <div class="card-header">My Diligence Teams</div>
+                <div class="dd-team-row">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#0d9488">
+                        <path d="M12 2c1.1 0 2 .9 2 2v4h6c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V10c0-1.1.9-2 2-2h6V4c0-1.1.9-2 2-2z"/>
+                    </svg>
+                    <span style="font-size:12px;font-weight:600;color:#0f172a;">AlgaFilm</span>
+                    <div class="avatar-stack" style="margin-left:8px;">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face" alt="" class="avatar-sm">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&crop=face" alt="" class="avatar-sm">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&h=60&fit=crop&crop=face" alt="" class="avatar-sm">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&h=60&fit=crop&crop=face" alt="" class="avatar-sm">
+                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=60&h=60&fit=crop&crop=face" alt="" class="avatar-sm">
+                    </div>
+                </div>
+                <div style="font-size:11px;color:#64748b;margin-bottom:4px;">John Smith, Jane Smith, Michael Chen, Sarah Park, David Kumar</div>
+                <div style="font-size:11px;color:#1e293b;">Target: Dec 30, 2026 · Round close: Jan 1, 2027</div>
+                <a href="#" class="blue-link">Go to Diligence Workspace →</a>
+            </div>
+
+            <!-- MY INTEREST FORMS -->
+            <div class="card">
+                <div class="card-header">My Interest Forms</div>
+                <div class="interest-row">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#0d9488">
+                        <path d="M12 2c1.1 0 2 .9 2 2 0 .55-.22 1.05-.59 1.41L7.41 10c-.37.37-.86.59-1.41.59H4c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h2.59c.55 0 1.04-.22 1.41-.59L12 2z"/>
+                    </svg>
+                    <span style="font-size:12px;font-weight:500;color:#1e293b;">Algafilm</span>
+                    <span class="interest-badge badge-in-diligence">In Diligence</span>
+                </div>
+                <div class="interest-row">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#0d9488">
+                        <rect x="5" y="8" width="14" height="8" rx="1"></rect>
+                        <rect x="7" y="4" width="10" height="4" rx="1"></rect>
+                    </svg>
+                    <span style="font-size:12px;font-weight:500;color:#1e293b;">EELI Technology</span>
+                    <span class="interest-badge badge-balloting">Balloting</span>
+                </div>
+                <a href="#" class="blue-link">View interest forms →</a>
+            </div>
+
+            <!-- SCREENING QUEUE -->
+            <div class="card">
+                <div class="card-header-with-badge">
+                    <div class="card-header" style="margin-bottom:0;">Screening Queue</div>
+                    <div class="badge-count">4</div>
+                </div>
+                <div class="screening-row">
+                    <span class="screening-name">CleanGrid Solutions</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <div class="screening-row">
+                    <span class="screening-name">Verdant Energy</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <div class="screening-row">
+                    <span class="screening-name">AquaPure Tech</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </div>
+                <div class="screening-row">
+                    <span class="screening-name">SolarWeave</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </div>
+                <a href="#" class="blue-link">Go to Screening →</a>
+            </div>
+
+            <!-- KEY DOCUMENTS -->
+            <div class="card">
+                <div class="card-header">Key Documents</div>
+                <ul class="doc-link-list">
+                    <li class="doc-link-item">
+                        <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        <a href="#" class="doc-name">Membership Guide</a>
+                    </li>
+                    <li class="doc-link-item">
+                        <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            <path d="m9 12 2 2 4-4"></path>
+                        </svg>
+                        <a href="#" class="doc-name">Investment Policy</a>
+                    </li>
+                    <li class="doc-link-item">
+                        <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                            <path d="M11 8v6M8 11h6"></path>
+                        </svg>
+                        <a href="#" class="doc-name">DD Handbook</a>
+                    </li>
+                    <li class="doc-link-item">
+                        <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 7c0-1 1-2 2-2h12c1 0 2 1 2 2v10c0 1-1 2-2 2H6c-1 0-2-1-2-2V7z"></path>
+                            <path d="M6 10l4-3 4 2 4-3"></path>
+                        </svg>
+                        <a href="#" class="doc-name">Fund Agreement</a>
+                    </li>
+                </ul>
+                <a href="#" class="blue-link">All documents →</a>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             RIGHT COLUMN: COMMUNITY
+        ══════════════════════════════════ -->
+        <div class="col-right">
+            <div class="column-label">
+                <svg class="column-label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                Community
+            </div>
+
+            <!--
+                PORTFOLIO NEWS PILL
+                Replaces the full Portfolio News card. Rationale encoded above.
+            -->
+            <a href="#" class="portfolio-news-pill">
+                📣 4 recent portfolio updates →
+            </a>
+
+            <!-- COMBINED FEED: upcoming events interleaved with posts -->
+            <div class="feed-wrapper">
+                <div class="feed-section-label">What's New at E8</div>
+
+                <!--
+                    EVENTS INTERLEAVED IN FEED
+                    All 5 events are in the future relative to today (Mar 30, 2026).
+                    The most recent post is Mar 26. So chronologically the events
+                    cluster at the top of the feed, above the posts.
+
+                    Visual treatment:
+                    - Slim card, no prose body, no avatar
+                    - Colored 3px left border: teal = DD debriefs, violet = social, blue = member meeting
+                    - Date badge (month + day number) on the left
+                    - Event name + time center
+                    - "Add to calendar" micro-link right-aligned
+                    - Compact height (~50px) so a cluster of events reads as a
+                      calendar preview rather than competing for prose real estate
+                -->
+                <div class="feed-events-group-label">Upcoming — add to your calendar</div>
+
+                <!-- Mar 30 — EELI DD Debrief (teal, DD) -->
+                <div class="feed-event">
+                    <div class="feed-event-date">
+                        <div class="fed-event-month">Mar</div>
+                        <div class="fed-event-day">30</div>
+                    </div>
+                    <div class="feed-event-body">
+                        <div class="feed-event-name">EELI Technology DD Debrief</div>
+                        <div class="feed-event-time">5:00 PM PT</div>
+                    </div>
+                    <a href="#" class="feed-event-action">Add to calendar</a>
+                </div>
+
+                <!-- Apr 6 — Hitt Power DD Debrief (teal, DD) -->
+                <div class="feed-event">
+                    <div class="feed-event-date">
+                        <div class="fed-event-month">Apr</div>
+                        <div class="fed-event-day">6</div>
+                    </div>
+                    <div class="feed-event-body">
+                        <div class="feed-event-name">Hitt Power DD Debrief</div>
+                        <div class="feed-event-time">5:00 PM PT</div>
+                    </div>
+                    <a href="#" class="feed-event-action">Add to calendar</a>
+                </div>
+
+                <!-- Apr 13 — agapyo DD Debrief (teal, DD) -->
+                <div class="feed-event">
+                    <div class="feed-event-date">
+                        <div class="fed-event-month">Apr</div>
+                        <div class="fed-event-day">13</div>
+                    </div>
+                    <div class="feed-event-body">
+                        <div class="feed-event-name">agapyo DD Debrief</div>
+                        <div class="feed-event-time">5:00 PM PT</div>
+                    </div>
+                    <a href="#" class="feed-event-action">Add to calendar</a>
+                </div>
+
+                <!-- Apr 22 — SF Happy Hour (violet, social) -->
+                <div class="feed-event event-violet">
+                    <div class="feed-event-date">
+                        <div class="fed-event-month">Apr</div>
+                        <div class="fed-event-day">22</div>
+                    </div>
+                    <div class="feed-event-body">
+                        <div class="feed-event-name">SF Happy Hour — Climate Week</div>
+                        <div class="feed-event-time">5:00 PM</div>
+                    </div>
+                    <a href="#" class="feed-event-action">Add to calendar</a>
+                </div>
+
+                <!-- Apr 30 — Member Meeting (blue, meeting) -->
+                <div class="feed-event event-blue" style="margin-bottom:0;">
+                    <div class="feed-event-date">
+                        <div class="fed-event-month">Apr</div>
+                        <div class="fed-event-day">30</div>
+                    </div>
+                    <div class="feed-event-body">
+                        <div class="feed-event-name">Member Meeting</div>
+                        <div class="feed-event-time">12:00 PM PT</div>
+                    </div>
+                    <a href="#" class="feed-event-action">Add to calendar</a>
+                </div>
+
+                <!-- POST 1 — Mar 26 -->
+                <div class="post">
+                    <div class="post-author-row">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&fit=crop&crop=face" alt="Amanda White" class="post-avatar">
+                        <div>
+                            <div class="post-author-name">Amanda White</div>
+                            <div class="post-date">Mar 26, 2026</div>
+                        </div>
+                    </div>
+                    <div class="post-body" id="post-1">
+                        Our March Member Meeting is in the books! We had an incredible session with three pitching companies and six diligence updates.<br><br>
+                        Pitching Companies: <a href="#" class="post-link">Aris Hydronics</a>, <a href="#" class="post-link">TerraSafe</a>, <a href="#" class="post-link">RUSHNU</a> — each brought compelling visions for how their technology can accelerate the clean energy transition. Aris Hydronics presented their novel approach to heating and cooling using radiant hydronic systems, TerraSafe showcased their recyclable food packaging solutions, and RUSHNU demonstrated their CO₂ capture and conversion technology.<br><br>
+                        Diligence Updates: <a href="#" class="post-link">agapyo</a>, <a href="#" class="post-link">Enzinc</a>, <a href="#" class="post-link">EELI Technologies</a>, <a href="#" class="post-link">Hitt Power</a>, <a href="#" class="post-link">AlgaFilm</a> — our diligence teams shared their latest findings and progress.<br><br>
+                        Check out the recap email with tons of information and links, including the upcoming Follow Up Calls and Diligence Debriefs. We hope to see you at one of our many upcoming events, and if not, at our next member meeting on April 30th!
+                        <div class="post-body-gradient"></div>
+                    </div>
+                    <div class="continue-reading" onclick="togglePost(1)">Continue reading</div>
+                    <div class="post-attachment">
+                        <svg style="display:inline;width:13px;height:13px;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+                            <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                        </svg>
+                        <a href="#" class="attachment-link">Watch the recording</a>
+                    </div>
+                </div>
+
+                <!-- POST 2 — Mar 24 -->
+                <div class="post">
+                    <div class="post-author-row">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&fit=crop&crop=face" alt="Amanda White" class="post-avatar">
+                        <div>
+                            <div class="post-author-name">Amanda White</div>
+                            <div class="post-date">Mar 24, 2026</div>
+                        </div>
+                    </div>
+                    <div class="post-body" id="post-2">
+                        Thanks to everyone who joined us for our Impact Investing Learning Lab cohosted with <a href="#" class="post-link">Bridgespan Social Impact</a>! We covered the spectrum from finance-first to impact-first investing, explored the current climate investing landscape, and discussed how to evaluate the impact of investments.<br><br>
+                        One of the strengths of our community is that, as individual investors, where you fall on that spectrum is shaped by your own investment thesis. While many large climate funds sit at specific points along this range, each of you has the flexibility to define your own approach and decide where you want to invest.<br><br>
+                        The session generated excellent discussion about measurement frameworks, the difference between intentionality and additionality, and practical tools for assessing whether your investments are truly creating impact beyond financial returns.
+                        <div class="post-body-gradient"></div>
+                    </div>
+                    <div class="continue-reading" onclick="togglePost(2)">Continue reading</div>
+                    <div class="post-attachment">
+                        <svg style="display:inline;width:13px;height:13px;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+                            <path d="M4 7c0-1 1-2 2-2h12c1 0 2 1 2 2v10c0 1-1 2-2 2H6c-1 0-2-1-2-2V7z"></path>
+                        </svg>
+                        <a href="#" class="attachment-link">260318_Investing_Impact.pdf</a>
+                        <span style="color:#cbd5e1;margin:0 4px;">·</span>
+                        <svg style="display:inline;width:13px;height:13px;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+                            <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                        </svg>
+                        <a href="#" class="attachment-link">Watch Recording</a>
+                    </div>
+                </div>
+
+                <!-- POST 3 — Mar 17 -->
+                <div class="post">
+                    <div class="post-author-row">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&fit=crop&crop=face" alt="Amanda White" class="post-avatar">
+                        <div>
+                            <div class="post-author-name">Amanda White</div>
+                            <div class="post-date">Mar 17, 2026</div>
+                        </div>
+                    </div>
+                    <div class="post-body" id="post-3">
+                        This week's E8 highlights — lots happening!<br><br>
+                        <svg style="display:inline;width:13px;height:13px;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <a href="#" class="post-link">AlgaFilm</a> Diligence Debrief — Today, 5:00 PM PT. Join us as the diligence team presents their findings on AlgaFilm's sustainable packaging technology.<br><br>
+                        <svg style="display:inline;width:13px;height:13px;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        March Learning Lab: Impact Investing — March 18, 12:00 PM PT. Co-hosted with Bridgespan Social Impact.<br><br>
+                        <svg style="display:inline;width:13px;height:13px;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        March Member Meeting — March 19, 12:00 PM PT. Join us for our monthly meeting featuring pitching companies and diligence updates.<br><br>
+                        All events are on our events calendar — add them to yours!
+                        <div class="post-body-gradient"></div>
+                    </div>
+                    <div class="continue-reading" onclick="togglePost(3)">Continue reading</div>
+                </div>
+
+                <!-- POST 4 — Mar 10 -->
+                <div class="post">
+                    <div class="post-author-row">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&fit=crop&crop=face" alt="Amanda White" class="post-avatar">
+                        <div>
+                            <div class="post-author-name">Amanda White</div>
+                            <div class="post-date">Mar 10, 2026</div>
+                        </div>
+                    </div>
+                    <div class="post-body" id="post-4">
+                        Happy to share some exciting portfolio company news:<br><br>
+                        <a href="#" class="post-link">OpConnect</a> just closed $5M in debt financing and won't need to raise again until 2028 — a strong milestone for capital efficiency.<br><br>
+                        <a href="#" class="post-link">Lilac Solutions</a> will deploy their ion-exchange lithium-extraction technology in Indonesia, their first pilot in Southeast Asia.<br><br>
+                        <a href="#" class="post-link">Volexion</a> has executed two JDAs with 6K Energy and Stratus Materials, and is in negotiations with several top-five global automotive OEMs.<br><br>
+                        <a href="#" class="post-link">TalkingHeads Wireless</a> secured a ~$500K purchase order from Vonu, with expectations of materially larger follow-on orders and first field deployments in Ivory Coast and Nigeria by EOY 2026.
+                        <div class="post-body-gradient"></div>
+                    </div>
+                    <div class="continue-reading" onclick="togglePost(4)">Continue reading</div>
+                </div>
+
+                <button class="load-more-button">Load earlier posts</button>
+            </div>
+
+            <!-- COMMUNITY SUBSECTIONS (2-col grid) -->
+            <div class="community-subsections">
+
+                <!-- OPEN FOR INVESTMENT -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="pulsing-dot"></span>Open for Investment
+                    </div>
+                    <div class="invest-item">
+                        <svg class="invest-logo" viewBox="0 0 24 24" fill="#0d9488">
+                            <path d="M12 2c1.1 0 2 .9 2 2 0 .55-.22 1.05-.59 1.41L7.41 10c-.37.37-.86.59-1.41.59H4c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h2.59c.55 0 1.04-.22 1.41-.59L12 2z"/>
+                        </svg>
+                        <div>
+                            <div class="invest-name">Algafilm</div>
+                            <div class="invest-desc">Sustainable film packaging</div>
+                        </div>
+                        <a href="#" class="invest-link">Register →</a>
+                    </div>
+                    <div class="invest-item">
+                        <svg class="invest-logo" viewBox="0 0 24 24" fill="#1e3a8a">
+                            <path d="M12 2L15 10H23L17 15L19 23L12 18L5 23L7 15L1 10H9L12 2Z"/>
+                        </svg>
+                        <div>
+                            <div class="invest-name">Imperium Technologies</div>
+                            <div class="invest-desc">Carbon capture tech</div>
+                        </div>
+                        <a href="#" class="invest-link">Register →</a>
+                    </div>
+                    <a href="#" class="blue-link">View all →</a>
+                </div>
+
+                <!-- RECENT RECORDINGS -->
+                <div class="card">
+                    <div class="tab-header">
+                        <button class="tab-button active" onclick="switchTab('meetings')">Meetings</button>
+                        <button class="tab-button" onclick="switchTab('labs')">Learning Labs</button>
+                    </div>
+
+                    <div id="meetings-tab">
+                        <div class="recording-thumb" style="background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);">
+                            <svg class="play-icon" viewBox="0 0 24 24" fill="white">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                        </div>
+                        <div class="recording-title">February 2026 Member Meeting</div>
+                        <div class="recording-companies">ZILA BioWorks, Enzinc, SolarSteam, Hitt Power, EELI, agapyo</div>
+                        <a href="#" class="recording-watch">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                            </svg>
+                            Watch Recording
+                        </a>
+                    </div>
+
+                    <div id="labs-tab" style="display:none;">
+                        <div class="recording-thumb" style="background: linear-gradient(135deg, #92400e 0%, #d97706 100%);">
+                            <svg class="play-icon" viewBox="0 0 24 24" fill="white">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                        </div>
+                        <div class="recording-title">Impact Investing Learning Lab</div>
+                        <div class="recording-companies">Bridgespan Social Impact cohost · March 2026</div>
+                        <a href="#" class="recording-watch">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                            </svg>
+                            Watch Recording
+                        </a>
+                    </div>
+                    <a href="#" class="blue-link">All recordings →</a>
+                </div>
+
+                <!-- MEMBER DIRECTORY -->
+                <div class="card">
+                    <div class="card-header">Member Directory</div>
+                    <div class="member-search-wrapper">
+                        <svg class="member-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" class="member-search" placeholder="Find a member...">
+                    </div>
+                    <div class="member-count">247 active members</div>
+                    <div class="member-avatars">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=64&h=64&fit=crop&crop=face" alt="" class="member-avatar">
+                        <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=64&h=64&fit=crop&crop=face" alt="" class="member-avatar">
+                        <img src="https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=64&h=64&fit=crop&crop=face" alt="" class="member-avatar">
+                        <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=64&h=64&fit=crop&crop=face" alt="" class="member-avatar">
+                        <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=64&h=64&fit=crop&crop=face" alt="" class="member-avatar">
+                        <img src="https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=64&h=64&fit=crop&crop=face" alt="" class="member-avatar">
+                    </div>
+                    <a href="#" class="blue-link">Browse full directory →</a>
+                </div>
+
+                <!-- E8 FUND 2026 -->
+                <div class="card">
+                    <div class="fund-header">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#0d9488">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2" stroke="white" stroke-width="2" fill="none"/>
+                        </svg>
+                        <span class="fund-name">E8 Fund 2026</span>
+                    </div>
+
+                    <div class="active-vote-box">
+                        <div style="font-size:11px;font-weight:600;color:#0f172a;margin-bottom:4px;">Active Vote</div>
+                        <div style="font-size:12px;font-weight:600;color:#0f172a;">EELI Technology</div>
+                        <div class="vote-deadline">
+                            <svg class="clock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            Closes March 29, 10:00 PM PT
+                        </div>
+                        <div class="vote-bar">
+                            <div class="vote-segment segment-red" style="width:30%;"></div>
+                            <div class="vote-segment segment-green" style="width:40%;"></div>
+                            <div class="vote-segment segment-blue" style="width:20%;"></div>
+                            <div class="vote-segment segment-slate" style="width:10%;"></div>
+                        </div>
+                        <div class="vote-legend">
+                            <div class="legend-item"><div class="legend-dot" style="background:#f87171;"></div><span>30% Don't Invest</span></div>
+                            <div class="legend-item"><div class="legend-dot" style="background:#4ade80;"></div><span>40% $125K</span></div>
+                            <div class="legend-item"><div class="legend-dot" style="background:#60a5fa;"></div><span>20% $175K</span></div>
+                            <div class="legend-item"><div class="legend-dot" style="background:#94a3b8;"></div><span>10% $225K</span></div>
+                        </div>
+                        <div style="font-size:12px;color:#2563eb;font-weight:600;margin-top:6px;cursor:pointer;">Cast your vote →</div>
+                    </div>
+
+                    <div class="fund-separator"></div>
+                    <div class="fund-subheader">Recent Investments</div>
+                    <div class="fund-investment-row">
+                        <span class="fund-investment-name">Ateios Systems · $125K</span>
+                        <svg class="fund-checkmark" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5">
+                            <path d="M20 6L9 17L4 12"/>
+                        </svg>
+                    </div>
+                    <div class="fund-investment-row">
+                        <span class="fund-investment-name">Imperium Tech · $125K</span>
+                        <svg class="fund-checkmark" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5">
+                            <path d="M20 6L9 17L4 12"/>
+                        </svg>
+                    </div>
+                    <div class="fund-investment-row">
+                        <span class="fund-investment-name">Algafilm · $125K</span>
+                        <svg class="fund-checkmark" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5">
+                            <path d="M20 6L9 17L4 12"/>
+                        </svg>
+                    </div>
+                    <a href="#" class="blue-link">Fund details →</a>
+                </div>
+
+            </div><!-- /community-subsections -->
+        </div><!-- /col-right -->
+    </div><!-- /main-container -->
+
+    <!-- FOOTER -->
+    <footer style="text-align:center;font-size:13px;color:#94a3b8;padding:32px 16px;margin-top:32px;">
+        E8 Angels · Bellevue, WA
+    </footer>
+
+    <script>
+        // Dropdown menu
+        document.querySelectorAll('.nav-link.has-dropdown').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const dropdownId = this.getAttribute('data-dropdown');
+                const dropdown = document.getElementById(dropdownId);
+                dropdown.classList.toggle('active');
+            });
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.nav-link.has-dropdown')) {
+                document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('active'));
+            }
+        });
+
+        // Post expand/collapse
+        function togglePost(postNum) {
+            const postBody = document.getElementById('post-' + postNum);
+            const isExpanded = postBody.classList.contains('expanded');
+            postBody.classList.toggle('expanded');
+
+            // Find the toggle control (sibling after post-body)
+            let control = postBody.nextElementSibling;
+
+            if (!isExpanded) {
+                // Was collapsed, now expanded — replace continue-reading with show-less
+                if (control && control.classList.contains('continue-reading')) {
+                    const showLess = document.createElement('div');
+                    showLess.className = 'show-less';
+                    showLess.textContent = 'Show less';
+                    showLess.onclick = function() { togglePost(postNum); };
+                    control.replaceWith(showLess);
+                }
+            } else {
+                // Was expanded, now collapsed — replace show-less with continue-reading
+                if (control && control.classList.contains('show-less')) {
+                    const cr = document.createElement('div');
+                    cr.className = 'continue-reading';
+                    cr.textContent = 'Continue reading';
+                    cr.onclick = function() { togglePost(postNum); };
+                    control.replaceWith(cr);
+                }
+            }
+        }
+
+        // Recording tabs
+        function switchTab(tabName) {
+            const meetingsTab = document.getElementById('meetings-tab');
+            const labsTab = document.getElementById('labs-tab');
+            const buttons = document.querySelectorAll('.tab-button');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            if (tabName === 'meetings') {
+                meetingsTab.style.display = 'block';
+                labsTab.style.display = 'none';
+                buttons[0].classList.add('active');
+            } else {
+                meetingsTab.style.display = 'none';
+                labsTab.style.display = 'block';
+                buttons[1].classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
