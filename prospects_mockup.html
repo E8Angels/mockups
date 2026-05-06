@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>E8 Portal — Prospects</title>
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --border-strong: #d1d5db;
+    --text: #111827;
+    --text-muted: #6b7280;
+    --text-soft: #9ca3af;
+    --primary: #111827;
+    --accent: #2563eb;
+    --accent-soft: #eff6ff;
+    --green: #059669;
+    --green-soft: #ecfdf5;
+    --amber: #d97706;
+    --amber-soft: #fffbeb;
+    --red: #dc2626;
+    --red-soft: #fef2f2;
+    --purple: #7c3aed;
+    --purple-soft: #f5f3ff;
+    --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.04);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px; }
+  a { color: inherit; text-decoration: none; }
+
+  /* Top nav */
+  .nav {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; }
+  .brand-dot { width: 18px; height: 18px; background: var(--accent); border-radius: 4px; }
+  .nav-links { display: flex; gap: 18px; color: var(--text-muted); font-size: 13.5px; }
+  .nav-links a.active { color: var(--text); font-weight: 600; }
+  .nav-spacer { flex: 1; }
+  .nav-search {
+    background: #f3f4f6; border: 1px solid transparent; border-radius: 6px;
+    padding: 6px 10px; width: 240px; font-size: 13px;
+  }
+
+  /* Sub-tabs */
+  .subtabs {
+    background: #fff; border-bottom: 1px solid var(--border);
+    padding: 0 24px; display: flex; gap: 4px;
+  }
+  .subtab {
+    padding: 12px 14px; font-size: 13.5px; color: var(--text-muted);
+    border-bottom: 2px solid transparent; cursor: pointer;
+  }
+  .subtab.active { color: var(--text); border-bottom-color: var(--text); font-weight: 600; }
+
+  /* Layout */
+  .page { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 88px); }
+  .sidebar {
+    background: #fff; border-right: 1px solid var(--border); padding: 16px 12px;
+  }
+  .sidebar h4 {
+    margin: 12px 8px 6px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--text-soft); font-weight: 600;
+  }
+  .view {
+    padding: 7px 10px; font-size: 13px; color: var(--text); border-radius: 6px;
+    cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+  }
+  .view:hover { background: #f3f4f6; }
+  .view.active { background: var(--text); color: #fff; }
+  .view .count {
+    font-size: 11px; padding: 1px 6px; border-radius: 10px;
+    background: rgba(0,0,0,0.06);
+  }
+  .view.active .count { background: rgba(255,255,255,0.15); color: #fff; }
+
+  .content { padding: 20px 24px 40px; overflow: auto; }
+
+  /* Page header */
+  .page-head {
+    display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 16px;
+  }
+  .page-title { font-size: 20px; font-weight: 700; margin: 0 0 2px; }
+  .page-sub { color: var(--text-muted); font-size: 13px; }
+  .head-actions { display: flex; gap: 8px; }
+
+  /* Buttons */
+  .btn {
+    border: 1px solid var(--border); background: #fff; color: var(--text);
+    padding: 7px 12px; border-radius: 6px; font-size: 13px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px; font-weight: 500;
+  }
+  .btn:hover { background: #f9fafb; }
+  .btn-primary { background: var(--text); color: #fff; border-color: var(--text); }
+  .btn-primary:hover { background: #000; }
+  .btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-ghost { background: transparent; border: none; color: var(--text-muted); }
+  .btn-ghost:hover { color: var(--text); background: #f3f4f6; }
+  .btn-sm { padding: 4px 8px; font-size: 12px; }
+
+  /* Stats */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px;
+  }
+  .stat {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; box-shadow: var(--shadow); cursor: pointer;
+    transition: border-color 0.15s, transform 0.05s;
+    display: flex; flex-direction: column; gap: 6px; position: relative;
+  }
+  .stat:hover { border-color: var(--border-strong); }
+  .stat.active { border-color: var(--text); box-shadow: 0 0 0 3px rgba(17,24,39,0.05); }
+  .stat-label { color: var(--text-muted); font-size: 12.5px; display: flex; align-items: center; gap: 6px; }
+  .stat-value { font-size: 26px; font-weight: 700; line-height: 1; }
+  .stat-meta { font-size: 12px; color: var(--text-muted); display: flex; gap: 8px; align-items: center; }
+  .delta-up { color: var(--green); font-weight: 600; }
+  .delta-down { color: var(--red); font-weight: 600; }
+  .stat-icon {
+    width: 28px; height: 28px; border-radius: 7px; display: inline-flex;
+    align-items: center; justify-content: center; font-size: 14px; position: absolute;
+    top: 14px; right: 14px;
+  }
+  .icon-blue { background: var(--accent-soft); color: var(--accent); }
+  .icon-amber { background: var(--amber-soft); color: var(--amber); }
+  .icon-green { background: var(--green-soft); color: var(--green); }
+  .icon-purple { background: var(--purple-soft); color: var(--purple); }
+
+  /* Toolbar */
+  .toolbar {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px 10px 0 0;
+    padding: 10px 12px; display: flex; gap: 8px; align-items: center; border-bottom: none;
+  }
+  .toolbar .search {
+    flex: 1; max-width: 280px; background: #f9fafb; border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 10px 6px 30px; font-size: 13px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'><circle cx='11' cy='11' r='7'/><path d='M21 21l-4.3-4.3'/></svg>");
+    background-repeat: no-repeat; background-position: 9px 50%;
+  }
+  .chip {
+    border: 1px solid var(--border); background: #fff; border-radius: 20px;
+    padding: 4px 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;
+    cursor: pointer;
+  }
+  .chip.active { background: var(--accent-soft); color: var(--accent); border-color: #bfdbfe; }
+  .chip .x { font-size: 14px; line-height: 1; opacity: 0.6; }
+  .toolbar-spacer { flex: 1; }
+
+  /* Bulk actions bar */
+  .bulk-bar {
+    background: #1f2937; color: #fff; padding: 8px 14px;
+    border: 1px solid #1f2937; border-bottom: none;
+    display: none; align-items: center; gap: 12px; font-size: 13px;
+  }
+  .bulk-bar.show { display: flex; }
+  .bulk-bar .btn { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); color: #fff; }
+  .bulk-bar .btn:hover { background: rgba(255,255,255,0.18); }
+
+  /* Table */
+  .table-wrap {
+    background: #fff; border: 1px solid var(--border); border-radius: 0 0 10px 10px;
+    overflow: hidden; box-shadow: var(--shadow);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    text-align: left; font-weight: 600; color: var(--text-muted); font-size: 12px;
+    padding: 10px 12px; border-bottom: 1px solid var(--border);
+    background: #fafbfc; position: sticky; top: 0; z-index: 1;
+    white-space: nowrap;
+  }
+  tbody td {
+    padding: 10px 12px; border-bottom: 1px solid #f1f3f5; vertical-align: middle;
+  }
+  tbody tr:hover { background: #fafbfc; }
+  tbody tr.selected { background: var(--accent-soft); }
+  .row-name { font-weight: 600; color: var(--text); }
+  .row-name .email { font-weight: 400; color: var(--text-muted); font-size: 12px; }
+
+  /* Badges */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+    border-radius: 10px; font-size: 11.5px; font-weight: 600;
+  }
+  .b-new { background: var(--purple-soft); color: var(--purple); }
+  .b-active { background: var(--accent-soft); color: var(--accent); }
+  .b-warm { background: var(--amber-soft); color: var(--amber); }
+  .b-cold { background: #f3f4f6; color: var(--text-muted); }
+  .b-signed { background: var(--green-soft); color: var(--green); }
+  .b-overdue { background: var(--red-soft); color: var(--red); }
+
+  .priority-dot {
+    width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px;
+  }
+  .p-high { background: var(--red); }
+  .p-med { background: var(--amber); }
+  .p-low { background: #9ca3af; }
+
+  /* Editable cells */
+  .cell-editable { cursor: pointer; padding: 4px 6px; border-radius: 4px; display: inline-block; min-width: 60px; }
+  .cell-editable:hover { background: #f3f4f6; outline: 1px dashed var(--border-strong); }
+  .cell-empty { color: var(--text-soft); font-style: italic; }
+  .cell-input {
+    border: 1px solid var(--accent); background: #fff; border-radius: 4px;
+    padding: 3px 6px; font-size: 13px; width: 100%; outline: none;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  }
+  select.cell-input { padding: 3px 4px; }
+  .date-overdue { color: var(--red); font-weight: 600; }
+  .date-soon { color: var(--amber); font-weight: 600; }
+
+  .avatar {
+    width: 22px; height: 22px; border-radius: 50%; background: var(--accent);
+    color: #fff; font-size: 11px; font-weight: 600;
+    display: inline-flex; align-items: center; justify-content: center; margin-right: 6px;
+  }
+
+  /* Row actions */
+  .row-actions { display: flex; gap: 2px; opacity: 0; transition: opacity 0.1s; }
+  tr:hover .row-actions { opacity: 1; }
+  .icon-btn {
+    border: 1px solid transparent; background: transparent; color: var(--text-muted);
+    width: 26px; height: 26px; border-radius: 5px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .icon-btn:hover { background: #f3f4f6; color: var(--text); border-color: var(--border); }
+
+  /* Drawer */
+  .drawer-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.25); display: none; z-index: 50;
+  }
+  .drawer-backdrop.show { display: block; }
+  .drawer {
+    position: fixed; top: 0; right: 0; width: 460px; max-width: 100%; height: 100%;
+    background: #fff; box-shadow: -8px 0 24px rgba(0,0,0,0.08); z-index: 60;
+    transform: translateX(100%); transition: transform 0.2s ease; display: flex; flex-direction: column;
+  }
+  .drawer.show { transform: translateX(0); }
+  .drawer-head {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .drawer-head h3 { margin: 0; font-size: 16px; }
+  .drawer-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+  .drawer-section { margin-bottom: 18px; }
+  .drawer-section h5 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--text-soft); font-weight: 600; }
+  .field-row { display: grid; grid-template-columns: 130px 1fr; gap: 10px; padding: 6px 0; align-items: center; }
+  .field-row label { color: var(--text-muted); font-size: 12.5px; }
+  .field-row .val { font-size: 13.5px; }
+  .field-row input, .field-row select, .field-row textarea {
+    width: 100%; border: 1px solid var(--border); border-radius: 5px; padding: 5px 8px;
+    font-size: 13px; font-family: inherit;
+  }
+
+  .timeline { border-left: 2px solid var(--border); padding-left: 14px; margin-left: 4px; }
+  .tl-item { margin-bottom: 14px; position: relative; }
+  .tl-item::before {
+    content: ""; width: 8px; height: 8px; background: var(--accent);
+    border-radius: 50%; position: absolute; left: -19px; top: 5px;
+    border: 2px solid #fff; box-shadow: 0 0 0 2px var(--accent);
+  }
+  .tl-when { font-size: 11.5px; color: var(--text-soft); }
+  .tl-what { font-size: 13px; }
+
+  /* Footer */
+  .table-foot {
+    padding: 10px 14px; border-top: 1px solid var(--border); background: #fafbfc;
+    display: flex; align-items: center; justify-content: space-between; font-size: 12.5px;
+    color: var(--text-muted);
+  }
+  .pager { display: flex; gap: 4px; }
+  .pager .btn { padding: 3px 8px; font-size: 12px; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: #111827; color: #fff; padding: 10px 16px; border-radius: 8px;
+    font-size: 13px; box-shadow: 0 10px 20px rgba(0,0,0,0.15); opacity: 0;
+    transition: opacity 0.2s; pointer-events: none; z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+
+  /* Checkbox */
+  .cb { width: 14px; height: 14px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="brand"><div class="brand-dot"></div> E8 Portal</div>
+  <div class="nav-links">
+    <a>Home</a>
+    <a>Pipeline</a>
+    <a>Recordings</a>
+    <a>E8 Fund</a>
+    <a>Portfolio News</a>
+    <a>Explore</a>
+    <a>Committees</a>
+    <a class="active">Manage</a>
+  </div>
+  <div class="nav-spacer"></div>
+  <input class="nav-search" placeholder="Search companies..." />
+</div>
+
+<div class="subtabs">
+  <div class="subtab active">People</div>
+  <div class="subtab">News Feed</div>
+  <div class="subtab">Diligence</div>
+  <div class="subtab">Invoices</div>
+  <div class="subtab">Committees</div>
+  <div class="subtab">Engagements</div>
+  <div class="subtab">Meetings</div>
+  <div class="subtab">Surveys</div>
+  <div class="subtab">Documents</div>
+</div>
+
+<div class="page">
+  <aside class="sidebar">
+    <h4>Shared Views</h4>
+    <div class="view">All <span class="count">214</span></div>
+    <div class="view">Members <span class="count">163</span></div>
+    <div class="view">Members – Overdue <span class="count">12</span></div>
+    <div class="view">Past Members <span class="count">28</span></div>
+    <div class="view active">Prospects – Active <span class="count">51</span></div>
+    <div class="view">Entrepreneurs <span class="count">87</span></div>
+    <div class="view">New Members <span class="count">9</span></div>
+    <div class="view">Regional Hubs <span class="count">14</span></div>
+    <div class="view">Partners <span class="count">22</span></div>
+    <div class="view">Board <span class="count">11</span></div>
+    <h4>My Views</h4>
+    <div class="view">Prospects – All <span class="count">79</span></div>
+    <div class="view">Prospects – Pre-qualified <span class="count">18</span></div>
+    <button class="btn btn-sm" style="margin: 8px 6px 0; width: calc(100% - 12px); justify-content: center;">+ New view</button>
+  </aside>
+
+  <main class="content">
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Prospects</h1>
+        <div class="page-sub">Active prospects across all sources · last synced just now</div>
+      </div>
+      <div class="head-actions">
+        <button class="btn">⤓ Export</button>
+        <button class="btn">✉ Broadcast</button>
+        <button class="btn btn-primary">+ New prospect</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat" data-filter="all" onclick="setStat(this)">
+        <div class="stat-icon icon-blue">●</div>
+        <div class="stat-label">Active prospects</div>
+        <div class="stat-value">51</div>
+        <div class="stat-meta"><span class="delta-up">▲ 8</span> vs. last month</div>
+      </div>
+      <div class="stat active" data-filter="overdue" onclick="setStat(this)">
+        <div class="stat-icon icon-amber">!</div>
+        <div class="stat-label">Overdue follow-up <span title="No contact in 30+ days" style="color:var(--text-soft); cursor:help;">ⓘ</span></div>
+        <div class="stat-value">14</div>
+        <div class="stat-meta"><span class="delta-down">▲ 3</span> needs attention</div>
+      </div>
+      <div class="stat" data-filter="new" onclick="setStat(this)">
+        <div class="stat-icon icon-purple">✦</div>
+        <div class="stat-label">New this week</div>
+        <div class="stat-value">7</div>
+        <div class="stat-meta"><span class="delta-up">▲ 2</span> vs. previous week</div>
+      </div>
+      <div class="stat" data-filter="upcoming" onclick="setStat(this)">
+        <div class="stat-icon icon-green">↗</div>
+        <div class="stat-label">Upcoming follow-ups (7d)</div>
+        <div class="stat-value">9</div>
+        <div class="stat-meta">3 today · 2 tomorrow</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <input class="search" placeholder="Search prospects by name, email, company..." oninput="searchTable(this.value)" />
+      <span class="chip active">Status: Active <span class="x">×</span></span>
+      <span class="chip">Owner: Anyone ▾</span>
+      <span class="chip">Source: All ▾</span>
+      <span class="chip">+ Add filter</span>
+      <div class="toolbar-spacer"></div>
+      <button class="btn btn-sm">⇅ Sort</button>
+      <button class="btn btn-sm">▤ Fields</button>
+      <button class="btn btn-sm">▦ Group</button>
+    </div>
+
+    <!-- Bulk -->
+    <div id="bulkBar" class="bulk-bar">
+      <span><b id="bulkCount">0</b> selected</span>
+      <button class="btn btn-sm">Assign owner</button>
+      <button class="btn btn-sm">Set follow-up</button>
+      <button class="btn btn-sm">Tag</button>
+      <button class="btn btn-sm">Send broadcast</button>
+      <div class="toolbar-spacer"></div>
+      <button class="btn btn-sm" onclick="clearSelection()">Clear</button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table id="prospectsTable">
+        <thead>
+          <tr>
+            <th style="width:30px;"><input type="checkbox" class="cb" onclick="toggleAll(this)" /></th>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Next follow-up</th>
+            <th>Last contact</th>
+            <th>Source</th>
+            <th>Owner</th>
+            <th style="width:90px;"></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="table-foot">
+        <span id="rowCount">Showing 1–12 of 51</span>
+        <div class="pager">
+          <button class="btn btn-sm">‹ Prev</button>
+          <button class="btn btn-sm">1</button>
+          <button class="btn btn-sm">2</button>
+          <button class="btn btn-sm">3</button>
+          <button class="btn btn-sm">›</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Drawer for prospect detail -->
+<div id="drawerBackdrop" class="drawer-backdrop" onclick="closeDrawer()"></div>
+<div id="drawer" class="drawer">
+  <div class="drawer-head">
+    <div>
+      <h3 id="drawerName">—</h3>
+      <div style="color:var(--text-muted); font-size:12.5px;" id="drawerEmail">—</div>
+    </div>
+    <button class="btn btn-ghost" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-section">
+      <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        <button class="btn btn-sm">📞 Log call</button>
+        <button class="btn btn-sm">✉ Send email</button>
+        <button class="btn btn-sm">📅 Schedule</button>
+        <button class="btn btn-sm">+ Add note</button>
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <h5>Details</h5>
+      <div class="field-row"><label>Status</label>
+        <select id="dStatus"><option>New</option><option>Active</option><option>Warm</option><option>Cold</option><option>Signed</option></select>
+      </div>
+      <div class="field-row"><label>Priority</label>
+        <select id="dPriority"><option>High</option><option>Medium</option><option>Low</option></select>
+      </div>
+      <div class="field-row"><label>Next follow-up</label>
+        <input type="date" id="dNext" />
+      </div>
+      <div class="field-row"><label>Last contact</label>
+        <input type="date" id="dLast" />
+      </div>
+      <div class="field-row"><label>Lead source</label>
+        <select id="dSource"><option>In Person Event</option><option>Member Referral</option><option>Annual Fund Page Visit</option><option>Seattle Angel Conference</option><option>Inbound — website</option></select>
+      </div>
+      <div class="field-row"><label>Source detail</label><input type="text" id="dSourceDetail" /></div>
+      <div class="field-row"><label>Owner</label>
+        <select id="dOwner"><option>Amanda White</option><option>Maja Larson</option><option>Karin Kidder</option><option>Ashwin Moodithaya</option><option>Unassigned</option></select>
+      </div>
+      <div class="field-row"><label>Signed</label>
+        <select id="dSigned"><option>No</option><option>Yes</option></select>
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <h5>Notes</h5>
+      <textarea id="dNotes" rows="3" style="width:100%; border:1px solid var(--border); border-radius:6px; padding:8px; font-size:13px; font-family:inherit;" placeholder="Add a note..."></textarea>
+    </div>
+
+    <div class="drawer-section">
+      <h5>Activity</h5>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-when">2 days ago · Amanda White</div><div class="tl-what">Sent intro email about Becoming a Climate Angel</div></div>
+        <div class="tl-item"><div class="tl-when">2 weeks ago · Amanda White</div><div class="tl-what">Met at Bend Venture Conference, exchanged contacts</div></div>
+        <div class="tl-item"><div class="tl-when">1 month ago</div><div class="tl-what">Added as a new prospect via referral</div></div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:12px 20px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end;">
+    <button class="btn" onclick="closeDrawer()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveDrawer()">Save changes</button>
+  </div>
+</div>
+
+<div id="toast" class="toast">Saved</div>
+
+<script>
+  // Mock data — based on the screenshot, with extra fields for the new design
+  const today = new Date('2026-05-06');
+  function d(offsetDays) { const x = new Date(today); x.setDate(x.getDate() + offsetDays); return x.toISOString().slice(0,10); }
+
+  const owners = ['Amanda White','Maja Larson','Karin Kidder','Ashwin Moodithaya','Unassigned'];
+  const statuses = ['New','Active','Warm','Cold','Signed'];
+
+  let prospects = [
+    { id:1,  name:'Aaron Moser',        email:'aaron.moser@example.com',     status:'Active',  priority:'Med',  next:null,        last:null,       source:'Annual Fund Page Visit', sourceDetail:'',                                  owner:'Unassigned',     signed:'No', isNew:true },
+    { id:2,  name:'Alexis Nelson',      email:'alexis@nelsonco.io',          status:'Warm',    priority:'High', next:d(2),        last:d(-113),    source:'In Person Event',        sourceDetail:'Bend Venture Conference',          owner:'Amanda White',   signed:'No' },
+    { id:3,  name:'Andy Johnston',      email:'andy.j@example.com',          status:'Cold',    priority:'Low',  next:null,        last:d(-84),     source:'',                       sourceDetail:'',                                  owner:'Amanda White',   signed:'No' },
+    { id:4,  name:'Ao Teng',            email:'ao.teng@example.com',         status:'Active',  priority:'Med',  next:null,        last:d(-11),     source:'In Person Event',        sourceDetail:'BACA (SF)',                         owner:'Amanda White',   signed:'No' },
+    { id:5,  name:'Bastiaan den Braber',email:'bastiaan@example.com',        status:'Warm',    priority:'Med',  next:null,        last:d(-48),     source:'',                       sourceDetail:'',                                  owner:'Amanda White',   signed:'No' },
+    { id:6,  name:'Ben Mathes',         email:'ben.mathes@example.com',      status:'Active',  priority:'High', next:d(5),        last:null,       source:'Member Referral',        sourceDetail:'Ashwin Moodithaya',                 owner:'Amanda White',   signed:'No' },
+    { id:7,  name:'Ben Packard',        email:'bpackard@example.com',        status:'Active',  priority:'Med',  next:null,        last:d(-113),    source:'Annual Fund Page Visit', sourceDetail:'',                                  owner:'Amanda White',   signed:'No' },
+    { id:8,  name:'Brett Bressler',     email:'brett@bressler.co',           status:'Cold',    priority:'Low',  next:null,        last:null,       source:'',                       sourceDetail:'',                                  owner:'Amanda White',   signed:'No' },
+    { id:9,  name:'Brian Sokolow',      email:'brian.sokolow@example.com',   status:'Warm',    priority:'High', next:d(0),        last:d(-30),     source:'In Person Event',        sourceDetail:'Becoming a Climate Angel with E8',  owner:'Amanda White',   signed:'No' },
+    { id:10, name:'Cassia Attard',      email:'cassia@example.com',          status:'New',     priority:'Med',  next:d(-1),       last:null,       source:'',                       sourceDetail:'',                                  owner:'Amanda White',   signed:'No', isNew:true },
+    { id:11, name:'Claire Woo',         email:'claire.woo@example.com',      status:'New',     priority:'Med',  next:null,        last:null,       source:'',                       sourceDetail:'',                                  owner:'Amanda White',   signed:'No', isNew:true },
+    { id:12, name:'David Apgar',        email:'dapgar@example.com',          status:'Warm',    priority:'High', next:d(-4),       last:d(-30),     source:'In Person Event',        sourceDetail:'Becoming a Climate Angel with E8',  owner:'Amanda White',   signed:'No' },
+    { id:13, name:'Don Paumier',        email:'don.paumier@example.com',     status:'Active',  priority:'Med',  next:null,        last:d(-113),    source:'In Person Event',        sourceDetail:'Bend Venture Conference',          owner:'Amanda White',   signed:'No' },
+    { id:14, name:'Eric Fleishman',     email:'eric@fleishman.io',           status:'Warm',    priority:'High', next:d(-7),       last:d(-7),      source:'In Person Event',        sourceDetail:'E8 Learning Lab: Impact Investing', owner:'Amanda White',   signed:'No' },
+    { id:15, name:'Hassan Natha',       email:'hassan.natha@example.com',    status:'Active',  priority:'Med',  next:d(89),       last:d(-42),     source:'Member Referral',        sourceDetail:'Maja Larson',                       owner:'Amanda White',   signed:'No' },
+    { id:16, name:'Jane Franch',        email:'jane.franch@example.com',     status:'Warm',    priority:'Med',  next:null,        last:d(-33),     source:'In Person Event',        sourceDetail:'NYCW',                              owner:'Amanda White',   signed:'No' },
+    { id:17, name:'Josh Stein',         email:'josh.stein@example.com',      status:'Active',  priority:'High', next:null,        last:d(-1),      source:'Member Referral',        sourceDetail:'Jim Huston',                        owner:'Amanda White',   signed:'No', isNew:true },
+    { id:18, name:'Karen Law',          email:'karen.law@example.com',       status:'Warm',    priority:'Med',  next:null,        last:d(-42),     source:'In Person Event',        sourceDetail:'E8 Off Script: Founder Stories',    owner:'Amanda White',   signed:'No' },
+    { id:19, name:'Kas Menhaji',        email:'kas.menhaji@example.com',     status:'Warm',    priority:'High', next:null,        last:d(-11),     source:'In Person Event',        sourceDetail:'Becoming a Climate Angel with E8',  owner:'Amanda White',   signed:'No' },
+    { id:20, name:'Kathryn Carpenter',  email:'kathryn.c@example.com',       status:'New',     priority:'Med',  next:null,        last:d(0),       source:'',                       sourceDetail:'Becoming a Climate Angel with E8',  owner:'Amanda White',   signed:'No', isNew:true },
+  ];
+
+  const tbody = document.getElementById('tbody');
+  let activeFilter = 'overdue';
+  let searchTerm = '';
+  let selected = new Set();
+  let currentEditId = null;
+
+  function statusBadge(s) {
+    const map = { 'New':'b-new','Active':'b-active','Warm':'b-warm','Cold':'b-cold','Signed':'b-signed' };
+    return `<span class="badge ${map[s]||'b-active'}">${s}</span>`;
+  }
+  function priorityCell(p) {
+    const map = { 'High':'p-high','Med':'p-med','Low':'p-low' };
+    return `<span class="cell-editable" onclick="editPriority(event, ${'CURRENT_ID'})"><span class="priority-dot ${map[p]}"></span>${p}</span>`;
+  }
+  function fmtDate(s) {
+    if (!s) return '<span class="cell-empty">—</span>';
+    const dt = new Date(s);
+    const opts = { month: 'short', day: 'numeric' };
+    const out = dt.toLocaleDateString('en-US', opts);
+    const diff = Math.round((dt - today) / 86400000);
+    if (diff < 0) return `<span class="date-overdue">${out} · ${Math.abs(diff)}d ago</span>`;
+    if (diff === 0) return `<span class="date-soon">Today</span>`;
+    if (diff <= 3) return `<span class="date-soon">${out} · in ${diff}d</span>`;
+    return out;
+  }
+  function avatar(name) {
+    if (!name || name === 'Unassigned') return '<span class="avatar" style="background:#9ca3af;">?</span>';
+    const initials = name.split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase();
+    const colors = ['#2563eb','#7c3aed','#059669','#d97706','#dc2626'];
+    const c = colors[name.length % colors.length];
+    return `<span class="avatar" style="background:${c};">${initials}</span>`;
+  }
+
+  function rowMatchesFilter(p) {
+    if (activeFilter === 'all') return true;
+    if (activeFilter === 'overdue') {
+      if (!p.last) return false;
+      const days = Math.round((today - new Date(p.last)) / 86400000);
+      return days >= 30;
+    }
+    if (activeFilter === 'new') return p.isNew === true;
+    if (activeFilter === 'upcoming') {
+      if (!p.next) return false;
+      const days = Math.round((new Date(p.next) - today) / 86400000);
+      return days >= 0 && days <= 7;
+    }
+    return true;
+  }
+  function rowMatchesSearch(p) {
+    if (!searchTerm) return true;
+    const t = searchTerm.toLowerCase();
+    return (p.name + ' ' + p.email + ' ' + p.sourceDetail + ' ' + p.source).toLowerCase().includes(t);
+  }
+
+  function render() {
+    const list = prospects.filter(p => rowMatchesFilter(p) && rowMatchesSearch(p));
+    tbody.innerHTML = list.map(p => `
+      <tr data-id="${p.id}" class="${selected.has(p.id)?'selected':''}">
+        <td><input type="checkbox" class="cb" ${selected.has(p.id)?'checked':''} onclick="toggleRow(${p.id}, this)"></td>
+        <td>
+          <div class="row-name">${p.name}</div>
+          <div class="email">${p.email}</div>
+        </td>
+        <td><span class="cell-editable" onclick="editStatus(event, ${p.id})">${statusBadge(p.status)}</span></td>
+        <td>${priorityCell(p.priority).replace('CURRENT_ID', p.id)}</td>
+        <td><span class="cell-editable" onclick="editDate(event, ${p.id}, 'next')">${fmtDate(p.next)}</span></td>
+        <td><span class="cell-editable" onclick="editDate(event, ${p.id}, 'last')">${fmtDate(p.last)}</span></td>
+        <td>
+          <div style="font-size:13px;">${p.source||'<span class="cell-empty">—</span>'}</div>
+          <div style="font-size:11.5px; color:var(--text-muted);">${p.sourceDetail||''}</div>
+        </td>
+        <td><span class="cell-editable" onclick="editOwner(event, ${p.id})">${avatar(p.owner)}${p.owner}</span></td>
+        <td>
+          <div class="row-actions">
+            <button class="icon-btn" title="Open" onclick="openDrawer(${p.id})">↗</button>
+            <button class="icon-btn" title="Quick log" onclick="quickLog(${p.id})">✓</button>
+            <button class="icon-btn" title="More" onclick="toast('Menu opened')">⋯</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+    document.getElementById('rowCount').textContent = `Showing ${list.length} of ${prospects.length}`;
+  }
+
+  // Inline editors
+  function editStatus(e, id) {
+    e.stopPropagation();
+    const p = prospects.find(x => x.id === id);
+    const cell = e.currentTarget;
+    cell.innerHTML = `<select class="cell-input">${statuses.map(s => `<option ${s===p.status?'selected':''}>${s}</option>`).join('')}</select>`;
+    const sel = cell.querySelector('select');
+    sel.focus();
+    sel.onblur = sel.onchange = () => { p.status = sel.value; toast('Status updated'); render(); };
+  }
+  function editPriority(e, id) {
+    e.stopPropagation();
+    const p = prospects.find(x => x.id === id);
+    const cell = e.currentTarget;
+    cell.innerHTML = `<select class="cell-input">${['High','Med','Low'].map(s => `<option ${s===p.priority?'selected':''}>${s}</option>`).join('')}</select>`;
+    const sel = cell.querySelector('select');
+    sel.focus();
+    sel.onblur = sel.onchange = () => { p.priority = sel.value; toast('Priority updated'); render(); };
+  }
+  function editDate(e, id, field) {
+    e.stopPropagation();
+    const p = prospects.find(x => x.id === id);
+    const cell = e.currentTarget;
+    cell.innerHTML = `<input class="cell-input" type="date" value="${p[field]||''}">`;
+    const inp = cell.querySelector('input');
+    inp.focus();
+    inp.onchange = () => { p[field] = inp.value || null; toast(`${field==='next'?'Follow-up':'Last contact'} updated`); render(); };
+    inp.onblur = () => { render(); };
+  }
+  function editOwner(e, id) {
+    e.stopPropagation();
+    const p = prospects.find(x => x.id === id);
+    const cell = e.currentTarget;
+    cell.innerHTML = `<select class="cell-input">${owners.map(o => `<option ${o===p.owner?'selected':''}>${o}</option>`).join('')}</select>`;
+    const sel = cell.querySelector('select');
+    sel.focus();
+    sel.onblur = sel.onchange = () => { p.owner = sel.value; toast('Owner updated'); render(); };
+  }
+
+  // Bulk select
+  function toggleRow(id, el) {
+    if (el.checked) selected.add(id); else selected.delete(id);
+    updateBulk();
+    render();
+  }
+  function toggleAll(el) {
+    const list = prospects.filter(p => rowMatchesFilter(p) && rowMatchesSearch(p));
+    if (el.checked) list.forEach(p => selected.add(p.id));
+    else list.forEach(p => selected.delete(p.id));
+    updateBulk();
+    render();
+  }
+  function clearSelection() { selected.clear(); updateBulk(); render(); }
+  function updateBulk() {
+    document.getElementById('bulkCount').textContent = selected.size;
+    document.getElementById('bulkBar').classList.toggle('show', selected.size > 0);
+  }
+
+  // Stats filter
+  function setStat(el) {
+    document.querySelectorAll('.stat').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+    activeFilter = el.dataset.filter;
+    render();
+  }
+
+  // Search
+  function searchTable(v) { searchTerm = v.trim(); render(); }
+
+  // Quick log
+  function quickLog(id) {
+    const p = prospects.find(x => x.id === id);
+    p.last = today.toISOString().slice(0,10);
+    toast(`Logged contact with ${p.name}`);
+    render();
+  }
+
+  // Drawer
+  function openDrawer(id) {
+    const p = prospects.find(x => x.id === id);
+    currentEditId = id;
+    document.getElementById('drawerName').textContent = p.name;
+    document.getElementById('drawerEmail').textContent = p.email;
+    document.getElementById('dStatus').value = p.status;
+    document.getElementById('dPriority').value = p.priority === 'Med' ? 'Medium' : p.priority;
+    document.getElementById('dNext').value = p.next || '';
+    document.getElementById('dLast').value = p.last || '';
+    document.getElementById('dSource').value = p.source || 'In Person Event';
+    document.getElementById('dSourceDetail').value = p.sourceDetail || '';
+    document.getElementById('dOwner').value = p.owner;
+    document.getElementById('dSigned').value = p.signed;
+    document.getElementById('drawer').classList.add('show');
+    document.getElementById('drawerBackdrop').classList.add('show');
+  }
+  function closeDrawer() {
+    document.getElementById('drawer').classList.remove('show');
+    document.getElementById('drawerBackdrop').classList.remove('show');
+    currentEditId = null;
+  }
+  function saveDrawer() {
+    if (!currentEditId) return;
+    const p = prospects.find(x => x.id === currentEditId);
+    p.status = document.getElementById('dStatus').value;
+    const pr = document.getElementById('dPriority').value;
+    p.priority = pr === 'Medium' ? 'Med' : pr;
+    p.next = document.getElementById('dNext').value || null;
+    p.last = document.getElementById('dLast').value || null;
+    p.source = document.getElementById('dSource').value;
+    p.sourceDetail = document.getElementById('dSourceDetail').value;
+    p.owner = document.getElementById('dOwner').value;
+    p.signed = document.getElementById('dSigned').value;
+    closeDrawer();
+    toast(`Saved changes for ${p.name}`);
+    render();
+  }
+
+  // Toast
+  let toastTimer;
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+  }
+
+  render();
+</script>
+</body>
+</html>
