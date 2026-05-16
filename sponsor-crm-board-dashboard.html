@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sponsor CRM — Board Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scroll-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  .kanban-col { min-width: 240px; max-width: 240px; }
+  .stage-prospect    { background:#f1f5f9; color:#475569; }
+  .stage-outreach    { background:#fef3c7; color:#a16207; }
+  .stage-conversation{ background:#fed7aa; color:#9a3412; }
+  .stage-proposal    { background:#bfdbfe; color:#1d4ed8; }
+  .stage-committed   { background:#c7d2fe; color:#4338ca; }
+  .stage-received    { background:#bbf7d0; color:#065f46; }
+  .entity-c6 { background:#dbeafe; color:#1e40af; }
+  .entity-c3 { background:#e9d5ff; color:#6b21a8; }
+  .entity-both { background:#fef3c7; color:#92400e; }
+  .activity-commitment { background:#c7d2fe; color:#3730a3; }
+  .activity-gift { background:#bbf7d0; color:#065f46; }
+  .activity-prospect { background:#fef3c7; color:#92400e; }
+  .activity-stage { background:#bfdbfe; color:#1d4ed8; }
+  @media (max-width: 768px) {
+    #kanbanBoard { scroll-snap-type: x mandatory; }
+    .kanban-col { scroll-snap-align: start; min-width: 85vw; max-width: 85vw; }
+  }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 text-sm">
+
+<!-- HEADER -->
+<header class="bg-white border-b border-slate-200 px-4 py-2 flex items-center gap-3 sticky top-0 z-40">
+  <div class="font-semibold tracking-tight">E8 · <span class="text-slate-500 font-normal">Board / Development Committee</span></div>
+  <div class="flex items-center bg-slate-100 rounded-md p-0.5 ml-2 text-xs">
+    <button class="px-2.5 py-1 rounded font-medium bg-white shadow-sm">All entities</button>
+    <button class="px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">E8 Angels</button>
+    <button class="px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">E8 Impact</button>
+  </div>
+  <div class="ml-auto flex items-center gap-2">
+    <button id="logInteractionBtn" class="h-8 px-3 text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white rounded flex items-center gap-1">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
+      <span class="hidden sm:inline">Log my interaction</span>
+      <span class="sm:hidden">Log</span>
+    </button>
+    <button class="h-8 px-3 text-xs font-medium border border-slate-300 bg-white hover:bg-slate-50 rounded">Export board report</button>
+    <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 text-xs flex items-center justify-center font-semibold" title="Lisa Rasmussen">LR</div>
+  </div>
+</header>
+
+<!-- Intro strip -->
+<section class="bg-slate-100 border-b border-slate-200 px-4 py-2 text-xs text-slate-600">
+  Welcome, <strong>Lisa</strong>. This is the read-only board view. Use <em>Log my interaction</em> to drop a quick note from a meeting or event you attended.
+</section>
+
+<!-- KPI STRIP -->
+<section class="px-4 py-3 grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3 bg-slate-50 border-b border-slate-200">
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[11px] uppercase tracking-wide text-slate-500">Raised vs goal</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5 text-emerald-700">$152k</div>
+    <div class="h-1.5 bg-slate-200 rounded-full mt-1.5 overflow-hidden"><div class="h-full bg-emerald-500" style="width:14%"></div></div>
+    <div class="text-[11px] text-slate-500 mt-1">14% of $1.1M FY26 combined</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[11px] uppercase tracking-wide text-slate-500">Pipeline value</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5 text-blue-700">$598k</div>
+    <div class="text-[11px] text-slate-500 mt-1">If everything in stages 2–5 closes</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[11px] uppercase tracking-wide text-slate-500">Active prospects</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5">9</div>
+    <div class="text-[11px] text-slate-500 mt-1">Stages 2–4 across both entities</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[11px] uppercase tracking-wide text-slate-500">Overdue follow-ups</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5 text-red-700">2</div>
+    <div class="text-[11px] text-slate-500 mt-1">Where staff may need board help</div>
+  </div>
+  <div class="col-span-2 md:col-span-1 bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[11px] uppercase tracking-wide text-slate-500">Avg gift received</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5">$50k</div>
+    <div class="text-[11px] text-slate-500 mt-1">3 gifts FY26</div>
+  </div>
+</section>
+
+<!-- BODY -->
+<main class="px-3 md:px-4 py-4 grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-4">
+
+  <!-- LEFT: pipeline + recent activity + grants -->
+  <div class="space-y-4 min-w-0">
+
+    <!-- Pipeline (read-only kanban) -->
+    <section class="bg-white border border-slate-200 rounded-md">
+      <div class="px-3 py-2 border-b border-slate-200 flex items-center">
+        <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Pipeline</div>
+        <div class="ml-2 text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">Read-only</div>
+        <div class="ml-auto text-[11px] text-slate-500">Click a card to view detail</div>
+      </div>
+      <div class="overflow-x-auto p-3 bg-slate-50">
+        <div id="kanbanBoard" class="flex gap-2.5"></div>
+      </div>
+    </section>
+
+    <!-- Recent activity -->
+    <section class="bg-white border border-slate-200 rounded-md">
+      <div class="px-3 py-2 border-b border-slate-200 flex items-center">
+        <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Recent activity · last 30 days</div>
+      </div>
+      <ul class="divide-y divide-slate-100" id="activityFeed"></ul>
+    </section>
+
+    <!-- Grant deadlines -->
+    <section class="bg-white border border-slate-200 rounded-md">
+      <div class="px-3 py-2 border-b border-slate-200 flex items-center">
+        <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Foundation grant deadlines · next 60 days</div>
+      </div>
+      <div class="p-3 space-y-2" id="grantList"></div>
+    </section>
+  </div>
+
+  <!-- RIGHT: my connections -->
+  <aside class="space-y-4 xl:sticky xl:top-[60px] xl:self-start">
+    <section class="bg-white border border-slate-200 rounded-md">
+      <div class="px-3 py-2 border-b border-slate-200 flex items-center">
+        <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">My connections</div>
+        <div class="ml-auto text-[11px] text-slate-400">5</div>
+      </div>
+      <ul class="divide-y divide-slate-100" id="myConnections"></ul>
+    </section>
+    <section class="bg-white border border-slate-200 rounded-md p-3 text-xs text-slate-600 leading-relaxed">
+      <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1.5">About this view</div>
+      Anything where you're listed as the source or where you've logged a note appears here. Click any sponsor to view the full record and add another note.
+    </section>
+  </aside>
+</main>
+
+<!-- LOG INTERACTION MODAL -->
+<div id="logModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-md shadow-xl w-full max-w-lg">
+    <div class="px-4 py-3 border-b border-slate-200 flex items-center">
+      <div class="font-semibold">Log my interaction</div>
+      <button onclick="closeModal()" class="ml-auto text-slate-400 hover:text-slate-700">
+        <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+      </button>
+    </div>
+    <div class="px-4 py-3 space-y-3 text-sm">
+      <div>
+        <label class="text-[11px] text-slate-500 block mb-1">Sponsor</label>
+        <input type="text" autocomplete="off" data-lpignore="true" data-form-type="other" placeholder="Type to search…" value="Walton Family Foundation" class="w-full border border-slate-300 rounded px-2 h-8 text-sm" />
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="text-[11px] text-slate-500 block mb-1">When</label>
+          <input type="date" value="2026-05-16" class="!w-[150px] border border-slate-300 rounded px-2 h-8 text-sm" autocomplete="off" data-lpignore="true"/>
+        </div>
+        <div>
+          <label class="text-[11px] text-slate-500 block mb-1">Channel</label>
+          <select class="w-full border border-slate-300 rounded px-2 h-8 text-sm">
+            <option>Call</option><option>Email</option><option selected>In-person</option><option>Event</option><option>Text</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="text-[11px] text-slate-500 block mb-1">Summary <span class="text-[10px] text-slate-400">(max 500 chars)</span></label>
+        <textarea rows="3" maxlength="500" autocomplete="off" data-lpignore="true" data-form-type="other" class="w-full border border-slate-300 rounded px-2 py-1 text-sm" placeholder="What did you discuss? (visible to E8 staff)"></textarea>
+      </div>
+      <div>
+        <label class="text-[11px] text-slate-500 block mb-1">Outcome / next step (optional)</label>
+        <input type="text" autocomplete="off" data-lpignore="true" data-form-type="other" class="w-full border border-slate-300 rounded px-2 h-8 text-sm" placeholder="e.g. Karin to send follow-up deck" />
+      </div>
+      <div class="bg-slate-50 border border-slate-200 rounded p-2 text-[11px] text-slate-600">
+        Submitting will tag this note as logged by you. <strong>Jordan S.</strong> (primary owner) will be notified.
+      </div>
+    </div>
+    <div class="px-4 py-3 border-t border-slate-200 flex justify-end gap-2">
+      <button onclick="closeModal()" class="h-8 px-3 text-xs border border-slate-300 rounded">Cancel</button>
+      <button class="h-8 px-3 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Save note</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STAGES = [
+  { id:'prospect',     n:'1', label:'Prospect',     cls:'stage-prospect' },
+  { id:'outreach',     n:'2', label:'Outreach',     cls:'stage-outreach' },
+  { id:'conversation', n:'3', label:'Conversation', cls:'stage-conversation' },
+  { id:'proposal',     n:'4', label:'Proposal',     cls:'stage-proposal' },
+  { id:'committed',    n:'5', label:'Committed',    cls:'stage-committed' },
+  { id:'received',     n:'6', label:'Received',     cls:'stage-received' },
+];
+
+const SPONSORS = [
+  { name:'Microsoft AI for Good',     stage:'received',     amount:'$75k', entity:'c3',  owner:'KK' },
+  { name:'Anonymous Individual',      stage:'received',     amount:'$25k', entity:'c3',  owner:'KK' },
+  { name:'Bullitt Foundation',        stage:'committed',    amount:'$50k', entity:'c3',  owner:'KK', overdue:true, lisa:true },
+  { name:'Stoel Rives LLP',           stage:'committed',    amount:'$15k', entity:'c6',  owner:'KO' },
+  { name:'Convene Seattle (Venue)',   stage:'committed',    amount:'$8k',  entity:'c6',  owner:'KO' },
+  { name:'Schwabe Williamson',        stage:'proposal',     amount:'$25k', entity:'c6',  owner:'KO' },
+  { name:'McKinstry',                 stage:'proposal',     amount:'$30k', entity:'c3',  owner:'LO', overdue:true },
+  { name:'Russell Family Foundation', stage:'proposal',     amount:'$35k', entity:'c3',  owner:'LO' },
+  { name:'Walton Family Foundation',  stage:'conversation', amount:'$100k',entity:'c3',  owner:'JS', lisa:true },
+  { name:'Wilson Sonsini',            stage:'conversation', amount:'$10k', entity:'both',owner:'KK' },
+  { name:'Starbucks',                 stage:'conversation', amount:'$20k', entity:'both',owner:'KO' },
+  { name:'Bezos Earth Fund',          stage:'outreach',     amount:'$250k',entity:'c3',  owner:'JS', lisa:true },
+  { name:'Patagonia',                 stage:'outreach',     amount:'$15k', entity:'c3',  owner:'JS' },
+  { name:'Sea Mar Foundation',        stage:'prospect',     amount:'$5k',  entity:'c3',  owner:'KK' },
+];
+
+const ACTIVITY = [
+  { kind:'commitment', sponsor:'Bullitt Foundation',    text:'committed $50,000',                amount:'$50k',  at:'May 14' },
+  { kind:'gift',       sponsor:'Microsoft AI for Good', text:'gift received',                    amount:'$75k',  at:'May 11' },
+  { kind:'stage',      sponsor:'Walton Family Fdn.',    text:'moved Outreach → Conversation',    amount:null,    at:'May 12' },
+  { kind:'commitment', sponsor:'Stoel Rives LLP',       text:'committed underwriting for Summit', amount:'$15k', at:'May 9' },
+  { kind:'prospect',   sponsor:'Bezos Earth Fund',      text:'added to pipeline',                amount:null,    at:'May 8' },
+  { kind:'gift',       sponsor:'Anonymous Individual',  text:'gift received',                    amount:'$25k',  at:'May 4' },
+  { kind:'stage',      sponsor:'Starbucks',             text:'moved Outreach → Conversation',    amount:null,    at:'May 2' },
+];
+
+const GRANTS = [
+  { name:'Russell Family Foundation', stage:'Proposal',     amount:'$35k', owner:'LO', due:'May 28', daysLeft:12 },
+  { name:'Sea Mar Foundation',        stage:'Prospect',     amount:'$5k',  owner:'KK', due:'Jun 5',  daysLeft:20 },
+  { name:'Bullitt Foundation',        stage:'Committed',    amount:'$50k', owner:'KK', due:'Jun 13', daysLeft:28 },
+  { name:'Bezos Earth Fund',          stage:'Outreach',     amount:'$250k',owner:'JS', due:'Jun 25', daysLeft:40 },
+  { name:'Walton Family Foundation',  stage:'Conversation', amount:'$100k',owner:'JS', due:'Jul 10', daysLeft:55 },
+];
+
+function entityChip(e) {
+  if (e === 'c6') return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium entity-c6">c6</span>`;
+  if (e === 'c3') return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium entity-c3">c3</span>`;
+  return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium entity-both">both</span>`;
+}
+function stageChip(s) {
+  const st = STAGES.find(x => x.id === s);
+  return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${st.cls}">${st.n}—${st.label}</span>`;
+}
+
+function renderKanban() {
+  const board = document.getElementById('kanbanBoard');
+  board.innerHTML = STAGES.map(st => {
+    const items = SPONSORS.filter(s => s.stage === st.id);
+    return `<div class="kanban-col bg-white border border-slate-200 rounded">
+      <div class="px-2.5 py-1.5 border-b border-slate-200 flex items-center gap-1.5">
+        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${st.cls}">${st.n} — ${st.label}</span>
+        <span class="text-[11px] text-slate-400 ml-auto">${items.length}</span>
+      </div>
+      <div class="p-2 space-y-1.5 max-h-[300px] overflow-y-auto scroll-thin bg-slate-50">
+        ${items.map(s => `<a href="sponsor-crm-sponsor-detail.html" class="block bg-white border border-slate-200 rounded p-2 hover:border-blue-400">
+          <div class="flex items-start gap-1.5">
+            <div class="font-medium text-[12px] leading-tight flex-1 truncate">${s.name}</div>
+            ${entityChip(s.entity)}
+          </div>
+          <div class="flex items-center gap-1.5 mt-1 text-[11px] text-slate-600">
+            <span class="font-semibold">${s.amount}</span>
+            <span class="ml-auto w-4 h-4 rounded-full bg-slate-200 text-slate-700 text-[9px] inline-flex items-center justify-center font-semibold">${s.owner}</span>
+          </div>
+        </a>`).join('')}
+        ${items.length === 0 ? '<div class="text-[11px] text-slate-400 text-center py-3">Empty</div>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderActivity() {
+  const feed = document.getElementById('activityFeed');
+  feed.innerHTML = ACTIVITY.map(a => {
+    const cls = `activity-${a.kind}`;
+    const label = a.kind === 'commitment' ? 'Committed' : a.kind === 'gift' ? 'Gift received' : a.kind === 'prospect' ? 'New prospect' : 'Stage advanced';
+    return `<li class="px-3 py-2.5 hover:bg-slate-50 flex items-center gap-3">
+      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${cls} w-[80px] justify-center">${label}</span>
+      <div class="flex-1 min-w-0 text-[13px]">
+        <a href="sponsor-crm-sponsor-detail.html" class="font-medium hover:underline">${a.sponsor}</a>
+        <span class="text-slate-600"> ${a.text}</span>
+        ${a.amount ? `<span class="font-semibold ml-1">${a.amount}</span>` : ''}
+      </div>
+      <span class="text-[11px] text-slate-500 whitespace-nowrap">${a.at}</span>
+    </li>`;
+  }).join('');
+}
+
+function renderGrants() {
+  const list = document.getElementById('grantList');
+  list.innerHTML = GRANTS.map(g => `
+    <a href="sponsor-crm-sponsor-detail.html" class="flex items-center gap-3 hover:bg-slate-50 rounded p-1.5 -m-1.5">
+      <div class="w-12 text-center shrink-0">
+        <div class="text-[10px] uppercase text-slate-500">${g.due.split(' ')[0]}</div>
+        <div class="text-lg font-semibold leading-none">${g.due.split(' ')[1]}</div>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-[13px] font-medium truncate">${g.name}</div>
+        <div class="text-[11px] text-slate-500">${g.stage} · Ask ${g.amount} · ${g.daysLeft} days left</div>
+      </div>
+      <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] inline-flex items-center justify-center font-semibold">${g.owner}</span>
+    </a>`).join('');
+}
+
+function renderConnections() {
+  const list = document.getElementById('myConnections');
+  const items = SPONSORS.filter(s => s.lisa);
+  list.innerHTML = items.map(s => `
+    <li class="px-3 py-2.5 hover:bg-slate-50">
+      <a href="sponsor-crm-sponsor-detail.html" class="block">
+        <div class="flex items-center gap-1.5">
+          <div class="font-medium text-[13px] flex-1 truncate">${s.name}</div>
+          ${entityChip(s.entity)}
+        </div>
+        <div class="flex items-center gap-1.5 mt-0.5 text-[11px]">
+          ${stageChip(s.stage)}
+          <span class="font-semibold">${s.amount}</span>
+          ${s.overdue ? '<span class="ml-auto text-red-700 font-medium">Overdue follow-up</span>' : '<span class="ml-auto text-slate-500">Last activity 4d</span>'}
+        </div>
+      </a>
+    </li>`).join('');
+}
+
+function openModal() {
+  const m = document.getElementById('logModal');
+  m.classList.remove('hidden'); m.classList.add('flex');
+}
+function closeModal() {
+  const m = document.getElementById('logModal');
+  m.classList.add('hidden'); m.classList.remove('flex');
+}
+document.getElementById('logInteractionBtn').addEventListener('click', openModal);
+
+renderKanban();
+renderActivity();
+renderGrants();
+renderConnections();
+</script>
+</body>
+</html>

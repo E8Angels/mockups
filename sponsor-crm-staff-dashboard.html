@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sponsor CRM — Staff Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scroll-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  .kanban-col { min-width: 260px; max-width: 260px; }
+  .stage-prospect    { background:#f1f5f9; color:#475569; }
+  .stage-outreach    { background:#fef3c7; color:#a16207; }
+  .stage-conversation{ background:#fed7aa; color:#9a3412; }
+  .stage-proposal    { background:#bfdbfe; color:#1d4ed8; }
+  .stage-committed   { background:#c7d2fe; color:#4338ca; }
+  .stage-received    { background:#bbf7d0; color:#065f46; }
+  .stage-declined    { background:#fee2e2; color:#b91c1c; }
+  .entity-c6 { background:#dbeafe; color:#1e40af; }
+  .entity-c3 { background:#e9d5ff; color:#6b21a8; }
+  .entity-both { background:#fef3c7; color:#92400e; }
+  .type-corporate { background:#e0e7ff; color:#3730a3; }
+  .type-foundation{ background:#fce7f3; color:#9d174d; }
+  .type-individual{ background:#dcfce7; color:#166534; }
+  .type-in_kind   { background:#ffedd5; color:#9a3412; }
+  .priority-high { color:#b91c1c; }
+  .priority-med  { color:#a16207; }
+  .priority-low  { color:#64748b; }
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+  .card-drag { cursor: grab; }
+  .card-drag:active { cursor: grabbing; }
+  /* Mobile kanban: snap-scroll columns */
+  @media (max-width: 768px) {
+    #kanbanBoard { scroll-snap-type: x mandatory; }
+    .kanban-col { scroll-snap-align: start; min-width: 85vw; max-width: 85vw; }
+  }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 text-sm">
+
+<!-- HEADER -->
+<header class="bg-white border-b border-slate-200 px-4 py-2 flex items-center gap-3 sticky top-0 z-40">
+  <div class="font-semibold tracking-tight whitespace-nowrap">E8 · <span class="text-slate-500 font-normal">Sponsors</span></div>
+
+  <!-- Entity toggle -->
+  <div class="flex items-center bg-slate-100 rounded-md p-0.5 ml-2 text-xs">
+    <button data-entity="all"   class="entity-btn px-2.5 py-1 rounded font-medium bg-white shadow-sm">All entities</button>
+    <button data-entity="501c6" class="entity-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">E8 Angels (501c6)</button>
+    <button data-entity="501c3" class="entity-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">E8 Impact (501c3)</button>
+  </div>
+
+  <div class="ml-3 flex-1 min-w-0 max-w-md relative hidden md:block">
+    <svg class="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"/></svg>
+    <input type="text" placeholder="Search sponsors, contacts, notes…" autocomplete="off" data-lpignore="true" data-form-type="other" class="w-full h-8 pl-8 pr-3 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+  </div>
+  <button class="h-8 px-3 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md flex items-center gap-1 whitespace-nowrap">
+    <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
+    <span class="hidden sm:inline">New sponsor</span>
+    <span class="sm:hidden">New</span>
+  </button>
+  <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 text-xs flex items-center justify-center font-semibold" title="Karin Kidder">KK</div>
+</header>
+
+<!-- KPI STRIP -->
+<section class="px-4 py-3 grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3 bg-slate-50 border-b border-slate-200">
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[11px] uppercase tracking-wide text-slate-500">Received vs. goal</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5" id="kpiRaised">—</div>
+    <div class="h-1.5 bg-slate-200 rounded-full mt-1.5 overflow-hidden"><div id="kpiBar" class="h-full bg-emerald-500" style="width:0%"></div></div>
+    <div class="text-[11px] text-slate-500 mt-1"><span id="kpiPct">—</span> of <span id="kpiGoal">—</span></div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[11px] uppercase tracking-wide text-slate-500">In pipeline</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5 text-blue-700" id="kpiPipeline">—</div>
+    <div class="text-[11px] text-slate-500 mt-1">Stages 2–5 ask total</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[11px] uppercase tracking-wide text-slate-500">Active prospects</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5" id="kpiActive">—</div>
+    <div class="text-[11px] text-slate-500 mt-1">Stages 2–4</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[11px] uppercase tracking-wide text-slate-500">Overdue follow-ups</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5 text-red-700" id="kpiOverdue">—</div>
+    <div class="text-[11px] text-slate-500 mt-1">Across all owners</div>
+  </div>
+  <div class="col-span-2 md:col-span-1 bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[11px] uppercase tracking-wide text-slate-500">Avg gift (received)</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5" id="kpiAvg">—</div>
+    <div class="text-[11px] text-slate-500 mt-1"><span id="kpiAvgN">—</span> gifts FY26</div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<div class="flex h-[calc(100vh-148px)] md:h-[calc(100vh-148px)]">
+  <!-- SIDEBAR -->
+  <aside class="hidden md:block w-56 border-r border-slate-200 bg-white overflow-y-auto scroll-thin shrink-0">
+    <div class="p-3 space-y-4">
+      <details open>
+        <summary class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+          <span>Sponsor type</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+        </summary>
+        <ul class="text-[13px] space-y-0.5 mt-1" id="typeFilter"></ul>
+      </details>
+      <details open>
+        <summary class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+          <span>Pipeline stage</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+        </summary>
+        <ul class="text-[13px] space-y-0.5 mt-1" id="stageFilter"></ul>
+      </details>
+      <details>
+        <summary class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+          <span>Assigned to</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+        </summary>
+        <ul class="text-[13px] space-y-0.5 mt-1" id="ownerFilter"></ul>
+      </details>
+      <details>
+        <summary class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+          <span>Priority</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+        </summary>
+        <ul class="text-[13px] space-y-0.5 mt-1">
+          <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded" /><span class="priority-high">High</span></label></li>
+          <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded" /><span class="priority-med">Medium</span></label></li>
+          <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded" /><span class="priority-low">Low</span></label></li>
+        </ul>
+      </details>
+      <details>
+        <summary class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+          <span>Follow-up</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+        </summary>
+        <ul class="text-[13px] space-y-0.5 mt-1">
+          <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded"/><span class="text-red-700">Overdue</span></label></li>
+          <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded"/><span>Due in 7 days</span></label></li>
+          <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded"/><span class="text-slate-500">None scheduled</span></label></li>
+        </ul>
+      </details>
+    </div>
+  </aside>
+
+  <!-- MAIN PANE -->
+  <main class="flex-1 overflow-hidden flex flex-col">
+    <!-- toolbar -->
+    <div class="px-3 md:px-4 py-2 border-b border-slate-200 bg-white flex items-center gap-2 md:gap-3 shrink-0 overflow-x-auto">
+      <div class="text-xs text-slate-500 whitespace-nowrap" id="resultCount">—</div>
+      <div class="flex items-center bg-slate-100 rounded-md p-0.5 ml-auto text-xs">
+        <button data-mode="kanban" class="mode-btn px-2.5 py-1 font-medium rounded bg-white shadow-sm">Kanban</button>
+        <button data-mode="list"   class="mode-btn px-2.5 py-1 font-medium rounded text-slate-600 hover:bg-white">List</button>
+        <button data-mode="grants" class="mode-btn px-2.5 py-1 font-medium rounded text-slate-600 hover:bg-white">Grant calendar</button>
+      </div>
+      <button class="h-7 px-2.5 text-xs font-medium border border-slate-300 bg-white hover:bg-slate-50 rounded">Export CSV</button>
+      <button class="h-7 px-2.5 text-xs font-medium border border-slate-300 bg-white hover:bg-slate-50 rounded hidden md:inline-block">Snapshot PDF</button>
+    </div>
+
+    <!-- Overdue banner -->
+    <div id="overdueBanner" class="px-3 md:px-4 py-2 bg-red-50 border-b border-red-200 text-red-800 text-xs flex items-center gap-2 hidden">
+      <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a1 1 0 011 1v4a1 1 0 11-2 0V6a1 1 0 011-1zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+      <span><strong id="overdueCount">—</strong> follow-ups overdue. <a href="#" class="underline">Review</a></span>
+    </div>
+
+    <!-- Kanban -->
+    <div id="kanbanView" class="flex-1 overflow-x-auto overflow-y-hidden bg-slate-50 px-3 md:px-4 py-3">
+      <div id="kanbanBoard" class="flex gap-3 h-full"></div>
+    </div>
+
+    <!-- List view -->
+    <div id="listView" class="flex-1 overflow-auto bg-white hidden">
+      <table class="w-full text-[13px] border-collapse">
+        <thead class="bg-slate-50 sticky top-0 z-10">
+          <tr class="text-left text-[11px] uppercase tracking-wider text-slate-500">
+            <th class="px-3 py-2 font-semibold">Sponsor</th>
+            <th class="px-3 py-2 font-semibold">Type</th>
+            <th class="px-3 py-2 font-semibold">Entity</th>
+            <th class="px-3 py-2 font-semibold">Stage</th>
+            <th class="px-3 py-2 font-semibold text-right">Ask</th>
+            <th class="px-3 py-2 font-semibold text-right">Received</th>
+            <th class="px-3 py-2 font-semibold">Owner</th>
+            <th class="px-3 py-2 font-semibold">Next follow-up</th>
+          </tr>
+        </thead>
+        <tbody id="listBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Grant deadline calendar -->
+    <div id="grantsView" class="flex-1 overflow-auto bg-slate-50 px-3 md:px-4 py-3 hidden">
+      <div class="text-xs text-slate-500 mb-2">Foundation grant deadlines · next 60 days</div>
+      <div id="grantList" class="space-y-1.5"></div>
+    </div>
+  </main>
+</div>
+
+<!-- Stage-change modal stub -->
+<div id="stageModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-md shadow-xl w-full max-w-md">
+    <div class="px-4 py-3 border-b border-slate-200 font-semibold">Move stage</div>
+    <div class="px-4 py-3 space-y-2 text-sm">
+      <div class="text-slate-600 text-xs">Moving <strong id="modalSponsor">—</strong> from <span id="modalFrom" class="chip"></span> to <span id="modalTo" class="chip"></span></div>
+      <label class="block text-xs text-slate-600 mt-2">Note (optional)</label>
+      <textarea autocomplete="off" data-lpignore="true" rows="3" class="w-full border border-slate-300 rounded p-2 text-sm" placeholder="Why this move? What's the next step?"></textarea>
+      <label class="block text-xs text-slate-600 mt-2">Auto-suggest follow-up <span class="text-slate-400">(stage default)</span></label>
+      <input type="date" class="!w-[150px] border border-slate-300 rounded p-1 text-sm" id="modalFollowup" />
+    </div>
+    <div class="px-4 py-3 border-t border-slate-200 flex justify-end gap-2">
+      <button onclick="document.getElementById('stageModal').classList.add('hidden'); document.getElementById('stageModal').classList.remove('flex')" class="h-8 px-3 text-xs border border-slate-300 rounded">Cancel</button>
+      <button class="h-8 px-3 text-xs bg-blue-600 text-white rounded">Confirm move</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============== DATA ==============
+const STAGES = [
+  { id:'prospect',     n:'1', label:'Prospect',     cls:'stage-prospect' },
+  { id:'outreach',     n:'2', label:'Outreach',     cls:'stage-outreach' },
+  { id:'conversation', n:'3', label:'Conversation', cls:'stage-conversation' },
+  { id:'proposal',     n:'4', label:'Proposal',     cls:'stage-proposal' },
+  { id:'committed',    n:'5', label:'Committed',    cls:'stage-committed' },
+  { id:'received',     n:'6', label:'Received',     cls:'stage-received' },
+  { id:'declined',     n:'7', label:'Declined',     cls:'stage-declined' },
+];
+const TYPES = [
+  { id:'corporate',  label:'Corporate',  cls:'type-corporate' },
+  { id:'foundation', label:'Foundation', cls:'type-foundation' },
+  { id:'individual', label:'Individual', cls:'type-individual' },
+  { id:'in_kind',    label:'In-kind',    cls:'type-in_kind' },
+];
+const STAFF = [
+  { id:'p_karin',    initials:'KK', name:'Karin K.' },
+  { id:'p_kathleen', initials:'KO', name:'Kathleen O.' },
+  { id:'p_lee',      initials:'LO', name:'Lee O.' },
+  { id:'p_jordan',   initials:'JS', name:'Jordan S.' },
+];
+const TODAY = new Date('2026-05-16');
+const isoDate = d => d.toISOString().slice(0,10);
+const daysFromToday = n => { const d = new Date(TODAY); d.setDate(d.getDate()+n); return isoDate(d); };
+const fmtMoney = (cents, opts={}) => {
+  if (cents == null) return '—';
+  const dollars = Math.round(cents/100);
+  if (opts.compact && dollars >= 1000) return '$' + Math.round(dollars/1000) + 'k';
+  return '$' + dollars.toLocaleString();
+};
+
+// Sponsors — mix drawn loosely from the master spreadsheet shape, not real PII
+const SPONSORS = [
+  { id:'spn_1',  name:'Microsoft AI for Good',     type:'corporate',  entity:'501c3', stage:'received',    priority:'high', ask:7500000,  commit:7500000, received:7500000, owner:'p_karin',    contact:'Brandon M.',     campaign:'FY26 Annual Fund',  followup:daysFromToday(45), renewal_month:8, grant_deadline:null,           note:'Renewed for FY26 — full payment received Feb.' },
+  { id:'spn_2',  name:'Bullitt Foundation',         type:'foundation', entity:'501c3', stage:'committed',   priority:'high', ask:5000000,  commit:5000000, received:0,       owner:'p_karin',    contact:'Pat F.',         campaign:'FY26 Annual Fund',  followup:daysFromToday(-3), renewal_month:null, grant_deadline:daysFromToday(28), note:'Signed LOI; check arriving Q2.' },
+  { id:'spn_3',  name:'Stoel Rives LLP',            type:'corporate',  entity:'501c6', stage:'committed',   priority:'medium', ask:1500000, commit:1500000, received:0,    owner:'p_kathleen', contact:'Greg J.',        campaign:'Member Events',     followup:daysFromToday(5),  renewal_month:9,  grant_deadline:null, note:'Underwriting Summit reception.' },
+  { id:'spn_4',  name:'Schwabe Williamson',         type:'corporate',  entity:'501c6', stage:'proposal',    priority:'high', ask:2500000,  commit:0,        received:0,    owner:'p_kathleen', contact:'Connie S.',      campaign:'Member Events',     followup:daysFromToday(2),  renewal_month:null, grant_deadline:null, note:'Sent proposal 4/28; partners reviewing.' },
+  { id:'spn_5',  name:'Wilson Sonsini',             type:'corporate',  entity:'both',  stage:'conversation',priority:'medium', ask:1000000,commit:0,        received:0,    owner:'p_karin',    contact:'Mark T.',         campaign:'Member Events',     followup:daysFromToday(7),  renewal_month:null, grant_deadline:null, note:'Mark is shopping internally for owner.' },
+  { id:'spn_6',  name:'McKinstry',                  type:'corporate',  entity:'501c3', stage:'proposal',    priority:'medium', ask:3000000,commit:0,        received:0,    owner:'p_lee',      contact:'Ash A. / Ana M.', campaign:'Fellowship Program', followup:daysFromToday(-1), renewal_month:null, grant_deadline:null, note:'Awaiting decision from foundation board.' },
+  { id:'spn_7',  name:'Walton Family Foundation',   type:'foundation', entity:'501c3', stage:'conversation',priority:'high', ask:10000000,commit:0,        received:0,    owner:'p_jordan',   contact:'Taylor B.',       campaign:'Fellowship Program',followup:daysFromToday(10), renewal_month:null, grant_deadline:daysFromToday(55), note:'Karin & Taylor met at GreenBiz; positive signals.' },
+  { id:'spn_8',  name:'Bezos Earth Fund',           type:'foundation', entity:'501c3', stage:'outreach',    priority:'high', ask:25000000, commit:0,        received:0,    owner:'p_jordan',   contact:'Andy K.',         campaign:'Fellowship Program',followup:daysFromToday(4),  renewal_month:null, grant_deadline:daysFromToday(40), note:'Cold intro through board.' },
+  { id:'spn_9',  name:'Sea Mar Foundation',         type:'foundation', entity:'501c3', stage:'prospect',    priority:'low',  ask:500000,   commit:0,        received:0,    owner:'p_karin',    contact:null,              campaign:'Fellowship Program',followup:null,             renewal_month:null, grant_deadline:daysFromToday(20), note:'Researching focus area fit.' },
+  { id:'spn_10', name:'Starbucks',                  type:'corporate',  entity:'both',  stage:'conversation',priority:'medium',ask:2000000, commit:0,        received:0,    owner:'p_kathleen', contact:'Maria L.',        campaign:'Member Events',     followup:daysFromToday(3),  renewal_month:null, grant_deadline:null, note:'Coffee on us @ Summit; partnerships team interested.' },
+  { id:'spn_11', name:'JP Morgan Climate',          type:'corporate',  entity:'501c3', stage:'declined',    priority:'low',  ask:5000000,  commit:0,        received:0,    owner:'p_karin',    contact:'Reed P.',         campaign:'FY26 Annual Fund',  followup:null,             renewal_month:null, grant_deadline:null, note:'Passed FY26; revisit FY27.' },
+  { id:'spn_12', name:'Anonymous Individual',       type:'individual', entity:'501c3', stage:'received',    priority:'high', ask:2500000,  commit:2500000, received:2500000, owner:'p_karin', contact:null,              campaign:'FY26 Annual Fund',  followup:daysFromToday(90), renewal_month:11, grant_deadline:null, note:'Major donor — anonymous gift.' },
+  { id:'spn_13', name:'Convene Seattle (Venue)',    type:'in_kind',    entity:'501c6', stage:'committed',   priority:'medium',ask:800000,  commit:800000,   received:0,    owner:'p_kathleen', contact:'Jen R.',          campaign:'Member Events',     followup:daysFromToday(14), renewal_month:null, grant_deadline:null, note:'Donating Summit venue space.' },
+  { id:'spn_14', name:'Russell Family Foundation',  type:'foundation', entity:'501c3', stage:'proposal',    priority:'medium',ask:3500000, commit:0,        received:0,    owner:'p_lee',      contact:'Erika R.',        campaign:'Fellowship Program',followup:daysFromToday(8),  renewal_month:null, grant_deadline:daysFromToday(12), note:'Application submitted; decision late June.' },
+  { id:'spn_15', name:'Patagonia',                  type:'corporate',  entity:'501c3', stage:'outreach',    priority:'medium',ask:1500000, commit:0,        received:0,    owner:'p_jordan',   contact:'Cara D.',         campaign:'FY26 Annual Fund',  followup:daysFromToday(6),  renewal_month:null, grant_deadline:null, note:'Recently funded similar nonprofits.' },
+];
+
+// ============== STATE ==============
+let entityFilter = 'all';
+let viewMode = 'kanban';
+
+// ============== RENDER ==============
+function filteredSponsors() {
+  return SPONSORS.filter(s => {
+    if (entityFilter === 'all') return true;
+    return s.entity === entityFilter || s.entity === 'both';
+  });
+}
+
+function renderKPIs() {
+  const items = filteredSponsors();
+  const received = items.filter(s => s.stage === 'received').reduce((a,s) => a + (s.received||0), 0);
+  const goal = entityFilter === '501c6' ? 5000000_00 : entityFilter === '501c3' ? 6000000_00 : 11000000_00;
+  const pipeline = items.filter(s => ['outreach','conversation','proposal','committed'].includes(s.stage)).reduce((a,s) => a + (s.ask||0), 0);
+  const active = items.filter(s => ['outreach','conversation','proposal'].includes(s.stage)).length;
+  const overdue = items.filter(s => s.followup && s.followup < isoDate(TODAY) && s.stage !== 'received' && s.stage !== 'declined').length;
+  const gifts = items.filter(s => s.stage === 'received');
+  const avg = gifts.length ? Math.round(gifts.reduce((a,s)=>a+(s.received||0),0) / gifts.length) : 0;
+  document.getElementById('kpiRaised').textContent = fmtMoney(received, {compact:true});
+  document.getElementById('kpiGoal').textContent = fmtMoney(goal, {compact:true});
+  document.getElementById('kpiPct').textContent = Math.round((received/goal)*100) + '%';
+  document.getElementById('kpiBar').style.width = Math.min(100, Math.round((received/goal)*100)) + '%';
+  document.getElementById('kpiPipeline').textContent = fmtMoney(pipeline, {compact:true});
+  document.getElementById('kpiActive').textContent = active;
+  document.getElementById('kpiOverdue').textContent = overdue;
+  document.getElementById('kpiAvg').textContent = fmtMoney(avg, {compact:true});
+  document.getElementById('kpiAvgN').textContent = gifts.length;
+  const banner = document.getElementById('overdueBanner');
+  if (overdue > 0) { banner.classList.remove('hidden'); banner.classList.add('flex'); document.getElementById('overdueCount').textContent = overdue; }
+  else { banner.classList.add('hidden'); banner.classList.remove('flex'); }
+}
+
+function renderSidebar() {
+  const items = filteredSponsors();
+  const typeFilter = document.getElementById('typeFilter');
+  typeFilter.innerHTML = TYPES.map(t => {
+    const n = items.filter(s => s.type === t.id).length;
+    return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
+      <input type="checkbox" class="rounded" />
+      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${t.cls}">${t.label}</span>
+      <span class="ml-auto text-[11px] text-slate-400">${n}</span>
+    </label></li>`;
+  }).join('');
+  const stageFilter = document.getElementById('stageFilter');
+  stageFilter.innerHTML = STAGES.map(st => {
+    const n = items.filter(s => s.stage === st.id).length;
+    return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
+      <input type="checkbox" class="rounded" />
+      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${st.cls}">${st.n} — ${st.label}</span>
+      <span class="ml-auto text-[11px] text-slate-400">${n}</span>
+    </label></li>`;
+  }).join('');
+  const ownerFilter = document.getElementById('ownerFilter');
+  ownerFilter.innerHTML = STAFF.map(o => {
+    const n = items.filter(s => s.owner === o.id).length;
+    return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
+      <input type="checkbox" class="rounded" />
+      <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center font-semibold">${o.initials}</span>
+      <span>${o.name}</span>
+      <span class="ml-auto text-[11px] text-slate-400">${n}</span>
+    </label></li>`;
+  }).join('');
+}
+
+function staffById(id) { return STAFF.find(s => s.id === id) || {initials:'?', name:'?'}; }
+function typeById(id) { return TYPES.find(t => t.id === id) || {label:id, cls:''}; }
+function stageById(id) { return STAGES.find(s => s.id === id) || {label:id, cls:'', n:'?'}; }
+function entityChip(entity) {
+  if (entity === '501c6') return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium entity-c6">c6</span>`;
+  if (entity === '501c3') return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium entity-c3">c3</span>`;
+  return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium entity-both">both</span>`;
+}
+function fmtDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso + 'T12:00:00');
+  return d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+}
+function followupBadge(iso) {
+  if (!iso) return '<span class="text-[10px] text-slate-400">no follow-up</span>';
+  const today = isoDate(TODAY);
+  if (iso < today) return `<span class="text-[10px] font-medium text-red-700 bg-red-100 px-1 py-0.5 rounded">Overdue · ${fmtDate(iso)}</span>`;
+  const due = new Date(iso + 'T12:00:00');
+  const days = Math.round((due - TODAY) / 86400000);
+  if (days <= 7) return `<span class="text-[10px] font-medium text-amber-700 bg-amber-100 px-1 py-0.5 rounded">Due ${fmtDate(iso)}</span>`;
+  return `<span class="text-[10px] text-slate-500">→ ${fmtDate(iso)}</span>`;
+}
+
+function renderKanban() {
+  const items = filteredSponsors();
+  const board = document.getElementById('kanbanBoard');
+  board.innerHTML = STAGES.map(st => {
+    const stageItems = items.filter(s => s.stage === st.id);
+    const askTotal = stageItems.reduce((a,s) => a + (s.ask||0), 0);
+    return `<div class="kanban-col bg-white border border-slate-200 rounded-md flex flex-col h-full" data-stage="${st.id}">
+      <div class="px-3 py-2 border-b border-slate-200 flex items-center gap-2">
+        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${st.cls}">${st.n} — ${st.label}</span>
+        <span class="text-[11px] text-slate-400 ml-auto">${stageItems.length} · ${fmtMoney(askTotal,{compact:true})}</span>
+      </div>
+      <div class="flex-1 overflow-y-auto scroll-thin p-2 space-y-2 bg-slate-50">
+        ${stageItems.map(s => `
+          <div class="card-drag bg-white border border-slate-200 rounded p-2 hover:border-blue-400 hover:shadow-sm" draggable="true">
+            <div class="flex items-start gap-1.5">
+              <a href="sponsor-crm-sponsor-detail.html" class="text-[13px] font-medium leading-tight hover:underline truncate flex-1">${s.name}</a>
+              ${entityChip(s.entity)}
+            </div>
+            <div class="flex items-center gap-1.5 mt-1">
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${typeById(s.type).cls}">${typeById(s.type).label}</span>
+              ${s.priority === 'high' ? '<svg class="w-3 h-3 text-red-600" viewBox="0 0 20 20" fill="currentColor"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/></svg>' : ''}
+            </div>
+            <div class="text-[11px] text-slate-600 mt-1 flex items-center gap-1.5">
+              <span class="font-semibold">${fmtMoney(s.ask, {compact:true})}</span>
+              <span class="text-slate-400">ask</span>
+              ${s.contact ? `<span class="text-slate-400 ml-auto truncate max-w-[80px]">${s.contact}</span>` : ''}
+            </div>
+            <div class="flex items-center gap-1.5 mt-1.5">
+              <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center font-semibold" title="${staffById(s.owner).name}">${staffById(s.owner).initials}</span>
+              ${followupBadge(s.followup)}
+            </div>
+          </div>`).join('')}
+        ${stageItems.length === 0 ? '<div class="text-[11px] text-slate-400 text-center py-4">No sponsors</div>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderList() {
+  const items = filteredSponsors();
+  const tbody = document.getElementById('listBody');
+  tbody.innerHTML = items.map(s => `
+    <tr class="border-b border-slate-100 hover:bg-slate-50 cursor-pointer">
+      <td class="px-3 py-2"><a href="sponsor-crm-sponsor-detail.html" class="font-medium hover:underline">${s.name}</a></td>
+      <td class="px-3 py-2"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${typeById(s.type).cls}">${typeById(s.type).label}</span></td>
+      <td class="px-3 py-2">${entityChip(s.entity)}</td>
+      <td class="px-3 py-2"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${stageById(s.stage).cls}">${stageById(s.stage).n}—${stageById(s.stage).label}</span></td>
+      <td class="px-3 py-2 text-right tabular-nums">${fmtMoney(s.ask,{compact:true})}</td>
+      <td class="px-3 py-2 text-right tabular-nums">${s.received ? fmtMoney(s.received,{compact:true}) : '<span class="text-slate-400">—</span>'}</td>
+      <td class="px-3 py-2"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] inline-flex items-center justify-center font-semibold" title="${staffById(s.owner).name}">${staffById(s.owner).initials}</span></td>
+      <td class="px-3 py-2">${followupBadge(s.followup)}</td>
+    </tr>`).join('');
+  document.getElementById('resultCount').textContent = items.length + ' sponsors';
+}
+
+function renderGrants() {
+  const items = filteredSponsors().filter(s => s.grant_deadline).sort((a,b) => a.grant_deadline.localeCompare(b.grant_deadline));
+  const list = document.getElementById('grantList');
+  list.innerHTML = items.map(s => `
+    <a href="sponsor-crm-sponsor-detail.html" class="block bg-white border border-slate-200 rounded p-3 hover:border-blue-400 hover:shadow-sm">
+      <div class="flex items-start gap-3">
+        <div class="text-center w-12 shrink-0">
+          <div class="text-[10px] uppercase text-slate-500">${new Date(s.grant_deadline+'T12:00:00').toLocaleDateString('en-US',{month:'short'})}</div>
+          <div class="text-xl font-semibold">${new Date(s.grant_deadline+'T12:00:00').getDate()}</div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-medium flex items-center gap-2 truncate">${s.name} ${entityChip(s.entity)}</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">${typeById(s.type).label} · Ask ${fmtMoney(s.ask,{compact:true})} · Stage ${stageById(s.stage).label}</div>
+          <div class="text-[11px] text-slate-600 mt-1 truncate">${s.note||''}</div>
+        </div>
+        <div class="text-right">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] inline-flex items-center justify-center font-semibold">${staffById(s.owner).initials}</span>
+        </div>
+      </div>
+    </a>`).join('') || '<div class="text-xs text-slate-500">No upcoming deadlines.</div>';
+}
+
+function renderAll() {
+  renderKPIs();
+  renderSidebar();
+  renderKanban();
+  renderList();
+  renderGrants();
+  document.getElementById('resultCount').textContent = filteredSponsors().length + ' sponsors';
+}
+
+// Entity toggle
+document.querySelectorAll('.entity-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    entityFilter = btn.dataset.entity;
+    document.querySelectorAll('.entity-btn').forEach(b => {
+      b.classList.remove('bg-white','shadow-sm');
+      b.classList.add('text-slate-600','hover:bg-white');
+    });
+    btn.classList.add('bg-white','shadow-sm');
+    btn.classList.remove('text-slate-600','hover:bg-white');
+    renderAll();
+  });
+});
+
+// View mode toggle
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    viewMode = btn.dataset.mode;
+    document.querySelectorAll('.mode-btn').forEach(b => {
+      b.classList.remove('bg-white','shadow-sm');
+      b.classList.add('text-slate-600','hover:bg-white');
+    });
+    btn.classList.add('bg-white','shadow-sm');
+    btn.classList.remove('text-slate-600','hover:bg-white');
+    document.getElementById('kanbanView').classList.toggle('hidden', viewMode !== 'kanban');
+    document.getElementById('listView').classList.toggle('hidden', viewMode !== 'list');
+    document.getElementById('grantsView').classList.toggle('hidden', viewMode !== 'grants');
+  });
+});
+
+renderAll();
+</script>
+
+</body>
+</html>

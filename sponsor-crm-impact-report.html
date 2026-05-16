@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>E8 · FY26 Impact Report — Sample</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .page {
+    background: white; max-width: 8.5in; margin: 24px auto; padding: 0.6in 0.7in;
+    box-shadow: 0 2px 12px rgba(15,23,42,.08); border: 1px solid #e2e8f0;
+    color: #0f172a;
+  }
+  h1, h2, h3 { font-weight: 600; }
+  .kpi-card { border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px 14px; }
+  .bar { height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+  .bar > div { height: 100%; }
+  .pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 500; }
+  .pill-c6 { background:#dbeafe; color:#1e40af; }
+  .pill-c3 { background:#e9d5ff; color:#6b21a8; }
+  .doc-actions { max-width: 8.5in; margin: 14px auto 0; padding: 0 0.7in; display: flex; gap: 8px; }
+  .stat-large { font-size: 28px; font-weight: 600; line-height: 1.1; }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: #64748b; }
+  @media print {
+    body { background: white !important; }
+    .doc-actions, .no-print { display: none !important; }
+    .page { box-shadow: none; border: 0; margin: 0; }
+  }
+  @media (max-width: 640px) {
+    .page { padding: 20px; margin: 8px; }
+  }
+</style>
+</head>
+<body class="bg-slate-100 text-slate-900 text-sm">
+
+<!-- Toolbar (visible on screen, hidden in print) -->
+<div class="doc-actions no-print">
+  <div class="bg-amber-50 border border-amber-200 rounded px-3 py-1.5 text-[11px] text-amber-900 flex-1">
+    Sample preview · v1.5 deliverable · shareable with sponsors and the board. Print-to-PDF supported.
+  </div>
+  <button onclick="window.print()" class="h-8 px-3 text-xs font-medium border border-slate-300 bg-white hover:bg-slate-50 rounded">Print / Save as PDF</button>
+  <button class="h-8 px-3 text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white rounded">Export PDF</button>
+</div>
+
+<!-- =================== PAGE 1: Cover / KPIs =================== -->
+<article class="page">
+  <header class="border-b border-slate-200 pb-4 mb-5 flex items-start gap-4">
+    <div class="flex-1">
+      <div class="text-[11px] uppercase tracking-wider text-slate-500">FY 2026 · Mid-year</div>
+      <h1 class="text-[28px] leading-tight mt-1">E8 Angels &amp; E8 Impact</h1>
+      <div class="text-base text-slate-600 mt-1">Fundraising and impact snapshot · for sponsors, prospects, and board members</div>
+    </div>
+    <div class="text-right text-[11px] text-slate-500">
+      <div>Prepared May 16, 2026</div>
+      <div class="mt-1">e8angels.org</div>
+    </div>
+  </header>
+
+  <section class="grid grid-cols-3 gap-3 mb-6">
+    <div class="kpi-card">
+      <div class="stat-label">Raised year-to-date</div>
+      <div class="stat-large mt-1">$152,500</div>
+      <div class="bar mt-2"><div style="width:14%; background:#10b981"></div></div>
+      <div class="text-[11px] text-slate-500 mt-1.5">14% of $1.1M FY26 combined goal</div>
+    </div>
+    <div class="kpi-card">
+      <div class="stat-label">Active pipeline</div>
+      <div class="stat-large mt-1">$598,000</div>
+      <div class="text-[11px] text-slate-500 mt-2">9 active prospects across both entities</div>
+    </div>
+    <div class="kpi-card">
+      <div class="stat-label">Sponsors &amp; donors</div>
+      <div class="stat-large mt-1">14</div>
+      <div class="text-[11px] text-slate-500 mt-2">Corporates, foundations, individuals, in-kind</div>
+    </div>
+  </section>
+
+  <section class="grid grid-cols-2 gap-5">
+    <div>
+      <h2 class="text-base mb-2">Who supports our work</h2>
+      <p class="text-[13px] text-slate-700 leading-relaxed">
+        E8 Angels is a member-driven angel investing community accelerating climate-tech entrepreneurship. E8 Impact, our newly formed 501(c)(3), extends that work into education, fellowship, and ecosystem programs that are accessible to founders regardless of investor relationships.
+      </p>
+      <p class="text-[13px] text-slate-700 leading-relaxed mt-2">
+        Our supporters fund three programs: the <strong>Annual Fund</strong> (operations &amp; member services, 501c6), the <strong>Fellowship Program</strong> (early-stage founders, 501c3), and <strong>Member Events</strong> (Summit and quarterly gatherings, both entities).
+      </p>
+    </div>
+    <div>
+      <h2 class="text-base mb-2">Two entities, one mission</h2>
+      <div class="bg-slate-50 border border-slate-200 rounded p-3 text-[13px] leading-relaxed">
+        <div class="flex items-start gap-2">
+          <span class="pill pill-c6 mt-0.5 shrink-0">E8 Angels · 501c6</span>
+          <div class="text-slate-700"><strong>Mission:</strong> deploy member capital to climate startups; build the community that surrounds them.</div>
+        </div>
+        <div class="flex items-start gap-2 mt-3">
+          <span class="pill pill-c3 mt-0.5 shrink-0">E8 Impact · 501c3</span>
+          <div class="text-slate-700"><strong>Mission:</strong> fund and run programs that strengthen the climate-tech ecosystem — independent of investor membership.</div>
+        </div>
+        <div class="text-[11px] text-slate-500 mt-3">Gifts are routed to the entity that matches your tax preference and the program you're supporting.</div>
+      </div>
+    </div>
+  </section>
+</article>
+
+<!-- =================== PAGE 2: Goals by entity & program =================== -->
+<article class="page">
+  <h2 class="text-base mb-3">FY26 goal &amp; progress · by entity and program</h2>
+
+  <div class="grid grid-cols-2 gap-4 mb-5">
+    <div class="border border-slate-200 rounded p-4">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="pill pill-c6">E8 Angels · 501c6</span>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <div class="flex justify-between text-[12px]"><span>Annual Fund</span><span class="font-medium">$32k / $400k</span></div>
+          <div class="bar mt-1"><div style="width:8%; background:#3b82f6"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-[12px]"><span>Member Events</span><span class="font-medium">$23k / $100k</span></div>
+          <div class="bar mt-1"><div style="width:23%; background:#3b82f6"></div></div>
+        </div>
+        <div class="border-t border-slate-200 pt-3">
+          <div class="flex justify-between text-[12px]"><span class="font-semibold">501c6 total</span><span class="font-semibold">$55k / $500k</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="border border-slate-200 rounded p-4">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="pill pill-c3">E8 Impact · 501c3</span>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <div class="flex justify-between text-[12px]"><span>Annual Fund</span><span class="font-medium">$100k / $300k</span></div>
+          <div class="bar mt-1"><div style="width:33%; background:#a855f7"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-[12px]"><span>Fellowship Program</span><span class="font-medium">$0 / $300k</span></div>
+          <div class="bar mt-1"><div style="width:0%; background:#a855f7"></div></div>
+        </div>
+        <div class="border-t border-slate-200 pt-3">
+          <div class="flex justify-between text-[12px]"><span class="font-semibold">501c3 total</span><span class="font-semibold">$100k / $600k</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="text-sm mb-2 mt-6">Pipeline composition</h3>
+  <div class="border border-slate-200 rounded overflow-hidden text-[12px]">
+    <table class="w-full">
+      <thead class="bg-slate-50">
+        <tr class="text-left text-[10px] uppercase tracking-wider text-slate-500">
+          <th class="px-3 py-2 font-semibold">Stage</th>
+          <th class="px-3 py-2 font-semibold text-right">Sponsors</th>
+          <th class="px-3 py-2 font-semibold text-right">501c6 ask</th>
+          <th class="px-3 py-2 font-semibold text-right">501c3 ask</th>
+          <th class="px-3 py-2 font-semibold text-right">Total ask</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <tr><td class="px-3 py-1.5">2 — Outreach</td><td class="px-3 py-1.5 text-right">2</td><td class="px-3 py-1.5 text-right">—</td><td class="px-3 py-1.5 text-right">$265k</td><td class="px-3 py-1.5 text-right font-medium">$265k</td></tr>
+        <tr><td class="px-3 py-1.5">3 — Conversation</td><td class="px-3 py-1.5 text-right">3</td><td class="px-3 py-1.5 text-right">$10k</td><td class="px-3 py-1.5 text-right">$120k</td><td class="px-3 py-1.5 text-right font-medium">$130k</td></tr>
+        <tr><td class="px-3 py-1.5">4 — Proposal</td><td class="px-3 py-1.5 text-right">3</td><td class="px-3 py-1.5 text-right">$25k</td><td class="px-3 py-1.5 text-right">$65k</td><td class="px-3 py-1.5 text-right font-medium">$90k</td></tr>
+        <tr><td class="px-3 py-1.5">5 — Committed</td><td class="px-3 py-1.5 text-right">3</td><td class="px-3 py-1.5 text-right">$23k</td><td class="px-3 py-1.5 text-right">$50k</td><td class="px-3 py-1.5 text-right font-medium">$73k</td></tr>
+        <tr><td class="px-3 py-1.5">6 — Received</td><td class="px-3 py-1.5 text-right">3</td><td class="px-3 py-1.5 text-right">$22k</td><td class="px-3 py-1.5 text-right">$100k</td><td class="px-3 py-1.5 text-right font-medium">$122k</td></tr>
+        <tr class="bg-slate-50 font-semibold"><td class="px-3 py-2">Total</td><td class="px-3 py-2 text-right">14</td><td class="px-3 py-2 text-right">$80k</td><td class="px-3 py-2 text-right">$600k</td><td class="px-3 py-2 text-right">$680k</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="text-[11px] text-slate-500 mt-3">Sample data shown. In production, this view auto-generates from the current pipeline and respects sponsor-confidentiality preferences (anonymous donors aggregated only).</p>
+</article>
+
+<!-- =================== PAGE 3: Impact stats + leadership =================== -->
+<article class="page">
+  <h2 class="text-base mb-3">What we've built together</h2>
+  <p class="text-[13px] text-slate-700 leading-relaxed mb-4">
+    Sponsor and donor support keeps E8's flywheel turning. The figures below are pulled directly from the E8 portal — they're the same numbers the membership sees on their dashboards, refreshed each time this report is generated.
+  </p>
+
+  <section class="grid grid-cols-4 gap-3 mb-6">
+    <div class="kpi-card text-center">
+      <div class="stat-label">Active members</div>
+      <div class="stat-large mt-1">187</div>
+    </div>
+    <div class="kpi-card text-center">
+      <div class="stat-label">Cumulative deployed</div>
+      <div class="stat-large mt-1">$42M</div>
+    </div>
+    <div class="kpi-card text-center">
+      <div class="stat-label">Portfolio companies</div>
+      <div class="stat-large mt-1">68</div>
+    </div>
+    <div class="kpi-card text-center">
+      <div class="stat-label">Fellows since 2023</div>
+      <div class="stat-large mt-1">24</div>
+    </div>
+  </section>
+
+  <h3 class="text-sm mb-2">FY26 highlights</h3>
+  <ul class="text-[13px] text-slate-700 leading-relaxed space-y-2 mb-6">
+    <li class="flex items-start gap-2"><span class="text-emerald-600 mt-0.5">●</span><span>Closed the Spring cohort with 8 portfolio companies onboarded, raising a combined $11.2M in follow-on capital from outside investors.</span></li>
+    <li class="flex items-start gap-2"><span class="text-emerald-600 mt-0.5">●</span><span>Stood up the E8 Impact 501(c)(3) — already accepting tax-deductible gifts for the Fellowship Program.</span></li>
+    <li class="flex items-start gap-2"><span class="text-emerald-600 mt-0.5">●</span><span>Hosted our annual Summit with 320 attendees, underwritten by founding sponsor Microsoft AI for Good.</span></li>
+    <li class="flex items-start gap-2"><span class="text-emerald-600 mt-0.5">●</span><span>Expanded our screening committee with 14 new members; processed 312 applications year-to-date.</span></li>
+  </ul>
+
+  <h3 class="text-sm mb-2">Founding &amp; renewing sponsors · FY26</h3>
+  <div class="grid grid-cols-3 gap-2 text-[12px] mb-6">
+    <div class="border border-slate-200 rounded px-3 py-2"><div class="font-medium">Microsoft AI for Good</div><div class="text-[10px] text-slate-500">Annual Fund · 501c3</div></div>
+    <div class="border border-slate-200 rounded px-3 py-2"><div class="font-medium">Bullitt Foundation</div><div class="text-[10px] text-slate-500">Annual Fund · 501c3</div></div>
+    <div class="border border-slate-200 rounded px-3 py-2"><div class="font-medium">Stoel Rives LLP</div><div class="text-[10px] text-slate-500">Member Events · 501c6</div></div>
+    <div class="border border-slate-200 rounded px-3 py-2"><div class="font-medium">Anonymous Individual</div><div class="text-[10px] text-slate-500">Annual Fund · 501c3</div></div>
+    <div class="border border-slate-200 rounded px-3 py-2"><div class="font-medium">Convene Seattle</div><div class="text-[10px] text-slate-500">In-kind · 501c6</div></div>
+    <div class="border border-slate-200 rounded px-3 py-2 text-slate-400 italic">+ 9 more in pipeline</div>
+  </div>
+
+  <section class="border-t border-slate-200 pt-4 mt-6">
+    <h3 class="text-sm mb-2">Get involved</h3>
+    <div class="grid grid-cols-3 gap-4 text-[12px]">
+      <div>
+        <div class="font-medium">Make a gift</div>
+        <p class="text-slate-600 mt-1">Both entities accept gifts; your tax preference and the program choose the entity. Contact Karin to discuss multi-year commitments.</p>
+      </div>
+      <div>
+        <div class="font-medium">Underwrite an event</div>
+        <p class="text-slate-600 mt-1">Summit and quarterly gatherings are sponsorship-driven; in-kind and cash both welcome.</p>
+      </div>
+      <div>
+        <div class="font-medium">Connect us</div>
+        <p class="text-slate-600 mt-1">Board members and members can warm-intro us to foundations and corporate funders. Logging an introduction in the portal kicks off a follow-up within 48 hours.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-slate-200 mt-6 pt-3 text-[10px] text-slate-500 flex items-center gap-3">
+    <div>Karin Kidder · karin@e8angels.com</div>
+    <div class="ml-auto">FY26 Impact Report · Generated 2026-05-16 · v1.5 mockup</div>
+  </footer>
+</article>
+
+</body>
+</html>

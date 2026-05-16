@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sponsor CRM — Sponsor detail</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scroll-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  .stage-prospect    { background:#f1f5f9; color:#475569; }
+  .stage-outreach    { background:#fef3c7; color:#a16207; }
+  .stage-conversation{ background:#fed7aa; color:#9a3412; }
+  .stage-proposal    { background:#bfdbfe; color:#1d4ed8; }
+  .stage-committed   { background:#c7d2fe; color:#4338ca; }
+  .stage-received    { background:#bbf7d0; color:#065f46; }
+  .stage-declined    { background:#fee2e2; color:#b91c1c; }
+  .entity-c6 { background:#dbeafe; color:#1e40af; }
+  .entity-c3 { background:#e9d5ff; color:#6b21a8; }
+  .entity-both { background:#fef3c7; color:#92400e; }
+  .type-corporate { background:#e0e7ff; color:#3730a3; }
+  .timeline-dot::before {
+    content:''; position:absolute; left:-19px; top:6px; width:9px; height:9px;
+    border-radius:50%; background:#cbd5e1; border:2px solid white; box-shadow:0 0 0 1px #cbd5e1;
+  }
+  .timeline-dot.timeline-gift::before { background:#10b981; box-shadow:0 0 0 1px #10b981; }
+  .timeline-dot.timeline-stage::before { background:#3b82f6; box-shadow:0 0 0 1px #3b82f6; }
+  .timeline-dot.timeline-board::before { background:#a855f7; box-shadow:0 0 0 1px #a855f7; }
+  .timeline-line { border-left: 2px solid #e2e8f0; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 text-sm">
+
+<!-- HEADER -->
+<header class="bg-white border-b border-slate-200 px-4 py-2 flex items-center gap-3 sticky top-0 z-30">
+  <a href="sponsor-crm-staff-dashboard.html" class="text-slate-500 hover:text-slate-900 flex items-center gap-1 text-xs">
+    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
+    <span class="hidden sm:inline">All sponsors</span>
+  </a>
+  <div class="font-semibold tracking-tight">E8 · <span class="text-slate-500 font-normal">Sponsor</span></div>
+  <div class="ml-auto flex items-center gap-2">
+    <button class="h-7 px-2.5 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded hidden sm:inline-block">Send email</button>
+    <button class="h-7 px-2.5 text-xs bg-slate-100 hover:bg-slate-200 rounded text-slate-600">Archive</button>
+    <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 text-xs flex items-center justify-center font-semibold">KK</div>
+  </div>
+</header>
+
+<!-- TITLE / SUMMARY -->
+<section class="bg-white border-b border-slate-200 px-4 py-4">
+  <div class="max-w-5xl mx-auto">
+    <div class="flex items-start gap-3 flex-wrap">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 flex-wrap">
+          <h1 class="text-xl md:text-2xl font-semibold truncate">Walton Family Foundation</h1>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium type-corporate">Foundation</span>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium entity-c3">E8 Impact · 501c3</span>
+          <span class="inline-flex items-center text-[11px] text-red-600 font-medium" title="High priority">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/></svg>
+            High
+          </span>
+        </div>
+        <div class="text-xs text-slate-500 mt-1">Fellowship Program · Owners: <strong>Jordan S.</strong>, Karin K. · Source: Warm intro (GreenBiz)</div>
+      </div>
+
+      <!-- Stage stepper / advance -->
+      <div class="flex items-center gap-2">
+        <div class="text-[11px] uppercase tracking-wide text-slate-500 mr-1">Stage</div>
+        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium stage-conversation">3 — Conversation</span>
+        <button class="h-7 px-2 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded flex items-center gap-1">
+          Advance
+          <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Follow-up banner -->
+    <div class="mt-3 bg-amber-50 border border-amber-200 rounded p-2.5 flex items-center gap-3 text-xs">
+      <svg class="w-4 h-4 text-amber-700 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .2.08.4.22.53l3 3a.75.75 0 101.06-1.06l-2.78-2.78V5z" clip-rule="evenodd"/></svg>
+      <div class="flex-1">
+        <strong>Follow-up due May 26</strong> (10 days) — <span class="text-slate-700">Send outcomes data + 3-year fellowship roadmap to Taylor.</span>
+      </div>
+      <button class="h-6 px-2 text-[11px] border border-amber-300 bg-white hover:bg-amber-50 rounded">Mark done</button>
+      <button class="h-6 px-2 text-[11px] border border-amber-300 bg-white hover:bg-amber-50 rounded">Edit</button>
+    </div>
+  </div>
+</section>
+
+<!-- TABS -->
+<nav class="bg-white border-b border-slate-200 px-4 sticky top-[44px] z-20">
+  <div class="max-w-5xl mx-auto flex items-center gap-1 overflow-x-auto">
+    <button data-tab="overview" class="tab-btn px-3 py-2 text-xs font-medium border-b-2 border-blue-600 text-blue-700 whitespace-nowrap">Overview</button>
+    <button data-tab="activity" class="tab-btn px-3 py-2 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">Activity <span class="text-slate-400">8</span></button>
+    <button data-tab="contacts" class="tab-btn px-3 py-2 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">Contacts <span class="text-slate-400">2</span></button>
+    <button data-tab="amounts"  class="tab-btn px-3 py-2 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">Money</button>
+    <button data-tab="attachments" class="tab-btn px-3 py-2 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">Attachments <span class="text-slate-400">3</span></button>
+  </div>
+</nav>
+
+<!-- TAB PANELS -->
+<main class="max-w-5xl mx-auto px-3 md:px-4 py-4">
+
+  <!-- OVERVIEW -->
+  <section id="tab-overview" class="tab-panel grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- Key facts -->
+    <div class="lg:col-span-2 bg-white border border-slate-200 rounded p-4">
+      <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-3">Key facts</div>
+      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+        <div>
+          <dt class="text-[11px] text-slate-500">Sponsor type</dt>
+          <dd class="text-[13px]">Foundation</dd>
+        </div>
+        <div>
+          <dt class="text-[11px] text-slate-500">Entity</dt>
+          <dd class="text-[13px]">E8 Impact (501c3)</dd>
+        </div>
+        <div>
+          <dt class="text-[11px] text-slate-500">Campaign / program</dt>
+          <dd class="text-[13px]">Fellowship Program</dd>
+        </div>
+        <div>
+          <dt class="text-[11px] text-slate-500">Source / how we know them</dt>
+          <dd class="text-[13px]">Warm intro at GreenBiz 2026</dd>
+        </div>
+        <div>
+          <dt class="text-[11px] text-slate-500">Ask amount</dt>
+          <dd class="text-[13px] font-semibold">$100,000</dd>
+        </div>
+        <div>
+          <dt class="text-[11px] text-slate-500">Committed</dt>
+          <dd class="text-[13px] text-slate-400">— not yet</dd>
+        </div>
+        <div>
+          <dt class="text-[11px] text-slate-500">Received</dt>
+          <dd class="text-[13px] text-slate-400">—</dd>
+        </div>
+        <div>
+          <dt class="text-[11px] text-slate-500">Grant deadline</dt>
+          <dd class="text-[13px]">Jul 10, 2026 <span class="text-[10px] text-slate-500 ml-1">(55 days)</span></dd>
+        </div>
+        <div>
+          <dt class="text-[11px] text-slate-500">Priority</dt>
+          <dd class="text-[13px] text-red-600 flex items-center gap-1">
+            <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/></svg>
+            High
+          </dd>
+        </div>
+        <div>
+          <dt class="text-[11px] text-slate-500">Owners</dt>
+          <dd class="text-[13px] flex items-center gap-1.5">
+            <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] inline-flex items-center justify-center font-semibold">JS</span>
+            <span>Jordan S. <span class="text-[10px] text-slate-500">(primary)</span></span>
+            <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] inline-flex items-center justify-center font-semibold">KK</span>
+            <span>Karin K.</span>
+          </dd>
+        </div>
+        <div class="sm:col-span-2">
+          <dt class="text-[11px] text-slate-500">Tags / notes</dt>
+          <dd class="text-[13px] text-slate-700">Climate justice focus area. Multi-year roadmap requested. Prefers single annual gift over installments.</dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Right sidebar: quick actions + upcoming follow-ups -->
+    <div class="space-y-3">
+      <div class="bg-white border border-slate-200 rounded p-3">
+        <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-2">Quick actions</div>
+        <div class="grid grid-cols-2 gap-1.5">
+          <button class="h-8 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded flex items-center justify-center gap-1">+ Note</button>
+          <button class="h-8 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded flex items-center justify-center gap-1">+ Follow-up</button>
+          <button class="h-8 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded flex items-center justify-center gap-1">+ Gift</button>
+          <button class="h-8 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded flex items-center justify-center gap-1">+ Attachment</button>
+        </div>
+      </div>
+      <div class="bg-white border border-slate-200 rounded p-3">
+        <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-2">Upcoming</div>
+        <ul class="text-xs space-y-2">
+          <li class="flex items-start gap-2">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0"></span>
+            <div><strong>May 26</strong> — Send outcomes data <div class="text-[11px] text-slate-500">Jordan S.</div></div>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0"></span>
+            <div><strong>Jul 10</strong> — Grant deadline <div class="text-[11px] text-slate-500">Foundation portal submission</div></div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTIVITY -->
+  <section id="tab-activity" class="tab-panel hidden">
+    <!-- Quick add note -->
+    <div class="bg-white border border-slate-200 rounded p-3 mb-3">
+      <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-2">Log a conversation</div>
+      <div class="grid grid-cols-1 sm:grid-cols-[120px_140px_1fr] gap-2 items-start">
+        <div>
+          <label class="text-[11px] text-slate-500">When</label>
+          <input type="date" value="2026-05-16" class="!w-[150px] block border border-slate-300 rounded px-2 h-8 text-xs" autocomplete="off" data-lpignore="true"/>
+        </div>
+        <div>
+          <label class="text-[11px] text-slate-500">Channel</label>
+          <select class="block w-full border border-slate-300 rounded px-2 h-8 text-xs">
+            <option>Call</option><option>Email</option><option>In-person</option><option>Event</option><option>Text</option><option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-[11px] text-slate-500">Summary</label>
+          <textarea rows="2" autocomplete="off" data-lpignore="true" data-form-type="other" class="block w-full border border-slate-300 rounded px-2 py-1 text-xs" placeholder="What was discussed?"></textarea>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 mt-2">
+        <input type="text" autocomplete="off" data-lpignore="true" data-form-type="other" placeholder="Next step (optional)" class="flex-1 border border-slate-300 rounded px-2 h-8 text-xs"/>
+        <button class="h-8 px-3 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Save note</button>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="bg-white border border-slate-200 rounded p-4">
+      <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-3 flex items-center gap-2">
+        <span>Timeline</span>
+        <div class="ml-auto flex items-center gap-1 text-[11px]">
+          <button class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">All</button>
+          <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Notes</button>
+          <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Stage</button>
+          <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Money</button>
+        </div>
+      </div>
+      <ol class="timeline-line ml-3 pl-5 space-y-4">
+        <li class="timeline-dot relative">
+          <div class="text-[11px] text-slate-500">May 12, 2026 · Jordan S. <span class="text-slate-400">· note</span></div>
+          <div class="text-[13px] mt-0.5">Taylor wants to see fellowship outcomes broken out by cohort year. I'll pull from the portal and send by 5/26.</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">Next: outcomes deck + 3-year roadmap</div>
+          <div class="text-[10px] text-slate-400 mt-1"><a href="#" class="hover:underline">Edit (8 min remaining)</a></div>
+        </li>
+        <li class="timeline-dot timeline-stage relative">
+          <div class="text-[11px] text-slate-500">May 12, 2026 · Jordan S. <span class="text-slate-400">· stage change</span></div>
+          <div class="text-[13px] mt-0.5">Stage <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium stage-outreach">2 — Outreach</span> → <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium stage-conversation">3 — Conversation</span></div>
+        </li>
+        <li class="timeline-dot timeline-board relative">
+          <div class="text-[11px] text-slate-500">May 8, 2026 · Lisa R. (Board) <span class="text-slate-400">· in-person</span></div>
+          <div class="text-[13px] mt-0.5">Sat next to Taylor at the GreenBiz dinner. They've already evaluated three orgs in our space; we made the short list. Pat from Bullitt vouched for us.</div>
+          <div class="text-[10px] text-slate-400 mt-1">Logged by board member · notified Jordan S.</div>
+        </li>
+        <li class="timeline-dot relative">
+          <div class="text-[11px] text-slate-500">May 5, 2026 · Jordan S. <span class="text-slate-400">· email</span></div>
+          <div class="text-[13px] mt-0.5">Sent intro email to Taylor with deck attached. CC'd Karin.</div>
+        </li>
+        <li class="timeline-dot timeline-stage relative">
+          <div class="text-[11px] text-slate-500">May 3, 2026 · Karin K. <span class="text-slate-400">· stage change</span></div>
+          <div class="text-[13px] mt-0.5">Stage <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium stage-prospect">1 — Prospect</span> → <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium stage-outreach">2 — Outreach</span></div>
+          <div class="text-[13px] mt-0.5 text-slate-600">Confirmed warm intro path through Lisa.</div>
+        </li>
+        <li class="timeline-dot relative">
+          <div class="text-[11px] text-slate-500">Apr 28, 2026 · Karin K. <span class="text-slate-400">· note</span></div>
+          <div class="text-[13px] mt-0.5">Added to pipeline. Foundation focus areas are a strong match for the fellowship program.</div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- CONTACTS -->
+  <section id="tab-contacts" class="tab-panel hidden">
+    <div class="bg-white border border-slate-200 rounded">
+      <div class="px-4 py-2 border-b border-slate-200 flex items-center">
+        <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Contacts</div>
+        <button class="ml-auto h-7 px-2.5 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded">+ Add contact</button>
+      </div>
+      <table class="w-full text-[13px]">
+        <thead class="bg-slate-50">
+          <tr class="text-left text-[11px] uppercase tracking-wider text-slate-500">
+            <th class="px-4 py-2 font-semibold">Name</th>
+            <th class="px-4 py-2 font-semibold">Title / role</th>
+            <th class="px-4 py-2 font-semibold">Email</th>
+            <th class="px-4 py-2 font-semibold">Phone</th>
+            <th class="px-4 py-2 font-semibold"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-t border-slate-100">
+            <td class="px-4 py-2"><a href="#" class="hover:underline font-medium">Taylor Brugh</a> <span class="text-[10px] bg-blue-100 text-blue-800 px-1 rounded">Primary</span></td>
+            <td class="px-4 py-2">Program Officer, Climate Justice</td>
+            <td class="px-4 py-2 text-slate-700">taylorbrugh@…</td>
+            <td class="px-4 py-2 text-slate-500">—</td>
+            <td class="px-4 py-2 text-right"><button class="text-xs text-slate-500 hover:text-slate-900">Edit</button></td>
+          </tr>
+          <tr class="border-t border-slate-100">
+            <td class="px-4 py-2"><a href="#" class="hover:underline">Brandon Middaugh</a></td>
+            <td class="px-4 py-2">Director, Strategic Grants</td>
+            <td class="px-4 py-2 text-slate-700">brmidd@…</td>
+            <td class="px-4 py-2 text-slate-500">—</td>
+            <td class="px-4 py-2 text-right"><button class="text-xs text-slate-500 hover:text-slate-900">Edit</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="px-4 py-2 text-[11px] text-slate-500 border-t border-slate-100">Contacts live in the shared people directory; this view links to their full profiles.</div>
+    </div>
+  </section>
+
+  <!-- AMOUNTS -->
+  <section id="tab-amounts" class="tab-panel hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="lg:col-span-2 bg-white border border-slate-200 rounded">
+        <div class="px-4 py-2 border-b border-slate-200 flex items-center">
+          <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Money</div>
+          <button class="ml-auto h-7 px-2.5 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded">+ Entry</button>
+        </div>
+        <table class="w-full text-[13px]">
+          <thead class="bg-slate-50">
+            <tr class="text-left text-[11px] uppercase tracking-wider text-slate-500">
+              <th class="px-4 py-2 font-semibold">Kind</th>
+              <th class="px-4 py-2 font-semibold">Date</th>
+              <th class="px-4 py-2 font-semibold">Campaign</th>
+              <th class="px-4 py-2 font-semibold text-right">Amount</th>
+              <th class="px-4 py-2 font-semibold">Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-t border-slate-100">
+              <td class="px-4 py-2"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700">Ask</span></td>
+              <td class="px-4 py-2 text-slate-700">Apr 28, 2026</td>
+              <td class="px-4 py-2">Fellowship Program</td>
+              <td class="px-4 py-2 text-right font-semibold">$100,000</td>
+              <td class="px-4 py-2 text-slate-700">Stated in proposal draft</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="bg-white border border-slate-200 rounded p-4">
+        <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-2">Summary</div>
+        <dl class="space-y-2 text-[13px]">
+          <div class="flex justify-between"><dt class="text-slate-500">Total ask</dt><dd class="font-semibold">$100,000</dd></div>
+          <div class="flex justify-between"><dt class="text-slate-500">Committed</dt><dd class="text-slate-400">—</dd></div>
+          <div class="flex justify-between"><dt class="text-slate-500">Received YTD</dt><dd class="text-slate-400">—</dd></div>
+          <div class="flex justify-between"><dt class="text-slate-500">Lifetime received</dt><dd class="text-slate-400">—</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ATTACHMENTS -->
+  <section id="tab-attachments" class="tab-panel hidden">
+    <div class="bg-white border border-slate-200 rounded">
+      <div class="px-4 py-2 border-b border-slate-200 flex items-center">
+        <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Attachments</div>
+        <button class="ml-auto h-7 px-2.5 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded">Upload file</button>
+      </div>
+      <ul class="divide-y divide-slate-100">
+        <li class="px-4 py-3 flex items-center gap-3 hover:bg-slate-50">
+          <svg class="w-5 h-5 text-red-500 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h6l4 4v10a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm10 1V2.5L15.5 4H14a1 1 0 01-1-1V2v1z" clip-rule="evenodd"/></svg>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium text-[13px] truncate">E8 Fellowship Program Overview.pdf</div>
+            <div class="text-[11px] text-slate-500">Uploaded May 5 by Jordan S. · 2.4 MB</div>
+          </div>
+          <button class="text-xs text-slate-500 hover:text-slate-900">Download</button>
+        </li>
+        <li class="px-4 py-3 flex items-center gap-3 hover:bg-slate-50">
+          <svg class="w-5 h-5 text-blue-500 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/></svg>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium text-[13px] truncate">Walton LOI draft (red-lined).docx</div>
+            <div class="text-[11px] text-slate-500">Uploaded May 10 by Karin K. · 64 KB</div>
+          </div>
+          <button class="text-xs text-slate-500 hover:text-slate-900">Download</button>
+        </li>
+        <li class="px-4 py-3 flex items-center gap-3 hover:bg-slate-50">
+          <svg class="w-5 h-5 text-emerald-500 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" clip-rule="evenodd"/></svg>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium text-[13px] truncate">Cohort outcomes 2023–2025.xlsx</div>
+            <div class="text-[11px] text-slate-500">Uploaded May 12 by Jordan S. · 187 KB</div>
+          </div>
+          <button class="text-xs text-slate-500 hover:text-slate-900">Download</button>
+        </li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('border-blue-600','text-blue-700');
+      b.classList.add('border-transparent','text-slate-500');
+    });
+    btn.classList.remove('border-transparent','text-slate-500');
+    btn.classList.add('border-blue-600','text-blue-700');
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+    document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+  });
+});
+</script>
+</body>
+</html>
