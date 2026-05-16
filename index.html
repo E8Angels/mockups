@@ -2,50 +2,188 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>E8 · Mockups</title>
+<title>E8 · Feature Plans &amp; Mockups</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; color: #0f172a; line-height: 1.5; }
+  :root {
+    --fg: #0f172a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --bg-hover: #f8fafc;
+    --link: #0369a1;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    max-width: 980px;
+    margin: 36px auto;
+    padding: 0 20px;
+    color: var(--fg);
+    line-height: 1.45;
+  }
   h1 { font-size: 24px; margin: 0 0 4px; }
-  .sub { color: #64748b; margin-bottom: 28px; font-size: 14px; }
-  ul { list-style: none; padding: 0; margin: 0; }
-  li { border-bottom: 1px solid #e2e8f0; }
-  li:first-child { border-top: 1px solid #e2e8f0; }
-  a { display: flex; align-items: baseline; gap: 12px; padding: 10px 4px; color: #0f172a; text-decoration: none; }
-  a:hover { background: #f8fafc; }
-  .name { font-weight: 500; }
-  .file { color: #94a3b8; font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin-left: auto; }
-  .note { background: #fef9c3; border: 1px solid #fde68a; padding: 10px 14px; border-radius: 6px; font-size: 13px; color: #713f12; margin-bottom: 24px; }
+  .sub { color: var(--muted); margin-bottom: 24px; font-size: 14px; }
+  .note {
+    background: #fef9c3;
+    border: 1px solid #fde68a;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #713f12;
+    margin-bottom: 20px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th {
+    background: #f1f5f9;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    position: sticky;
+    top: 0;
+  }
+  tr:hover td { background: var(--bg-hover); }
+  td.title { font-weight: 500; }
+  td.meta  { color: var(--muted); font-size: 13px; white-space: nowrap; }
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .status-draft     { background: #e2e8f0; color: #475569; }
+  .status-in-review { background: #fed7aa; color: #9a3412; }
+  .status-accepted  { background: #bfdbfe; color: #1e40af; }
+  .status-building  { background: #fef08a; color: #854d0e; }
+  .status-shipped   { background: #bbf7d0; color: #166534; }
+  .status-unknown   { background: #f1f5f9; color: #94a3b8; }
+  .mockup-list, .doc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .mockup-list a, .doc-list a { font-size: 13px; }
+  .footer {
+    margin-top: 28px;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: right;
+  }
+  .empty {
+    color: var(--muted);
+    font-style: italic;
+  }
 </style>
 </head>
 <body>
-  <h1>E8 · Mockups</h1>
-  <div class="sub">Static prototypes and design explorations. Click to open.</div>
-  <div class="note">All seed data is fictional. Names, companies, dollar amounts, and dates are placeholders for design review only.</div>
-  <ul id="list"></ul>
+  <h1>E8 · Feature Plans &amp; Mockups</h1>
+  <div class="sub">One row per feature. Plans, mockups, and CHANGELOGs live together in the <a href="https://github.com/E8Angels/mockups">E8Angels/mockups</a> repo. Use the publish-feature-plan skill in Cowork to add or update.</div>
+  <div class="note">All seed data in mockups is fictional. Names, companies, dollar amounts, and dates are placeholders for design review only.</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Owner</th>
+        <th>Updated</th>
+        <th>Mockups</th>
+        <th>Docs</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+  </table>
+  <div class="footer" id="footer"></div>
+
 <script>
-  const FILES = [
-    { f: 'sponsors-prototype.html',                 n: 'Sponsors — CRM prototype' },
-    { f: 'prospects_mockup.html',                   n: 'Prospects' },
-    { f: 'admin-calendar-view.html',                n: 'Admin calendar view' },
-    { f: 'diligence-tab.html',                      n: 'Diligence tab' },
-    { f: 'help-widget.html',                        n: 'Help widget' },
-    { f: 'homepage-nav-v1-v2.html',                 n: 'Homepage nav (v1 vs v2)' },
-    { f: 'homepage-option-1-hero-feed.html',        n: 'Homepage option 1 — hero feed' },
-    { f: 'homepage-option-2-action-dashboard.html', n: 'Homepage option 2 — action dashboard' },
-    { f: 'homepage-option-3-editorial.html',        n: 'Homepage option 3 — editorial' },
-    { f: 'homepage-option-4-you-community.html',    n: 'Homepage option 4 — you + community' },
-    { f: 'investments-redesign.html',               n: 'Investments redesign' },
-    { f: 'recurring-email-manager.html',            n: 'Recurring email manager' },
-    { f: 'tiles-left-sidebar.html',                 n: 'Home tiles — left sidebar' },
-    { f: 'tiles-right-sidebar.html',                n: 'Home tiles — right sidebar' },
-  ];
-  const ul = document.getElementById('list');
-  FILES.sort((a,b)=>a.n.localeCompare(b.n)).forEach(({f,n}) => {
-    const li = document.createElement('li');
-    li.innerHTML = `<a href="${f}"><span class="name">${n}</span><span class="file">${f}</span></a>`;
-    ul.appendChild(li);
+const STATUS_ORDER = ['building', 'in-review', 'accepted', 'draft', 'shipped', 'unknown'];
+const REPO_BLOB = 'https://github.com/E8Angels/mockups/blob/main';
+
+function fmtDate(iso) {
+  if (!iso) return '';
+  // Accept "2026-05-16" or full ISO; show YYYY-MM-DD.
+  return iso.slice(0, 10);
+}
+
+function statusBadge(s) {
+  const cls = `status status-${(s || 'unknown').replace(/[^a-z-]/gi, '').toLowerCase()}`;
+  return `<span class="${cls}">${s || 'unknown'}</span>`;
+}
+
+function mockupLinks(mockups) {
+  if (!mockups || mockups.length === 0) return '<span class="empty">none</span>';
+  return `<div class="mockup-list">${mockups.map(m =>
+    `<a href="${m.path}">${m.name}.html</a>`
+  ).join('')}</div>`;
+}
+
+function docLinks(plan) {
+  const parts = [`<a href="${REPO_BLOB}/${plan.slug}/plan.md">plan</a>`];
+  if (plan.has_changelog) {
+    parts.push(`<a href="${REPO_BLOB}/${plan.slug}/CHANGELOG.md">changelog</a>`);
+  }
+  return `<div class="doc-list">${parts.join('')}</div>`;
+}
+
+function sortPlans(plans) {
+  return plans.slice().sort((a, b) => {
+    const ai = STATUS_ORDER.indexOf(a.status);
+    const bi = STATUS_ORDER.indexOf(b.status);
+    const aRank = ai === -1 ? STATUS_ORDER.length : ai;
+    const bRank = bi === -1 ? STATUS_ORDER.length : bi;
+    if (aRank !== bRank) return aRank - bRank;
+    return a.title.localeCompare(b.title);
   });
+}
+
+async function load() {
+  try {
+    const res = await fetch(`manifest.json?ts=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const manifest = await res.json();
+    const plans = sortPlans(manifest.plans || []);
+    const tbody = document.getElementById('tbody');
+    if (plans.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty">No plans yet.</td></tr>';
+    } else {
+      tbody.innerHTML = plans.map(p => `
+        <tr>
+          <td class="title">${p.title}</td>
+          <td>${statusBadge(p.status)}</td>
+          <td class="meta">${p.owner || ''}</td>
+          <td class="meta">${fmtDate(p.last_changed_at || p.last_updated)}${
+            p.last_changed_by ? `<br><span style="font-size:11px">by ${p.last_changed_by}</span>` : ''
+          }</td>
+          <td>${mockupLinks(p.mockups)}</td>
+          <td>${docLinks(p)}</td>
+        </tr>
+      `).join('');
+    }
+    document.getElementById('footer').textContent =
+      `Generated ${fmtDate(manifest.generated)} · ${plans.length} feature${plans.length === 1 ? '' : 's'}`;
+  } catch (err) {
+    document.getElementById('tbody').innerHTML =
+      `<tr><td colspan="6" class="empty">Failed to load manifest.json (${err.message}). The auto-build workflow may not have run yet.</td></tr>`;
+  }
+}
+
+load();
 </script>
 </body>
 </html>
