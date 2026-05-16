@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-16T20:43:09+00:00",
+  "generated": "2026-05-16T20:49:55+00:00",
   "plans": [
     {
       "slug": "fly-to-vercel-migration",
@@ -9,7 +9,7 @@
       "created": "2026-05-16",
       "last_updated": "2026-05-16",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38+00:00",
+      "last_changed_at": "2026-05-16T20:40:38Z",
       "has_plan": true,
       "has_changelog": true,
       "mockups": []
@@ -22,7 +22,7 @@
       "created": "2026-05-16",
       "last_updated": "2026-05-16",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38+00:00",
+      "last_changed_at": "2026-05-16T20:43:17Z",
       "has_plan": true,
       "has_changelog": true,
       "mockups": []
@@ -35,7 +35,7 @@
       "created": "2026-05-16",
       "last_updated": "2026-05-16",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38+00:00",
+      "last_changed_at": "2026-05-16T20:40:38Z",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
@@ -53,7 +53,7 @@
       "created": "2026-05-16",
       "last_updated": "2026-05-16",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38+00:00",
+      "last_changed_at": "2026-05-16T20:40:38Z",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
@@ -71,7 +71,7 @@
       "created": "2026-05-16",
       "last_updated": "2026-05-16",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38+00:00",
+      "last_changed_at": "2026-05-16T20:40:38Z",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
