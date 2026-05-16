@@ -1,0 +1,101 @@
+{
+  "generated": "2026-05-16T20:43:09+00:00",
+  "plans": [
+    {
+      "slug": "fly-to-vercel-migration",
+      "title": "Fly.io/Turso \u2192 Vercel/Supabase Migration",
+      "status": "draft",
+      "owner": "jordan",
+      "created": "2026-05-16",
+      "last_updated": "2026-05-16",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-05-16T20:40:38+00:00",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": []
+    },
+    {
+      "slug": "membership-dashboard-meetings-cleanup",
+      "title": "Membership Dashboard: Meetings Code Cleanup",
+      "status": "building",
+      "owner": "jordan",
+      "created": "2026-05-16",
+      "last_updated": "2026-05-16",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-05-16T20:40:38+00:00",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": []
+    },
+    {
+      "slug": "per-company-investor-groups",
+      "title": "Per-Company Investor Google Groups",
+      "status": "draft",
+      "owner": "jordan",
+      "created": "2026-05-16",
+      "last_updated": "2026-05-16",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-05-16T20:40:38+00:00",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": [
+        {
+          "name": "mockup",
+          "path": "per-company-investor-groups/mockup.html"
+        }
+      ]
+    },
+    {
+      "slug": "prospects",
+      "title": "Prospects Page",
+      "status": "draft",
+      "owner": "jordan",
+      "created": "2026-05-16",
+      "last_updated": "2026-05-16",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-05-16T20:40:38+00:00",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": [
+        {
+          "name": "mockup",
+          "path": "prospects/mockup.html"
+        }
+      ]
+    },
+    {
+      "slug": "sponsor-crm",
+      "title": "Sponsor CRM",
+      "status": "draft",
+      "owner": "jordan",
+      "created": "2026-05-16",
+      "last_updated": "2026-05-16",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-05-16T20:40:38+00:00",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": [
+        {
+          "name": "board-dashboard",
+          "path": "sponsor-crm/board-dashboard.html"
+        },
+        {
+          "name": "impact-report",
+          "path": "sponsor-crm/impact-report.html"
+        },
+        {
+          "name": "prototype",
+          "path": "sponsor-crm/prototype.html"
+        },
+        {
+          "name": "sponsor-detail",
+          "path": "sponsor-crm/sponsor-detail.html"
+        },
+        {
+          "name": "staff-dashboard",
+          "path": "sponsor-crm/staff-dashboard.html"
+        }
+      ]
+    }
+  ]
+}

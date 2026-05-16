@@ -1,5 +1,5 @@
 ---
-title: Membership Dashboard: Meetings Code Cleanup
+title: "Membership Dashboard: Meetings Code Cleanup"
 status: building
 owner: jordan
 created: 2026-05-16
