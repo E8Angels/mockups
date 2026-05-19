@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Add filter — interactive demo</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .seed-note         { background:#fef9c3; border:1px solid #fde68a; color:#713f12; }
+  .filter-chip       { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
+  .seg-btn           { background:#fff; color:#475569; border:1px solid #e2e8f0; }
+  .seg-btn.on        { background:#1e293b; color:#fff; border-color:#1e293b; }
+  .dd-trigger        { background:#fff; border:1px solid #cbd5e1; }
+  .dd-trigger:hover  { border-color:#94a3b8; }
+  .drag-handle       { color:#cbd5e1; cursor:grab; user-select:none; }
+  .drag-handle:hover { color:#64748b; }
+  .filter-block      { position:relative; }
+  .filter-block:hover .filter-close { opacity:1; }
+  .filter-close      { opacity:0; transition:opacity 0.15s; }
+  .modal-bg          { position:fixed; inset:0; background:rgba(15,23,42,0.4); z-index:50; display:none; align-items:center; justify-content:center; }
+  .modal-bg.open     { display:flex; }
+  .modal             { background:#fff; border-radius:8px; box-shadow:0 16px 48px rgba(0,0,0,0.25); width:680px; max-width:92vw; max-height:84vh; overflow:hidden; display:flex; flex-direction:column; }
+  .field-row         { display:flex; align-items:center; gap:8px; padding:7px 16px; cursor:pointer; }
+  .field-row:hover   { background:#eff6ff; }
+  .field-row.added   { opacity:0.45; cursor:default; background:#f8fafc; }
+  .field-row.added:hover { background:#f8fafc; }
+  .field-row .fr-label { flex:1; font-size:13px; color:#0f172a; }
+  .field-row.added .fr-label { color:#64748b; }
+  .group-label       { font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:#0f172a; font-weight:700; padding:10px 16px 8px; display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; }
+  .group-label:hover { background:#f8fafc; }
+  .group-label .gl-chevron { font-size:9px; color:#64748b; width:10px; display:inline-block; text-align:center; }
+  .group-label .gl-rule  { flex:1; height:1px; background:#e2e8f0; }
+  .group-label .gl-count { font-size:10px; color:#94a3b8; font-weight:600; letter-spacing:0; background:#f1f5f9; padding:1px 6px; border-radius:8px; }
+  .group-label.first { padding-top:8px; }
+  .proposed-tag      { background:#fed7aa; color:#9a3412; font-size:9px; font-weight:600; padding:1px 5px; border-radius:3px; letter-spacing:0.02em; text-transform:uppercase; }
+  .recent-chip       { background:#f1f5f9; color:#334155; border:1px solid #e2e8f0; font-size:11px; padding:3px 8px; border-radius:12px; cursor:pointer; }
+  .recent-chip:hover { background:#e2e8f0; }
+  .dd-panel          { position:absolute; z-index:30; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #cbd5e1; border-radius:6px; box-shadow:0 8px 24px rgba(0,0,0,0.08); display:none; }
+  .dd-panel.open     { display:block; }
+  .pulse-once        { animation: pulse 0.9s ease-out 1; }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(59,130,246,0.6); background:#eff6ff; }
+    100% { box-shadow: 0 0 0 16px rgba(59,130,246,0); background:transparent; }
+  }
+  .step-num { background:#1e293b; color:#fff; width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:600; flex-shrink:0; }
+</style>
+</head>
+<body class="bg-white text-slate-900 text-sm">
+
+<div class="bg-slate-800 text-slate-100 px-4 py-2 text-xs flex items-center gap-3 sticky top-0 z-50">
+  <span class="font-semibold">Mockup v5</span>
+  <span class="text-slate-300">Add filter — interactive click-through</span>
+  <span class="ml-auto"><a class="text-blue-300 hover:underline" href="variant-a-list.html">← List view</a></span>
+  <span><a class="text-blue-300 hover:underline" href="variant-a-groupby.html">Group-by →</a></span>
+  <span><a class="text-blue-300 hover:underline" href="plan.md">plan.md</a></span>
+</div>
+
+<div class="max-w-[1400px] mx-auto px-4 py-4">
+
+  <div class="seed-note rounded-md px-3 py-2 mb-3 text-xs">
+    <span class="font-semibold">v5 changes:</span> Dialog rebuilt from the real fields in <code>lib/admin-grid-config.js</code> — now including the 14 pitch-content long-text fields and the rest of the application columns (Dealum ID, deal terms, lead investor, financial position, use of funds, etc.). Rollups not yet implemented are tagged <span class="proposed-tag">Proposed</span> — see plan §16 for the audit + engineering prerequisites. <b>Domain headings are collapsible</b>; by default only "About the company" is expanded. Typing a search query auto-expands any domain whose fields match. <b>A–Z mode is a flat alphabetical list</b> — no domain or letter headings. "Recent" chip strip lives at the top.<br>
+    <span class="font-semibold">Try it:</span>
+    <span class="step-num ml-1">1</span> Click <b>＋ Add filter</b>.
+    <span class="step-num ml-2">2</span> Click a collapsed domain heading to expand it, or type "pitch" / "deal" / "race" to auto-expand matching domains.
+    <span class="step-num ml-2">3</span> Toggle to A–Z to see the flat list.
+  </div>
+
+  <!-- TITLE -->
+  <div class="flex items-center gap-3 mb-3">
+    <h1 class="text-lg font-semibold">Companies</h1>
+  </div>
+
+  <!-- ACTIVE FILTER CHIPS -->
+  <div class="flex items-center gap-1.5 mb-3 text-xs flex-wrap" id="activeChips">
+    <span class="text-slate-500">Filters:</span>
+    <span class="filter-chip rounded-full px-2 py-0.5 flex items-center gap-1" data-fid="invested">Have we invested? = Yes <button onclick="removeChip('invested')" class="text-blue-700 hover:text-blue-900">×</button></span>
+    <button class="text-slate-500 hover:text-slate-700 ml-1">Clear all</button>
+  </div>
+
+  <div class="grid grid-cols-12 gap-3">
+
+    <!-- LEFT RAIL FILTERS -->
+    <aside class="col-span-3 text-xs">
+      <div class="border border-slate-200 rounded-md bg-white divide-y divide-slate-200" id="filterRail">
+
+        <!-- Have we invested? -->
+        <div class="filter-block p-2.5" data-fid="invested">
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="drag-handle">⋮⋮</span>
+            <span class="font-semibold text-slate-700">Have we invested?</span>
+            <button class="filter-close text-slate-400 hover:text-slate-700 ml-auto" onclick="removeFilter('invested')">×</button>
+          </div>
+          <div class="flex pl-4">
+            <button class="seg-btn on h-6 px-2.5 rounded-l-md text-[11px]">Yes</button>
+            <button class="seg-btn h-6 px-2.5 border-l-0 text-[11px]">No</button>
+            <button class="seg-btn h-6 px-2.5 border-l-0 rounded-r-md text-[11px]">Either</button>
+          </div>
+        </div>
+
+        <!-- Sector -->
+        <div class="filter-block p-2.5" data-fid="sector">
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="drag-handle">⋮⋮</span>
+            <span class="font-semibold text-slate-700">Sector</span>
+            <button class="filter-close text-slate-400 hover:text-slate-700 ml-auto" onclick="removeFilter('sector')">×</button>
+          </div>
+          <button class="dd-trigger w-full h-7 px-2 rounded-md text-left flex items-center gap-1">
+            <span class="flex-1 truncate text-slate-400">Any sector</span>
+            <span class="text-slate-400">▾</span>
+          </button>
+        </div>
+
+        <!-- Country -->
+        <div class="filter-block p-2.5" data-fid="country">
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="drag-handle">⋮⋮</span>
+            <span class="font-semibold text-slate-700">Country</span>
+            <button class="filter-close text-slate-400 hover:text-slate-700 ml-auto" onclick="removeFilter('country')">×</button>
+          </div>
+          <div class="flex pl-4">
+            <button class="seg-btn on h-6 px-2.5 rounded-l-md text-[11px]">US + Canada</button>
+            <button class="seg-btn h-6 px-2.5 border-l-0 text-[11px]">US</button>
+            <button class="seg-btn h-6 px-2.5 border-l-0 rounded-r-md text-[11px]">Canada</button>
+          </div>
+        </div>
+
+        <!-- Furthest stage -->
+        <div class="filter-block p-2.5" data-fid="furthest">
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="drag-handle">⋮⋮</span>
+            <span class="font-semibold text-slate-700">Furthest stage</span>
+            <button class="filter-close text-slate-400 hover:text-slate-700 ml-auto" onclick="removeFilter('furthest')">×</button>
+          </div>
+          <button class="dd-trigger w-full h-7 px-2 rounded-md text-left flex items-center gap-1">
+            <span class="flex-1 truncate text-slate-400">Any stage</span>
+            <span class="text-slate-400">▾</span>
+          </button>
+        </div>
+
+        <!-- Status -->
+        <div class="filter-block p-2.5" data-fid="status">
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="drag-handle">⋮⋮</span>
+            <span class="font-semibold text-slate-700">Status</span>
+            <button class="filter-close text-slate-400 hover:text-slate-700 ml-auto" onclick="removeFilter('status')">×</button>
+          </div>
+          <button class="dd-trigger w-full h-7 px-2 rounded-md text-left flex items-center gap-1">
+            <span class="flex-1 truncate text-slate-400">All</span>
+            <span class="text-slate-400">▾</span>
+          </button>
+        </div>
+
+        <!-- ADD FILTER BUTTON -->
+        <div class="p-2.5" id="addFilterCell">
+          <button onclick="openChooser()" class="w-full h-7 leading-[1.6rem] text-center text-blue-600 hover:bg-blue-50 rounded border border-dashed border-blue-300 text-[11px] font-medium">＋ Add filter</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="col-span-9">
+      <div class="bg-slate-50 border border-slate-200 rounded-md px-3 py-2 mb-2 text-xs flex items-center gap-5">
+        <div><span class="text-slate-500">Matching: </span><span class="font-semibold tabular-nums" id="matchCount">312</span> <span class="text-slate-500">companies</span></div>
+        <div><span class="text-slate-500">Investments: </span><span class="font-semibold tabular-nums" id="invCount">410</span></div>
+        <div><span class="text-slate-500">Total deployed: </span><span class="font-semibold tabular-nums" id="depTotal">$78,200,000</span></div>
+      </div>
+      <div class="border border-slate-200 rounded-md p-6 text-center text-slate-400 text-xs">
+        <p>Table is shown in <a href="variant-a-list.html" class="text-blue-600 hover:underline">variant-a-list.html</a>.</p>
+      </div>
+    </main>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     CHOOSER MODAL
+     ============================================================ -->
+<div class="modal-bg" id="chooser">
+  <div class="modal">
+    <!-- HEADER -->
+    <div class="px-4 py-3 border-b border-slate-200 flex items-center gap-3">
+      <div class="font-semibold text-sm">Add a filter</div>
+      <div class="ml-auto flex items-center gap-2 text-xs">
+        <span class="text-slate-500">Sort</span>
+        <div class="flex border border-slate-300 rounded-md overflow-hidden">
+          <button id="sortByDomainBtn" onclick="setSort('domain')" class="px-2 py-0.5 bg-slate-900 text-white">By domain</button>
+          <button id="sortAlphaBtn" onclick="setSort('alpha')" class="px-2 py-0.5 bg-white text-slate-600 border-l border-slate-300 hover:bg-slate-50">A–Z</button>
+        </div>
+        <button onclick="closeChooser()" class="text-slate-400 hover:text-slate-700 text-xl leading-none ml-1">×</button>
+      </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="px-4 py-2 border-b border-slate-100">
+      <input type="text" id="chooserSearch" placeholder="Find a filter…" autocomplete="off" data-lpignore="true" data-form-type="other"
+             class="w-full h-8 px-3 border border-slate-300 rounded-md text-xs"
+             oninput="renderChooser()" />
+    </div>
+
+    <!-- RECENTLY USED -->
+    <div id="recentRow" class="px-4 py-2 border-b border-slate-100 flex items-center gap-2 flex-wrap">
+      <span class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mr-1">Recent</span>
+      <button class="recent-chip" onclick="addFilter('demographics', 'Founder demographics')">Founder demographics</button>
+      <button class="recent-chip" onclick="addFilter('total_invested', 'Total invested')">Total invested</button>
+      <button class="recent-chip" onclick="addFilter('latest_pitch_date', 'Latest pitch date')">Latest pitch date</button>
+      <button class="recent-chip" onclick="addFilter('investment_since', 'Investment Since')">Investment Since</button>
+    </div>
+
+    <!-- LIST -->
+    <div class="overflow-y-auto" id="chooserList" style="flex:1; padding-bottom:8px;"></div>
+
+    <!-- FOOTER -->
+    <div class="border-t border-slate-100 p-2 flex items-center">
+      <div class="text-[10px] text-slate-400 ml-1">
+        <span class="proposed-tag mr-1">Proposed</span>
+        not yet implemented — visible only during this design review.
+      </div>
+      <button onclick="closeChooser()" class="ml-auto h-7 px-3 border border-slate-300 rounded hover:bg-slate-50 text-xs">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     DROPDOWN PANELS (popovers for the in-rail demographics filter)
+     ============================================================ -->
+
+<script>
+  /* ===== Filter catalog (real fields from lib/admin-grid-config.js + proposed new rollups) ===== */
+  const FILTERS = [
+    // About the company
+    { fid: 'city',                domain: 'company',     label: 'City' },
+    { fid: 'company_name',        domain: 'company',     label: 'Company name' },
+    { fid: 'country',             domain: 'company',     label: 'Country' },
+    { fid: 'created_date',        domain: 'company',     label: 'Created date' },
+    { fid: 'follow_up',           domain: 'company',     label: 'Follow-up date' },
+    { fid: 'demographics',        domain: 'company',     label: 'Founder demographics' },
+    { fid: 'internal_leads',      domain: 'company',     label: 'Internal leads' },
+    { fid: 'updated_date',        domain: 'company',     label: 'Last updated date' },
+    { fid: 'latest_note_date',    domain: 'company',     label: 'Latest note date' },
+    { fid: 'lead_source',         domain: 'company',     label: 'Lead source' },
+    { fid: 'lead_source_detail',  domain: 'company',     label: 'Lead source detail' },
+    { fid: 'lead_stage',          domain: 'company',     label: 'Lead stage' },
+    { fid: 'notes_count',         domain: 'company',     label: 'Notes count' },
+    { fid: 'primary_contact',     domain: 'company',     label: 'Primary contact' },
+    { fid: 'sector',              domain: 'company',     label: 'Sector (primary)' },
+    { fid: 'sector_secondary',    domain: 'company',     label: 'Sector (secondary)' },
+    { fid: 'state',               domain: 'company',     label: 'State / Province' },
+    { fid: 'underrepresented',    domain: 'company',     label: 'Underrepresented founder' },
+    { fid: 'website',             domain: 'company',     label: 'Website' },
+
+    // About their applications
+    { fid: 'apptext',                  domain: 'application', label: 'Application content (full-text)' },
+    { fid: 'app_business_model',       domain: 'application', label: 'Business Model' },
+    { fid: 'app_cap_table',            domain: 'application', label: 'Cap table' },
+    { fid: 'capseek',                  domain: 'application', label: 'Capital seeking' },
+    { fid: 'app_competitive_advantage',domain: 'application', label: 'Competitive Advantage' },
+    { fid: 'app_competitors',          domain: 'application', label: 'Competitors' },
+    { fid: 'pipeline',                 domain: 'application', label: 'Current pipeline stage' },
+    { fid: 'app_data_room',            domain: 'application', label: 'Has data room' },
+    { fid: 'dealum_id',                domain: 'application', label: 'Dealum ID' },
+    { fid: 'app_deal_terms',           domain: 'application', label: 'Deal terms' },
+    { fid: 'decarbon8',                domain: 'application', label: 'Decarbon8 candidate' },
+    { fid: 'app_diligence_folder',     domain: 'application', label: 'Has diligence folder' },
+    { fid: 'draft',                    domain: 'application', label: 'Draft application' },
+    { fid: 'app_environmental_impact', domain: 'application', label: 'Environmental Impact' },
+    { fid: 'app_financial_position',   domain: 'application', label: 'Financial position' },
+    { fid: 'followon',                 domain: 'application', label: 'Follow-on application' },
+    { fid: 'funding_to_date',          domain: 'application', label: 'Funding to date' },
+    { fid: 'app_funding_to_date_amt',  domain: 'application', label: 'Funding to date amount' },
+    { fid: 'app_future_milestones',    domain: 'application', label: 'Future Milestones' },
+    { fid: 'app_go_to_market',         domain: 'application', label: 'Go to Market' },
+    { fid: 'in_active_pipeline',       domain: 'application', label: 'In active pipeline' },
+    { fid: 'app_lead_investor',        domain: 'application', label: 'Lead investor' },
+    { fid: 'locked',                   domain: 'application', label: 'Locked application' },
+    { fid: 'app_management_qual',      domain: 'application', label: 'Management Qualifications' },
+    { fid: 'app_market',               domain: 'application', label: 'Market' },
+    { fid: 'most_recent_app',          domain: 'application', label: 'Most recent application' },
+    { fid: 'most_recent',              domain: 'application', label: 'Most recent pipeline activity' },
+    { fid: 'num_apps',                 domain: 'application', label: 'Number of applications' },
+    { fid: 'app_patentable_ideas',     domain: 'application', label: 'Patentable Ideas' },
+    { fid: 'pitch_deck',               domain: 'application', label: 'Has pitch deck' },
+    { fid: 'app_problem',              domain: 'application', label: 'Problem' },
+    { fid: 'raiseinstrument',          domain: 'application', label: 'Raise instrument' },
+    { fid: 'round_close',              domain: 'application', label: 'Round close date' },
+    { fid: 'app_slack_channel',        domain: 'application', label: 'Slack channel' },
+    { fid: 'app_solution',             domain: 'application', label: 'Solution' },
+    { fid: 'app_status',               domain: 'application', label: 'Status (per application)' },
+    { fid: 'app_tagline',              domain: 'application', label: 'Tagline' },
+    { fid: 'app_team',                 domain: 'application', label: 'Team' },
+    { fid: 'app_traction',             domain: 'application', label: 'Traction' },
+    { fid: 'app_use_of_funds',         domain: 'application', label: 'Use of funds' },
+
+    // About our investments
+    { fid: 'decarbon8_vintage',   domain: 'investment',  label: 'Decarbon8 vintage (latest)' },
+    { fid: 'e8_fund_vintage',     domain: 'investment',  label: 'E8 Fund vintage (latest)' },
+    { fid: 'first_invest_date',   domain: 'investment',  label: 'First investment date', proposed: true },
+    { fid: 'funds_invested_via',  domain: 'investment',  label: 'Funds invested via', proposed: true },
+    { fid: 'has_decarbon8',       domain: 'investment',  label: 'Has Decarbon8 investment' },
+    { fid: 'has_e8_fund',         domain: 'investment',  label: 'Has E8 Fund investment' },
+    { fid: 'has_catalyzed',       domain: 'investment',  label: 'Has catalyzed investment', proposed: true },
+    { fid: 'has_followon',        domain: 'investment',  label: 'Has follow-on investment', proposed: true },
+    { fid: 'spv',                 domain: 'investment',  label: 'Has SPV investment', proposed: true },
+    { fid: 'invested',            domain: 'investment',  label: 'Have we invested?' },
+    { fid: 'investing_entity',    domain: 'investment',  label: 'Investing entity' },
+    { fid: 'instrument_type',     domain: 'investment',  label: 'Instrument type', proposed: true },
+    { fid: 'investment_since',    domain: 'investment',  label: 'Investment Since' },
+    { fid: 'latest_invest_date',  domain: 'investment',  label: 'Latest investment date' },
+    { fid: 'net_invested',        domain: 'investment',  label: 'Net invested', proposed: true },
+    { fid: 'num_investments',     domain: 'investment',  label: 'Number of investments', proposed: true },
+    { fid: 'round',               domain: 'investment',  label: 'Round (seed / Series A / …)' },
+    { fid: 'status',              domain: 'investment',  label: 'Status (Active / Exited / Closed)' },
+    { fid: 'total_invested',      domain: 'investment',  label: 'Total invested' },
+    { fid: 'total_returned',      domain: 'investment',  label: 'Total returned', proposed: true },
+
+    // About their events (all proposed)
+    { fid: 'diligence_years',       domain: 'event',     label: 'Diligence year(s)', proposed: true },
+    { fid: 'has_pitched',           domain: 'event',     label: 'Has pitched', proposed: true },
+    { fid: 'last_event_date',       domain: 'event',     label: 'Last event date', proposed: true },
+    { fid: 'latest_pitch_date',     domain: 'event',     label: 'Latest pitch date', proposed: true },
+    { fid: 'latest_screening_date', domain: 'event',     label: 'Latest screening date', proposed: true },
+    { fid: 'num_pitches',           domain: 'event',     label: 'Number of pitches', proposed: true },
+    { fid: 'was_in_diligence',      domain: 'event',     label: 'Was in diligence', proposed: true },
+
+    // Pipeline ladder
+    { fid: 'furthest',            domain: 'pipeline',    label: 'Furthest stage', proposed: true },
+  ];
+
+  const DOMAIN_ORDER = ['company', 'application', 'investment', 'event', 'pipeline'];
+  const DOMAIN_LABELS = {
+    company:     'About the company',
+    application: 'About their applications',
+    investment:  'About our investments',
+    event:       'About their events',
+    pipeline:    'Pipeline ladder',
+  };
+
+  // Existing filters in the rail
+  const existingFids = new Set(['invested', 'sector', 'country', 'furthest', 'status']);
+
+  let sortMode = 'domain';
+  // domains the user has chosen to expand; default = only 'company'
+  const expandedDomains = new Set(['company']);
+
+  function toggleDomain(d) {
+    if (expandedDomains.has(d)) expandedDomains.delete(d);
+    else expandedDomains.add(d);
+    renderChooser();
+  }
+
+  function openChooser() {
+    document.getElementById('chooser').classList.add('open');
+    renderChooser();
+    setTimeout(() => document.getElementById('chooserSearch').focus(), 50);
+  }
+  function closeChooser() {
+    document.getElementById('chooser').classList.remove('open');
+    document.getElementById('chooserSearch').value = '';
+  }
+  document.getElementById('chooser').addEventListener('click', (e) => {
+    if (e.target.id === 'chooser') closeChooser();
+  });
+
+  function setSort(mode) {
+    sortMode = mode;
+    const a = document.getElementById('sortByDomainBtn');
+    const b = document.getElementById('sortAlphaBtn');
+    a.className = mode === 'domain'
+      ? 'px-2 py-0.5 bg-slate-900 text-white'
+      : 'px-2 py-0.5 bg-white text-slate-600 hover:bg-slate-50';
+    b.className = mode === 'alpha'
+      ? 'px-2 py-0.5 bg-slate-900 text-white border-l border-slate-300'
+      : 'px-2 py-0.5 bg-white text-slate-600 border-l border-slate-300 hover:bg-slate-50';
+    renderChooser();
+  }
+
+  function escAttr(s) { return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+  function rowHtml(f) {
+    const added = existingFids.has(f.fid);
+    const click = added ? '' : `onclick="addFilter('${escAttr(f.fid)}','${escAttr(f.label)}')"`;
+    const cls = added ? 'field-row added' : 'field-row';
+    const tag = f.proposed ? '<span class="proposed-tag">Proposed</span>' : '';
+    const addedTag = added ? '<span class="text-[10px] text-slate-500">already added</span>' : '';
+    return `<div class="${cls}" data-fid="${f.fid}" ${click}><span class="fr-label">${f.label}</span>${tag}${addedTag}</div>`;
+  }
+
+  function renderChooser() {
+    const q = (document.getElementById('chooserSearch').value || '').toLowerCase().trim();
+    const list = document.getElementById('chooserList');
+    const filtered = FILTERS.filter(f => !q || f.label.toLowerCase().includes(q));
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="p-6 text-center text-xs text-slate-400">No matching filters.</div>';
+      return;
+    }
+    let html = '';
+    if (sortMode === 'alpha') {
+      // flat list, no headings
+      const sorted = [...filtered].sort((a, b) => a.label.localeCompare(b.label));
+      sorted.forEach(f => { html += rowHtml(f); });
+    } else {
+      const groups = {};
+      filtered.forEach(f => { (groups[f.domain] = groups[f.domain] || []).push(f); });
+      const hasSearch = q.length > 0;
+      let renderedAny = false;
+      DOMAIN_ORDER.forEach((d) => {
+        const fields = groups[d];
+        if (!fields || fields.length === 0) return;
+        fields.sort((a, b) => a.label.localeCompare(b.label));
+        // expanded when: user manually expanded it, OR an active search has matches in it
+        const expanded = expandedDomains.has(d) || (hasSearch && fields.length > 0);
+        const chevron = expanded ? '▾' : '▸';
+        const firstClass = renderedAny ? '' : ' first';
+        renderedAny = true;
+        html += `<div class="group-label${firstClass}" onclick="toggleDomain('${d}')">`
+              + `<span class="gl-chevron">${chevron}</span>`
+              + `${DOMAIN_LABELS[d]}`
+              + `<span class="gl-count">${fields.length}</span>`
+              + `<span class="gl-rule"></span>`
+              + `</div>`;
+        if (expanded) fields.forEach(f => { html += rowHtml(f); });
+      });
+    }
+    list.innerHTML = html;
+  }
+
+  // initial render so the dialog is populated before first open
+  document.addEventListener('DOMContentLoaded', renderChooser);
+
+  function addFilter(fid, label) {
+    if (existingFids.has(fid)) return;
+    existingFids.add(fid);
+
+    let html = '';
+    if (fid === 'demographics') {
+      html = `
+        <div class="filter-block p-2.5 pulse-once" data-fid="demographics">
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="drag-handle">⋮⋮</span>
+            <span class="font-semibold text-slate-700">Founder demographics</span>
+            <button class="filter-close text-slate-400 hover:text-slate-700 ml-auto" onclick="removeFilter('demographics')">×</button>
+          </div>
+          <div class="space-y-1.5 pl-4">
+            <div class="relative">
+              <div class="text-[10px] text-slate-500 mb-0.5">Race / Ethnicity</div>
+              <button class="dd-trigger w-full h-7 px-2 rounded-md text-left flex items-center gap-1" onclick="toggleDD('demoRace')">
+                <span id="demoRace-summary" class="flex-1 truncate text-slate-400">Any</span>
+                <span class="text-slate-400">▾</span>
+              </button>
+              <div class="dd-panel" id="demoRace-panel" style="position:absolute;">
+                <div class="p-2 border-b border-slate-100">
+                  <input type="text" placeholder="Find…" autocomplete="off" data-lpignore="true" data-form-type="other"
+                         class="w-full h-6 px-2 border border-slate-300 rounded text-[11px]" oninput="ddSearch(this,'demoRace')" />
+                </div>
+                <div class="max-h-40 overflow-auto p-1 text-[11px]" id="demoRace-list">
+                  <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Black or African American" onchange="ddUpdate('demoRace','Race/Ethnicity')" class="h-3 w-3"/><span>Black or African American</span></label>
+                  <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Latino or Hispanic" onchange="ddUpdate('demoRace','Race/Ethnicity')" class="h-3 w-3"/><span>Latino or Hispanic</span></label>
+                  <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Indigenous" onchange="ddUpdate('demoRace','Race/Ethnicity')" class="h-3 w-3"/><span>Indigenous</span></label>
+                  <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Asian" onchange="ddUpdate('demoRace','Race/Ethnicity')" class="h-3 w-3"/><span>Asian</span></label>
+                  <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Middle Eastern / North African" onchange="ddUpdate('demoRace','Race/Ethnicity')" class="h-3 w-3"/><span>Middle Eastern / North African</span></label>
+                  <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Pacific Islander" onchange="ddUpdate('demoRace','Race/Ethnicity')" class="h-3 w-3"/><span>Pacific Islander</span></label>
+                  <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="White" onchange="ddUpdate('demoRace','Race/Ethnicity')" class="h-3 w-3"/><span>White</span></label>
+                </div>
+                <div class="flex items-center justify-between border-t border-slate-100 p-1.5">
+                  <button class="text-[10px] text-slate-500 hover:text-slate-700" onclick="ddClear('demoRace')">Clear</button>
+                  <button class="text-[10px] text-blue-600 hover:underline" onclick="toggleDD('demoRace')">Done</button>
+                </div>
+              </div>
+            </div>
+            <div class="relative">
+              <div class="text-[10px] text-slate-500 mb-0.5">Gender</div>
+              <button class="dd-trigger w-full h-7 px-2 rounded-md text-left flex items-center gap-1" onclick="toggleDD('demoGender')">
+                <span id="demoGender-summary" class="flex-1 truncate text-slate-400">Any</span>
+                <span class="text-slate-400">▾</span>
+              </button>
+              <div class="dd-panel" id="demoGender-panel" style="position:absolute;">
+                <div class="max-h-40 overflow-auto p-1 text-[11px]">
+                  <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Woman" onchange="ddUpdate('demoGender','Gender')" class="h-3 w-3"/><span>Woman</span></label>
+                  <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Man" onchange="ddUpdate('demoGender','Gender')" class="h-3 w-3"/><span>Man</span></label>
+                  <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Non-binary" onchange="ddUpdate('demoGender','Gender')" class="h-3 w-3"/><span>Non-binary</span></label>
+                  <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Prefer not to say" onchange="ddUpdate('demoGender','Gender')" class="h-3 w-3"/><span>Prefer not to say</span></label>
+                </div>
+                <div class="flex items-center justify-between border-t border-slate-100 p-1.5">
+                  <button class="text-[10px] text-slate-500 hover:text-slate-700" onclick="ddClear('demoGender')">Clear</button>
+                  <button class="text-[10px] text-blue-600 hover:underline" onclick="toggleDD('demoGender')">Done</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    } else {
+      // generic placeholder filter (dropdown trigger)
+      html = `
+        <div class="filter-block p-2.5 pulse-once" data-fid="${fid}">
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="drag-handle">⋮⋮</span>
+            <span class="font-semibold text-slate-700">${label}</span>
+            <button class="filter-close text-slate-400 hover:text-slate-700 ml-auto" onclick="removeFilter('${fid}')">×</button>
+          </div>
+          <button class="dd-trigger w-full h-7 px-2 rounded-md text-left flex items-center gap-1">
+            <span class="flex-1 truncate text-slate-400">Set…</span>
+            <span class="text-slate-400">▾</span>
+          </button>
+        </div>`;
+    }
+
+    const addCell = document.getElementById('addFilterCell');
+    addCell.insertAdjacentHTML('beforebegin', html);
+
+    // chooser will re-render on next open with this fid marked added
+    closeChooser();
+  }
+
+  function removeFilter(fid) {
+    existingFids.delete(fid);
+    const el = document.querySelector(`#filterRail .filter-block[data-fid="${fid}"]`);
+    if (el) el.remove();
+    removeChip(fid);
+  }
+
+  function toggleDD(id) {
+    const panel = document.getElementById(id + '-panel');
+    if (!panel) return;
+    panel.classList.toggle('open');
+  }
+  function ddClear(id) {
+    document.querySelectorAll(`#${id}-panel input[type="checkbox"]`).forEach(cb => cb.checked = false);
+    ddUpdate(id, id === 'demoRace' ? 'Race/Ethnicity' : 'Gender');
+  }
+  function ddSearch(input, id) {
+    const q = (input.value || '').toLowerCase().trim();
+    document.querySelectorAll(`#${id}-list label`).forEach(lbl => {
+      lbl.style.display = (!q || lbl.textContent.toLowerCase().includes(q)) ? '' : 'none';
+    });
+  }
+  function ddUpdate(id, label) {
+    const checked = Array.from(document.querySelectorAll(`#${id}-panel input[type="checkbox"]:checked`)).map(cb => cb.value);
+    const summary = document.getElementById(id + '-summary');
+    if (checked.length === 0) {
+      summary.textContent = 'Any';
+      summary.className = 'flex-1 truncate text-slate-400';
+    } else if (checked.length === 1) {
+      summary.textContent = checked[0];
+      summary.className = 'flex-1 truncate text-slate-700';
+    } else {
+      summary.textContent = `${checked[0]} (+${checked.length - 1})`;
+      summary.className = 'flex-1 truncate text-slate-700';
+    }
+    // update chip
+    setDemographicsChip();
+    updateCounts();
+  }
+  function setDemographicsChip() {
+    const race = Array.from(document.querySelectorAll('#demoRace-panel input:checked')).map(cb => cb.value);
+    const gender = Array.from(document.querySelectorAll('#demoGender-panel input:checked')).map(cb => cb.value);
+    let chip = document.querySelector('#activeChips .filter-chip[data-fid="demographics"]');
+    const total = race.length + gender.length;
+    if (total === 0) {
+      if (chip) chip.remove();
+      return;
+    }
+    const parts = [];
+    if (race.length) parts.push(race.length === 1 ? race[0] : `${race[0]} (+${race.length-1})`);
+    if (gender.length) parts.push(gender.join(', '));
+    const text = `Founder: ${parts.join(' · ')}`;
+    if (!chip) {
+      const html = `<span class="filter-chip rounded-full px-2 py-0.5 flex items-center gap-1" data-fid="demographics">${text} <button onclick="removeChip('demographics')" class="text-blue-700 hover:text-blue-900">×</button></span>`;
+      const clearBtn = document.querySelector('#activeChips button.text-slate-500');
+      clearBtn.insertAdjacentHTML('beforebegin', html);
+    } else {
+      chip.firstChild.textContent = text + ' ';
+    }
+  }
+  function removeChip(fid) {
+    const chip = document.querySelector(`#activeChips .filter-chip[data-fid="${fid}"]`);
+    if (chip) chip.remove();
+    if (fid === 'demographics') {
+      document.querySelectorAll('#demoRace-panel input, #demoGender-panel input').forEach(cb => cb.checked = false);
+      ddUpdate('demoRace', 'Race/Ethnicity');
+      ddUpdate('demoGender', 'Gender');
+    }
+    updateCounts();
+  }
+  function updateCounts() {
+    // simulate: more filters = fewer rows
+    let n = 312;
+    document.querySelectorAll('#activeChips .filter-chip').forEach(c => { n = Math.max(8, Math.floor(n * 0.55)); });
+    document.getElementById('matchCount').textContent = String(n);
+    document.getElementById('invCount').textContent = String(Math.floor(n * 1.3));
+    const dep = n * 250000;
+    document.getElementById('depTotal').textContent = '$' + dep.toLocaleString('en-US');
+  }
+
+  // close dropdown panels on outside click
+  document.addEventListener('click', (e) => {
+    document.querySelectorAll('.dd-panel.open').forEach(p => {
+      const block = p.closest('.relative') || p.parentElement;
+      if (!block.contains(e.target)) p.classList.remove('open');
+    });
+  });
+</script>
+
+</body>
+</html>

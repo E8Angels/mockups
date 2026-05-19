@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Edit company — Voltaic Drive</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .status-active   { background:#bae6fd; color:#075985; }
+  .stage-pill      { background:#f8fafc; color:#475569; border:1px solid #e2e8f0; }
+  .ladder-invested { background:#bbf7d0; color:#065f46; }
+  .ladder-dilig    { background:#fde68a; color:#854d0e; }
+  .ladder-screen   { background:#e0e7ff; color:#3730a3; }
+  .badge           { background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:10px; padding:1px 6px; border-radius:3px; font-weight:600; }
+  .seed-note       { background:#fef9c3; border:1px solid #fde68a; color:#713f12; }
+  .edit-mode-badge { background:#fef3c7; color:#92400e; border:1px solid #fde68a; font-size:11px; padding:2px 8px; border-radius:10px; font-weight:600; letter-spacing:0.04em; }
+  .nav-item        { display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:4px; font-size:13px; color:#475569; }
+  .nav-item:hover  { background:#f1f5f9; color:#0f172a; }
+  .nav-item.active { background:#eff6ff; color:#1d4ed8; font-weight:500; }
+  .nav-item .nav-count { color:#94a3b8; font-size:11px; margin-left:auto; }
+  .nav-item.readonly { color:#94a3b8; }
+  .nav-item.readonly:hover { background:#f8fafc; }
+
+  /* Section card */
+  .section-card { background:#fff; border:1px solid #e2e8f0; border-radius:6px; padding:16px; }
+  .section-h    { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .section-h h2 { font-size:14px; font-weight:600; color:#0f172a; }
+  .section-h .section-count { color:#94a3b8; font-size:11px; font-weight:500; }
+  .section-h .readonly-tag { font-size:10px; text-transform:uppercase; letter-spacing:0.05em; color:#94a3b8; font-weight:600; }
+
+  /* CompactRow */
+  .crow { display:grid; grid-template-columns:160px 1fr; gap:12px; align-items:center; padding:5px 0; }
+  .crow > .crow-label { color:#475569; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; text-align:right; padding-top:5px; align-self:start; }
+
+  /* Inputs */
+  input[type="text"], input[type="date"], input[type="number"], select, textarea {
+    background:#fff; border:1px solid #cbd5e1; border-radius:4px; padding:5px 8px; font-size:13px; color:#0f172a;
+    outline:none; transition:border-color 80ms, box-shadow 80ms;
+  }
+  input[type="text"]:focus, input[type="date"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+    border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.15);
+  }
+  textarea { resize:vertical; min-height:80px; line-height:1.45; }
+  .h7 { height:28px; padding-top:0; padding-bottom:0; }
+  .w-150 { width:150px; }
+  .w-200 { width:200px; }
+  .multi-trigger { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #cbd5e1; border-radius:4px; padding:3px 8px; font-size:12px; cursor:pointer; }
+  .multi-trigger:hover { border-color:#94a3b8; }
+  .multi-trigger .chev { color:#94a3b8; font-size:10px; }
+  .multi-trigger .selected-count { background:#1e293b; color:#fff; border-radius:8px; padding:0 5px; font-size:10px; font-weight:600; }
+  .checkbox-group { display:flex; gap:14px; padding:4px 0; font-size:13px; }
+  .checkbox-group label { display:inline-flex; align-items:center; gap:5px; }
+
+  /* Contact pills (editor) */
+  .contact-pill-edit { display:inline-flex; align-items:center; gap:5px; padding:3px 4px 3px 8px; border:1px solid #cbd5e1; border-radius:14px; font-size:12px; background:#fff; }
+  .contact-pill-edit .x { color:#94a3b8; cursor:pointer; padding:0 4px; }
+  .contact-pill-edit .x:hover { color:#b91c1c; }
+  .contact-pill-edit.primary { border-color:#bae6fd; background:#f0f9ff; }
+  .add-pill-btn { padding:3px 10px; border:1px dashed #cbd5e1; border-radius:14px; font-size:12px; color:#475569; }
+  .add-pill-btn:hover { color:#1d4ed8; border-color:#3b82f6; background:#eff6ff; }
+
+  /* Application card (edit) */
+  .app-card { background:#fff; border:1px solid #e2e8f0; border-radius:6px; margin-bottom:14px; }
+  .app-card-head { display:flex; align-items:center; gap:10px; padding:10px 14px; cursor:pointer; }
+  .app-card-head:hover { background:#f8fafc; }
+  .app-card.open .app-card-head { background:#f8fafc; border-bottom:1px solid #e2e8f0; }
+  .app-card-body { display:none; padding:14px; }
+  .app-card.open .app-card-body { display:block; }
+
+  /* EditCard primitive (label above control) */
+  .edit-card { background:#fff; border:1px solid #e2e8f0; border-radius:6px; padding:14px; margin-bottom:14px; }
+  .edit-card h3 { font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#475569; font-weight:700; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #e2e8f0; }
+  .ec-field { display:flex; flex-direction:column; gap:4px; }
+  .ec-field > label { font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:#64748b; font-weight:600; }
+  .ec-field > input, .ec-field > select, .ec-field > textarea { width:100%; }
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px 18px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 18px; }
+  .ec-full { grid-column:1 / -1; }
+
+  /* Pitch deck (edit) */
+  .pitch-deck-thumb { background:#1e293b; border-radius:4px; padding:24px; display:flex; align-items:center; justify-content:center; aspect-ratio:16/10; }
+  .pitch-deck-thumb .ph { background:#fff; width:80%; height:80%; border-radius:3px; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-size:24px; }
+
+  /* Deal terms launcher */
+  .deal-terms-btn { background:#1e293b; color:#fff; padding:5px 12px; border-radius:4px; font-size:12px; align-self:flex-start; }
+  .deal-terms-btn:hover { background:#0f172a; }
+
+  /* Dialog (wizard modal) */
+  .modal-bg { position:fixed; inset:0; background:rgba(15,23,42,0.5); display:none; align-items:center; justify-content:center; z-index:80; }
+  .modal-bg.open { display:flex; }
+  .modal { background:#fff; border-radius:8px; box-shadow:0 24px 64px rgba(0,0,0,0.3); width:640px; max-width:92vw; max-height:80vh; display:flex; flex-direction:column; }
+  .progress-dots { display:flex; gap:6px; align-items:center; }
+  .dot { width:8px; height:8px; border-radius:50%; background:#e2e8f0; }
+  .dot.on { background:#1e293b; }
+
+  /* Notes editor */
+  .note-editor { border:1px solid #cbd5e1; border-radius:6px; padding:10px; background:#fff; }
+  .note-editor textarea { width:100%; min-height:80px; border:none; padding:0; }
+  .note-editor textarea:focus { box-shadow:none; }
+  .note-toolbar { display:flex; gap:6px; padding-bottom:8px; border-bottom:1px solid #f1f5f9; margin-bottom:8px; font-size:12px; }
+  .note-toolbar select { height:24px; padding:0 6px; font-size:11px; }
+
+  /* Save bar (sticky at bottom) */
+  .save-bar { position:sticky; bottom:0; background:#fff; border-top:1px solid #e2e8f0; padding:10px 16px; display:flex; align-items:center; gap:10px; margin-top:8px; z-index:30; box-shadow:0 -4px 16px rgba(0,0,0,0.05); border-radius:0 0 6px 6px; }
+  .btn-save { background:#1d4ed8; color:#fff; padding:6px 16px; border-radius:4px; font-size:13px; font-weight:500; }
+  .btn-save:hover { background:#1e40af; }
+  .btn-save:disabled { background:#cbd5e1; color:#fff; cursor:not-allowed; }
+  .btn-cancel { padding:6px 12px; border:1px solid #cbd5e1; border-radius:4px; font-size:13px; color:#475569; }
+  .btn-cancel:hover { border-color:#94a3b8; background:#f8fafc; }
+
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 text-sm">
+
+<div class="bg-slate-800 text-slate-100 px-4 py-2 text-xs flex items-center gap-3 sticky top-0 z-50">
+  <span class="font-semibold">Mockup v7</span>
+  <span class="text-slate-300">Company detail (edit mode)</span>
+  <span class="ml-auto"><a class="text-blue-300 hover:underline" href="detail.html">← View mode</a></span>
+  <span><a class="text-blue-300 hover:underline" href="plan.md">plan.md</a></span>
+</div>
+
+<div class="max-w-[1500px] mx-auto px-4 py-4">
+
+  <div class="seed-note rounded-md px-3 py-2 mb-3 text-xs">
+    <span class="font-semibold">v7 edit page:</span>
+    All editable fields use the existing patterns from <code>EditCompanyIsland</code> (CompactRow — 160px right-aligned label, multi-input rows) and <code>EditApplicationIsland</code> (EditCard — label-above-control 2-col grid for pitch fields).
+    <b>Status</b> in the header is read-only here too (derived from instruments); <b>Lead Stage</b> is gone.
+    Read-only sections (Events, Emails, Ratings) are hidden in edit mode but reachable via the nav (showing dimmed labels) — click "View mode" at top to see them.
+    <b>Deal Terms</b> has an "Edit Deal Terms" launcher; click the button to see the wizard mockup.
+    <b>Pitch deck</b> shows a thumbnail + Download / Replace / Remove (per <code>EditApplicationIsland</code>).
+    Save / Cancel bar sticky at the bottom.
+  </div>
+
+  <!-- HEADER BANNER -->
+  <div class="bg-white border border-slate-200 rounded-md p-3 mb-3 flex items-center gap-3 sticky top-[44px] z-40">
+    <div class="w-12 h-12 rounded bg-emerald-100 text-emerald-700 grid place-items-center text-sm font-semibold flex-shrink-0">VD</div>
+    <div class="min-w-0">
+      <div class="flex items-center gap-2 flex-wrap">
+        <h1 class="text-lg font-semibold">Voltaic Drive</h1>
+        <span class="status-active text-[11px] rounded px-2 py-0.5">Active</span>
+        <span class="edit-mode-badge ml-2">EDIT MODE</span>
+      </div>
+      <div class="text-xs text-slate-500 mt-0.5">Electric vehicles · Seattle, WA · USA · <a href="https://voltaicdrive.com" class="text-blue-600 hover:underline">voltaicdrive.com</a></div>
+    </div>
+    <div class="ml-auto flex items-center gap-2">
+      <a href="detail.html" class="btn-cancel">Cancel</a>
+      <button class="btn-save">Save</button>
+    </div>
+  </div>
+
+  <div class="flex gap-3">
+
+    <!-- LEFT NAV -->
+    <aside class="text-xs flex-shrink-0" style="width:200px;">
+      <nav class="border border-slate-200 rounded-md bg-white py-1 sticky top-[112px]">
+        <a href="#profile"      class="nav-item active">Profile</a>
+        <a href="#contacts"     class="nav-item">Contacts <span class="nav-count">4</span></a>
+        <a href="#applications" class="nav-item">Applications <span class="nav-count">3</span></a>
+        <a href="#notes"        class="nav-item">Notes <span class="nav-count">12</span></a>
+        <div class="border-t border-slate-100 my-1"></div>
+        <a href="detail.html#investments" class="nav-item readonly" title="Read-only in this view">Investments <span class="nav-count">2</span></a>
+        <a href="detail.html#events"      class="nav-item readonly" title="Read-only in this view">Events <span class="nav-count">7</span></a>
+        <a href="detail.html#emails"      class="nav-item readonly" title="Read-only in this view">Emails <span class="nav-count">24</span></a>
+        <a href="detail.html#ratings"     class="nav-item readonly" title="Read-only in this view">Ratings &amp; decisions <span class="nav-count">3</span></a>
+      </nav>
+      <div class="text-[10px] text-slate-400 mt-2 px-1 leading-relaxed">
+        Greyed sections are read-only and managed elsewhere (Investments via the valuation wizard; Events / Emails / Ratings are system-generated logs).
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="flex-1 min-w-0 space-y-3">
+
+      <!-- =========== PROFILE =========== -->
+      <section id="profile" class="section-card">
+        <div class="section-h"><h2>Profile</h2></div>
+
+        <div class="crow">
+          <div class="crow-label">Name</div>
+          <div class="flex items-center gap-2">
+            <input type="text" value="Voltaic Drive" class="h7 flex-1" autocomplete="off" data-lpignore="true" data-form-type="other" />
+            <input type="text" value="https://voltaicdrive.com" placeholder="Website" class="h7 flex-1" autocomplete="off" data-lpignore="true" data-form-type="other" />
+          </div>
+        </div>
+
+        <div class="crow">
+          <div class="crow-label">Sector</div>
+          <div class="flex items-center gap-2">
+            <select class="h7 w-200">
+              <option>Electric vehicles</option>
+              <option>Solar</option><option>Energy storage</option><option>Carbon capture</option>
+            </select>
+            <button class="multi-trigger h7" type="button">
+              Secondary: <span>Powertrains, Charging infra</span>
+              <span class="selected-count">2</span>
+              <span class="chev">▾</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="crow">
+          <div class="crow-label">HQ</div>
+          <div class="flex items-center gap-2">
+            <input type="text" value="Seattle" placeholder="City" class="h7 w-200" autocomplete="off" data-lpignore="true" data-form-type="other" />
+            <input type="text" value="WA" placeholder="State" class="h7" style="width:80px;" autocomplete="off" data-lpignore="true" data-form-type="other" />
+            <select class="h7" style="width:120px;">
+              <option>USA</option><option>Canada</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="crow">
+          <div class="crow-label">Race / Gender</div>
+          <div class="flex items-center gap-2">
+            <button class="multi-trigger h7" type="button">Race / Ethnicity <span class="selected-count">1</span> <span class="chev">▾</span></button>
+            <button class="multi-trigger h7" type="button">Gender <span class="selected-count">1</span> <span class="chev">▾</span></button>
+          </div>
+        </div>
+
+        <div class="crow">
+          <div class="crow-label">Underrepresented</div>
+          <div class="checkbox-group"><label><input type="checkbox" checked /> Founder is underrepresented</label></div>
+        </div>
+
+        <div class="crow">
+          <div class="crow-label">Referral partner</div>
+          <div>
+            <button class="multi-trigger h7" type="button">＋ Add partner</button>
+            <span class="contact-pill-edit ml-2">
+              <span>Decarbon8 · M. Patel</span>
+              <span class="x">×</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="crow">
+          <div class="crow-label">Lead source</div>
+          <div class="flex items-center gap-2">
+            <button class="multi-trigger h7" type="button">Sources <span class="selected-count">1</span> <span class="chev">▾</span></button>
+            <input type="text" value="via M. Patel @ Decarbon8" placeholder="Lead source detail" class="h7 flex-1" autocomplete="off" data-lpignore="true" data-form-type="other" />
+          </div>
+        </div>
+
+        <div class="crow">
+          <div class="crow-label">Internal leads</div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="contact-pill-edit"><span>Karen Stewart</span><span class="x">×</span></span>
+            <span class="contact-pill-edit"><span>Devon Walsh</span><span class="x">×</span></span>
+            <button class="add-pill-btn">＋ Add</button>
+          </div>
+        </div>
+
+        <div class="crow">
+          <div class="crow-label">Follow-up date</div>
+          <div><input type="date" value="2026-06-15" class="h7 w-150" /></div>
+        </div>
+      </section>
+
+      <!-- =========== CONTACTS =========== -->
+      <section id="contacts" class="section-card">
+        <div class="section-h">
+          <h2>Contacts</h2>
+          <span class="section-count">4 people</span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <span class="contact-pill-edit primary">
+            <span class="font-medium">Adi Rao</span>
+            <span class="text-slate-400">·</span><span class="text-slate-500 text-xs">Founder / CEO</span>
+            <span class="text-[9px] uppercase tracking-wider text-slate-500 ml-1">Primary</span>
+            <span class="x">×</span>
+          </span>
+          <span class="contact-pill-edit">
+            <span class="font-medium">Mei Yoon</span>
+            <span class="text-slate-400">·</span><span class="text-slate-500 text-xs">CTO</span>
+            <span class="x">×</span>
+          </span>
+          <span class="contact-pill-edit">
+            <span class="font-medium">Janet Park</span>
+            <span class="text-slate-400">·</span><span class="text-slate-500 text-xs">Head of Sales</span>
+            <span class="x">×</span>
+          </span>
+          <span class="contact-pill-edit">
+            <span class="font-medium">Robert Singh</span>
+            <span class="text-slate-400">·</span><span class="text-slate-500 text-xs">Lead Engineer</span>
+            <span class="x">×</span>
+          </span>
+          <button class="add-pill-btn">＋ Add contact</button>
+        </div>
+      </section>
+
+      <!-- =========== APPLICATIONS =========== -->
+      <section id="applications" class="section-card">
+        <div class="section-h">
+          <h2>Applications</h2>
+          <span class="section-count">3 submissions</span>
+        </div>
+
+        <!-- 2025 application — OPEN, all fields editable -->
+        <div class="app-card open" id="app-2025-edit">
+          <div class="app-card-head" onclick="toggleApp('app-2025-edit')">
+            <span class="text-slate-400">▾</span>
+            <span class="font-semibold text-sm">Apr 2025 · Application</span>
+            <span class="ladder-invested text-[11px] rounded px-1.5 py-0.5">Invested</span>
+            <span class="badge">Closed</span>
+            <span class="text-[11px] text-slate-400 ml-auto">app_4f3a2b…</span>
+          </div>
+          <div class="app-card-body">
+
+            <!-- BASICS card -->
+            <div class="edit-card">
+              <h3>Basics</h3>
+              <div class="three-col mb-3">
+                <div class="ec-field">
+                  <label>Company</label>
+                  <div class="text-slate-500 text-xs">Voltaic Drive <span class="text-slate-400">· read-only</span></div>
+                </div>
+                <div class="ec-field">
+                  <label>Dealum ID</label>
+                  <input type="text" value="DLM-2025-0142" autocomplete="off" data-lpignore="true" data-form-type="other" />
+                </div>
+                <div class="ec-field">
+                  <label>Pitch deck</label>
+                  <div class="flex items-start gap-3">
+                    <div class="pitch-deck-thumb flex-shrink-0" style="width:100px; padding:6px; aspect-ratio:4/3;">
+                      <div class="ph" style="font-size:14px;">PDF</div>
+                    </div>
+                    <div class="flex flex-col gap-1 text-xs">
+                      <a href="#" class="text-blue-600 hover:underline">Download</a>
+                      <button class="text-blue-600 hover:underline text-left">Replace…</button>
+                      <button class="text-red-600 hover:underline text-left">Remove</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="ec-field mb-3">
+                <label>Tagline</label>
+                <input type="text" value="EV powertrain conversion kits for last-mile fleets." autocomplete="off" data-lpignore="true" data-form-type="other" />
+              </div>
+
+              <div class="two-col">
+                <div class="ec-field">
+                  <label>Problem</label>
+                  <textarea>Class 3 commercial fleets electrifying their last-mile routes face 12–18 month lead times on ground-up EV trucks. Existing electric retrofits are bespoke and rely on Tier-2 integrators.</textarea>
+                </div>
+                <div class="ec-field">
+                  <label>Solution</label>
+                  <textarea>Drop-in powertrain conversion kit, three SKUs covering 90% of the Class 3 ICE fleet. Installs in &lt;8 hours by a certified shop.</textarea>
+                </div>
+                <div class="ec-field">
+                  <label>Business model</label>
+                  <textarea>Hardware unit economics: $18K margin per retrofit at $30K avg price; certified-installer network earns $6K each.</textarea>
+                </div>
+                <div class="ec-field">
+                  <label>Market</label>
+                  <textarea>14.2M Class 3 trucks in NA fleets. ~1.7M turning over to electric drivetrains 2026–2030 per ICCT.</textarea>
+                </div>
+                <div class="ec-field">
+                  <label>Go to market</label>
+                  <textarea>Land-and-expand with named fleet partners.</textarea>
+                </div>
+                <div class="ec-field">
+                  <label>Competitive advantage</label>
+                  <textarea>Drop-in form factor specific to Class 3 frame; certified-installer playbook.</textarea>
+                </div>
+                <div class="ec-field">
+                  <label>Traction</label>
+                  <textarea>137 paid retrofits to date. $4.2M ARR. 3 fleet customers signed for 2026.</textarea>
+                </div>
+                <div class="ec-field">
+                  <label>Competitors</label>
+                  <textarea>Lightning eMotors, Motiv, Workhorse — none do drop-in retrofits at this price.</textarea>
+                </div>
+                <div class="ec-field">
+                  <label>Future milestones</label>
+                  <textarea>Q3 2026: complete SKU-3. Q4 2026: 20 certified-installer locations. Q2 2027: Class 2 SKU.</textarea>
+                </div>
+                <div class="ec-field">
+                  <label>Patentable ideas</label>
+                  <textarea>Modular battery-skateboard mounting bracket; software-controlled regen tuning; provisional filings.</textarea>
+                </div>
+                <div class="ec-field ec-full">
+                  <label>Environmental impact</label>
+                  <textarea>Each retrofit avoids ~18 tons CO2/year. Cumulative avoided emissions at 2026 plan: ~24K tons.</textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- RAISE DETAILS card -->
+            <div class="edit-card">
+              <h3>Raise details</h3>
+              <div class="two-col">
+                <div class="ec-field"><label>Funding to date</label><div class="checkbox-group"><label><input type="checkbox" checked /> Yes</label></div></div>
+                <div class="ec-field"><label>Funding to date amount</label><input type="text" value="$1,800,000" autocomplete="off" data-lpignore="true" data-form-type="other" /></div>
+                <div class="ec-field"><label>Capital seeking</label><input type="text" value="$1.5M SAFE" autocomplete="off" data-lpignore="true" data-form-type="other" /></div>
+                <div class="ec-field"><label>Raise instrument</label><input type="text" value="SAFE" autocomplete="off" data-lpignore="true" data-form-type="other" /></div>
+                <div class="ec-field"><label>Lead investor</label><input type="text" value="Climate Capital ($500K)" autocomplete="off" data-lpignore="true" data-form-type="other" /></div>
+                <div class="ec-field"><label>Round close date</label><input type="date" value="2025-12-15" class="w-150" /></div>
+                <div class="ec-field"><label>Financial position</label><textarea>11 months runway at current burn. $4.2M ARR run-rate.</textarea></div>
+                <div class="ec-field"><label>Use of funds</label><textarea>~$700K SKU-3 tooling. ~$400K installer expansion. ~$250K working capital. ~$150K eng hires.</textarea></div>
+                <div class="ec-field ec-full">
+                  <label class="flex items-center justify-between">
+                    Deal terms <span class="text-slate-400 text-[10px] normal-case tracking-normal">paragraph generated from wizard data</span>
+                  </label>
+                  <textarea>SAFE with a $12M post-money cap and 20% discount. Most-favored nation rights. Minimum check size $25K. Target close 2025-12-15. Climate Capital leading with $500K committed; pro-rata rights for existing investors.</textarea>
+                  <button class="deal-terms-btn mt-2" onclick="document.getElementById('dealTermsModal').classList.add('open')" type="button">Edit Deal Terms</button>
+                </div>
+                <div class="ec-field ec-full">
+                  <label>Cap table</label>
+                  <textarea>Adi Rao 48% · Mei Yoon 18% · Climate Capital 7% · Decarbon8 2025 SAFE 2% · ESOP 12% · Other angels 13%. Pre-money fully diluted: ~$10M.</textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- TEAM card -->
+            <div class="edit-card">
+              <h3>Team</h3>
+              <div class="two-col">
+                <div class="ec-field">
+                  <label>Team</label>
+                  <textarea>Adi Rao (CEO, ex-Rivian); Mei Yoon (CTO, ex-Tesla); Janet Park (Sales); Robert Singh (Lead Eng). 12 FTEs + 4 part-time installers.</textarea>
+                </div>
+                <div class="ec-field">
+                  <label>Management qualifications</label>
+                  <textarea>Adi Rao: ex-Rivian Powertrain Lead (8y), Stanford ME. Mei Yoon: ex-Tesla Drive Unit (6y). Janet Park: ex-Cummins fleet sales (12y).</textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Flags / metadata -->
+            <div class="edit-card">
+              <h3>Flags &amp; metadata</h3>
+              <div class="three-col">
+                <div class="ec-field"><label>Decarbon8 application</label><div class="checkbox-group"><label><input type="checkbox" /> Yes</label></div></div>
+                <div class="ec-field"><label>Follow-on application</label><div class="checkbox-group"><label><input type="checkbox" /> Yes</label></div></div>
+                <div class="ec-field"><label>Locked</label><div class="checkbox-group"><label><input type="checkbox" /> Yes</label></div></div>
+                <div class="ec-field"><label>Draft</label><div class="checkbox-group"><label><input type="checkbox" /> Yes</label></div></div>
+                <div class="ec-field"><label>Data room</label><input type="text" placeholder="https://…" autocomplete="off" data-lpignore="true" data-form-type="other" /></div>
+                <div class="ec-field"><label>Diligence folder</label><input type="text" placeholder="https://drive.google.com/…" autocomplete="off" data-lpignore="true" data-form-type="other" /></div>
+                <div class="ec-field"><label>Slack channel</label><input type="text" value="#voltaic-drive" autocomplete="off" data-lpignore="true" data-form-type="other" /></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 2024 application — collapsed -->
+        <div class="app-card" id="app-2024-edit">
+          <div class="app-card-head" onclick="toggleApp('app-2024-edit')">
+            <span class="text-slate-400">▸</span>
+            <span class="font-semibold text-sm">Mar 2024 · Application</span>
+            <span class="ladder-dilig text-[11px] rounded px-1.5 py-0.5">Diligence Complete</span>
+            <span class="badge">Closed</span>
+            <span class="text-[11px] text-slate-400 ml-auto">app_8c1e9a…</span>
+          </div>
+        </div>
+
+        <!-- 2022 application — collapsed -->
+        <div class="app-card" id="app-2022-edit">
+          <div class="app-card-head" onclick="toggleApp('app-2022-edit')">
+            <span class="text-slate-400">▸</span>
+            <span class="font-semibold text-sm">Feb 2022 · Application</span>
+            <span class="ladder-screen text-[11px] rounded px-1.5 py-0.5">Screen</span>
+            <span class="badge">Closed</span>
+            <span class="text-[11px] text-slate-400 ml-auto">app_22d09f…</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========== NOTES =========== -->
+      <section id="notes" class="section-card">
+        <div class="section-h">
+          <h2>Notes</h2>
+          <span class="section-count">12 existing · add a new one below</span>
+        </div>
+
+        <div class="note-editor mb-4">
+          <div class="note-toolbar">
+            <select>
+              <option>Company-level</option>
+              <option>2025 application</option>
+              <option>2024 application</option>
+              <option>2022 application</option>
+            </select>
+            <select>
+              <option>Note</option>
+              <option>Referral</option>
+              <option>News</option>
+              <option>Ask</option>
+            </select>
+            <label class="text-[11px] ml-auto flex items-center gap-1 text-slate-600"><input type="checkbox" /> Confidential</label>
+          </div>
+          <textarea placeholder="Write a note (Markdown supported)…"></textarea>
+          <div class="flex items-center gap-2 mt-2">
+            <button class="text-[11px] px-2 py-1 border border-slate-300 rounded hover:bg-slate-50">Attach…</button>
+            <button class="ml-auto btn-save" style="padding:4px 12px; font-size:12px;">Add note</button>
+          </div>
+        </div>
+
+        <div class="text-[11px] text-slate-500 mb-2">Existing notes (click ✎ to edit, × to delete; 10-minute edit window after creation):</div>
+
+        <!-- Existing notes (compact) -->
+        <div class="border border-slate-200 rounded p-3 mb-2 text-xs">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="font-medium">Karen Stewart</span>
+            <span class="text-slate-500">· 2026-02-08 · 2025 application</span>
+            <button class="ml-auto text-slate-400 hover:text-blue-600">✎</button>
+            <button class="text-slate-400 hover:text-red-600">×</button>
+          </div>
+          <div class="text-slate-700">Met with Adi and the Sysco regional buyer. Confirmed signed PO. Working capital is the real question.</div>
+        </div>
+
+        <div class="border border-slate-200 rounded p-3 mb-2 text-xs">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="font-medium">M. Patel</span>
+            <span class="text-slate-500">· 2025-10-12 · Referral · Company-level</span>
+            <button class="ml-auto text-slate-400 hover:text-blue-600" title="Past edit window">✎</button>
+            <button class="text-slate-400 hover:text-red-600" title="Past edit window">×</button>
+          </div>
+          <div class="text-slate-700">Introduced Voltaic to Karen via Decarbon8 portfolio referrals network. Strongly recommend the 2025 application.</div>
+        </div>
+
+        <div class="text-center text-xs text-slate-400 pt-2"><a href="#" class="text-blue-600 hover:underline">Show all 12 notes</a></div>
+      </section>
+
+      <!-- SAVE BAR (sticky bottom) -->
+      <div class="save-bar">
+        <div class="text-xs text-slate-500">7 fields modified</div>
+        <a href="detail.html" class="btn-cancel ml-auto">Cancel</a>
+        <button class="btn-save">Save changes</button>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- =========== DEAL TERMS WIZARD MODAL =========== -->
+<div class="modal-bg" id="dealTermsModal">
+  <div class="modal">
+    <div class="px-4 py-3 border-b border-slate-200 flex items-center gap-3">
+      <div>
+        <div class="font-semibold text-sm">Edit Deal Terms</div>
+        <div class="text-[11px] text-slate-500">2025 application · what type of investment are you seeking?</div>
+      </div>
+      <div class="ml-auto flex items-center gap-3">
+        <div class="progress-dots">
+          <div class="dot on" title="Type"></div>
+          <div class="dot" title="Terms"></div>
+          <div class="dot" title="Details"></div>
+          <div class="dot" title="Review"></div>
+        </div>
+        <button onclick="document.getElementById('dealTermsModal').classList.remove('open')" class="text-slate-400 hover:text-slate-700 text-xl leading-none">×</button>
+      </div>
+    </div>
+    <div class="p-6 overflow-y-auto" style="flex:1;">
+      <div class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Step 1 of 4 — Offering type</div>
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <button class="border-2 border-blue-500 bg-blue-50 rounded-md p-4 text-left">
+          <div class="font-semibold mb-1">SAFE</div>
+          <div class="text-xs text-slate-600">Simple Agreement for Future Equity. Typical for pre-seed / seed.</div>
+        </button>
+        <button class="border border-slate-200 rounded-md p-4 text-left hover:border-slate-400">
+          <div class="font-semibold mb-1">Convertible note</div>
+          <div class="text-xs text-slate-600">Debt that converts. Has interest and maturity.</div>
+        </button>
+        <button class="border border-slate-200 rounded-md p-4 text-left hover:border-slate-400">
+          <div class="font-semibold mb-1">Equity round</div>
+          <div class="text-xs text-slate-600">Priced round — Preferred or Common.</div>
+        </button>
+        <button class="border border-slate-200 rounded-md p-4 text-left hover:border-slate-400">
+          <div class="font-semibold mb-1">Debt</div>
+          <div class="text-xs text-slate-600">Term loan; principal + interest + maturity.</div>
+        </button>
+        <button class="border border-slate-200 rounded-md p-4 text-left hover:border-slate-400">
+          <div class="font-semibold mb-1">Warrants</div>
+          <div class="text-xs text-slate-600">Coverage, exercise price, expiration.</div>
+        </button>
+        <button class="border border-slate-200 rounded-md p-4 text-left hover:border-slate-400">
+          <div class="font-semibold mb-1">Not sure yet</div>
+          <div class="text-xs text-slate-600">Free-text description, no structure required.</div>
+        </button>
+      </div>
+      <div class="text-[11px] text-slate-500">Steps 2–4 capture instrument-specific terms (cap, discount, MFN, valuation, etc.), close date, lead investor, and a review of all values. On save, the AI re-generates the deal-terms paragraph from the structured data.</div>
+    </div>
+    <div class="border-t border-slate-100 p-3 flex items-center gap-2">
+      <button onclick="document.getElementById('dealTermsModal').classList.remove('open')" class="btn-cancel">Cancel</button>
+      <button class="ml-auto btn-cancel">Back</button>
+      <button class="btn-save" style="padding:5px 14px;">Continue</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleApp(id) {
+    const card = document.getElementById(id);
+    if (!card) return;
+    card.classList.toggle('open');
+    const chev = card.querySelector('.app-card-head > span');
+    if (chev) chev.textContent = card.classList.contains('open') ? '▾' : '▸';
+  }
+</script>
+
+</body>
+</html>

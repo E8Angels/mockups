@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Company detail — Voltaic Drive</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .status-active   { background:#bae6fd; color:#075985; }
+  .stage-pill      { background:#f8fafc; color:#475569; border:1px solid #e2e8f0; font-size:11px; padding:1px 8px; border-radius:3px; display:inline-block; }
+  .ladder-invested { background:#bbf7d0; color:#065f46; }
+  .ladder-dilig    { background:#fde68a; color:#854d0e; }
+  .ladder-pitch    { background:#fef3c7; color:#92400e; }
+  .ladder-screen   { background:#e0e7ff; color:#3730a3; }
+  .badge           { background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:10px; padding:1px 6px; border-radius:3px; font-weight:600; }
+  .badge-d8        { background:#cffafe; color:#155e75; border-color:#a5f3fc; }
+  .badge-followon  { background:#fef3c7; color:#92400e; border-color:#fde68a; }
+  .seed-note       { background:#fef9c3; border:1px solid #fde68a; color:#713f12; }
+
+  /* ===== One person pill, used everywhere a person appears ===== */
+  .person-pill {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:2px 8px; border:1px solid #e2e8f0; border-radius:11px;
+    background:#fff; font-size:12px; line-height:1.5; color:#0f172a;
+    white-space:nowrap;
+  }
+  .person-pill .name  { font-weight:500; }
+  .person-pill .title { color:#64748b; font-size:11px; }
+  .person-pill .role  { color:#94a3b8; font-size:9px; text-transform:uppercase; letter-spacing:0.05em; padding-left:5px; margin-left:3px; border-left:1px solid #e2e8f0; }
+  .person-pill.primary { background:#f0f9ff; border-color:#bae6fd; }
+  .person-pill.compact { padding:1px 6px; font-size:11px; gap:4px; }
+
+  /* ===== Left rail nav ===== */
+  .nav-item        { display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:4px; font-size:12px; color:#475569; }
+  .nav-item:hover  { background:#f1f5f9; color:#0f172a; }
+  .nav-item.active { background:#eff6ff; color:#1d4ed8; font-weight:500; }
+  .nav-item .nav-count { color:#94a3b8; font-size:11px; margin-left:auto; tabular-nums; }
+  .nav-item.active .nav-count { color:#3b82f6; }
+
+  /* ===== Section card ===== */
+  .section-card { background:#fff; border:1px solid #e2e8f0; border-radius:6px; padding:14px 16px; }
+  .section-h    { display:flex; align-items:baseline; gap:8px; margin-bottom:10px; }
+  .section-h h2 { font-size:14px; font-weight:600; color:#0f172a; }
+  .section-h .section-count { color:#94a3b8; font-size:11px; font-weight:500; }
+  .section-h .section-actions { margin-left:auto; }
+  .section-h .section-edit { color:#94a3b8; cursor:pointer; font-size:11px; }
+  .section-h .section-edit:hover { color:#1d4ed8; }
+
+  /* ===== Profile dense strip ===== */
+  .meta-row { display:flex; align-items:baseline; gap:8px; padding:3px 0; font-size:12px; line-height:1.55; flex-wrap:wrap; }
+  .meta-row .meta-label { color:#94a3b8; font-size:10px; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; width:96px; flex-shrink:0; text-align:right; padding-right:4px; }
+  .meta-row .meta-value { color:#0f172a; display:flex; align-items:center; flex-wrap:wrap; gap:6px; flex:1; min-width:0; }
+  .meta-row .sep { color:#cbd5e1; padding:0 2px; }
+  .check-yes { color:#065f46; font-weight:500; }
+
+  /* ===== Application tabs ===== */
+  .app-tabs { display:flex; gap:2px; border-bottom:1px solid #e2e8f0; margin-bottom:14px; }
+  .app-tab  { padding:7px 12px; font-size:12px; color:#64748b; border-bottom:2px solid transparent; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+  .app-tab:hover { color:#0f172a; }
+  .app-tab.active { color:#0f172a; border-bottom-color:#0f172a; font-weight:500; }
+  .app-tab .stage-pill { font-size:10px; padding:0 6px; }
+  .app-tab .badge { font-size:9px; }
+  .app-panel { display:none; }
+  .app-panel.active { display:block; }
+
+  /* ===== Pitch deck embed ===== */
+  .pitch-deck { background:#0f172a; border-radius:6px; overflow:hidden; }
+  .pitch-deck-head { background:#1e293b; color:#fff; padding:5px 10px; display:flex; align-items:center; gap:8px; font-size:11px; }
+  .pitch-deck-head .deck-counter { color:#94a3b8; font-size:11px; }
+  .pitch-deck-head .deck-actions { margin-left:auto; display:flex; gap:4px; }
+  .pitch-deck-head .deck-actions button { color:#cbd5e1; padding:2px 5px; border-radius:3px; font-size:11px; }
+  .pitch-deck-head .deck-actions button:hover { color:#fff; background:rgba(255,255,255,0.08); }
+  .pitch-deck-body { aspect-ratio:16/9; background:#1e293b; position:relative; display:flex; align-items:center; justify-content:center; color:#475569; }
+  .pitch-deck-body .placeholder-slide { background:#fff; width:80%; height:80%; border-radius:3px; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-size:24px; }
+  .pitch-deck-nav { position:absolute; bottom:8px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.75); border-radius:14px; padding:3px 6px; display:flex; align-items:center; gap:6px; color:#fff; font-size:11px; }
+  .pitch-deck-nav button { padding:2px 4px; color:#fff; }
+
+  /* ===== Pitch content fields ===== */
+  .pfield { display:flex; flex-direction:column; gap:3px; }
+  .pfield .plabel { font-size:10px; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; font-weight:600; }
+  .pfield .pbody  { font-size:13px; line-height:1.45; color:#0f172a; }
+  .pfield-stack { display:grid; grid-template-columns:1fr 1fr; gap:14px 22px; }
+
+  /* ===== Compact inline key:value row for raise / metadata ===== */
+  .inline-kv { display:inline-flex; align-items:baseline; gap:4px; font-size:12px; line-height:1.5; }
+  .inline-kv .ikv-label { color:#94a3b8; font-size:10px; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; }
+  .inline-kv .ikv-value { color:#0f172a; font-weight:500; }
+
+  /* ===== Notes / Emails ===== */
+  .note-card { background:#fff; border:1px solid #e2e8f0; border-radius:5px; padding:10px 12px; margin-bottom:6px; }
+  .note-head { display:flex; align-items:center; gap:8px; margin-bottom:5px; font-size:12px; flex-wrap:wrap; }
+  .note-meta { color:#94a3b8; font-size:11px; }
+  .note-type { font-size:10px; padding:1px 6px; border-radius:3px; font-weight:600; }
+  .note-type-Note { background:#dbeafe; color:#1e40af; }
+  .note-type-Referral { background:#e9d5ff; color:#6b21a8; }
+  .note-type-News { background:#fef3c7; color:#92400e; }
+  .note-type-Ask { background:#fed7aa; color:#9a3412; }
+  .note-type-AISummary { background:#cffafe; color:#155e75; }
+  .note-body { color:#334155; font-size:13px; line-height:1.5; }
+
+  .email-row { background:#fff; border:1px solid #e2e8f0; border-radius:5px; padding:8px 12px; margin-bottom:5px; }
+  .email-row.expanded { padding-bottom:12px; }
+  .email-head { display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; flex-wrap:wrap; }
+  .email-row:not(.expanded) .email-body { display:none; }
+  .email-body { padding-top:10px; border-top:1px solid #f1f5f9; margin-top:10px; color:#334155; font-size:13px; line-height:1.5; white-space:pre-wrap; }
+  .email-channel { font-size:10px; padding:1px 6px; border-radius:3px; font-weight:600; background:#f1f5f9; color:#475569; flex-shrink:0; }
+  .email-channel.decision { background:#fee2e2; color:#b91c1c; }
+  .email-subject { color:#64748b; flex:1; min-width:0; }
+  .email-subject .truncate { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* ===== Events ===== */
+  .event-row { display:grid; grid-template-columns:96px 1fr; gap:12px; padding:6px 0; border-top:1px solid #f1f5f9; font-size:12px; }
+  .event-row:first-child { border-top:none; padding-top:0; }
+  .event-date { color:#475569; tabular-nums; }
+  .event-name { font-weight:500; color:#0f172a; }
+  .event-meta { color:#94a3b8; font-size:11px; }
+  .event-meta a { color:#3b82f6; }
+
+  /* ===== Ratings strip ===== */
+  .app-strip { display:inline-flex; gap:2px; }
+  .app-strip button { padding:3px 8px; font-size:11px; border-radius:4px; color:#475569; }
+  .app-strip button.on { background:#0f172a; color:#fff; }
+
+  details > summary { list-style:none; cursor:pointer; }
+  details > summary::-webkit-details-marker { display:none; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 text-sm">
+
+<div class="bg-slate-800 text-slate-100 px-4 py-2 text-xs flex items-center gap-3 sticky top-0 z-50">
+  <span class="font-semibold">Mockup v8</span>
+  <span class="text-slate-300">Company detail — density pass</span>
+  <span class="ml-auto"><a class="text-blue-300 hover:underline" href="variant-a-list.html">← List view</a></span>
+  <span><a class="text-blue-300 hover:underline" href="detail-edit.html">Edit mode →</a></span>
+  <span><a class="text-blue-300 hover:underline" href="plan.md">plan.md</a></span>
+</div>
+
+<div class="max-w-[1500px] mx-auto px-4 py-3">
+
+  <div class="seed-note rounded-md px-3 py-2 mb-3 text-xs">
+    <span class="font-semibold">v8 density pass:</span>
+    The page now leads with <b>application content</b>, not metadata. Header banner stays one row. Pitch deck + the three highest-leverage pitch fields (Tagline · Problem · Solution) sit side-by-side at the top so something substantive is on screen the moment the page loads. Remaining 11 pitch fields fill a tight 2-column grid below. Raise details collapse to inline <code>label: value</code> chips on one row each instead of full label-above-control blocks.
+    Profile is now <b>five dense lines</b> below the application — not a six-row sparse card. Founder demographics, sourcing, internal leads, follow-up all share lines.
+    One <b>person pill</b> component (`person-pill`) is used everywhere a person appears — contacts, internal leads, referral partner, note authors, email senders/recipients. No more text-on-grey / pills-on-blue / plain-text mixed treatments.
+    Tabs in the Applications section switch between submissions; the deck and pitch fields update with the tab.
+  </div>
+
+  <!-- HEADER BANNER -->
+  <div class="bg-white border border-slate-200 rounded-md px-3 py-2 mb-3 flex items-center gap-3 sticky top-[44px] z-40">
+    <div class="w-10 h-10 rounded bg-emerald-100 text-emerald-700 grid place-items-center text-xs font-semibold flex-shrink-0">VD</div>
+    <div class="min-w-0">
+      <div class="flex items-center gap-2 flex-wrap">
+        <h1 class="text-lg font-semibold leading-tight">Voltaic Drive</h1>
+        <span class="status-active text-[11px] rounded px-2 py-0.5">Active</span>
+      </div>
+      <div class="text-xs text-slate-500 leading-tight">Electric vehicles · Seattle, WA · USA · <a href="https://voltaicdrive.com" class="text-blue-600 hover:underline">voltaicdrive.com</a></div>
+    </div>
+    <div class="ml-auto text-xs text-slate-600 flex items-center gap-5">
+      <div><div class="text-slate-400 text-[10px] uppercase tracking-wide">$ Invested</div><div class="font-semibold tabular-nums leading-tight">$425,000 <span class="font-normal text-slate-500">· 2 inv.</span></div></div>
+      <div><div class="text-slate-400 text-[10px] uppercase tracking-wide">Latest application</div><div class="font-medium leading-tight">2025 · Closed</div></div>
+      <div><div class="text-slate-400 text-[10px] uppercase tracking-wide">Last touch</div><div class="font-medium leading-tight">3 days ago</div></div>
+      <a href="detail-edit.html" class="h-8 px-3 text-xs font-medium border border-slate-300 rounded-md hover:bg-slate-50 flex items-center">Edit</a>
+    </div>
+  </div>
+
+  <div class="flex gap-3">
+
+    <!-- LEFT NAV -->
+    <aside class="text-xs flex-shrink-0" style="width:180px;">
+      <nav class="border border-slate-200 rounded-md bg-white py-1 sticky top-[100px]">
+        <a href="#applications" class="nav-item active">Application <span class="nav-count">3</span></a>
+        <a href="#profile"      class="nav-item">Profile</a>
+        <a href="#investments"  class="nav-item">Investments <span class="nav-count">2</span></a>
+        <a href="#notes"        class="nav-item">Notes <span class="nav-count">12</span></a>
+        <a href="#emails"       class="nav-item">Emails <span class="nav-count">24</span></a>
+        <a href="#events"       class="nav-item">Events <span class="nav-count">7</span></a>
+        <a href="#ratings"      class="nav-item">Ratings &amp; decisions <span class="nav-count">3</span></a>
+      </nav>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="flex-1 min-w-0 space-y-3">
+
+      <!-- =========== APPLICATION (first, the meat) =========== -->
+      <section id="applications" class="section-card">
+        <div class="section-h">
+          <h2>Application</h2>
+          <div class="section-actions"><a href="detail-edit.html#applications" class="section-edit">✎ Edit</a></div>
+        </div>
+
+        <!-- Tabs for each submission -->
+        <div class="app-tabs" id="appTabs">
+          <button class="app-tab active" data-app="2025">
+            Apr 2025
+            <span class="ladder-invested stage-pill">Invested</span>
+          </button>
+          <button class="app-tab" data-app="2024">
+            Mar 2024
+            <span class="ladder-dilig stage-pill">Diligence Complete</span>
+            <span class="badge">Passed</span>
+          </button>
+          <button class="app-tab" data-app="2022">
+            Feb 2022
+            <span class="ladder-screen stage-pill">Screen</span>
+            <span class="badge">Passed</span>
+          </button>
+          <div class="ml-auto self-center text-[10px] text-slate-400 px-2 tabular-nums">app_4f3a2b…</div>
+        </div>
+
+        <!-- 2025 APPLICATION PANEL (active) -->
+        <div class="app-panel active" data-app="2025">
+
+          <!-- Top tagline row, full-width -->
+          <div class="mb-3 px-1">
+            <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-1">Tagline</div>
+            <div class="text-base font-medium text-slate-900 leading-snug">EV powertrain conversion kits for last-mile fleets.</div>
+          </div>
+
+          <!-- Deck (left) + Problem / Solution (right) on the same row -->
+          <div class="grid grid-cols-12 gap-4 mb-4">
+            <div class="col-span-5">
+              <div class="pitch-deck">
+                <div class="pitch-deck-head">
+                  <span class="font-medium">Pitch Deck</span>
+                  <span class="deck-counter">5 / 18</span>
+                  <div class="deck-actions">
+                    <button title="Expand">⛶</button>
+                    <button title="Download">↓</button>
+                  </div>
+                </div>
+                <div class="pitch-deck-body">
+                  <div class="placeholder-slide">PDF Slide 5</div>
+                  <div class="pitch-deck-nav">
+                    <button>◂</button>
+                    <span>5 of 18</span>
+                    <button>▸</button>
+                  </div>
+                </div>
+              </div>
+              <div class="text-[10px] text-slate-400 text-center mt-1">Pitch video: not submitted</div>
+            </div>
+            <div class="col-span-7 space-y-3">
+              <div class="pfield">
+                <div class="plabel">Problem</div>
+                <div class="pbody">Class 3 commercial fleets electrifying their last-mile routes face 12–18 month lead times on ground-up EV trucks. Existing electric retrofits are bespoke and rely on Tier-2 integrators.</div>
+              </div>
+              <div class="pfield">
+                <div class="plabel">Solution</div>
+                <div class="pbody">Drop-in powertrain conversion kit, three SKUs covering 90% of the Class 3 ICE fleet. Installs in &lt;8 hours by a certified shop.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Remaining 11 pitch fields, dense 2-col grid -->
+          <div class="pfield-stack mb-4">
+            <div class="pfield">
+              <div class="plabel">Business model</div>
+              <div class="pbody">Hardware unit economics: $18K margin per retrofit at $30K avg price; certified-installer network earns $6K each.</div>
+            </div>
+            <div class="pfield">
+              <div class="plabel">Market</div>
+              <div class="pbody">14.2M Class 3 trucks in NA fleets. ~1.7M turning over to electric drivetrains 2026–2030 per ICCT.</div>
+            </div>
+            <div class="pfield">
+              <div class="plabel">Go to market</div>
+              <div class="pbody">Land-and-expand with named fleet partners: Sysco regional, FedEx Ground regional, US Foods. Certified-installer expansion in PNW + CA in year 1.</div>
+            </div>
+            <div class="pfield">
+              <div class="plabel">Competitive advantage</div>
+              <div class="pbody">Drop-in form factor specific to Class 3 frame; certified-installer playbook; signed pilots in three fleet types.</div>
+            </div>
+            <div class="pfield">
+              <div class="plabel">Traction</div>
+              <div class="pbody">137 paid retrofits. $4.2M ARR at $30K avg ticket. 3 fleet customers signed for 2026 (Sysco, FedEx Ground regional, US Foods).</div>
+            </div>
+            <div class="pfield">
+              <div class="plabel">Competitors</div>
+              <div class="pbody">Lightning eMotors (ground-up), Motiv, Workhorse — none do drop-in retrofits at this price.</div>
+            </div>
+            <div class="pfield">
+              <div class="plabel">Future milestones</div>
+              <div class="pbody">Q3 2026: complete SKU-3. Q4 2026: 20 certified-installer locations. Q2 2027: launch Class 2 SKU.</div>
+            </div>
+            <div class="pfield">
+              <div class="plabel">Patentable ideas</div>
+              <div class="pbody">Modular battery-skateboard mounting bracket; software-controlled regen tuning by SKU; pending provisional filings.</div>
+            </div>
+            <div class="pfield">
+              <div class="plabel">Environmental impact</div>
+              <div class="pbody">Each retrofit avoids ~18 tons CO2/year. Cumulative avoided emissions at 2026 plan: ~24K tons.</div>
+            </div>
+            <div class="pfield">
+              <div class="plabel">Team</div>
+              <div class="pbody">Adi Rao (CEO, ex-Rivian); Mei Yoon (CTO, ex-Tesla); Janet Park (Sales); Robert Singh (Lead Eng). 12 FTEs + 4 part-time installers.</div>
+            </div>
+            <div class="pfield">
+              <div class="plabel">Management qualifications</div>
+              <div class="pbody">Adi Rao: ex-Rivian Powertrain Lead (8y), Stanford ME. Mei Yoon: ex-Tesla Drive Unit (6y). Janet Park: ex-Cummins fleet sales (12y).</div>
+            </div>
+          </div>
+
+          <!-- Raise details — dense inline strip -->
+          <div class="border-t border-slate-100 pt-3 mb-3">
+            <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-2">Raise details</div>
+            <div class="flex flex-wrap gap-x-6 gap-y-2 mb-3">
+              <span class="inline-kv"><span class="ikv-label">Capital seeking</span><span class="ikv-value">$1.5M SAFE</span></span>
+              <span class="text-slate-300">·</span>
+              <span class="inline-kv"><span class="ikv-label">Instrument</span><span class="ikv-value">SAFE</span></span>
+              <span class="text-slate-300">·</span>
+              <span class="inline-kv"><span class="ikv-label">Lead investor</span><span class="ikv-value">Climate Capital ($500K)</span></span>
+              <span class="text-slate-300">·</span>
+              <span class="inline-kv"><span class="ikv-label">Round close</span><span class="ikv-value tabular-nums">2025-12-15</span></span>
+              <span class="text-slate-300">·</span>
+              <span class="inline-kv"><span class="ikv-label">Funding to date</span><span class="ikv-value">$1.8M</span></span>
+            </div>
+            <div class="pfield mb-2">
+              <div class="plabel">Deal terms <span class="ml-1 normal-case tracking-normal text-[10px] text-slate-400">paragraph generated from wizard data</span></div>
+              <div class="pbody">SAFE with a $12M post-money cap and 20% discount. Most-favored nation rights. Minimum check size $25K. Target close 2025-12-15. Climate Capital leading with $500K committed; pro-rata rights for existing investors.</div>
+            </div>
+            <div class="pfield-stack">
+              <div class="pfield">
+                <div class="plabel">Financial position</div>
+                <div class="pbody">11 months runway at current burn ($95K/mo). $4.2M ARR run-rate. Path to default-alive at ~$5M revenue at 22% net margin.</div>
+              </div>
+              <div class="pfield">
+                <div class="plabel">Use of funds</div>
+                <div class="pbody">~$700K SKU-3 tooling. ~$400K certified-installer expansion (CA + TX). ~$250K working capital for inventory. ~$150K 2 engineering hires.</div>
+              </div>
+              <div class="pfield">
+                <div class="plabel">Cap table</div>
+                <div class="pbody">Adi Rao 48% · Mei Yoon 18% · Climate Capital 7% (notes converting) · Decarbon8 2025 SAFE 2% · ESOP 12% · Other angels 13%. Pre-money fully diluted: ~$10M.</div>
+              </div>
+              <div class="pfield">
+                <div class="plabel">Dealum ID</div>
+                <div class="pbody">DLM-2025-0142</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 2024 PANEL (hidden by default) -->
+        <div class="app-panel" data-app="2024">
+          <div class="text-xs text-slate-500 italic px-1 py-6 text-center">
+            2024 application — passed. Click the 2025 tab above to read the current application content; this panel would render the 2024 fields the same way.
+          </div>
+        </div>
+
+        <!-- 2022 PANEL (hidden by default) -->
+        <div class="app-panel" data-app="2022">
+          <div class="text-xs text-slate-500 italic px-1 py-6 text-center">
+            2022 application — passed at Screen stage.
+          </div>
+        </div>
+
+      </section>
+
+      <!-- =========== PROFILE (compact metadata + contacts together) =========== -->
+      <section id="profile" class="section-card">
+        <div class="section-h">
+          <h2>Profile</h2>
+          <div class="section-actions"><a href="detail-edit.html#profile" class="section-edit">✎ Edit</a></div>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-label">Contacts</div>
+          <div class="meta-value">
+            <span class="person-pill primary"><span class="name">Adi Rao</span><span class="title">Founder / CEO</span><span class="role">Primary</span></span>
+            <span class="person-pill"><span class="name">Mei Yoon</span><span class="title">CTO</span></span>
+            <span class="person-pill"><span class="name">Janet Park</span><span class="title">Head of Sales</span></span>
+            <span class="person-pill"><span class="name">Robert Singh</span><span class="title">Lead Engineer</span></span>
+          </div>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-label">Sector</div>
+          <div class="meta-value">
+            <span>Electric vehicles</span>
+            <span class="sep">·</span>
+            <span class="text-slate-500 text-[11px]">Secondary:</span>
+            <span class="text-slate-700">Powertrains, Charging infra</span>
+          </div>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-label">HQ</div>
+          <div class="meta-value">
+            <span>Seattle, WA · USA</span>
+          </div>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-label">Demographics</div>
+          <div class="meta-value">
+            <span class="text-slate-500 text-[11px]">Race/Ethnicity:</span> <span class="text-slate-700">South Asian</span>
+            <span class="sep">·</span>
+            <span class="text-slate-500 text-[11px]">Gender:</span> <span class="text-slate-700">Man</span>
+            <span class="sep">·</span>
+            <span class="check-yes">✓ Underrepresented founder</span>
+          </div>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-label">Sourcing</div>
+          <div class="meta-value">
+            <span class="text-slate-500 text-[11px]">Referred by</span>
+            <span class="person-pill compact"><span class="name">M. Patel</span><span class="title">@ Decarbon8</span></span>
+            <span class="sep">·</span>
+            <span class="text-slate-500 text-[11px]">Lead source:</span>
+            <span class="text-slate-700">Referral</span>
+          </div>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-label">Internal leads</div>
+          <div class="meta-value">
+            <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
+            <span class="person-pill compact"><span class="name">Devon Walsh</span></span>
+            <span class="sep">·</span>
+            <span class="text-slate-500 text-[11px]">Follow-up:</span>
+            <span class="text-slate-700 tabular-nums">2026-06-15</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========== INVESTMENTS =========== -->
+      <section id="investments" class="section-card">
+        <div class="section-h">
+          <h2>Investments</h2>
+          <span class="section-count">2 investments · $425,000 deployed · $0 returned · net $425,000</span>
+          <div class="section-actions"><a href="detail-edit.html#investments" class="section-edit">✎ Edit</a></div>
+        </div>
+        <table class="w-full text-xs border border-slate-200 rounded-md">
+          <thead class="bg-slate-50 text-slate-600">
+            <tr>
+              <th class="text-left font-medium px-2 py-1.5 w-24">Date</th>
+              <th class="text-left font-medium px-2 py-1.5 w-48">Fund / member</th>
+              <th class="text-right font-medium px-2 py-1.5 w-28">Amount</th>
+              <th class="text-left font-medium px-2 py-1.5 w-32">Instrument</th>
+              <th class="text-left font-medium px-2 py-1.5">Terms / status</th>
+              <th class="text-left font-medium px-2 py-1.5 w-28">Current mark</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr>
+              <td class="px-2 py-1.5 tabular-nums">2026-02-14</td>
+              <td class="px-2 py-1.5">Annual Fund 2026</td>
+              <td class="px-2 py-1.5 text-right tabular-nums font-medium">$200,000</td>
+              <td class="px-2 py-1.5"><span class="stage-pill">SAFE · active</span></td>
+              <td class="px-2 py-1.5 text-slate-600">Cap $12M post · 20% discount · MFN</td>
+              <td class="px-2 py-1.5">1.0× <span class="text-slate-400">(last round)</span></td>
+            </tr>
+            <tr>
+              <td class="px-2 py-1.5 tabular-nums">2025-11-08</td>
+              <td class="px-2 py-1.5">Annual Fund 2025</td>
+              <td class="px-2 py-1.5 text-right tabular-nums font-medium">$225,000</td>
+              <td class="px-2 py-1.5"><span class="stage-pill">SAFE · active</span></td>
+              <td class="px-2 py-1.5 text-slate-600">Cap $10M post · 20% discount</td>
+              <td class="px-2 py-1.5">1.2× <span class="text-slate-400">(internal)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- =========== NOTES =========== -->
+      <section id="notes" class="section-card">
+        <div class="section-h">
+          <h2>Notes</h2>
+          <span class="section-count">12 notes</span>
+          <div class="section-actions">
+            <button class="h-7 px-2 text-[11px] border border-slate-300 rounded hover:bg-slate-50">＋ New note</button>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 mb-3 text-xs">
+          <select class="h-7 px-2 border border-slate-300 rounded text-xs"><option>All scopes</option><option>Company-level only</option><option>2025 application</option><option>2024 application</option><option>2022 application</option></select>
+          <select class="h-7 px-2 border border-slate-300 rounded text-xs"><option>All types</option><option>Note</option><option>Referral</option><option>News</option><option>Ask</option><option>AI Summary</option></select>
+          <input type="text" class="h-7 px-2 border border-slate-300 rounded text-xs flex-1" placeholder="Search notes…" autocomplete="off" data-lpignore="true" data-form-type="other" />
+        </div>
+
+        <div class="note-card">
+          <div class="note-head">
+            <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
+            <span class="note-type note-type-Note">Note</span>
+            <span class="note-meta">2026-02-08 · 2025 application</span>
+          </div>
+          <div class="note-body">Met with Adi and the Sysco regional buyer. Confirmed signed PO. Working capital is the real question — see GTM section in diligence draft. Reviewing 2026 SKU-3 timeline with Mei next week.</div>
+        </div>
+
+        <div class="note-card">
+          <div class="note-head">
+            <span class="person-pill compact"><span class="name">Devon Walsh</span></span>
+            <span class="note-type note-type-AISummary">AI Summary</span>
+            <span class="note-meta">2025-12-04 · 2025 application</span>
+          </div>
+          <div class="note-body">Application summary: Strong unit economics ($18K margin/retrofit), three signed fleet pilots, clear path to default-alive at ~$5M ARR. Capital intensity of inventory is the principal risk; lead investor (Climate Capital) is taking a chunk of the round.</div>
+        </div>
+
+        <div class="note-card">
+          <div class="note-head">
+            <span class="person-pill compact"><span class="name">M. Patel</span></span>
+            <span class="note-type note-type-Referral">Referral</span>
+            <span class="note-meta">2025-10-12 · Company-level</span>
+          </div>
+          <div class="note-body">Introduced Voltaic to Karen via Decarbon8 portfolio referrals network. Strongly recommend looking at the 2025 application.</div>
+        </div>
+
+        <div class="note-card">
+          <div class="note-head">
+            <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
+            <span class="note-type note-type-Note">Note</span>
+            <span class="note-meta">2024-05-18 · 2024 application</span>
+          </div>
+          <div class="note-body">Decided to pass on the 2024 application. Team is strong but the proposition was platform-stage, no real fleet customer in hand. Encouraged Adi to reapply with traction.</div>
+        </div>
+
+        <div class="text-center text-xs text-slate-400 pt-2"><a href="#" class="text-blue-600 hover:underline">Show all 12 notes</a></div>
+      </section>
+
+      <!-- =========== EMAILS =========== -->
+      <section id="emails" class="section-card">
+        <div class="section-h">
+          <h2>Emails</h2>
+          <span class="section-count">24 emails · log only</span>
+        </div>
+
+        <div class="email-row expanded">
+          <div class="email-head" onclick="toggleEmail(this)">
+            <span class="email-channel">Email</span>
+            <span class="person-pill compact"><span class="name">Adi Rao</span></span>
+            <span class="text-slate-400">→</span>
+            <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
+            <span class="email-subject"><span class="truncate">"Sysco signed — PO attached"</span></span>
+            <span class="text-slate-400 text-[11px] tabular-nums">2026-01-22</span>
+          </div>
+          <div class="email-body">Karen — Great news. Sysco PNW just signed the PO for the first 22 retrofit units, deliverable Q2. Attaching the executed order. We're now at three signed fleet customers for 2026.
+
+[Attachment: sysco-PO-2026-01.pdf, 487 KB]</div>
+        </div>
+
+        <div class="email-row">
+          <div class="email-head" onclick="toggleEmail(this)">
+            <span class="email-channel decision">Decision</span>
+            <span class="person-pill compact"><span class="name">E8 Screening</span></span>
+            <span class="text-slate-400">→</span>
+            <span class="person-pill compact"><span class="name">Adi Rao</span></span>
+            <span class="email-subject"><span class="truncate">"Re: 2025 application — Advance to Investment"</span></span>
+            <span class="text-slate-400 text-[11px] tabular-nums">2025-09-25</span>
+          </div>
+        </div>
+
+        <div class="email-row">
+          <div class="email-head" onclick="toggleEmail(this)">
+            <span class="email-channel">Email</span>
+            <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
+            <span class="text-slate-400">→</span>
+            <span class="person-pill compact"><span class="name">Adi Rao</span></span>
+            <span class="email-subject"><span class="truncate">"Re: Diligence questions — battery sourcing"</span></span>
+            <span class="text-slate-400 text-[11px] tabular-nums">2025-08-19</span>
+          </div>
+        </div>
+
+        <div class="email-row">
+          <div class="email-head" onclick="toggleEmail(this)">
+            <span class="email-channel decision">Decision</span>
+            <span class="person-pill compact"><span class="name">E8 Screening</span></span>
+            <span class="text-slate-400">→</span>
+            <span class="person-pill compact"><span class="name">Adi Rao</span></span>
+            <span class="email-subject"><span class="truncate">"Re: 2024 application — Too early"</span></span>
+            <span class="text-slate-400 text-[11px] tabular-nums">2024-05-18</span>
+          </div>
+        </div>
+
+        <div class="text-center text-xs text-slate-400 pt-2"><a href="#" class="text-blue-600 hover:underline">Show all 24 emails</a></div>
+      </section>
+
+      <!-- =========== EVENTS =========== -->
+      <section id="events" class="section-card">
+        <div class="section-h">
+          <h2>Events</h2>
+          <span class="section-count">7 events</span>
+        </div>
+        <div class="px-2">
+          <div class="event-row">
+            <div class="event-date">2025-09-22</div>
+            <div>
+              <span class="event-name">Diligence Debrief</span>
+              <span class="event-meta">· 2025 application · Lead: </span>
+              <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
+              <span class="event-meta">· <a href="#">Recording</a> · <a href="#">Questions doc</a></span>
+            </div>
+          </div>
+          <div class="event-row">
+            <div class="event-date">2025-08-19</div>
+            <div>
+              <span class="event-name">Diligence Formed</span>
+              <span class="event-meta">· 2025 application · Lead: </span>
+              <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
+            </div>
+          </div>
+          <div class="event-row">
+            <div class="event-date">2025-07-12</div>
+            <div>
+              <span class="event-name">Pitch</span>
+              <span class="event-meta">· 2025 application · linked to Member Meeting 2025-07-12 · <a href="#">Recording</a></span>
+            </div>
+          </div>
+          <div class="event-row">
+            <div class="event-date">2025-06-08</div>
+            <div>
+              <span class="event-name">Screening</span>
+              <span class="event-meta">· 2025 application</span>
+            </div>
+          </div>
+          <div class="event-row">
+            <div class="event-date">2025-05-22</div>
+            <div>
+              <span class="event-name">Pre-Screening</span>
+              <span class="event-meta">· 2025 application</span>
+            </div>
+          </div>
+          <div class="event-row">
+            <div class="event-date">2024-04-30</div>
+            <div>
+              <span class="event-name">Diligence Debrief</span>
+              <span class="event-meta">· 2024 application · Lead: </span>
+              <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
+            </div>
+          </div>
+          <div class="event-row">
+            <div class="event-date">2022-03-14</div>
+            <div>
+              <span class="event-name">Screening</span>
+              <span class="event-meta">· 2022 application</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========== RATINGS & DECISIONS =========== -->
+      <section id="ratings" class="section-card">
+        <div class="section-h">
+          <h2>Ratings &amp; decisions</h2>
+          <div class="app-strip ml-2">
+            <button class="on">All apps</button>
+            <button>2025</button>
+            <button>2024</button>
+            <button>2022</button>
+          </div>
+        </div>
+
+        <div class="border border-slate-200 rounded p-3 mb-2 text-xs">
+          <div class="font-semibold text-[11px] uppercase tracking-wider text-slate-500 mb-1">Screening ratings — 2025 application</div>
+          <div class="text-slate-700 mb-1">17 submissions · avg <b>4.1 / 5</b> · 12 recommend / 5 don't recommend</div>
+          <div class="text-slate-500">Top concern: capital intensity of inventory. Top reason to recommend: clear pull from named fleet buyers.</div>
+        </div>
+
+        <div class="border border-slate-200 rounded p-3 mb-2 text-xs">
+          <div class="font-semibold text-[11px] uppercase tracking-wider text-slate-500 mb-1">Decision — 2025 application</div>
+          <div class="text-slate-700"><b>Advance to Investment</b> · sent 2025-09-25 by <span class="person-pill compact"><span class="name">Karen Stewart</span></span></div>
+          <div class="text-slate-600 mt-1">"Following the diligence debrief we're moving forward with an investment from the Annual Fund 2025…"</div>
+        </div>
+
+        <div class="border border-slate-200 rounded p-3 mb-2 text-xs">
+          <div class="font-semibold text-[11px] uppercase tracking-wider text-slate-500 mb-1">Decision — 2024 application</div>
+          <div class="text-slate-700"><b>Pass · Too Early</b> · sent 2024-05-18 by <span class="person-pill compact"><span class="name">Karen Stewart</span></span></div>
+        </div>
+
+        <div class="border border-slate-200 rounded p-3 text-xs">
+          <div class="font-semibold text-[11px] uppercase tracking-wider text-slate-500 mb-1">Decision — 2022 application</div>
+          <div class="text-slate-700"><b>Pass</b> · sent 2022-03-25 by <span class="person-pill compact"><span class="name">Devon Walsh</span></span></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+  // Application tabs
+  document.querySelectorAll('#appTabs .app-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const app = tab.dataset.app;
+      document.querySelectorAll('#appTabs .app-tab').forEach(t => t.classList.toggle('active', t === tab));
+      document.querySelectorAll('.app-panel').forEach(p => p.classList.toggle('active', p.dataset.app === app));
+    });
+  });
+
+  function toggleEmail(headEl) {
+    const row = headEl.closest('.email-row');
+    if (!row) return;
+    row.classList.toggle('expanded');
+  }
+</script>
+
+</body>
+</html>
