@@ -56,6 +56,16 @@
   .workspace-handle:hover::before, .workspace-handle.dragging::before { background:#3b82f6; left:1px; width:4px; }
   .workspace-main { flex:1; min-width:0; padding-left:10px; }
 
+  /* Collapsed rail — thin vertical button (mirrors diligence RightRail) */
+  .rail-collapsed-btn { width:36px; flex-shrink:0; border-right:1px solid #e2e8f0; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:14px 0; cursor:pointer; }
+  .rail-collapsed-btn:hover { background:#f8fafc; }
+  .rail-collapsed-btn .rcb-chev { color:#64748b; font-size:14px; line-height:1; }
+  .rail-collapsed-btn:hover .rcb-chev { color:#0f172a; }
+  .rail-collapsed-btn .rcb-label { writing-mode:vertical-rl; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:#475569; }
+  .rail-collapsed-btn:hover .rcb-label { color:#0f172a; }
+  .rail-collapsed-btn .rcb-icon { color:#64748b; }
+  .rail-collapsed-btn:hover .rcb-icon { color:#0f172a; }
+
   /* Row interactions */
   tbody tr.table-row { cursor:pointer; }
   .row-chev { font-size:13px; color:#475569; line-height:1; display:inline-block; width:14px; text-align:center; }
@@ -90,6 +100,7 @@
 <div class="max-w-[1500px] mx-auto px-4 py-4">
 
   <div class="seed-note rounded-md px-3 py-2 mb-3 text-xs">
+    <span class="font-semibold">v8 update:</span> Left filter rail is now <b>collapsible</b>. Click the <code>‹</code> at the top-right of the rail (or drag the resize handle all the way left) to collapse it to a thin vertical button. Click that button to re-expand. State persists in localStorage. Pattern mirrors the diligence-tab Right Rail.<br>
     <span class="font-semibold">v7 changes on this page:</span>
     <b>$ Invested</b> replaces "Capital."
     Click anywhere on a company row to expand its application history (the chevron is just an indicator now).
@@ -241,8 +252,25 @@
 
   <div class="workspace" id="workspace">
 
+    <!-- COLLAPSED RAIL BUTTON (hidden by default; shown when rail is collapsed) -->
+    <button id="workspaceRailCollapsed"
+            type="button"
+            onclick="expandRail()"
+            title="Open filters"
+            class="rail-collapsed-btn"
+            style="display:none;">
+      <span class="rcb-chev">›</span>
+      <span class="rcb-label">Filters</span>
+      <svg class="rcb-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+      </svg>
+    </button>
+
     <!-- LEFT RAIL FILTERS -->
     <aside class="workspace-rail text-xs" id="workspaceRail" style="width:280px;">
+      <div class="flex items-center justify-end mb-1.5">
+        <button type="button" onclick="collapseRail()" title="Collapse filters" class="text-slate-400 hover:text-slate-700 text-xs leading-none px-1">‹</button>
+      </div>
       <div class="border border-slate-200 rounded-md bg-white divide-y divide-slate-200">
 
         <!-- HAVE WE INVESTED? -->
@@ -742,34 +770,96 @@
     }
   });
 
-  /* ===== Resizable rail ===== */
+  /* ===== Resizable + collapsible rail (mirrors diligence RightRail pattern) ===== */
+  const RAIL_MIN_PX = 200;
+  const RAIL_MAX_PX = 560;
+  const COLLAPSE_THRESHOLD_PX = 160;
+  const RAIL_WIDTH_KEY = 'e8.companies.filterRailWidth';
+  const RAIL_OPEN_KEY  = 'e8.companies.filterRailOpen';
+
+  function collapseRail() {
+    const rail = document.getElementById('workspaceRail');
+    const handle = document.getElementById('workspaceHandle');
+    const btn = document.getElementById('workspaceRailCollapsed');
+    if (rail) rail.style.display = 'none';
+    if (handle) handle.style.display = 'none';
+    if (btn) btn.style.display = '';
+    try { localStorage.setItem(RAIL_OPEN_KEY, '0'); } catch (e) {}
+  }
+  function expandRail() {
+    const rail = document.getElementById('workspaceRail');
+    const handle = document.getElementById('workspaceHandle');
+    const btn = document.getElementById('workspaceRailCollapsed');
+    if (rail) rail.style.display = '';
+    if (handle) handle.style.display = '';
+    if (btn) btn.style.display = 'none';
+    try { localStorage.setItem(RAIL_OPEN_KEY, '1'); } catch (e) {}
+  }
+
   (function initResize() {
     const handle = document.getElementById('workspaceHandle');
     const rail   = document.getElementById('workspaceRail');
     if (!handle || !rail) return;
+
+    // Restore persisted state on load
+    try {
+      const savedW = parseInt(localStorage.getItem(RAIL_WIDTH_KEY) || '', 10);
+      if (Number.isFinite(savedW) && savedW >= RAIL_MIN_PX && savedW <= RAIL_MAX_PX) {
+        rail.style.width = savedW + 'px';
+      }
+      const open = localStorage.getItem(RAIL_OPEN_KEY);
+      if (open === '0') collapseRail();
+    } catch (e) {}
+
     let resizing = false;
     let startX = 0;
     let startW = 0;
+    let lastW  = 0;
+
     handle.addEventListener('mousedown', (e) => {
       resizing = true;
       startX = e.clientX;
       startW = rail.offsetWidth;
+      lastW  = startW;
       handle.classList.add('dragging');
       document.body.style.cursor = 'col-resize';
       document.body.style.userSelect = 'none';
       e.preventDefault();
     });
+
     document.addEventListener('mousemove', (e) => {
       if (!resizing) return;
       const dx = e.clientX - startX;
-      rail.style.width = Math.max(200, Math.min(560, startW + dx)) + 'px';
+      const candidate = startW + dx;
+      // Allow shrinking past the min so the user can drag-to-collapse;
+      // clamp upper bound only.
+      if (candidate < COLLAPSE_THRESHOLD_PX) {
+        // visually shrink toward zero to telegraph "you're about to collapse"
+        rail.style.width = Math.max(60, candidate) + 'px';
+      } else {
+        rail.style.width = Math.min(RAIL_MAX_PX, candidate) + 'px';
+      }
+      lastW = candidate;
     });
+
     document.addEventListener('mouseup', () => {
       if (!resizing) return;
       resizing = false;
       handle.classList.remove('dragging');
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
+
+      if (lastW < COLLAPSE_THRESHOLD_PX) {
+        // Restore width to a sane default before collapsing so the next
+        // expand doesn't start at an awkward 60px.
+        rail.style.width = '280px';
+        try { localStorage.setItem(RAIL_WIDTH_KEY, '280'); } catch (e) {}
+        collapseRail();
+      } else {
+        const finalW = Math.max(RAIL_MIN_PX, Math.min(RAIL_MAX_PX, lastW));
+        rail.style.width = finalW + 'px';
+        try { localStorage.setItem(RAIL_WIDTH_KEY, String(finalW)); } catch (e) {}
+      }
     });
   })();
 
