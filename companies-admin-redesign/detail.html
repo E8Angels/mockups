@@ -125,6 +125,51 @@
 
   details > summary { list-style:none; cursor:pointer; }
   details > summary::-webkit-details-marker { display:none; }
+
+  /* ===== Right rail (Notes + Emails) — diligence RightRail pattern ===== */
+  .right-rail { flex-shrink:0; align-self:flex-start; position:sticky; top:100px; background:#fff; border:1px solid #e2e8f0; border-radius:6px; overflow:hidden; max-height:calc(100vh - 120px); display:flex; flex-direction:column; }
+  .right-rail-resize { position:absolute; left:0; top:0; bottom:0; width:6px; cursor:col-resize; z-index:5; }
+  .right-rail-resize:hover, .right-rail-resize.dragging { background:rgba(59,130,246,0.25); }
+  .rr-panel { flex-shrink:0; display:flex; flex-direction:column; border-top:1px solid #e2e8f0; }
+  .rr-panel:first-child { border-top:none; }
+  .rr-panel.expanded { flex:1; min-height:0; }
+  .rr-panel-head { display:flex; align-items:center; gap:6px; padding:8px 10px; cursor:pointer; background:#f8fafc; font-size:12px; user-select:none; }
+  .rr-panel-head:hover { background:#f1f5f9; }
+  .rr-panel.expanded .rr-panel-head { background:#0f172a; color:#fff; }
+  .rr-panel.expanded .rr-panel-head .rrh-count { color:#cbd5e1; }
+  .rr-panel-head .rrh-chev { font-size:9px; color:#64748b; width:10px; }
+  .rr-panel.expanded .rr-panel-head .rrh-chev { color:#cbd5e1; }
+  .rr-panel-head .rrh-title { font-weight:600; }
+  .rr-panel-head .rrh-count { color:#94a3b8; font-size:11px; font-weight:500; }
+  .rr-panel-head .rrh-actions { margin-left:auto; display:flex; gap:4px; }
+  .rr-panel-head .rrh-actions button { font-size:11px; padding:1px 7px; border-radius:3px; background:rgba(255,255,255,0.1); color:#fff; }
+  .rr-panel-head .rrh-actions button:hover { background:rgba(255,255,255,0.2); }
+  .rr-panel:not(.expanded) .rr-panel-body { display:none; }
+  .rr-panel-body { flex:1; min-height:0; overflow-y:auto; padding:10px; }
+
+  /* Collapsed-rail button on the RIGHT side */
+  .right-rail-collapsed { width:36px; flex-shrink:0; background:#fff; border:1px solid #e2e8f0; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:14px 0; cursor:pointer; align-self:flex-start; position:sticky; top:100px; }
+  .right-rail-collapsed:hover { background:#f8fafc; }
+  .right-rail-collapsed .rrc-chev { color:#64748b; font-size:14px; line-height:1; }
+  .right-rail-collapsed:hover .rrc-chev { color:#0f172a; }
+  .right-rail-collapsed .rrc-label { writing-mode:vertical-rl; transform:rotate(180deg); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:#475569; }
+  .right-rail-collapsed:hover .rrc-label { color:#0f172a; }
+  .right-rail-collapsed .rrc-icon { color:#64748b; }
+  .right-rail-collapsed:hover .rrc-icon { color:#0f172a; }
+
+  /* Compact note + email inside the right rail */
+  .rr-note { background:#fff; border:1px solid #e2e8f0; border-radius:4px; padding:8px 10px; margin-bottom:6px; }
+  .rr-note-head { display:flex; align-items:center; gap:6px; margin-bottom:4px; font-size:11px; flex-wrap:wrap; }
+  .rr-note-meta { color:#94a3b8; font-size:10px; }
+  .rr-note-body { color:#334155; font-size:12px; line-height:1.45; }
+
+  .rr-email { background:#fff; border:1px solid #e2e8f0; border-radius:4px; padding:7px 10px; margin-bottom:5px; }
+  .rr-email.expanded { padding-bottom:10px; }
+  .rr-email-head { display:flex; align-items:center; gap:5px; font-size:11px; cursor:pointer; flex-wrap:wrap; }
+  .rr-email:not(.expanded) .rr-email-body { display:none; }
+  .rr-email-body { padding-top:8px; border-top:1px solid #f1f5f9; margin-top:8px; color:#334155; font-size:12px; line-height:1.45; white-space:pre-wrap; }
+  .rr-email-subject { color:#475569; flex:1; min-width:0; }
+  .rr-email-subject .truncate { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 </style>
 </head>
 <body class="bg-slate-50 text-slate-900 text-sm">
@@ -140,6 +185,7 @@
 <div class="max-w-[1500px] mx-auto px-4 py-3">
 
   <div class="seed-note rounded-md px-3 py-2 mb-3 text-xs">
+    <span class="font-semibold">v9 update:</span> <b>Notes</b> and <b>Emails</b> moved to a right-side rail with stacked accordion panels — only one open at a time, just like the diligence-tab Right Rail. Click <code>‹</code> on a panel header (or drag the rail's left edge fully closed) to collapse the rail to a thin vertical button on the right; click that to re-open. Header banner trimmed: dropped "Last touch" and the <code>app_…</code> record ID. Per-section ✎ Edit links removed — use the single <b>Edit</b> button in the header.<br>
     <span class="font-semibold">v8 density pass:</span>
     The page now leads with <b>application content</b>, not metadata. Header banner stays one row. Pitch deck + the three highest-leverage pitch fields (Tagline · Problem · Solution) sit side-by-side at the top so something substantive is on screen the moment the page loads. Remaining 11 pitch fields fill a tight 2-column grid below. Raise details collapse to inline <code>label: value</code> chips on one row each instead of full label-above-control blocks.
     Profile is now <b>five dense lines</b> below the application — not a six-row sparse card. Founder demographics, sourcing, internal leads, follow-up all share lines.
@@ -160,7 +206,6 @@
     <div class="ml-auto text-xs text-slate-600 flex items-center gap-5">
       <div><div class="text-slate-400 text-[10px] uppercase tracking-wide">$ Invested</div><div class="font-semibold tabular-nums leading-tight">$425,000 <span class="font-normal text-slate-500">· 2 inv.</span></div></div>
       <div><div class="text-slate-400 text-[10px] uppercase tracking-wide">Latest application</div><div class="font-medium leading-tight">2025 · Closed</div></div>
-      <div><div class="text-slate-400 text-[10px] uppercase tracking-wide">Last touch</div><div class="font-medium leading-tight">3 days ago</div></div>
       <a href="detail-edit.html" class="h-8 px-3 text-xs font-medium border border-slate-300 rounded-md hover:bg-slate-50 flex items-center">Edit</a>
     </div>
   </div>
@@ -173,8 +218,6 @@
         <a href="#applications" class="nav-item active">Application <span class="nav-count">3</span></a>
         <a href="#profile"      class="nav-item">Profile</a>
         <a href="#investments"  class="nav-item">Investments <span class="nav-count">2</span></a>
-        <a href="#notes"        class="nav-item">Notes <span class="nav-count">12</span></a>
-        <a href="#emails"       class="nav-item">Emails <span class="nav-count">24</span></a>
         <a href="#events"       class="nav-item">Events <span class="nav-count">7</span></a>
         <a href="#ratings"      class="nav-item">Ratings &amp; decisions <span class="nav-count">3</span></a>
       </nav>
@@ -187,7 +230,6 @@
       <section id="applications" class="section-card">
         <div class="section-h">
           <h2>Application</h2>
-          <div class="section-actions"><a href="detail-edit.html#applications" class="section-edit">✎ Edit</a></div>
         </div>
 
         <!-- Tabs for each submission -->
@@ -206,7 +248,6 @@
             <span class="ladder-screen stage-pill">Screen</span>
             <span class="badge">Passed</span>
           </button>
-          <div class="ml-auto self-center text-[10px] text-slate-400 px-2 tabular-nums">app_4f3a2b…</div>
         </div>
 
         <!-- 2025 APPLICATION PANEL (active) -->
@@ -361,7 +402,6 @@
       <section id="profile" class="section-card">
         <div class="section-h">
           <h2>Profile</h2>
-          <div class="section-actions"><a href="detail-edit.html#profile" class="section-edit">✎ Edit</a></div>
         </div>
 
         <div class="meta-row">
@@ -430,7 +470,6 @@
         <div class="section-h">
           <h2>Investments</h2>
           <span class="section-count">2 investments · $425,000 deployed · $0 returned · net $425,000</span>
-          <div class="section-actions"><a href="detail-edit.html#investments" class="section-edit">✎ Edit</a></div>
         </div>
         <table class="w-full text-xs border border-slate-200 rounded-md">
           <thead class="bg-slate-50 text-slate-600">
@@ -464,116 +503,7 @@
         </table>
       </section>
 
-      <!-- =========== NOTES =========== -->
-      <section id="notes" class="section-card">
-        <div class="section-h">
-          <h2>Notes</h2>
-          <span class="section-count">12 notes</span>
-          <div class="section-actions">
-            <button class="h-7 px-2 text-[11px] border border-slate-300 rounded hover:bg-slate-50">＋ New note</button>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 mb-3 text-xs">
-          <select class="h-7 px-2 border border-slate-300 rounded text-xs"><option>All scopes</option><option>Company-level only</option><option>2025 application</option><option>2024 application</option><option>2022 application</option></select>
-          <select class="h-7 px-2 border border-slate-300 rounded text-xs"><option>All types</option><option>Note</option><option>Referral</option><option>News</option><option>Ask</option><option>AI Summary</option></select>
-          <input type="text" class="h-7 px-2 border border-slate-300 rounded text-xs flex-1" placeholder="Search notes…" autocomplete="off" data-lpignore="true" data-form-type="other" />
-        </div>
-
-        <div class="note-card">
-          <div class="note-head">
-            <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
-            <span class="note-type note-type-Note">Note</span>
-            <span class="note-meta">2026-02-08 · 2025 application</span>
-          </div>
-          <div class="note-body">Met with Adi and the Sysco regional buyer. Confirmed signed PO. Working capital is the real question — see GTM section in diligence draft. Reviewing 2026 SKU-3 timeline with Mei next week.</div>
-        </div>
-
-        <div class="note-card">
-          <div class="note-head">
-            <span class="person-pill compact"><span class="name">Devon Walsh</span></span>
-            <span class="note-type note-type-AISummary">AI Summary</span>
-            <span class="note-meta">2025-12-04 · 2025 application</span>
-          </div>
-          <div class="note-body">Application summary: Strong unit economics ($18K margin/retrofit), three signed fleet pilots, clear path to default-alive at ~$5M ARR. Capital intensity of inventory is the principal risk; lead investor (Climate Capital) is taking a chunk of the round.</div>
-        </div>
-
-        <div class="note-card">
-          <div class="note-head">
-            <span class="person-pill compact"><span class="name">M. Patel</span></span>
-            <span class="note-type note-type-Referral">Referral</span>
-            <span class="note-meta">2025-10-12 · Company-level</span>
-          </div>
-          <div class="note-body">Introduced Voltaic to Karen via Decarbon8 portfolio referrals network. Strongly recommend looking at the 2025 application.</div>
-        </div>
-
-        <div class="note-card">
-          <div class="note-head">
-            <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
-            <span class="note-type note-type-Note">Note</span>
-            <span class="note-meta">2024-05-18 · 2024 application</span>
-          </div>
-          <div class="note-body">Decided to pass on the 2024 application. Team is strong but the proposition was platform-stage, no real fleet customer in hand. Encouraged Adi to reapply with traction.</div>
-        </div>
-
-        <div class="text-center text-xs text-slate-400 pt-2"><a href="#" class="text-blue-600 hover:underline">Show all 12 notes</a></div>
-      </section>
-
-      <!-- =========== EMAILS =========== -->
-      <section id="emails" class="section-card">
-        <div class="section-h">
-          <h2>Emails</h2>
-          <span class="section-count">24 emails · log only</span>
-        </div>
-
-        <div class="email-row expanded">
-          <div class="email-head" onclick="toggleEmail(this)">
-            <span class="email-channel">Email</span>
-            <span class="person-pill compact"><span class="name">Adi Rao</span></span>
-            <span class="text-slate-400">→</span>
-            <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
-            <span class="email-subject"><span class="truncate">"Sysco signed — PO attached"</span></span>
-            <span class="text-slate-400 text-[11px] tabular-nums">2026-01-22</span>
-          </div>
-          <div class="email-body">Karen — Great news. Sysco PNW just signed the PO for the first 22 retrofit units, deliverable Q2. Attaching the executed order. We're now at three signed fleet customers for 2026.
-
-[Attachment: sysco-PO-2026-01.pdf, 487 KB]</div>
-        </div>
-
-        <div class="email-row">
-          <div class="email-head" onclick="toggleEmail(this)">
-            <span class="email-channel decision">Decision</span>
-            <span class="person-pill compact"><span class="name">E8 Screening</span></span>
-            <span class="text-slate-400">→</span>
-            <span class="person-pill compact"><span class="name">Adi Rao</span></span>
-            <span class="email-subject"><span class="truncate">"Re: 2025 application — Advance to Investment"</span></span>
-            <span class="text-slate-400 text-[11px] tabular-nums">2025-09-25</span>
-          </div>
-        </div>
-
-        <div class="email-row">
-          <div class="email-head" onclick="toggleEmail(this)">
-            <span class="email-channel">Email</span>
-            <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
-            <span class="text-slate-400">→</span>
-            <span class="person-pill compact"><span class="name">Adi Rao</span></span>
-            <span class="email-subject"><span class="truncate">"Re: Diligence questions — battery sourcing"</span></span>
-            <span class="text-slate-400 text-[11px] tabular-nums">2025-08-19</span>
-          </div>
-        </div>
-
-        <div class="email-row">
-          <div class="email-head" onclick="toggleEmail(this)">
-            <span class="email-channel decision">Decision</span>
-            <span class="person-pill compact"><span class="name">E8 Screening</span></span>
-            <span class="text-slate-400">→</span>
-            <span class="person-pill compact"><span class="name">Adi Rao</span></span>
-            <span class="email-subject"><span class="truncate">"Re: 2024 application — Too early"</span></span>
-            <span class="text-slate-400 text-[11px] tabular-nums">2024-05-18</span>
-          </div>
-        </div>
-
-        <div class="text-center text-xs text-slate-400 pt-2"><a href="#" class="text-blue-600 hover:underline">Show all 24 emails</a></div>
-      </section>
+      <!-- Notes + Emails moved to right-side rail -->
 
       <!-- =========== EVENTS =========== -->
       <section id="events" class="section-card">
@@ -674,6 +604,146 @@
       </section>
 
     </main>
+
+    <!-- =========== RIGHT RAIL — NOTES + EMAILS (stacked accordion, diligence pattern) =========== -->
+    <aside id="rightRail" class="right-rail" style="width:340px;">
+      <div id="rightRailResize" class="right-rail-resize" title="Drag to resize · drag fully closed to collapse"></div>
+
+      <!-- NOTES PANEL -->
+      <div class="rr-panel expanded" data-panel="notes">
+        <div class="rr-panel-head" onclick="togglePanel('notes')">
+          <span class="rrh-chev">▾</span>
+          <span class="rrh-title">Notes</span>
+          <span class="rrh-count">12</span>
+          <div class="rrh-actions">
+            <button onclick="event.stopPropagation()" title="New note">＋</button>
+            <button onclick="event.stopPropagation(); collapseRightRail();" title="Collapse">‹</button>
+          </div>
+        </div>
+        <div class="rr-panel-body">
+          <div class="flex items-center gap-1 mb-2 text-[11px]">
+            <select class="h-6 px-1 border border-slate-300 rounded text-[11px] flex-1 min-w-0"><option>All scopes</option><option>Company-level</option><option>2025</option><option>2024</option><option>2022</option></select>
+            <select class="h-6 px-1 border border-slate-300 rounded text-[11px] flex-1 min-w-0"><option>All types</option><option>Note</option><option>Referral</option><option>News</option><option>Ask</option><option>AI Summary</option></select>
+          </div>
+          <input type="text" class="h-6 px-2 border border-slate-300 rounded text-[11px] w-full mb-2" placeholder="Search notes…" autocomplete="off" data-lpignore="true" data-form-type="other" />
+
+          <div class="rr-note">
+            <div class="rr-note-head">
+              <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
+              <span class="note-type note-type-Note">Note</span>
+              <span class="rr-note-meta">2026-02-08 · 2025 app</span>
+            </div>
+            <div class="rr-note-body">Met with Adi and the Sysco regional buyer. Confirmed signed PO. Working capital is the real question — see GTM section in diligence draft.</div>
+          </div>
+
+          <div class="rr-note">
+            <div class="rr-note-head">
+              <span class="person-pill compact"><span class="name">Devon Walsh</span></span>
+              <span class="note-type note-type-AISummary">AI Summary</span>
+              <span class="rr-note-meta">2025-12-04 · 2025 app</span>
+            </div>
+            <div class="rr-note-body">Strong unit economics ($18K margin/retrofit), three signed fleet pilots, clear path to default-alive at ~$5M ARR. Capital intensity of inventory is the principal risk.</div>
+          </div>
+
+          <div class="rr-note">
+            <div class="rr-note-head">
+              <span class="person-pill compact"><span class="name">M. Patel</span></span>
+              <span class="note-type note-type-Referral">Referral</span>
+              <span class="rr-note-meta">2025-10-12 · Company</span>
+            </div>
+            <div class="rr-note-body">Introduced Voltaic to Karen via Decarbon8 portfolio referrals network. Strongly recommend looking at the 2025 application.</div>
+          </div>
+
+          <div class="rr-note">
+            <div class="rr-note-head">
+              <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
+              <span class="note-type note-type-Note">Note</span>
+              <span class="rr-note-meta">2024-05-18 · 2024 app</span>
+            </div>
+            <div class="rr-note-body">Decided to pass on the 2024 application. Team is strong but the proposition was platform-stage. Encouraged Adi to reapply with traction.</div>
+          </div>
+
+          <div class="text-center text-[10px] text-slate-400 pt-1"><a href="#" class="text-blue-600 hover:underline">Show all 12 notes</a></div>
+        </div>
+      </div>
+
+      <!-- EMAILS PANEL -->
+      <div class="rr-panel" data-panel="emails">
+        <div class="rr-panel-head" onclick="togglePanel('emails')">
+          <span class="rrh-chev">▸</span>
+          <span class="rrh-title">Emails</span>
+          <span class="rrh-count">24</span>
+        </div>
+        <div class="rr-panel-body">
+          <div class="rr-email expanded">
+            <div class="rr-email-head" onclick="toggleEmail(this)">
+              <span class="email-channel">Email</span>
+              <span class="person-pill compact"><span class="name">Adi Rao</span></span>
+              <span class="text-slate-400">→</span>
+              <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
+              <span class="rr-email-subject"><span class="truncate">"Sysco signed — PO attached"</span></span>
+              <span class="text-slate-400 text-[10px] tabular-nums">2026-01-22</span>
+            </div>
+            <div class="rr-email-body">Karen — Great news. Sysco PNW just signed the PO for the first 22 retrofit units, deliverable Q2. We're now at three signed fleet customers for 2026.
+
+[Attachment: sysco-PO-2026-01.pdf, 487 KB]</div>
+          </div>
+
+          <div class="rr-email">
+            <div class="rr-email-head" onclick="toggleEmail(this)">
+              <span class="email-channel decision">Decision</span>
+              <span class="person-pill compact"><span class="name">E8 Screening</span></span>
+              <span class="text-slate-400">→</span>
+              <span class="person-pill compact"><span class="name">Adi Rao</span></span>
+              <span class="rr-email-subject"><span class="truncate">"Re: 2025 — Advance to Investment"</span></span>
+              <span class="text-slate-400 text-[10px] tabular-nums">2025-09-25</span>
+            </div>
+          </div>
+
+          <div class="rr-email">
+            <div class="rr-email-head" onclick="toggleEmail(this)">
+              <span class="email-channel">Email</span>
+              <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
+              <span class="text-slate-400">→</span>
+              <span class="person-pill compact"><span class="name">Adi Rao</span></span>
+              <span class="rr-email-subject"><span class="truncate">"Re: Diligence — battery sourcing"</span></span>
+              <span class="text-slate-400 text-[10px] tabular-nums">2025-08-19</span>
+            </div>
+          </div>
+
+          <div class="rr-email">
+            <div class="rr-email-head" onclick="toggleEmail(this)">
+              <span class="email-channel decision">Decision</span>
+              <span class="person-pill compact"><span class="name">E8 Screening</span></span>
+              <span class="text-slate-400">→</span>
+              <span class="person-pill compact"><span class="name">Adi Rao</span></span>
+              <span class="rr-email-subject"><span class="truncate">"Re: 2024 — Too early"</span></span>
+              <span class="text-slate-400 text-[10px] tabular-nums">2024-05-18</span>
+            </div>
+          </div>
+
+          <div class="text-center text-[10px] text-slate-400 pt-1"><a href="#" class="text-blue-600 hover:underline">Show all 24 emails</a></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- COLLAPSED RIGHT-RAIL BUTTON (hidden by default; shown when rail is collapsed) -->
+    <button id="rightRailCollapsed"
+            type="button"
+            onclick="expandRightRail()"
+            title="Open notes &amp; emails"
+            class="right-rail-collapsed"
+            style="display:none;">
+      <span class="rrc-chev">‹</span>
+      <span class="rrc-label">Notes &amp; Emails</span>
+      <svg class="rrc-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="9" y1="13" x2="15" y2="13"></line>
+        <line x1="9" y1="17" x2="15" y2="17"></line>
+      </svg>
+    </button>
+
   </div>
 </div>
 
@@ -688,10 +758,121 @@
   });
 
   function toggleEmail(headEl) {
-    const row = headEl.closest('.email-row');
+    const row = headEl.closest('.rr-email, .email-row');
     if (!row) return;
     row.classList.toggle('expanded');
   }
+
+  /* ===== Right rail accordion (Notes / Emails) ===== */
+  function togglePanel(name) {
+    const panels = document.querySelectorAll('#rightRail .rr-panel');
+    panels.forEach(p => {
+      const isTarget = p.dataset.panel === name;
+      const isExpanded = p.classList.contains('expanded');
+      // Clicking the open panel collapses it; clicking another swaps.
+      if (isTarget) {
+        p.classList.toggle('expanded');
+      } else {
+        p.classList.remove('expanded');
+      }
+    });
+    // Update chevrons
+    panels.forEach(p => {
+      const chev = p.querySelector('.rrh-chev');
+      if (chev) chev.textContent = p.classList.contains('expanded') ? '▾' : '▸';
+    });
+    try { localStorage.setItem('e8.companies.detailRightPanel', name); } catch(e) {}
+  }
+
+  /* ===== Right rail collapse / expand ===== */
+  const RR_OPEN_KEY  = 'e8.companies.detailRightRailOpen';
+  const RR_WIDTH_KEY = 'e8.companies.detailRightRailWidth';
+  const RR_MIN_PX = 260;
+  const RR_MAX_PX = 520;
+  const RR_COLLAPSE_THRESHOLD = 180;
+
+  function collapseRightRail() {
+    const rail = document.getElementById('rightRail');
+    const btn  = document.getElementById('rightRailCollapsed');
+    if (rail) rail.style.display = 'none';
+    if (btn)  btn.style.display  = '';
+    try { localStorage.setItem(RR_OPEN_KEY, '0'); } catch(e) {}
+  }
+  function expandRightRail() {
+    const rail = document.getElementById('rightRail');
+    const btn  = document.getElementById('rightRailCollapsed');
+    if (rail) rail.style.display = '';
+    if (btn)  btn.style.display  = 'none';
+    try { localStorage.setItem(RR_OPEN_KEY, '1'); } catch(e) {}
+  }
+
+  /* Drag-to-resize the right rail (handle is on its LEFT edge — dragging left = wider) */
+  (function initRightRailResize() {
+    const rail = document.getElementById('rightRail');
+    const handle = document.getElementById('rightRailResize');
+    if (!rail || !handle) return;
+
+    try {
+      const w = parseInt(localStorage.getItem(RR_WIDTH_KEY) || '', 10);
+      if (Number.isFinite(w) && w >= RR_MIN_PX && w <= RR_MAX_PX) rail.style.width = w + 'px';
+      if (localStorage.getItem(RR_OPEN_KEY) === '0') collapseRightRail();
+    } catch(e) {}
+
+    let resizing = false;
+    let startX = 0, startW = 0, lastW = 0;
+    handle.addEventListener('mousedown', (e) => {
+      resizing = true;
+      startX = e.clientX;
+      startW = rail.offsetWidth;
+      lastW  = startW;
+      handle.classList.add('dragging');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (!resizing) return;
+      // Handle is on the LEFT edge: dragging the cursor LEFT increases width.
+      const dx = startX - e.clientX;
+      const candidate = startW + dx;
+      if (candidate < RR_COLLAPSE_THRESHOLD) {
+        rail.style.width = Math.max(60, candidate) + 'px';
+      } else {
+        rail.style.width = Math.min(RR_MAX_PX, candidate) + 'px';
+      }
+      lastW = candidate;
+    });
+    document.addEventListener('mouseup', () => {
+      if (!resizing) return;
+      resizing = false;
+      handle.classList.remove('dragging');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      if (lastW < RR_COLLAPSE_THRESHOLD) {
+        rail.style.width = '340px';
+        try { localStorage.setItem(RR_WIDTH_KEY, '340'); } catch(e) {}
+        collapseRightRail();
+      } else {
+        const finalW = Math.max(RR_MIN_PX, Math.min(RR_MAX_PX, lastW));
+        rail.style.width = finalW + 'px';
+        try { localStorage.setItem(RR_WIDTH_KEY, String(finalW)); } catch(e) {}
+      }
+    });
+  })();
+
+  /* Restore which panel was last expanded */
+  (function restorePanel() {
+    try {
+      const last = localStorage.getItem('e8.companies.detailRightPanel');
+      if (last && (last === 'notes' || last === 'emails')) {
+        document.querySelectorAll('#rightRail .rr-panel').forEach(p => {
+          p.classList.toggle('expanded', p.dataset.panel === last);
+          const chev = p.querySelector('.rrh-chev');
+          if (chev) chev.textContent = p.classList.contains('expanded') ? '▾' : '▸';
+        });
+      }
+    } catch(e) {}
+  })();
 </script>
 
 </body>
