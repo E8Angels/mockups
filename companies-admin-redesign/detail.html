@@ -163,13 +163,47 @@
   .rr-note-meta { color:#94a3b8; font-size:10px; }
   .rr-note-body { color:#334155; font-size:12px; line-height:1.45; }
 
-  .rr-email { background:#fff; border:1px solid #e2e8f0; border-radius:4px; padding:7px 10px; margin-bottom:5px; }
-  .rr-email.expanded { padding-bottom:10px; }
-  .rr-email-head { display:flex; align-items:center; gap:5px; font-size:11px; cursor:pointer; flex-wrap:wrap; }
-  .rr-email:not(.expanded) .rr-email-body { display:none; }
-  .rr-email-body { padding-top:8px; border-top:1px solid #f1f5f9; margin-top:8px; color:#334155; font-size:12px; line-height:1.45; white-space:pre-wrap; }
-  .rr-email-subject { color:#475569; flex:1; min-width:0; }
-  .rr-email-subject .truncate { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  /* Email row — proper From/To/Subject/Body layout */
+  .rr-email { background:#fff; border:1px solid #e2e8f0; border-radius:5px; margin-bottom:6px; overflow:hidden; }
+  .rr-email:hover { border-color:#cbd5e1; }
+  .rr-email.decision { border-left:3px solid #ef4444; }
+
+  .rr-email-row { padding:8px 11px; cursor:pointer; }
+  .rr-email-row:hover { background:#f8fafc; }
+  .rr-email-line1 { display:flex; align-items:baseline; gap:8px; }
+  .rr-email-line1 .from-name { font-weight:600; color:#0f172a; font-size:12px; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rr-email-line1 .date { color:#94a3b8; font-size:10px; font-feature-settings:'tnum'; flex-shrink:0; }
+  .rr-email-line2 { display:flex; align-items:center; gap:6px; margin-top:2px; }
+  .rr-email-line2 .subject { color:#475569; font-size:12px; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rr-email-line2 .chan-mini { font-size:9px; padding:1px 5px; border-radius:3px; font-weight:600; flex-shrink:0; background:#fee2e2; color:#b91c1c; letter-spacing:0.02em; }
+
+  .rr-email:not(.expanded) .rr-email-detail { display:none; }
+  .rr-email-detail { padding:12px; border-top:1px solid #f1f5f9; }
+  .rr-email-headers { font-size:11px; margin-bottom:10px; }
+  .rr-email-headers .hdr-row { display:flex; gap:8px; padding:1px 0; }
+  .rr-email-headers .hdr-label { color:#94a3b8; width:36px; flex-shrink:0; text-transform:uppercase; font-size:9px; letter-spacing:0.05em; font-weight:600; padding-top:2px; text-align:right; }
+  .rr-email-headers .hdr-value { color:#334155; }
+  .rr-email-headers .hdr-value .addr { color:#94a3b8; font-size:10px; margin-left:4px; }
+
+  .rr-email-subject-full { font-size:13px; font-weight:600; color:#0f172a; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #f1f5f9; line-height:1.4; }
+
+  .rr-email-body-full { font-size:12px; line-height:1.55; color:#334155; white-space:pre-wrap; }
+
+  .rr-email-attachments { margin-top:12px; padding-top:10px; border-top:1px solid #f1f5f9; display:flex; flex-direction:column; gap:5px; }
+  .rr-email-attachments-label { font-size:9px; text-transform:uppercase; letter-spacing:0.05em; color:#94a3b8; font-weight:600; margin-bottom:4px; }
+
+  .att-card { display:flex; align-items:center; gap:10px; padding:7px 10px; border:1px solid #e2e8f0; border-radius:5px; background:#fff; text-decoration:none; transition:background 80ms, border-color 80ms; }
+  .att-card:hover { background:#f8fafc; border-color:#cbd5e1; }
+  .att-icon { width:30px; height:30px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border-radius:5px; }
+  .att-icon.pdf  { background:#fee2e2; color:#b91c1c; }
+  .att-icon.doc  { background:#dbeafe; color:#1e40af; }
+  .att-icon.xls  { background:#dcfce7; color:#065f46; }
+  .att-icon.img  { background:#fef3c7; color:#92400e; }
+  .att-icon.zip  { background:#ede9fe; color:#6b21a8; }
+  .att-icon svg { width:16px; height:16px; }
+  .att-text { min-width:0; flex:1; }
+  .att-name { font-size:12px; font-weight:500; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.3; }
+  .att-meta { font-size:10px; color:#94a3b8; line-height:1.3; }
 </style>
 </head>
 <body class="bg-slate-50 text-slate-900 text-sm">
@@ -675,50 +709,102 @@
           <span class="rrh-count">24</span>
         </div>
         <div class="rr-panel-body">
+          <!-- Email 1 — expanded by default -->
           <div class="rr-email expanded">
-            <div class="rr-email-head" onclick="toggleEmail(this)">
-              <span class="email-channel">Email</span>
-              <span class="person-pill compact"><span class="name">Adi Rao</span></span>
-              <span class="text-slate-400">→</span>
-              <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
-              <span class="rr-email-subject"><span class="truncate">"Sysco signed — PO attached"</span></span>
-              <span class="text-slate-400 text-[10px] tabular-nums">2026-01-22</span>
+            <div class="rr-email-row" onclick="toggleEmail(this)">
+              <div class="rr-email-line1">
+                <span class="from-name">Adi Rao</span>
+                <span class="date">2026-01-22</span>
+              </div>
+              <div class="rr-email-line2">
+                <span class="subject">Sysco signed — PO attached</span>
+              </div>
             </div>
-            <div class="rr-email-body">Karen — Great news. Sysco PNW just signed the PO for the first 22 retrofit units, deliverable Q2. We're now at three signed fleet customers for 2026.
+            <div class="rr-email-detail">
+              <div class="rr-email-headers">
+                <div class="hdr-row"><span class="hdr-label">From</span><span class="hdr-value">Adi Rao <span class="addr">adi@voltaicdrive.com</span></span></div>
+                <div class="hdr-row"><span class="hdr-label">To</span><span class="hdr-value">Karen Stewart <span class="addr">karen@e8angels.com</span></span></div>
+                <div class="hdr-row"><span class="hdr-label">Date</span><span class="hdr-value">Thu, Jan 22, 2026 · 9:14 AM</span></div>
+              </div>
+              <div class="rr-email-subject-full">Sysco signed — PO attached</div>
+              <div class="rr-email-body-full">Karen —
 
-[Attachment: sysco-PO-2026-01.pdf, 487 KB]</div>
+Great news. Sysco PNW just signed the PO for the first 22 retrofit units, deliverable Q2. We're now at three signed fleet customers for 2026 (Sysco, FedEx Ground regional, US Foods).
+
+Let me know when you'd like to talk through the next milestone update.
+
+— Adi</div>
+              <div class="rr-email-attachments">
+                <div class="rr-email-attachments-label">1 attachment</div>
+                <a class="att-card" href="#" onclick="event.stopPropagation()">
+                  <span class="att-icon pdf">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                  </span>
+                  <div class="att-text">
+                    <div class="att-name">Sysco PNW — signed purchase order</div>
+                    <div class="att-meta">PDF</div>
+                  </div>
+                </a>
+              </div>
+            </div>
           </div>
 
-          <div class="rr-email">
-            <div class="rr-email-head" onclick="toggleEmail(this)">
-              <span class="email-channel decision">Decision</span>
-              <span class="person-pill compact"><span class="name">E8 Screening</span></span>
-              <span class="text-slate-400">→</span>
-              <span class="person-pill compact"><span class="name">Adi Rao</span></span>
-              <span class="rr-email-subject"><span class="truncate">"Re: 2025 — Advance to Investment"</span></span>
-              <span class="text-slate-400 text-[10px] tabular-nums">2025-09-25</span>
+          <!-- Email 2 — Decision -->
+          <div class="rr-email decision">
+            <div class="rr-email-row" onclick="toggleEmail(this)">
+              <div class="rr-email-line1">
+                <span class="from-name">E8 Screening</span>
+                <span class="date">2025-09-25</span>
+              </div>
+              <div class="rr-email-line2">
+                <span class="subject">Advance to Investment — 2025 application</span>
+                <span class="chan-mini">Decision</span>
+              </div>
+            </div>
+            <div class="rr-email-detail">
+              <div class="rr-email-headers">
+                <div class="hdr-row"><span class="hdr-label">From</span><span class="hdr-value">E8 Screening <span class="addr">screening@e8angels.com</span></span></div>
+                <div class="hdr-row"><span class="hdr-label">To</span><span class="hdr-value">Adi Rao <span class="addr">adi@voltaicdrive.com</span></span></div>
+                <div class="hdr-row"><span class="hdr-label">Date</span><span class="hdr-value">Thu, Sep 25, 2025 · 3:42 PM</span></div>
+              </div>
+              <div class="rr-email-subject-full">Advance to Investment — 2025 application</div>
+              <div class="rr-email-body-full">Adi —
+
+Following the diligence debrief on Monday, the Investment Committee voted to advance Voltaic Drive to investment from the Annual Fund 2025. We'll be in touch with the SAFE terms by end of week.
+
+Congratulations.
+
+— Karen on behalf of the E8 Screening Committee</div>
             </div>
           </div>
 
+          <!-- Email 3 -->
           <div class="rr-email">
-            <div class="rr-email-head" onclick="toggleEmail(this)">
-              <span class="email-channel">Email</span>
-              <span class="person-pill compact"><span class="name">Karen Stewart</span></span>
-              <span class="text-slate-400">→</span>
-              <span class="person-pill compact"><span class="name">Adi Rao</span></span>
-              <span class="rr-email-subject"><span class="truncate">"Re: Diligence — battery sourcing"</span></span>
-              <span class="text-slate-400 text-[10px] tabular-nums">2025-08-19</span>
+            <div class="rr-email-row" onclick="toggleEmail(this)">
+              <div class="rr-email-line1">
+                <span class="from-name">Karen Stewart</span>
+                <span class="date">2025-08-19</span>
+              </div>
+              <div class="rr-email-line2">
+                <span class="subject">Re: Diligence questions — battery sourcing</span>
+              </div>
             </div>
           </div>
 
-          <div class="rr-email">
-            <div class="rr-email-head" onclick="toggleEmail(this)">
-              <span class="email-channel decision">Decision</span>
-              <span class="person-pill compact"><span class="name">E8 Screening</span></span>
-              <span class="text-slate-400">→</span>
-              <span class="person-pill compact"><span class="name">Adi Rao</span></span>
-              <span class="rr-email-subject"><span class="truncate">"Re: 2024 — Too early"</span></span>
-              <span class="text-slate-400 text-[10px] tabular-nums">2024-05-18</span>
+          <!-- Email 4 — Decision -->
+          <div class="rr-email decision">
+            <div class="rr-email-row" onclick="toggleEmail(this)">
+              <div class="rr-email-line1">
+                <span class="from-name">E8 Screening</span>
+                <span class="date">2024-05-18</span>
+              </div>
+              <div class="rr-email-line2">
+                <span class="subject">Too early — 2024 application</span>
+                <span class="chan-mini">Decision</span>
+              </div>
             </div>
           </div>
 
