@@ -247,7 +247,7 @@ function renderKanban() {
         <span class="text-[11px] text-slate-400 ml-auto">${items.length}</span>
       </div>
       <div class="p-2 space-y-1.5 max-h-[300px] overflow-y-auto scroll-thin bg-slate-50">
-        ${items.map(s => `<a href="sponsor-crm-sponsor-detail.html" class="block bg-white border border-slate-200 rounded p-2 hover:border-blue-400">
+        ${items.map(s => `<a href="sponsor-detail.html" class="block bg-white border border-slate-200 rounded p-2 hover:border-blue-400">
           <div class="flex items-start gap-1.5">
             <div class="font-medium text-[12px] leading-tight flex-1 truncate">${s.name}</div>
             ${entityChip(s.entity)}
@@ -271,7 +271,7 @@ function renderActivity() {
     return `<li class="px-3 py-2.5 hover:bg-slate-50 flex items-center gap-3">
       <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${cls} w-[80px] justify-center">${label}</span>
       <div class="flex-1 min-w-0 text-[13px]">
-        <a href="sponsor-crm-sponsor-detail.html" class="font-medium hover:underline">${a.sponsor}</a>
+        <a href="sponsor-detail.html" class="font-medium hover:underline">${a.sponsor}</a>
         <span class="text-slate-600"> ${a.text}</span>
         ${a.amount ? `<span class="font-semibold ml-1">${a.amount}</span>` : ''}
       </div>
@@ -283,7 +283,7 @@ function renderActivity() {
 function renderGrants() {
   const list = document.getElementById('grantList');
   list.innerHTML = GRANTS.map(g => `
-    <a href="sponsor-crm-sponsor-detail.html" class="flex items-center gap-3 hover:bg-slate-50 rounded p-1.5 -m-1.5">
+    <a href="sponsor-detail.html" class="flex items-center gap-3 hover:bg-slate-50 rounded p-1.5 -m-1.5">
       <div class="w-12 text-center shrink-0">
         <div class="text-[10px] uppercase text-slate-500">${g.due.split(' ')[0]}</div>
         <div class="text-lg font-semibold leading-none">${g.due.split(' ')[1]}</div>
@@ -301,7 +301,7 @@ function renderConnections() {
   const items = SPONSORS.filter(s => s.lisa);
   list.innerHTML = items.map(s => `
     <li class="px-3 py-2.5 hover:bg-slate-50">
-      <a href="sponsor-crm-sponsor-detail.html" class="block">
+      <a href="sponsor-detail.html" class="block">
         <div class="flex items-center gap-1.5">
           <div class="font-medium text-[13px] flex-1 truncate">${s.name}</div>
           ${entityChip(s.entity)}

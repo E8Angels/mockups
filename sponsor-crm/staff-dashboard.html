@@ -367,7 +367,7 @@ function renderKanban() {
         ${stageItems.map(s => `
           <div class="card-drag bg-white border border-slate-200 rounded p-2 hover:border-blue-400 hover:shadow-sm" draggable="true">
             <div class="flex items-start gap-1.5">
-              <a href="sponsor-crm-sponsor-detail.html" class="text-[13px] font-medium leading-tight hover:underline truncate flex-1">${s.name}</a>
+              <a href="sponsor-detail.html" class="text-[13px] font-medium leading-tight hover:underline truncate flex-1">${s.name}</a>
               ${entityChip(s.entity)}
             </div>
             <div class="flex items-center gap-1.5 mt-1">
@@ -395,7 +395,7 @@ function renderList() {
   const tbody = document.getElementById('listBody');
   tbody.innerHTML = items.map(s => `
     <tr class="border-b border-slate-100 hover:bg-slate-50 cursor-pointer">
-      <td class="px-3 py-2"><a href="sponsor-crm-sponsor-detail.html" class="font-medium hover:underline">${s.name}</a></td>
+      <td class="px-3 py-2"><a href="sponsor-detail.html" class="font-medium hover:underline">${s.name}</a></td>
       <td class="px-3 py-2"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${typeById(s.type).cls}">${typeById(s.type).label}</span></td>
       <td class="px-3 py-2">${entityChip(s.entity)}</td>
       <td class="px-3 py-2"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${stageById(s.stage).cls}">${stageById(s.stage).n}—${stageById(s.stage).label}</span></td>
@@ -411,7 +411,7 @@ function renderGrants() {
   const items = filteredSponsors().filter(s => s.grant_deadline).sort((a,b) => a.grant_deadline.localeCompare(b.grant_deadline));
   const list = document.getElementById('grantList');
   list.innerHTML = items.map(s => `
-    <a href="sponsor-crm-sponsor-detail.html" class="block bg-white border border-slate-200 rounded p-3 hover:border-blue-400 hover:shadow-sm">
+    <a href="sponsor-detail.html" class="block bg-white border border-slate-200 rounded p-3 hover:border-blue-400 hover:shadow-sm">
       <div class="flex items-start gap-3">
         <div class="text-center w-12 shrink-0">
           <div class="text-[10px] uppercase text-slate-500">${new Date(s.grant_deadline+'T12:00:00').toLocaleDateString('en-US',{month:'short'})}</div>
