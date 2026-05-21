@@ -1,9 +1,9 @@
 ---
-title: Sponsor CRM
+title: Development Dashboard
 status: draft
 owner: jordan
 created: 2026-05-16
-last_updated: 2026-05-16
+last_updated: 2026-05-19
 mockup: mockup.html
 ---
 

@@ -70,15 +70,13 @@
   }
   .mockup-variants {
     margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
     font-size: 12px;
-    color: var(--muted);
   }
   .mockup-variants a {
     color: var(--link);
-  }
-  .mockup-variants .sep {
-    color: var(--border);
-    margin: 0 4px;
   }
   .footer {
     margin-top: 28px;
@@ -116,8 +114,13 @@ const REPO_BLOB = 'https://github.com/E8Angels/mockups/blob/main';
 
 function fmtDate(iso) {
   if (!iso) return '';
-  // Accept "2026-05-16" or full ISO; show YYYY-MM-DD.
-  return iso.slice(0, 10);
+  // Accept date-only ("2026-05-16") or full ISO ("2026-05-16T20:40:38+00:00").
+  // Pin date-only strings to noon UTC so timezone shifts don't bump the day.
+  const d = /^\d{4}-\d{2}-\d{2}$/.test(iso)
+    ? new Date(iso + 'T12:00:00Z')
+    : new Date(iso);
+  if (isNaN(d)) return iso;
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function mockupLinks(mockups) {
@@ -125,16 +128,17 @@ function mockupLinks(mockups) {
 
   // Primary = the file with is_home: true (set by build-manifest.py based on
   // front-matter `home:` field, or defaulted to the first file alphabetically).
-  // Variants = everything else.
+  // "View mockup" link always goes to the home file.
   const home = mockups.find(m => m.is_home) || mockups[0];
-  const others = mockups.filter(m => m !== home);
 
-  let html = `<a class="mockup-primary" href="${home.path}">Open ${home.name}.html</a>`;
-  if (others.length > 0) {
-    const links = others.map(m =>
+  let html = `<a class="mockup-primary" href="${home.path}">View mockup</a>`;
+  // For multi-mockup folders, list every variant (including the home) as
+  // small secondary links so users can jump directly to any specific one.
+  if (mockups.length > 1) {
+    const links = mockups.map(m =>
       `<a href="${m.path}">${m.name}</a>`
-    ).join('<span class="sep">·</span>');
-    html += `<div class="mockup-variants">also: ${links}</div>`;
+    ).join('');
+    html += `<div class="mockup-variants">${links}</div>`;
   }
   return html;
 }

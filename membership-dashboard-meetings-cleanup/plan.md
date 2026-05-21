@@ -1,9 +1,9 @@
 ---
-title: "Membership Dashboard: Meetings Code Cleanup"
+title: Membership Dashboard
 status: building
 owner: jordan
 created: 2026-05-16
-last_updated: 2026-05-16
+last_updated: 2026-05-19
 ---
 
 # Handoff prompt: clean up dead meetings code in MembershipDashboardIsland.jsx

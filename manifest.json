@@ -1,37 +1,42 @@
 {
-  "generated": "2026-05-20T02:21:53+00:00",
+  "generated": "2026-05-21T04:35:51+00:00",
   "plans": [
     {
       "slug": "companies-admin-redesign",
-      "title": "Companies admin redesign: company-first, not table-first",
+      "title": "Companies Admin Redesign",
       "status": "draft",
       "owner": "jordan",
       "created": "2026-05-17",
-      "last_updated": "2026-05-17",
+      "last_updated": "2026-05-19",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-20T02:11:13Z",
+      "last_changed_at": "2026-05-21T04:00:59+00:00",
       "has_plan": true,
       "has_changelog": false,
       "mockups": [
         {
           "name": "detail",
-          "path": "companies-admin-redesign/detail.html"
+          "path": "companies-admin-redesign/detail.html",
+          "is_home": false
         },
         {
           "name": "detail-edit",
-          "path": "companies-admin-redesign/detail-edit.html"
+          "path": "companies-admin-redesign/detail-edit.html",
+          "is_home": false
         },
         {
           "name": "variant-a-groupby",
-          "path": "companies-admin-redesign/variant-a-groupby.html"
+          "path": "companies-admin-redesign/variant-a-groupby.html",
+          "is_home": true
         },
         {
           "name": "variant-a-list",
-          "path": "companies-admin-redesign/variant-a-list.html"
+          "path": "companies-admin-redesign/variant-a-list.html",
+          "is_home": false
         },
         {
           "name": "view-builder",
-          "path": "companies-admin-redesign/view-builder.html"
+          "path": "companies-admin-redesign/view-builder.html",
+          "is_home": false
         }
       ]
     },
@@ -43,20 +48,20 @@
       "created": "2026-05-16",
       "last_updated": "2026-05-16",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38Z",
+      "last_changed_at": "2026-05-16T20:40:38+00:00",
       "has_plan": true,
       "has_changelog": true,
       "mockups": []
     },
     {
       "slug": "membership-dashboard-meetings-cleanup",
-      "title": "Membership Dashboard: Meetings Code Cleanup",
+      "title": "Membership Dashboard",
       "status": "building",
       "owner": "jordan",
       "created": "2026-05-16",
-      "last_updated": "2026-05-16",
+      "last_updated": "2026-05-19",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:43:17Z",
+      "last_changed_at": "2026-05-16T20:43:17+00:00",
       "has_plan": true,
       "has_changelog": true,
       "mockups": []
@@ -69,13 +74,14 @@
       "created": "2026-05-16",
       "last_updated": "2026-05-16",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38Z",
+      "last_changed_at": "2026-05-16T20:40:38+00:00",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
         {
           "name": "mockup",
-          "path": "per-company-investor-groups/mockup.html"
+          "path": "per-company-investor-groups/mockup.html",
+          "is_home": true
         }
       ]
     },
@@ -87,47 +93,53 @@
       "created": "2026-05-16",
       "last_updated": "2026-05-16",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38Z",
+      "last_changed_at": "2026-05-16T20:40:38+00:00",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
         {
           "name": "mockup",
-          "path": "prospects/mockup.html"
+          "path": "prospects/mockup.html",
+          "is_home": true
         }
       ]
     },
     {
       "slug": "sponsor-crm",
-      "title": "Sponsor CRM",
+      "title": "Development Dashboard",
       "status": "draft",
       "owner": "jordan",
       "created": "2026-05-16",
-      "last_updated": "2026-05-16",
+      "last_updated": "2026-05-19",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38Z",
+      "last_changed_at": "2026-05-16T20:40:38+00:00",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
         {
           "name": "board-dashboard",
-          "path": "sponsor-crm/board-dashboard.html"
+          "path": "sponsor-crm/board-dashboard.html",
+          "is_home": true
         },
         {
           "name": "impact-report",
-          "path": "sponsor-crm/impact-report.html"
+          "path": "sponsor-crm/impact-report.html",
+          "is_home": false
         },
         {
           "name": "prototype",
-          "path": "sponsor-crm/prototype.html"
+          "path": "sponsor-crm/prototype.html",
+          "is_home": false
         },
         {
           "name": "sponsor-detail",
-          "path": "sponsor-crm/sponsor-detail.html"
+          "path": "sponsor-crm/sponsor-detail.html",
+          "is_home": false
         },
         {
           "name": "staff-dashboard",
-          "path": "sponsor-crm/staff-dashboard.html"
+          "path": "sponsor-crm/staff-dashboard.html",
+          "is_home": false
         }
       ]
     }
