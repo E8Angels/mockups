@@ -1,15 +1,15 @@
 {
-  "generated": "2026-05-21T04:35:51+00:00",
+  "generated": "2026-05-21T04:06:14+00:00",
   "plans": [
     {
       "slug": "companies-admin-redesign",
-      "title": "Companies Admin Redesign",
+      "title": "Companies admin redesign: company-first, not table-first",
       "status": "draft",
       "owner": "jordan",
       "created": "2026-05-17",
-      "last_updated": "2026-05-19",
+      "last_updated": "2026-05-17",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-21T04:00:59+00:00",
+      "last_changed_at": "2026-05-21T04:00:59Z",
       "has_plan": true,
       "has_changelog": false,
       "mockups": [
@@ -48,20 +48,20 @@
       "created": "2026-05-16",
       "last_updated": "2026-05-16",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38+00:00",
+      "last_changed_at": "2026-05-16T20:40:38Z",
       "has_plan": true,
       "has_changelog": true,
       "mockups": []
     },
     {
       "slug": "membership-dashboard-meetings-cleanup",
-      "title": "Membership Dashboard",
+      "title": "Membership Dashboard: Meetings Code Cleanup",
       "status": "building",
       "owner": "jordan",
       "created": "2026-05-16",
-      "last_updated": "2026-05-19",
+      "last_updated": "2026-05-16",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:43:17+00:00",
+      "last_changed_at": "2026-05-16T20:43:17Z",
       "has_plan": true,
       "has_changelog": true,
       "mockups": []
@@ -74,7 +74,7 @@
       "created": "2026-05-16",
       "last_updated": "2026-05-16",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38+00:00",
+      "last_changed_at": "2026-05-16T20:40:38Z",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
@@ -93,7 +93,7 @@
       "created": "2026-05-16",
       "last_updated": "2026-05-16",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38+00:00",
+      "last_changed_at": "2026-05-16T20:40:38Z",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
@@ -106,13 +106,13 @@
     },
     {
       "slug": "sponsor-crm",
-      "title": "Development Dashboard",
+      "title": "Sponsor CRM",
       "status": "draft",
       "owner": "jordan",
       "created": "2026-05-16",
-      "last_updated": "2026-05-19",
+      "last_updated": "2026-05-16",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38+00:00",
+      "last_changed_at": "2026-05-16T20:40:38Z",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
