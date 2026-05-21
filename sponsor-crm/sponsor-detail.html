@@ -8,387 +8,596 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-  .scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
-  .scroll-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+  /* Stage palette — matches staff-dashboard.html */
   .stage-prospect    { background:#f1f5f9; color:#475569; }
-  .stage-outreach    { background:#fef3c7; color:#a16207; }
-  .stage-conversation{ background:#fed7aa; color:#9a3412; }
+  .stage-outreach    { background:#e2e8f0; color:#334155; }
+  .stage-conversation{ background:#dbeafe; color:#1e3a8a; }
   .stage-proposal    { background:#bfdbfe; color:#1d4ed8; }
-  .stage-committed   { background:#c7d2fe; color:#4338ca; }
-  .stage-received    { background:#bbf7d0; color:#065f46; }
-  .stage-declined    { background:#fee2e2; color:#b91c1c; }
-  .entity-c6 { background:#dbeafe; color:#1e40af; }
-  .entity-c3 { background:#e9d5ff; color:#6b21a8; }
-  .entity-both { background:#fef3c7; color:#92400e; }
-  .type-corporate { background:#e0e7ff; color:#3730a3; }
+  .stage-committed   { background:#1d4ed8; color:#ffffff; }
+  .stage-received    { background:#059669; color:#ffffff; }
+  .stage-declined    { background:#f3f4f6; color:#6b7280; }
+  .entity-c6  { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; }
+  .entity-c3  { background:#faf5ff; color:#6b21a8; border:1px solid #e9d5ff; }
+  .entity-both{ background:#f8fafc; color:#475569; border:1px solid #e2e8f0; }
+  .type-chip  { background:#f8fafc; color:#475569; border:1px solid #e2e8f0; }
+
+  /* Timeline rail */
   .timeline-dot::before {
     content:''; position:absolute; left:-19px; top:6px; width:9px; height:9px;
     border-radius:50%; background:#cbd5e1; border:2px solid white; box-shadow:0 0 0 1px #cbd5e1;
   }
-  .timeline-dot.timeline-gift::before { background:#10b981; box-shadow:0 0 0 1px #10b981; }
-  .timeline-dot.timeline-stage::before { background:#3b82f6; box-shadow:0 0 0 1px #3b82f6; }
-  .timeline-dot.timeline-board::before { background:#a855f7; box-shadow:0 0 0 1px #a855f7; }
+  .timeline-dot.timeline-note::before  { background:#94a3b8; box-shadow:0 0 0 1px #94a3b8; }
+  .timeline-dot.timeline-email::before { background:#0ea5e9; box-shadow:0 0 0 1px #0ea5e9; }
+  .timeline-dot.timeline-stage::before { background:#1d4ed8; box-shadow:0 0 0 1px #1d4ed8; }
+  .timeline-dot.timeline-money::before { background:#059669; box-shadow:0 0 0 1px #059669; }
+  .timeline-dot.timeline-file::before  { background:#a16207; box-shadow:0 0 0 1px #a16207; }
+  .timeline-dot.timeline-owner::before { background:#6b7280; box-shadow:0 0 0 1px #6b7280; }
   .timeline-line { border-left: 2px solid #e2e8f0; }
+
+  /* Note body styles */
+  .note-body { line-height: 1.5; }
+  .note-body p { margin: 0 0 0.5em; }
+  .note-body p:last-child { margin-bottom: 0; }
+  .note-body ul, .note-body ol { margin: 0 0 0.5em 1.25em; }
+  .note-body ul { list-style: disc; }
+  .note-body ol { list-style: decimal; }
+  .note-body a  { color:#1d4ed8; text-decoration: underline; }
+
+  /* TipTap toolbar */
+  .tt-toolbar button { padding: 2px 6px; border-radius: 3px; color:#475569; }
+  .tt-toolbar button:hover { background:#f1f5f9; color:#0f172a; }
+  .tt-toolbar button.active { background:#e2e8f0; color:#0f172a; }
+
+  /* Hover-revealed edit icons on inline-editable fields */
+  .editable-inline { position: relative; }
+  .editable-inline .edit-pencil { opacity: 0; transition: opacity 100ms; }
+  .editable-inline:hover .edit-pencil { opacity: 1; }
+  /* Hover-revealed row actions (e.g. on contact rows) */
+  .row-hover-actions { position: relative; }
+  .row-hover-actions .row-actions { opacity: 0; transition: opacity 100ms; }
+  .row-hover-actions:hover .row-actions { opacity: 1; }
 </style>
 </head>
 <body class="bg-slate-50 text-slate-900 text-sm">
 
-<!-- HEADER -->
+<!-- SLIM STICKY HEADER -->
 <header class="bg-white border-b border-slate-200 px-4 py-2 flex items-center gap-3 sticky top-0 z-30">
-  <a href="staff-dashboard.html" class="text-slate-500 hover:text-slate-900 flex items-center gap-1 text-xs">
+  <a href="staff-dashboard.html" class="text-slate-500 hover:text-slate-900 flex items-center gap-1 text-[13px]">
     <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
     <span class="hidden sm:inline">All sponsors</span>
   </a>
-  <div class="font-semibold tracking-tight">E8 · <span class="text-slate-500 font-normal">Sponsor</span></div>
   <div class="ml-auto flex items-center gap-2">
-    <button class="h-7 px-2.5 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded hidden sm:inline-block">Send email</button>
-    <button class="h-7 px-2.5 text-xs bg-slate-100 hover:bg-slate-200 rounded text-slate-600">Archive</button>
-    <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 text-xs flex items-center justify-center font-semibold">KK</div>
+    <a href="mailto:taylor.brugh@waltonfamilyfoundation.org" class="h-7 px-2.5 text-[13px] border border-slate-300 bg-white hover:bg-slate-50 rounded inline-flex items-center hidden sm:inline-flex">Send email</a>
+    <button id="editDetailsBtn" class="h-7 px-2.5 text-[13px] border border-slate-300 bg-white hover:bg-slate-50 rounded inline-flex items-center gap-1">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+      Edit details
+    </button>
+    <button class="h-7 px-2.5 text-[13px] bg-slate-100 hover:bg-slate-200 rounded text-slate-600">Archive</button>
+    <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 text-[13px] flex items-center justify-center font-semibold">KK</div>
   </div>
 </header>
 
-<!-- TITLE / SUMMARY -->
-<section class="bg-white border-b border-slate-200 px-4 py-4">
-  <div class="max-w-5xl mx-auto">
-    <div class="flex items-start gap-3 flex-wrap">
+<main class="max-w-5xl mx-auto px-3 md:px-4">
+
+  <!-- TITLE + STAGE + FOLLOW-UP — one compact block -->
+  <section class="bg-white border border-slate-200 rounded-md mt-3">
+    <div class="px-4 py-3 flex items-start gap-3 flex-wrap">
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 flex-wrap">
           <h1 class="text-xl md:text-2xl font-semibold truncate">Walton Family Foundation</h1>
-          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium type-corporate">Foundation</span>
-          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium entity-c3">E8 Impact · 501c3</span>
-          <span class="inline-flex items-center text-[11px] text-red-600 font-medium" title="High priority">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/></svg>
-            High
-          </span>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium type-chip">Foundation</span>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c3">E8 Impact · 501c3</span>
         </div>
-        <div class="text-xs text-slate-500 mt-1">Fellowship Program · Owners: <strong>Jordan S.</strong>, Karin K. · Source: Warm intro (GreenBiz)</div>
+        <div class="text-[13px] text-slate-500 mt-1 flex items-center gap-1.5 flex-wrap">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] inline-flex items-center justify-center font-semibold">JS</span>
+          <span class="text-slate-700">Jordan Schwartz</span>
+          <span class="text-slate-400">primary</span>
+          <span class="text-slate-300">·</span>
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] inline-flex items-center justify-center font-semibold">KK</span>
+          <span class="text-slate-700">Karin Kidder</span>
+          <button class="text-slate-400 hover:text-slate-700 text-[12px] ml-1">+ owner</button>
+        </div>
       </div>
 
-      <!-- Stage stepper / advance -->
-      <div class="flex items-center gap-2">
-        <div class="text-[11px] uppercase tracking-wide text-slate-500 mr-1">Stage</div>
-        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium stage-conversation">3 — Conversation</span>
-        <button class="h-7 px-2 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded flex items-center gap-1">
+      <!-- Stage chip + advance -->
+      <div class="flex items-center gap-2 shrink-0">
+        <span class="text-[11px] uppercase tracking-wider text-slate-500">Stage</span>
+        <span class="inline-flex items-center px-2 py-1 rounded text-[13px] font-medium stage-conversation">3 — Conversation</span>
+        <button class="h-7 px-2 text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded inline-flex items-center gap-1">
           Advance
           <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
         </button>
       </div>
     </div>
 
-    <!-- Follow-up banner -->
-    <div class="mt-3 bg-amber-50 border border-amber-200 rounded p-2.5 flex items-center gap-3 text-xs">
+    <!-- Follow-up bar -->
+    <div class="px-4 py-2 border-t border-slate-100 bg-amber-50 flex items-center gap-3 text-[13px] flex-wrap">
       <svg class="w-4 h-4 text-amber-700 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .2.08.4.22.53l3 3a.75.75 0 101.06-1.06l-2.78-2.78V5z" clip-rule="evenodd"/></svg>
-      <div class="flex-1">
-        <strong>Follow-up due May 26</strong> (10 days) — <span class="text-slate-700">Send outcomes data + 3-year fellowship roadmap to Taylor.</span>
+      <div class="flex-1 min-w-0">
+        <strong>Follow-up due May 26</strong>
+        <span class="text-slate-500">(10 days)</span>
+        <span class="text-slate-700"> — Send outcomes data + 3-year fellowship roadmap to Taylor.</span>
       </div>
-      <button class="h-6 px-2 text-[11px] border border-amber-300 bg-white hover:bg-amber-50 rounded">Mark done</button>
-      <button class="h-6 px-2 text-[11px] border border-amber-300 bg-white hover:bg-amber-50 rounded">Edit</button>
-    </div>
-  </div>
-</section>
-
-<!-- TABS -->
-<nav class="bg-white border-b border-slate-200 px-4 sticky top-[44px] z-20">
-  <div class="max-w-5xl mx-auto flex items-center gap-1 overflow-x-auto">
-    <button data-tab="overview" class="tab-btn px-3 py-2 text-xs font-medium border-b-2 border-blue-600 text-blue-700 whitespace-nowrap">Overview</button>
-    <button data-tab="activity" class="tab-btn px-3 py-2 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">Activity <span class="text-slate-400">8</span></button>
-    <button data-tab="contacts" class="tab-btn px-3 py-2 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">Contacts <span class="text-slate-400">2</span></button>
-    <button data-tab="amounts"  class="tab-btn px-3 py-2 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">Money</button>
-    <button data-tab="attachments" class="tab-btn px-3 py-2 text-xs font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">Attachments <span class="text-slate-400">3</span></button>
-  </div>
-</nav>
-
-<!-- TAB PANELS -->
-<main class="max-w-5xl mx-auto px-3 md:px-4 py-4">
-
-  <!-- OVERVIEW -->
-  <section id="tab-overview" class="tab-panel grid grid-cols-1 lg:grid-cols-3 gap-4">
-    <!-- Key facts -->
-    <div class="lg:col-span-2 bg-white border border-slate-200 rounded p-4">
-      <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-3">Key facts</div>
-      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
-        <div>
-          <dt class="text-[11px] text-slate-500">Sponsor type</dt>
-          <dd class="text-[13px]">Foundation</dd>
-        </div>
-        <div>
-          <dt class="text-[11px] text-slate-500">Entity</dt>
-          <dd class="text-[13px]">E8 Impact (501c3)</dd>
-        </div>
-        <div>
-          <dt class="text-[11px] text-slate-500">Campaign / program</dt>
-          <dd class="text-[13px]">Fellowship Program</dd>
-        </div>
-        <div>
-          <dt class="text-[11px] text-slate-500">Source / how we know them</dt>
-          <dd class="text-[13px]">Warm intro at GreenBiz 2026</dd>
-        </div>
-        <div>
-          <dt class="text-[11px] text-slate-500">Ask amount</dt>
-          <dd class="text-[13px] font-semibold">$100,000</dd>
-        </div>
-        <div>
-          <dt class="text-[11px] text-slate-500">Committed</dt>
-          <dd class="text-[13px] text-slate-400">— not yet</dd>
-        </div>
-        <div>
-          <dt class="text-[11px] text-slate-500">Received</dt>
-          <dd class="text-[13px] text-slate-400">—</dd>
-        </div>
-        <div>
-          <dt class="text-[11px] text-slate-500">Grant deadline</dt>
-          <dd class="text-[13px]">Jul 10, 2026 <span class="text-[10px] text-slate-500 ml-1">(55 days)</span></dd>
-        </div>
-        <div>
-          <dt class="text-[11px] text-slate-500">Priority</dt>
-          <dd class="text-[13px] text-red-600 flex items-center gap-1">
-            <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/></svg>
-            High
-          </dd>
-        </div>
-        <div>
-          <dt class="text-[11px] text-slate-500">Owners</dt>
-          <dd class="text-[13px] flex items-center gap-1.5">
-            <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] inline-flex items-center justify-center font-semibold">JS</span>
-            <span>Jordan S. <span class="text-[10px] text-slate-500">(primary)</span></span>
-            <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] inline-flex items-center justify-center font-semibold">KK</span>
-            <span>Karin K.</span>
-          </dd>
-        </div>
-        <div class="sm:col-span-2">
-          <dt class="text-[11px] text-slate-500">Tags / notes</dt>
-          <dd class="text-[13px] text-slate-700">Climate justice focus area. Multi-year roadmap requested. Prefers single annual gift over installments.</dd>
-        </div>
-      </dl>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button class="h-6 px-2 text-[12px] border border-amber-300 bg-white hover:bg-amber-50 rounded">Mark done</button>
+        <button class="h-6 px-2 text-[12px] border border-amber-300 bg-white hover:bg-amber-50 rounded">Edit</button>
+        <button class="h-6 px-2 text-[12px] text-amber-800 hover:bg-amber-100 rounded">+ another</button>
+      </div>
     </div>
 
-    <!-- Right sidebar: quick actions + upcoming follow-ups -->
-    <div class="space-y-3">
-      <div class="bg-white border border-slate-200 rounded p-3">
-        <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-2">Quick actions</div>
-        <div class="grid grid-cols-2 gap-1.5">
-          <button class="h-8 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded flex items-center justify-center gap-1">+ Note</button>
-          <button class="h-8 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded flex items-center justify-center gap-1">+ Follow-up</button>
-          <button class="h-8 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded flex items-center justify-center gap-1">+ Gift</button>
-          <button class="h-8 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded flex items-center justify-center gap-1">+ Attachment</button>
-        </div>
-      </div>
-      <div class="bg-white border border-slate-200 rounded p-3">
-        <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-2">Upcoming</div>
-        <ul class="text-xs space-y-2">
-          <li class="flex items-start gap-2">
-            <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0"></span>
-            <div><strong>May 26</strong> — Send outcomes data <div class="text-[11px] text-slate-500">Jordan S.</div></div>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="inline-block w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0"></span>
-            <div><strong>Jul 10</strong> — Grant deadline <div class="text-[11px] text-slate-500">Foundation portal submission</div></div>
-          </li>
-        </ul>
-      </div>
+    <!-- Facts strip: campaign / ask / commit / received / deadline / renewal / source -->
+    <div class="px-4 py-2 border-t border-slate-100 flex items-baseline flex-wrap gap-x-5 gap-y-1 text-[14px]">
+      <div><span class="text-[11px] uppercase tracking-wider text-slate-500 mr-1">Campaign</span><span class="font-medium">Fellowship Program</span></div>
+      <div><span class="text-[11px] uppercase tracking-wider text-slate-500 mr-1">Ask</span><span class="font-semibold tabular-nums">$100,000</span></div>
+      <div><span class="text-[11px] uppercase tracking-wider text-slate-500 mr-1">Committed</span><span class="text-slate-400">—</span></div>
+      <div><span class="text-[11px] uppercase tracking-wider text-slate-500 mr-1">Received</span><span class="text-slate-400">—</span></div>
+      <div><span class="text-[11px] uppercase tracking-wider text-slate-500 mr-1">Grant deadline</span><span class="font-medium">Jul 10, 2026</span><span class="text-slate-400 text-[12px] ml-1">55d</span></div>
+      <div><span class="text-[11px] uppercase tracking-wider text-slate-500 mr-1">Source</span><span class="text-slate-700">Warm intro · GreenBiz 2026</span></div>
+    </div>
+
+    <!-- About this sponsor (sponsor-level freeform notes — durable, editable inline) -->
+    <div class="px-4 py-2 border-t border-slate-100 editable-inline">
+      <span class="text-[11px] uppercase tracking-wider text-slate-500 mr-2">About</span>
+      <span class="text-[14px] text-slate-700">Climate justice focus area. Multi-year roadmap requested. Prefers single annual gift over installments.</span>
+      <button class="edit-pencil text-[11px] text-slate-400 hover:text-slate-700 ml-1 align-middle">Edit</button>
     </div>
   </section>
 
-  <!-- ACTIVITY -->
-  <section id="tab-activity" class="tab-panel hidden">
-    <!-- Quick add note -->
-    <div class="bg-white border border-slate-200 rounded p-3 mb-3">
-      <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-2">Log a conversation</div>
-      <div class="grid grid-cols-1 sm:grid-cols-[120px_140px_1fr] gap-2 items-start">
-        <div>
-          <label class="text-[11px] text-slate-500">When</label>
-          <input type="date" value="2026-05-16" class="!w-[150px] block border border-slate-300 rounded px-2 h-8 text-xs" autocomplete="off" data-lpignore="true"/>
-        </div>
-        <div>
-          <label class="text-[11px] text-slate-500">Channel</label>
-          <select class="block w-full border border-slate-300 rounded px-2 h-8 text-xs">
-            <option>Call</option><option>Email</option><option>In-person</option><option>Event</option><option>Text</option><option>Other</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-[11px] text-slate-500">Summary</label>
-          <textarea rows="2" autocomplete="off" data-lpignore="true" data-form-type="other" class="block w-full border border-slate-300 rounded px-2 py-1 text-xs" placeholder="What was discussed?"></textarea>
-        </div>
-      </div>
-      <div class="flex items-center gap-2 mt-2">
-        <input type="text" autocomplete="off" data-lpignore="true" data-form-type="other" placeholder="Next step (optional)" class="flex-1 border border-slate-300 rounded px-2 h-8 text-xs"/>
-        <button class="h-8 px-3 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Save note</button>
-      </div>
-    </div>
+  <!-- THREE-COL REFERENCE STRIP: Contacts / Money / Attachments -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
 
-    <!-- Timeline -->
-    <div class="bg-white border border-slate-200 rounded p-4">
-      <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-3 flex items-center gap-2">
-        <span>Timeline</span>
-        <div class="ml-auto flex items-center gap-1 text-[11px]">
-          <button class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">All</button>
-          <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Notes</button>
-          <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Stage</button>
-          <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Money</button>
-        </div>
+    <!-- Contacts -->
+    <div class="bg-white border border-slate-200 rounded-md flex flex-col">
+      <div class="px-3 py-2 border-b border-slate-200 flex items-center">
+        <div class="text-[12px] uppercase tracking-wider text-slate-500 font-semibold">Contacts <span class="text-slate-400 font-normal">2</span></div>
+        <button class="ml-auto text-[12px] text-blue-700 hover:text-blue-900">+ Add</button>
       </div>
-      <ol class="timeline-line ml-3 pl-5 space-y-4">
-        <li class="timeline-dot relative">
-          <div class="text-[11px] text-slate-500">May 12, 2026 · Jordan S. <span class="text-slate-400">· note</span></div>
-          <div class="text-[13px] mt-0.5">Taylor wants to see fellowship outcomes broken out by cohort year. I'll pull from the portal and send by 5/26.</div>
-          <div class="text-[11px] text-slate-500 mt-0.5">Next: outcomes deck + 3-year roadmap</div>
-          <div class="text-[10px] text-slate-400 mt-1"><a href="#" class="hover:underline">Edit (8 min remaining)</a></div>
-        </li>
-        <li class="timeline-dot timeline-stage relative">
-          <div class="text-[11px] text-slate-500">May 12, 2026 · Jordan S. <span class="text-slate-400">· stage change</span></div>
-          <div class="text-[13px] mt-0.5">Stage <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium stage-outreach">2 — Outreach</span> → <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium stage-conversation">3 — Conversation</span></div>
-        </li>
-        <li class="timeline-dot timeline-board relative">
-          <div class="text-[11px] text-slate-500">May 8, 2026 · Lisa R. (Board) <span class="text-slate-400">· in-person</span></div>
-          <div class="text-[13px] mt-0.5">Sat next to Taylor at the GreenBiz dinner. They've already evaluated three orgs in our space; we made the short list. Pat from Bullitt vouched for us.</div>
-          <div class="text-[10px] text-slate-400 mt-1">Logged by board member · notified Jordan S.</div>
-        </li>
-        <li class="timeline-dot relative">
-          <div class="text-[11px] text-slate-500">May 5, 2026 · Jordan S. <span class="text-slate-400">· email</span></div>
-          <div class="text-[13px] mt-0.5">Sent intro email to Taylor with deck attached. CC'd Karin.</div>
-        </li>
-        <li class="timeline-dot timeline-stage relative">
-          <div class="text-[11px] text-slate-500">May 3, 2026 · Karin K. <span class="text-slate-400">· stage change</span></div>
-          <div class="text-[13px] mt-0.5">Stage <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium stage-prospect">1 — Prospect</span> → <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium stage-outreach">2 — Outreach</span></div>
-          <div class="text-[13px] mt-0.5 text-slate-600">Confirmed warm intro path through Lisa.</div>
-        </li>
-        <li class="timeline-dot relative">
-          <div class="text-[11px] text-slate-500">Apr 28, 2026 · Karin K. <span class="text-slate-400">· note</span></div>
-          <div class="text-[13px] mt-0.5">Added to pipeline. Foundation focus areas are a strong match for the fellowship program.</div>
-        </li>
-      </ol>
-    </div>
-  </section>
-
-  <!-- CONTACTS -->
-  <section id="tab-contacts" class="tab-panel hidden">
-    <div class="bg-white border border-slate-200 rounded">
-      <div class="px-4 py-2 border-b border-slate-200 flex items-center">
-        <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Contacts</div>
-        <button class="ml-auto h-7 px-2.5 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded">+ Add contact</button>
-      </div>
-      <table class="w-full text-[13px]">
-        <thead class="bg-slate-50">
-          <tr class="text-left text-[11px] uppercase tracking-wider text-slate-500">
-            <th class="px-4 py-2 font-semibold">Name</th>
-            <th class="px-4 py-2 font-semibold">Title / role</th>
-            <th class="px-4 py-2 font-semibold">Email</th>
-            <th class="px-4 py-2 font-semibold">Phone</th>
-            <th class="px-4 py-2 font-semibold"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="border-t border-slate-100">
-            <td class="px-4 py-2"><a href="#" class="hover:underline font-medium">Taylor Brugh</a> <span class="text-[10px] bg-blue-100 text-blue-800 px-1 rounded">Primary</span></td>
-            <td class="px-4 py-2">Program Officer, Climate Justice</td>
-            <td class="px-4 py-2 text-slate-700">taylorbrugh@…</td>
-            <td class="px-4 py-2 text-slate-500">—</td>
-            <td class="px-4 py-2 text-right"><button class="text-xs text-slate-500 hover:text-slate-900">Edit</button></td>
-          </tr>
-          <tr class="border-t border-slate-100">
-            <td class="px-4 py-2"><a href="#" class="hover:underline">Brandon Middaugh</a></td>
-            <td class="px-4 py-2">Director, Strategic Grants</td>
-            <td class="px-4 py-2 text-slate-700">brmidd@…</td>
-            <td class="px-4 py-2 text-slate-500">—</td>
-            <td class="px-4 py-2 text-right"><button class="text-xs text-slate-500 hover:text-slate-900">Edit</button></td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="px-4 py-2 text-[11px] text-slate-500 border-t border-slate-100">Contacts live in the shared people directory; this view links to their full profiles.</div>
-    </div>
-  </section>
-
-  <!-- AMOUNTS -->
-  <section id="tab-amounts" class="tab-panel hidden">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <div class="lg:col-span-2 bg-white border border-slate-200 rounded">
-        <div class="px-4 py-2 border-b border-slate-200 flex items-center">
-          <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Money</div>
-          <button class="ml-auto h-7 px-2.5 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded">+ Entry</button>
-        </div>
-        <table class="w-full text-[13px]">
-          <thead class="bg-slate-50">
-            <tr class="text-left text-[11px] uppercase tracking-wider text-slate-500">
-              <th class="px-4 py-2 font-semibold">Kind</th>
-              <th class="px-4 py-2 font-semibold">Date</th>
-              <th class="px-4 py-2 font-semibold">Campaign</th>
-              <th class="px-4 py-2 font-semibold text-right">Amount</th>
-              <th class="px-4 py-2 font-semibold">Note</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="border-t border-slate-100">
-              <td class="px-4 py-2"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700">Ask</span></td>
-              <td class="px-4 py-2 text-slate-700">Apr 28, 2026</td>
-              <td class="px-4 py-2">Fellowship Program</td>
-              <td class="px-4 py-2 text-right font-semibold">$100,000</td>
-              <td class="px-4 py-2 text-slate-700">Stated in proposal draft</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="bg-white border border-slate-200 rounded p-4">
-        <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-2">Summary</div>
-        <dl class="space-y-2 text-[13px]">
-          <div class="flex justify-between"><dt class="text-slate-500">Total ask</dt><dd class="font-semibold">$100,000</dd></div>
-          <div class="flex justify-between"><dt class="text-slate-500">Committed</dt><dd class="text-slate-400">—</dd></div>
-          <div class="flex justify-between"><dt class="text-slate-500">Received YTD</dt><dd class="text-slate-400">—</dd></div>
-          <div class="flex justify-between"><dt class="text-slate-500">Lifetime received</dt><dd class="text-slate-400">—</dd></div>
-        </dl>
-      </div>
-    </div>
-  </section>
-
-  <!-- ATTACHMENTS -->
-  <section id="tab-attachments" class="tab-panel hidden">
-    <div class="bg-white border border-slate-200 rounded">
-      <div class="px-4 py-2 border-b border-slate-200 flex items-center">
-        <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Attachments</div>
-        <button class="ml-auto h-7 px-2.5 text-xs border border-slate-300 bg-white hover:bg-slate-50 rounded">Upload file</button>
-      </div>
-      <ul class="divide-y divide-slate-100">
-        <li class="px-4 py-3 flex items-center gap-3 hover:bg-slate-50">
-          <svg class="w-5 h-5 text-red-500 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h6l4 4v10a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm10 1V2.5L15.5 4H14a1 1 0 01-1-1V2v1z" clip-rule="evenodd"/></svg>
-          <div class="flex-1 min-w-0">
-            <div class="font-medium text-[13px] truncate">E8 Fellowship Program Overview.pdf</div>
-            <div class="text-[11px] text-slate-500">Uploaded May 5 by Jordan S. · 2.4 MB</div>
+      <ul class="divide-y divide-slate-100 flex-1">
+        <li class="row-hover-actions px-3 py-2">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <a href="#" class="font-medium hover:underline text-[14px]">Taylor Brugh</a>
+            <span class="text-[11px] bg-blue-100 text-blue-800 px-1 rounded">Primary</span>
+            <span class="row-actions ml-auto flex items-center gap-2 text-[11px]">
+              <button class="text-slate-500 hover:text-slate-900">Edit</button>
+              <button class="text-slate-400 hover:text-red-700">Remove</button>
+            </span>
           </div>
-          <button class="text-xs text-slate-500 hover:text-slate-900">Download</button>
+          <div class="text-[13px] text-slate-600">Program Officer, Climate Justice</div>
+          <div class="text-[13px] text-slate-500"><a href="mailto:taylor.brugh@waltonfamilyfoundation.org" class="hover:underline">taylor.brugh@waltonfamilyfoundation.org</a></div>
         </li>
-        <li class="px-4 py-3 flex items-center gap-3 hover:bg-slate-50">
-          <svg class="w-5 h-5 text-blue-500 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/></svg>
-          <div class="flex-1 min-w-0">
-            <div class="font-medium text-[13px] truncate">Walton LOI draft (red-lined).docx</div>
-            <div class="text-[11px] text-slate-500">Uploaded May 10 by Karin K. · 64 KB</div>
+        <li class="row-hover-actions px-3 py-2">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <a href="#" class="font-medium hover:underline text-[14px]">Caroline Avila</a>
+            <span class="row-actions ml-auto flex items-center gap-2 text-[11px]">
+              <button class="text-slate-500 hover:text-slate-900">Make primary</button>
+              <button class="text-slate-500 hover:text-slate-900">Edit</button>
+              <button class="text-slate-400 hover:text-red-700">Remove</button>
+            </span>
           </div>
-          <button class="text-xs text-slate-500 hover:text-slate-900">Download</button>
+          <div class="text-[13px] text-slate-600">Director, Strategic Grants</div>
+          <div class="text-[13px] text-slate-500"><a href="mailto:caroline.avila@waltonfamilyfoundation.org" class="hover:underline">caroline.avila@waltonfamilyfoundation.org</a></div>
         </li>
-        <li class="px-4 py-3 flex items-center gap-3 hover:bg-slate-50">
-          <svg class="w-5 h-5 text-emerald-500 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" clip-rule="evenodd"/></svg>
-          <div class="flex-1 min-w-0">
-            <div class="font-medium text-[13px] truncate">Cohort outcomes 2023–2025.xlsx</div>
-            <div class="text-[11px] text-slate-500">Uploaded May 12 by Jordan S. · 187 KB</div>
-          </div>
-          <button class="text-xs text-slate-500 hover:text-slate-900">Download</button>
+      </ul>
+    </div>
+
+    <!-- Money -->
+    <div class="bg-white border border-slate-200 rounded-md flex flex-col">
+      <div class="px-3 py-2 border-b border-slate-200 flex items-center">
+        <div class="text-[12px] uppercase tracking-wider text-slate-500 font-semibold">Money</div>
+        <button class="ml-auto text-[12px] text-blue-700 hover:text-blue-900">+ Entry</button>
+      </div>
+      <ul class="divide-y divide-slate-100 text-[13px] flex-1">
+        <li class="row-hover-actions px-3 py-2 flex items-center gap-2">
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700">Ask</span>
+          <span class="font-semibold tabular-nums text-[14px]">$100,000</span>
+          <span class="text-slate-300">·</span>
+          <span class="text-slate-500">Apr 28, 2026</span>
+          <span class="row-actions ml-auto flex items-center gap-2 text-[11px]">
+            <button class="text-slate-500 hover:text-slate-900">Edit</button>
+            <button class="text-slate-400 hover:text-red-700">Remove</button>
+          </span>
+        </li>
+      </ul>
+      <div class="px-3 py-2 border-t border-slate-100 text-[13px] bg-slate-50 grid grid-cols-3 gap-1">
+        <div><div class="text-[11px] uppercase tracking-wider text-slate-500">Asked</div><div class="font-semibold tabular-nums">$100,000</div></div>
+        <div><div class="text-[11px] uppercase tracking-wider text-slate-500">Committed</div><div class="text-slate-400">—</div></div>
+        <div><div class="text-[11px] uppercase tracking-wider text-slate-500">Received</div><div class="text-slate-400">—</div></div>
+      </div>
+    </div>
+
+    <!-- Attachments -->
+    <div class="bg-white border border-slate-200 rounded-md flex flex-col">
+      <div class="px-3 py-2 border-b border-slate-200 flex items-center">
+        <div class="text-[12px] uppercase tracking-wider text-slate-500 font-semibold">Attachments <span class="text-slate-400 font-normal">3</span></div>
+        <button class="ml-auto text-[12px] text-blue-700 hover:text-blue-900">+ Upload</button>
+      </div>
+      <ul class="divide-y divide-slate-100 text-[13px] flex-1">
+        <li class="px-3 py-1.5 flex items-center gap-2 hover:bg-slate-50">
+          <svg class="w-4 h-4 text-red-500 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h6l4 4v10a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+          <a href="#" class="font-medium hover:underline truncate flex-1">E8 Fellowship Program Overview.pdf</a>
+          <span class="text-[11px] text-slate-400 whitespace-nowrap">2.4 MB</span>
+        </li>
+        <li class="px-3 py-1.5 flex items-center gap-2 hover:bg-slate-50">
+          <svg class="w-4 h-4 text-blue-500 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/></svg>
+          <a href="#" class="font-medium hover:underline truncate flex-1">Walton LOI draft (red-lined).docx</a>
+          <span class="text-[11px] text-slate-400 whitespace-nowrap">64 KB</span>
+        </li>
+        <li class="px-3 py-1.5 flex items-center gap-2 hover:bg-slate-50">
+          <svg class="w-4 h-4 text-emerald-500 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" clip-rule="evenodd"/></svg>
+          <a href="#" class="font-medium hover:underline truncate flex-1">Cohort outcomes 2023–2025.xlsx</a>
+          <span class="text-[11px] text-slate-400 whitespace-nowrap">187 KB</span>
         </li>
       </ul>
     </div>
   </section>
+
+  <!-- ADD A NOTE -->
+  <section class="bg-white border border-slate-200 rounded-md mt-3">
+    <div class="px-3 py-2 border-b border-slate-200 flex items-center gap-3">
+      <div class="text-[12px] uppercase tracking-wider text-slate-500 font-semibold">Add a note</div>
+      <div class="flex items-center gap-2 ml-auto">
+        <label class="text-[12px] text-slate-500">When</label>
+        <input type="date" value="2026-05-16" class="!w-[140px] border border-slate-300 rounded h-7 px-2 text-[13px]" autocomplete="off" data-lpignore="true"/>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="tt-toolbar flex items-center gap-0.5 px-2 py-1 border-b border-slate-100 text-[13px]" role="toolbar" aria-label="Formatting">
+      <button type="button" title="Bold" aria-label="Bold" class="font-bold w-7 h-6">B</button>
+      <button type="button" title="Italic" aria-label="Italic" class="italic w-7 h-6">I</button>
+      <span class="w-px h-4 bg-slate-200 mx-1"></span>
+      <button type="button" title="Bullet list" aria-label="Bullet list" class="w-7 h-6">
+        <svg class="w-3.5 h-3.5 inline" viewBox="0 0 20 20" fill="currentColor"><path d="M3 5a1 1 0 11-2 0 1 1 0 012 0zM3 10a1 1 0 11-2 0 1 1 0 012 0zM3 15a1 1 0 11-2 0 1 1 0 012 0zM6 5h11v1.5H6V5zm0 4.25h11v1.5H6v-1.5zm0 4.25h11V15H6v-1.5z"/></svg>
+      </button>
+      <button type="button" title="Numbered list" aria-label="Numbered list" class="w-7 h-6">
+        <svg class="w-3.5 h-3.5 inline" viewBox="0 0 20 20" fill="currentColor"><path d="M2 4h1v3H2V4zm0 5h1.5L2 11h1.5v1H2v-1H1v-1.5h1V9zm0 4h1.5v.5H2v.5h1.5V15H2v.5h1.5V16H1v-3h1v0zM6 5h11v1.5H6V5zm0 4.25h11v1.5H6v-1.5zm0 4.25h11V15H6v-1.5z"/></svg>
+      </button>
+      <span class="w-px h-4 bg-slate-200 mx-1"></span>
+      <button type="button" id="ttLinkBtn" title="Link" aria-label="Link" class="w-7 h-6">
+        <svg class="w-3.5 h-3.5 inline" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"/></svg>
+      </button>
+    </div>
+
+    <div id="ttEditor"
+         class="note-body min-h-[100px] px-3 py-2 text-[14px] outline-none focus:bg-slate-50/30"
+         contenteditable="true"
+         autocomplete="off"></div>
+
+    <div class="px-3 py-2 border-t border-slate-100 flex items-center gap-2 flex-wrap">
+      <button id="addFollowupToggle" type="button" class="h-7 px-2 text-[13px] text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded inline-flex items-center gap-1">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
+        Add follow-up
+      </button>
+      <button class="ml-auto h-7 px-3 text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Save note</button>
+    </div>
+
+    <div id="followupRow" class="hidden border-t border-slate-100 px-3 py-2 grid grid-cols-1 sm:grid-cols-[140px_160px_1fr] gap-2 items-end bg-slate-50">
+      <div>
+        <label class="text-[12px] text-slate-500 block">Due</label>
+        <input type="date" class="!w-[140px] border border-slate-300 rounded h-7 px-2 text-[13px]" autocomplete="off" data-lpignore="true"/>
+      </div>
+      <div>
+        <label class="text-[12px] text-slate-500 block">Assignee</label>
+        <select class="w-full border border-slate-300 rounded h-7 px-2 text-[13px]">
+          <option>Jordan Schwartz (me)</option><option>Karin Kidder</option><option>Kathleen Olson</option><option>Lee O'Connor</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-[12px] text-slate-500 block">Reminder note</label>
+        <input type="text" autocomplete="off" data-lpignore="true" data-form-type="other" class="w-full border border-slate-300 rounded h-7 px-2 text-[13px]"/>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTIVITY FEED -->
+  <section class="bg-white border border-slate-200 rounded-md mt-3 mb-4">
+    <div class="px-4 py-2 border-b border-slate-200 flex items-center gap-2 flex-wrap">
+      <div class="text-[12px] uppercase tracking-wider text-slate-500 font-semibold">Activity <span class="text-slate-400 font-normal">8</span></div>
+      <div class="ml-auto flex items-center gap-1 text-[12px]">
+        <button class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">All</button>
+        <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Notes</button>
+        <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Email</button>
+        <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Stage</button>
+        <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Money</button>
+        <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Files</button>
+      </div>
+    </div>
+    <ol class="timeline-line ml-6 pl-5 my-4 mr-4 space-y-4">
+
+      <li class="timeline-dot timeline-note relative">
+        <div class="text-[12px] text-slate-500 flex items-center gap-2 flex-wrap">
+          <span>May 12, 2026 · 3:42 PM</span>
+          <span>· Jordan Schwartz</span>
+          <span class="text-[11px] uppercase tracking-wider text-slate-400">Note</span>
+        </div>
+        <div class="note-body text-[14px] mt-1 text-slate-800">
+          <p>Call with Taylor. They've narrowed to 3 climate-justice orgs; we're on the short list.</p>
+          <p>Next ask from them: outcomes broken out by <em>cohort year</em>, not aggregate. They want to see retention from Year 1 → 3.</p>
+        </div>
+        <div class="text-[11px] text-slate-400 mt-1.5"><a href="#" class="hover:underline">Edit</a></div>
+      </li>
+
+      <li class="timeline-dot timeline-stage relative">
+        <div class="text-[12px] text-slate-500 flex items-center gap-2 flex-wrap">
+          <span>May 12, 2026 · 3:38 PM</span>
+          <span>· Jordan Schwartz</span>
+          <span class="text-[11px] uppercase tracking-wider text-slate-400">Stage</span>
+        </div>
+        <div class="text-[14px] mt-1 flex items-center gap-1.5 flex-wrap">
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-outreach">2 — Outreach</span>
+          <svg class="w-3 h-3 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-conversation">3 — Conversation</span>
+          <span class="text-slate-500 text-[13px]">— qualified after first real call</span>
+        </div>
+      </li>
+
+      <li class="timeline-dot timeline-email relative">
+        <div class="text-[12px] text-slate-500 flex items-center gap-2 flex-wrap">
+          <span>May 9, 2026 · 9:12 AM</span>
+          <span>· Taylor Brugh → Jordan Schwartz</span>
+          <span class="text-[11px] uppercase tracking-wider text-slate-400">Email</span>
+          <span class="text-[11px] text-slate-400">· auto-logged</span>
+        </div>
+        <div class="text-[14px] mt-1 font-medium text-slate-800">Re: E8 fellowship — quick call this week?</div>
+        <div class="text-[13px] text-slate-600 mt-0.5">Yes, let's do Thursday 11am PT. I'll send a calendar invite. Would love to hear how you measure cohort outcomes…</div>
+      </li>
+
+      <li class="timeline-dot timeline-note relative">
+        <div class="text-[12px] text-slate-500 flex items-center gap-2 flex-wrap">
+          <span>May 8, 2026</span>
+          <span>· Lisa Rasmussen</span>
+          <span class="text-[11px] uppercase tracking-wider text-slate-400">Note · Board</span>
+        </div>
+        <div class="note-body text-[14px] mt-1 text-slate-800">
+          <p>Sat next to Taylor at the GreenBiz dinner. They've already evaluated three orgs in our space; we made the short list. Pat from Bullitt vouched for us.</p>
+        </div>
+        <div class="text-[11px] text-slate-400 mt-1.5">Logged via board dashboard · notified Jordan Schwartz</div>
+      </li>
+
+      <li class="timeline-dot timeline-email relative">
+        <div class="text-[12px] text-slate-500 flex items-center gap-2 flex-wrap">
+          <span>May 5, 2026 · 4:02 PM</span>
+          <span>· Jordan Schwartz → Taylor Brugh</span>
+          <span class="text-[11px] uppercase tracking-wider text-slate-400">Email</span>
+          <span class="text-[11px] text-slate-400">· auto-logged</span>
+        </div>
+        <div class="text-[14px] mt-1 font-medium text-slate-800">E8 fellowship — intro &amp; deck</div>
+        <div class="text-[13px] text-slate-600 mt-0.5">Hi Taylor — Karin suggested I reach out. Attaching our 1-pager on the fellowship program. Happy to schedule a call…</div>
+        <div class="text-[11px] text-slate-400 mt-1">1 attachment</div>
+      </li>
+
+      <li class="timeline-dot timeline-stage relative">
+        <div class="text-[12px] text-slate-500 flex items-center gap-2 flex-wrap">
+          <span>May 3, 2026</span>
+          <span>· Karin Kidder</span>
+          <span class="text-[11px] uppercase tracking-wider text-slate-400">Stage</span>
+        </div>
+        <div class="text-[14px] mt-1 flex items-center gap-1.5 flex-wrap">
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-prospect">1 — Prospect</span>
+          <svg class="w-3 h-3 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-outreach">2 — Outreach</span>
+        </div>
+      </li>
+
+      <li class="timeline-dot timeline-money relative">
+        <div class="text-[12px] text-slate-500 flex items-center gap-2 flex-wrap">
+          <span>Apr 28, 2026</span>
+          <span>· Karin Kidder</span>
+          <span class="text-[11px] uppercase tracking-wider text-slate-400">Money</span>
+        </div>
+        <div class="text-[14px] mt-1 text-slate-800">
+          <span class="font-semibold">$100,000</span>
+          <span class="text-slate-500">ask</span>
+          <span class="text-slate-300">·</span>
+          <span class="text-slate-600">Fellowship Program</span>
+        </div>
+      </li>
+
+      <li class="timeline-dot timeline-file relative">
+        <div class="text-[12px] text-slate-500 flex items-center gap-2 flex-wrap">
+          <span>Apr 28, 2026</span>
+          <span>· Karin Kidder</span>
+          <span class="text-[11px] uppercase tracking-wider text-slate-400">File</span>
+        </div>
+        <div class="text-[14px] mt-1 text-slate-800">Attached <a href="#" class="text-blue-700 hover:underline">E8 Fellowship Program Overview.pdf</a> <span class="text-slate-400">· 2.4 MB</span></div>
+      </li>
+
+      <li class="timeline-dot timeline-owner relative">
+        <div class="text-[12px] text-slate-500 flex items-center gap-2 flex-wrap">
+          <span>Apr 28, 2026</span>
+          <span>· Karin Kidder</span>
+          <span class="text-[11px] uppercase tracking-wider text-slate-400">Sponsor created</span>
+        </div>
+        <div class="text-[14px] mt-1 text-slate-800">Added to pipeline · owners <strong>Jordan Schwartz</strong> (primary), Karin Kidder · entity <strong>E8 Impact</strong></div>
+      </li>
+
+    </ol>
+  </section>
+
 </main>
 
+<!-- EDIT SPONSOR DETAILS DIALOG -->
+<div id="editDetailsModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-md shadow-xl w-full max-w-lg">
+    <div class="px-4 py-3 border-b border-slate-200 flex items-center">
+      <div class="font-semibold">Edit sponsor details</div>
+      <button onclick="closeEditDetails()" class="ml-auto text-slate-400 hover:text-slate-700" aria-label="Close">
+        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+      </button>
+    </div>
+    <div class="px-4 py-3 space-y-3 text-sm max-h-[70vh] overflow-y-auto">
+
+      <!-- Name -->
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label for="editDisplayName" class="text-[13px] text-slate-600">Name</label>
+        <input id="editDisplayName" type="text" value="Walton Family Foundation" autocomplete="off" data-lpignore="true" data-form-type="other"
+               class="border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+      </div>
+
+      <!-- Type -->
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Type</label>
+        <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px] w-fit">
+          <button type="button" data-edittype="corporate"  class="edittype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Corporate</button>
+          <button type="button" data-edittype="foundation" class="edittype-btn px-2.5 py-1 rounded font-medium bg-white shadow-sm">Foundation</button>
+          <button type="button" data-edittype="individual" class="edittype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Individual</button>
+          <button type="button" data-edittype="in_kind"    class="edittype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">In-kind</button>
+        </div>
+      </div>
+
+      <!-- Entity -->
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Entity</label>
+        <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px] w-fit">
+          <button type="button" data-editentity="501c6" class="editentity-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">E8 Angels (501c6)</button>
+          <button type="button" data-editentity="501c3" class="editentity-btn px-2.5 py-1 rounded font-medium bg-white shadow-sm">E8 Impact (501c3)</button>
+          <button type="button" data-editentity="both"  class="editentity-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Both</button>
+        </div>
+      </div>
+
+      <!-- Source -->
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Source</label>
+        <input type="text" value="Warm intro at GreenBiz 2026" autocomplete="off" data-lpignore="true" data-form-type="other"
+               class="border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+      </div>
+
+      <!-- Campaign -->
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Campaign</label>
+        <select class="h-8 border border-slate-300 rounded px-2 text-[13px] w-[220px]">
+          <option value="">— none —</option>
+          <option>FY26 Annual Fund</option>
+          <option selected>Fellowship Program</option>
+          <option>Member Events</option>
+        </select>
+      </div>
+
+      <!-- Foundation-only: grant deadline -->
+      <div id="editGrantDeadlineRow" class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Grant deadline</label>
+        <input type="date" value="2026-07-10" autocomplete="off" data-lpignore="true"
+               class="!w-[150px] border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+      </div>
+
+      <!-- Corporate / Foundation: renewal month -->
+      <div id="editRenewalRow" class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Renewal month</label>
+        <select class="h-8 border border-slate-300 rounded px-2 text-[13px] w-[150px]">
+          <option value="">—</option>
+          <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+          <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+          <option value="7" selected>July</option><option value="8">August</option><option value="9">September</option>
+          <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+        </select>
+      </div>
+
+      <!-- Corporate-only: matching gift -->
+      <div id="editMatchingRow" class="grid grid-cols-[110px_1fr] items-center gap-3 hidden">
+        <label class="text-[13px] text-slate-600">Matching gift</label>
+        <label class="inline-flex items-center gap-1.5 text-[13px] text-slate-700">
+          <input type="checkbox" class="rounded"/> Eligible
+        </label>
+      </div>
+
+    </div>
+
+    <div class="px-4 py-3 border-t border-slate-200 flex items-center gap-2">
+      <button class="text-[11px] text-red-700 hover:text-red-900">Archive sponsor</button>
+      <div class="ml-auto flex items-center gap-2">
+        <button onclick="closeEditDetails()" class="h-8 px-3 text-[13px] border border-slate-300 rounded">Cancel</button>
+        <button class="h-8 px-3 text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => {
-      b.classList.remove('border-blue-600','text-blue-700');
-      b.classList.add('border-transparent','text-slate-500');
+// TipTap-style toolbar (mockup uses execCommand for fidelity preview;
+// real implementation uses @tiptap/react per AGENTS.md).
+(function () {
+  const editor = document.getElementById('ttEditor');
+  if (!editor) return;
+  const toolbar = document.querySelector('.tt-toolbar');
+  if (toolbar) {
+    toolbar.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const title = btn.getAttribute('title');
+      editor.focus();
+      if (title === 'Bold') document.execCommand('bold');
+      else if (title === 'Italic') document.execCommand('italic');
+      else if (title === 'Bullet list') document.execCommand('insertUnorderedList');
+      else if (title === 'Numbered list') document.execCommand('insertOrderedList');
+      else if (title === 'Link') {
+        const url = prompt('Link URL (mockup uses prompt; real UI is a styled modal):', 'https://');
+        if (url) document.execCommand('createLink', false, url);
+      }
     });
-    btn.classList.remove('border-transparent','text-slate-500');
-    btn.classList.add('border-blue-600','text-blue-700');
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
-    document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+  }
+  const ftBtn = document.getElementById('addFollowupToggle');
+  const ftRow = document.getElementById('followupRow');
+  if (ftBtn && ftRow) {
+    ftBtn.addEventListener('click', () => {
+      ftRow.classList.toggle('hidden');
+      if (!ftRow.classList.contains('hidden')) {
+        const d = ftRow.querySelector('input[type="date"]');
+        if (d && !d.value) {
+          const t = new Date('2026-05-16'); t.setDate(t.getDate() + 7);
+          d.value = t.toISOString().slice(0,10);
+        }
+      }
+    });
+  }
+})();
+
+// ============== EDIT SPONSOR DIALOG ==============
+(function () {
+  const modal = document.getElementById('editDetailsModal');
+  const trigger = document.getElementById('editDetailsBtn');
+  if (!modal || !trigger) return;
+  window.openEditDetails = function () {
+    modal.classList.remove('hidden'); modal.classList.add('flex');
+    document.getElementById('editDisplayName')?.focus();
+  };
+  window.closeEditDetails = function () {
+    modal.classList.add('hidden'); modal.classList.remove('flex');
+  };
+  trigger.addEventListener('click', window.openEditDetails);
+  modal.addEventListener('click', (e) => { if (e.target === modal) window.closeEditDetails(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) window.closeEditDetails();
   });
-});
+
+  // Type-conditional rows
+  function applyEditType(t) {
+    document.querySelectorAll('.edittype-btn').forEach(b => {
+      const active = b.dataset.edittype === t;
+      b.classList.toggle('bg-white', active);
+      b.classList.toggle('shadow-sm', active);
+      b.classList.toggle('text-slate-600', !active);
+      b.classList.toggle('hover:bg-white', !active);
+    });
+    document.getElementById('editGrantDeadlineRow').classList.toggle('hidden', t !== 'foundation');
+    document.getElementById('editRenewalRow').classList.toggle('hidden', !(t === 'corporate' || t === 'foundation'));
+    document.getElementById('editMatchingRow').classList.toggle('hidden', t !== 'corporate');
+  }
+  document.querySelectorAll('.edittype-btn').forEach(btn => btn.addEventListener('click', () => applyEditType(btn.dataset.edittype)));
+
+  // Entity-button active toggle (visual only)
+  document.querySelectorAll('.editentity-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.editentity-btn').forEach(b => {
+        const active = b === btn;
+        b.classList.toggle('bg-white', active);
+        b.classList.toggle('shadow-sm', active);
+        b.classList.toggle('text-slate-600', !active);
+        b.classList.toggle('hover:bg-white', !active);
+      });
+    });
+  });
+})();
 </script>
 </body>
 </html>
