@@ -36,13 +36,20 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+    table-layout: fixed;
   }
   th, td {
     text-align: left;
     padding: 10px 12px;
     border-bottom: 1px solid var(--border);
     vertical-align: top;
+    overflow-wrap: break-word;
   }
+  col.title-col   { width: 26%; }
+  col.owner-col   { width: 8%;  }
+  col.updated-col { width: 14%; }
+  col.mockups-col { width: 36%; }
+  col.docs-col    { width: 9%;  }
   th {
     background: #f1f5f9;
     font-weight: 600;
@@ -66,17 +73,33 @@
   .doc-list a { font-size: 13px; }
   .mockup-primary {
     display: inline-block;
+    padding: 4px 12px;
+    border: 1px solid var(--link);
+    border-radius: 4px;
+    background: #ffffff;
+    color: var(--link);
     font-weight: 500;
+    font-size: 13px;
+    line-height: 1.2;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .mockup-primary:hover {
+    background: #f0f9ff;
+    text-decoration: none;
   }
   .mockup-variants {
-    margin-top: 4px;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
+    margin-top: 6px;
     font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
   }
   .mockup-variants a {
     color: var(--link);
+  }
+  .mockup-variants .sep {
+    color: var(--border);
+    margin: 0 6px;
   }
   .footer {
     margin-top: 28px;
@@ -95,6 +118,13 @@
   <div class="sub">One row per feature. Plans, mockups, and CHANGELOGs live together in the <a href="https://github.com/E8Angels/mockups">E8Angels/mockups</a> repo. Use the publish-feature-plan skill in Cowork to add or update.</div>
   <div class="note">All seed data in mockups is fictional. Names, companies, dollar amounts, and dates are placeholders for design review only.</div>
   <table>
+    <colgroup>
+      <col class="title-col" />
+      <col class="owner-col" />
+      <col class="updated-col" />
+      <col class="mockups-col" />
+      <col class="docs-col" />
+    </colgroup>
     <thead>
       <tr>
         <th>Title</th>
@@ -133,11 +163,11 @@ function mockupLinks(mockups) {
 
   let html = `<a class="mockup-primary" href="${home.path}">View mockup</a>`;
   // For multi-mockup folders, list every variant (including the home) as
-  // small secondary links so users can jump directly to any specific one.
+  // small inline links with dots between them.
   if (mockups.length > 1) {
     const links = mockups.map(m =>
       `<a href="${m.path}">${m.name}</a>`
-    ).join('');
+    ).join('<span class="sep">·</span>');
     html += `<div class="mockup-variants">${links}</div>`;
   }
   return html;
