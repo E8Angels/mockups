@@ -4,6 +4,7 @@ status: draft
 owner: jordan
 created: 2026-05-17
 last_updated: 2026-05-17
+home: variant-a-groupby
 ---
 
 # Companies admin redesign

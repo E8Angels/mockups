@@ -52,6 +52,21 @@ def last_changed(folder: Path) -> tuple[str, str]:
     return "", ""
 
 
+def normalize_home_name(home_value, mockup_names):
+    """Resolve the front-matter `home` value against the actual mockup file
+    stems. Accepts the value with or without `.html`. Case-insensitive match.
+    Returns the matching stem, or None if no match."""
+    if not home_value or not mockup_names:
+        return None
+    target = str(home_value).strip().lower()
+    if target.endswith(".html"):
+        target = target[:-5]
+    for name in mockup_names:
+        if name.lower() == target:
+            return name
+    return None
+
+
 def build():
     plans = []
     for folder in sorted(ROOT.iterdir()):
@@ -69,6 +84,19 @@ def build():
             ],
             key=lambda m: m["name"],
         )
+
+        # Determine the "home" mockup — the one a viewer should open first.
+        # Priority:
+        #   1. Front matter `home:` field (with or without .html extension)
+        #   2. If only one mockup exists, use it
+        #   3. First alphabetically
+        mockup_names = [m["name"] for m in mockups]
+        home_name = normalize_home_name(meta.get("home"), mockup_names)
+        if not home_name and mockup_names:
+            home_name = mockup_names[0]
+        for m in mockups:
+            m["is_home"] = (m["name"] == home_name)
+
         author, when = last_changed(folder)
 
         plans.append({
