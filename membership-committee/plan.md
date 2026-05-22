@@ -3,7 +3,7 @@ title: "Membership Committee Page"
 status: draft
 owner: amanda
 created: 2026-05-21
-last_updated: 2026-05-21
+last_updated: 2026-05-22
 home: mockup
 ---
 
@@ -27,7 +27,7 @@ Every tile is clickable. The mockup is a multi-screen linked prototype:
 
 1. **Committee home** — the page with the At a glance card, Notes, and Metrics.
 2. **Bucket page** — clicking a tile opens a full-page list of the people in that bucket (e.g. "New members YTD", "Members in Seattle").
-3. **Member profile** — clicking a person opens a full profile: join date, tenure, referral source, location, LinkedIn, email, last activity, sector interests, reason for joining, and (for prospects/past members) pipeline or departure detail.
+3. **Member profile** — clicking a person opens a full profile with: contact & sourcing (location, email, LinkedIn, hub, lead source + detail, e8 member pair), lifecycle (join date, tenure, referral, last activity, survey), direct investments (company + date + amount, with deployed/returned totals), Annual Fund membership years, an engagement log (meetings / learning labs / diligence debriefs by count), committee history (current + past), diligence teams with role, interests, and — for prospects/past members — pipeline or departure detail.
 
 The Annual survey tile is an external link to the survey results page rather than a drill-in.
 
