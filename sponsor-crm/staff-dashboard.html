@@ -309,12 +309,12 @@
       <div class="grid grid-cols-[100px_1fr] items-center gap-3">
         <label class="text-[13px] text-slate-600">Stage</label>
         <select id="newStage" class="h-8 border border-slate-300 rounded px-2 text-[13px] w-[200px]">
-          <option value="prospect">1 — Prospect</option>
-          <option value="outreach">2 — Outreach</option>
-          <option value="conversation">3 — Conversation</option>
-          <option value="proposal">4 — Proposal</option>
-          <option value="committed">5 — Committed</option>
-          <option value="received">6 — Received</option>
+          <option value="prospect">Prospect</option>
+          <option value="outreach">Outreach</option>
+          <option value="conversation">Conversation</option>
+          <option value="proposal">Proposal</option>
+          <option value="committed">Committed</option>
+          <option value="received">Received</option>
         </select>
       </div>
 
@@ -523,7 +523,7 @@ function renderSidebar() {
     const n = items.filter(s => s.stage === st.id).length;
     return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
       <input type="checkbox" class="rounded" />
-      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[12px] font-medium ${st.cls}">${st.n} — ${st.label}</span>
+      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[12px] font-medium ${st.cls}">${st.label}</span>
       <span class="ml-auto text-[12px] text-slate-400">${n}</span>
     </label></li>`;
   }).join('');
@@ -592,8 +592,8 @@ function renderKanban() {
     const askTotal = stageItems.reduce((a,s) => a + (s.ask||0), 0);
     return `<div class="kanban-col bg-white border border-slate-200 rounded-md flex flex-col h-full" data-stage="${st.id}">
       <div class="px-3 py-2 border-b border-slate-200 flex items-center gap-2">
-        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[12px] font-medium ${st.cls}">${st.n} — ${st.label}</span>
-        <span class="text-[12px] text-slate-400 ml-auto">${stageItems.length} · ${fmtMoney(askTotal,{compact:true})}</span>
+        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[12px] font-medium ${st.cls}">${st.label}</span>
+        <span class="text-[12px] text-slate-400 ml-auto">${fmtMoney(askTotal,{compact:true})}</span>
       </div>
       <div class="flex-1 overflow-y-auto scroll-thin p-2 space-y-2 bg-slate-50">
         ${stageItems.map(s => `
@@ -627,7 +627,7 @@ function renderList() {
       <td class="px-3 py-2 font-medium">${s.name}</td>
       <td class="px-3 py-2"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${typeById(s.type).cls}">${typeById(s.type).label}</span></td>
       <td class="px-3 py-2">${entityChip(s.entity)}</td>
-      <td class="px-3 py-2"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${stageById(s.stage).cls}">${stageById(s.stage).n}—${stageById(s.stage).label}</span></td>
+      <td class="px-3 py-2"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${stageById(s.stage).cls}">${stageById(s.stage).label}</span></td>
       <td class="px-3 py-2 text-right tabular-nums">${fmtMoney(s.ask,{compact:true})}</td>
       <td class="px-3 py-2 text-right tabular-nums">${s.received ? fmtMoney(s.received,{compact:true}) : '<span class="text-slate-400">—</span>'}</td>
       <td class="px-3 py-2"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] inline-flex items-center justify-center font-semibold" title="${staffById(s.owner).name}">${staffById(s.owner).initials}</span></td>

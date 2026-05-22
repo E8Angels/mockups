@@ -344,7 +344,7 @@ function entityChip(e) {
 }
 function stageChip(s) {
   const st = STAGES.find(x => x.id === s);
-  return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${st.cls}">${st.n}—${st.label}</span>`;
+  return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${st.cls}">${st.label}</span>`;
 }
 function typeChip(label) {
   return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium type-chip">${label}</span>`;
@@ -420,8 +420,7 @@ function renderKanban() {
     const stageItems = items.filter(s => s.stage === st.id);
     return `<div class="kanban-col bg-white border border-slate-200 rounded">
       <div class="px-2.5 py-1.5 border-b border-slate-200 flex items-center gap-1.5">
-        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[12px] font-medium ${st.cls}">${st.n} — ${st.label}</span>
-        <span class="text-[12px] text-slate-400 ml-auto">${stageItems.length}</span>
+        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[12px] font-medium ${st.cls}">${st.label}</span>
       </div>
       <div class="p-2 space-y-1.5 max-h-[300px] overflow-y-auto scroll-thin bg-slate-50">
         ${stageItems.map(s => `<a href="sponsor-detail.html" class="block bg-white border border-slate-200 rounded hover:border-blue-400 transition no-underline text-inherit overflow-hidden">

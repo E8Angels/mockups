@@ -435,7 +435,7 @@ Triggered by the **"New sponsor"** button in the staff dashboard header. Modal, 
 | Type | 4-button segmented control: Corporate / Foundation / Individual / In-kind | Drives which optional fields appear. Defaults to Corporate (most common per the master spreadsheet). |
 | Name | Text | Org or individual name. Autofocused on open. |
 | Entity | 3-button segmented control: E8 Angels (501c6) / E8 Impact (501c3) / Both | Required. Defaults to 501c6. |
-| Stage | Select, options 1–6 | Defaults to "1 — Prospect". Stage 7 (Declined) is reached via the move-stage modal. |
+| Stage | Select, six options (Prospect → Received) | Defaults to "Prospect". Declined is reached via the move-stage modal. |
 | Owner | Person picker (staff only) | Defaults to the current user. Multi-owner is supported but the dialog only sets the primary; additional owners are added on the detail page. |
 
 **Optional fields** (collapsed under a "More details (optional)" disclosure):
@@ -511,7 +511,7 @@ Handling the data-quality issues observed:
 
 1. **Multi-value contact/email cells.** Pervasive in the spreadsheet (~50% of rows on the Active sheet, similar on Prospects). Split into separate `people` rows and link via `sponsor_contacts`. First listed becomes `is_primary=1`.
 2. **Multi-assignee cells.** Split into multiple `sponsor_owners` rows. First listed becomes `is_primary=1`.
-3. **Section headers as soft enum.** Sheets use merged-cell section dividers ("CONFIRMED 2026 SPONSORS", "HOT/WARM/COLD PROSPECTS"). Don't trust them blindly; let the `Stage` column ("3 — Conversation") be the truth, and use the section text only to break ties when stage is blank.
+3. **Section headers as soft enum.** Sheets use merged-cell section dividers ("CONFIRMED 2026 SPONSORS", "HOT/WARM/COLD PROSPECTS"). Don't trust them blindly; let the `Stage` column ("Conversation") be the truth, and use the section text only to break ties when stage is blank.
 4. **Mixed-format dates.** `Last Communication` and `Email Activity Log` columns mix `"2026-05-01"`, `"2024"`, `"Jan 2026"`. Parse to YMD where possible; store original string in `note` field of the migrated entry where not.
 5. **Free-text dollar ranges.** `Ask Range` like `"$20,000+"`, `"$3,000–$5,000"`, `"TBD"` becomes one `sponsor_amounts` row with `kind='ask'` and parsed midpoint (or floor for "$X+"); original string stored in `note`.
 6. **Foundation Focus Area tags.** Comma-separated → stored as-is in `notes_freeform`.

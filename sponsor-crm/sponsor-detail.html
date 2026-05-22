@@ -22,9 +22,13 @@
   .entity-both{ background:#f8fafc; color:#475569; border:1px solid #e2e8f0; }
   .type-chip  { background:#f8fafc; color:#475569; border:1px solid #e2e8f0; }
 
-  /* Timeline rail */
+  /* Timeline rail. The dot must sit ON the line, not beside it.
+     The <ol> has border-left:2px (the rail) and pl-5 (20px) padding, so each
+     <li>'s left edge sits at ol-x = 22 (2 border + 20 padding). The rail's
+     center is at ol-x = 1, i.e. -21px from the li. To center a 9px dot on
+     that line: left = -21 - 9/2 = -25.5px. */
   .timeline-dot::before {
-    content:''; position:absolute; left:-19px; top:6px; width:9px; height:9px;
+    content:''; position:absolute; left:-25.5px; top:6px; width:9px; height:9px;
     border-radius:50%; background:#cbd5e1; border:2px solid white; box-shadow:0 0 0 1px #cbd5e1;
   }
   .timeline-dot.timeline-note::before  { background:#94a3b8; box-shadow:0 0 0 1px #94a3b8; }
@@ -103,7 +107,7 @@
       <!-- Stage chip + advance -->
       <div class="flex items-center gap-2 shrink-0">
         <span class="text-[11px] uppercase tracking-wider text-slate-500">Stage</span>
-        <span class="inline-flex items-center px-2 py-1 rounded text-[13px] font-medium stage-conversation">3 — Conversation</span>
+        <span class="inline-flex items-center px-2 py-1 rounded text-[13px] font-medium stage-conversation">Conversation</span>
         <button class="h-7 px-2 text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded inline-flex items-center gap-1">
           Advance
           <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
@@ -325,9 +329,9 @@
           <span class="text-[11px] uppercase tracking-wider text-slate-400">Stage</span>
         </div>
         <div class="text-[14px] mt-1 flex items-center gap-1.5 flex-wrap">
-          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-outreach">2 — Outreach</span>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-outreach">Outreach</span>
           <svg class="w-3 h-3 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg>
-          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-conversation">3 — Conversation</span>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-conversation">Conversation</span>
           <span class="text-slate-500 text-[13px]">— qualified after first real call</span>
         </div>
       </li>
@@ -374,9 +378,9 @@
           <span class="text-[11px] uppercase tracking-wider text-slate-400">Stage</span>
         </div>
         <div class="text-[14px] mt-1 flex items-center gap-1.5 flex-wrap">
-          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-prospect">1 — Prospect</span>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-prospect">Prospect</span>
           <svg class="w-3 h-3 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg>
-          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-outreach">2 — Outreach</span>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-outreach">Outreach</span>
         </div>
       </li>
 
