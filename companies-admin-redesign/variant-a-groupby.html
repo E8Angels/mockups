@@ -7,7 +7,9 @@
 <title>Companies workspace — group-by mode (v6)</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  
+  html { font-size: 18px; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
   .seed-note         { background:#fef9c3; border:1px solid #fde68a; color:#713f12; }
   .stage-pill        { background:#f8fafc; color:#475569; border:1px solid #e2e8f0; }
   .ladder-screen     { background:#e0e7ff; color:#3730a3; }
@@ -26,43 +28,43 @@
   tbody tr.leaf:hover { background:#fafafa; }
   tr.group-l1 > td { background:#0f172a; color:#fff; font-weight:600; padding:8px 8px; border-top:1px solid #1e293b; }
   tr.group-l1 .sigma-out { color:#fff; }
-  tr.group-l1 .grp-meta { color:#94a3b8; font-weight:400; font-size:11px; }
+  tr.group-l1 .grp-meta { color:#94a3b8; font-weight:400; font-size:12px; }
   tr.group-l2 > td { background:#e2e8f0; color:#0f172a; font-weight:600; padding:6px 8px; }
-  tr.group-l2 .grp-meta { color:#64748b; font-weight:400; font-size:11px; }
+  tr.group-l2 .grp-meta { color:#64748b; font-weight:400; font-size:12px; }
   tr.group-l2 .sigma-out { color:#0f172a; }
   tr.summary > td { background:#0f172a; color:#fff; font-weight:600; padding:8px 8px; border-top:3px solid #1e293b; }
   tr.summary .sigma-out { color:#fff; }
-  tr.summary .grp-meta { color:#94a3b8; font-weight:400; font-size:11px; }
-  .chev { display:inline-block; width:14px; text-align:center; font-size:9px; user-select:none; }
+  tr.summary .grp-meta { color:#94a3b8; font-weight:400; font-size:12px; }
+  .chev { display:inline-block; width:14px; text-align:center; font-size:10px; user-select:none; }
   .indent-l1 { padding-left:8px; }
   .indent-l2 { padding-left:32px; }
   .indent-leaf-cell { padding-left:56px; }
 
-  .sigma-hdr-mark { color:#cbd5e1; font-weight:400; font-size:11px; margin-left:4px; }
-  .sigma-label { font-size:10px; color:#94a3b8; font-weight:500; letter-spacing:0; margin-right:6px; }
+  .sigma-hdr-mark { color:#cbd5e1; font-weight:400; font-size:12px; margin-left:4px; }
+  .sigma-label { font-size:11px; color:#94a3b8; font-weight:500; letter-spacing:0; margin-right:6px; }
 
   /* Summary footer cells */
   .sigma-cell        { cursor:pointer; transition:background 80ms; }
   .sigma-cell:hover  { background:#1e293b; }
-  .sigma-chev        { color:rgba(255,255,255,0.30); font-size:9px; margin-left:8px; }
+  .sigma-chev        { color:rgba(255,255,255,0.30); font-size:10px; margin-left:8px; }
   .sigma-cell:hover .sigma-chev { color:rgba(255,255,255,0.85); }
-  .sigma-empty-btn   { background:transparent; color:rgba(255,255,255,0.30); border:1px dashed rgba(255,255,255,0.18); font-size:10px; padding:1px 7px; border-radius:3px; cursor:pointer; letter-spacing:0; }
+  .sigma-empty-btn   { background:transparent; color:rgba(255,255,255,0.30); border:1px dashed rgba(255,255,255,0.18); font-size:11px; padding:1px 7px; border-radius:3px; cursor:pointer; letter-spacing:0; }
   .sigma-cell:hover .sigma-empty-btn { color:rgba(255,255,255,0.90); border-color:rgba(255,255,255,0.5); background:rgba(255,255,255,0.05); }
 
   /* Sigma menu popover */
   .sigma-menu { position:absolute; z-index:50; background:#fff; border:1px solid #cbd5e1; border-radius:6px; box-shadow:0 8px 24px rgba(0,0,0,0.12); min-width:200px; padding:4px 0; }
-  .sigma-item { padding:6px 12px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:8px; color:#0f172a; }
+  .sigma-item { padding:6px 12px; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:8px; color:#0f172a; }
   .sigma-item:hover { background:#f1f5f9; }
   .sigma-item.on { background:#eff6ff; color:#1d4ed8; font-weight:500; }
-  .sigma-item .sigma-checkmark { color:#1d4ed8; font-size:11px; }
+  .sigma-item .sigma-checkmark { color:#1d4ed8; font-size:12px; }
   .sigma-divider { border-top:1px solid #f1f5f9; margin:4px 0; }
-  .sigma-group { font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:#64748b; padding:6px 12px 2px; font-weight:600; }
+  .sigma-group { font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:#64748b; padding:6px 12px 2px; font-weight:600; }
 
   /* Group-by popover */
   .groupby-card { background:#fff; border:1px solid #cbd5e1; border-radius:8px; box-shadow:0 12px 32px rgba(0,0,0,0.10); }
   .groupby-level { background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:8px 10px; display:flex; align-items:center; gap:8px; }
   .groupby-level .level-handle { color:#94a3b8; cursor:grab; user-select:none; }
-  .groupby-level .level-num { font-size:9px; text-transform:uppercase; letter-spacing:0.04em; color:#64748b; font-weight:700; }
+  .groupby-level .level-num { font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:#64748b; font-weight:700; }
 
   /* Group-by button (closed state) */
   .gb-btn { background:#fff; color:#475569; border:1px solid #cbd5e1; }
@@ -90,17 +92,17 @@
     <h1 class="text-lg font-semibold">Companies</h1>
     <button class="dd-trigger h-7 px-2.5 rounded-md flex items-center gap-1.5 text-xs">
       <span class="font-medium">Portfolio by Status × Sector</span>
-      <span class="text-slate-400 text-[11px]">· modified</span>
-      <span class="text-slate-400 text-[10px]">▾</span>
+      <span class="text-slate-400 text-[12px]">· modified</span>
+      <span class="text-slate-400 text-[11px]">▾</span>
     </button>
-    <button class="h-7 px-2.5 rounded-md text-xs bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-1">Save <span class="text-[10px]">▾</span></button>
+    <button class="h-7 px-2.5 rounded-md text-xs bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-1">Save <span class="text-[11px]">▾</span></button>
     <div class="text-slate-500 text-xs ml-2">312 portfolio companies</div>
     <div class="ml-auto flex items-center gap-2">
       <button class="h-8 px-3 text-xs font-medium border border-slate-300 rounded-md hover:bg-slate-50">Columns</button>
       <button onclick="toggleGroupByCard()" class="gb-btn on h-8 px-3 text-xs font-medium rounded-md flex items-center gap-1.5" id="gbBtn">
         Group by
-        <span class="bg-white text-slate-900 rounded-full text-[10px] font-semibold px-1.5">2</span>
-        <span class="text-[10px]">▾</span>
+        <span class="bg-white text-slate-900 rounded-full text-[11px] font-semibold px-1.5">2</span>
+        <span class="text-[11px]">▾</span>
       </button>
     </div>
   </div>
@@ -125,7 +127,7 @@
           <option>Fund family</option>
           <option>Founder demographics</option>
         </select>
-        <div class="flex border border-slate-300 rounded overflow-hidden text-[11px]">
+        <div class="flex border border-slate-300 rounded overflow-hidden text-[12px]">
           <button class="px-2 py-0.5 bg-slate-900 text-white">A→Z</button>
           <button class="px-2 py-0.5 bg-white text-slate-600 hover:bg-slate-50 border-l border-slate-300">Z→A</button>
         </div>
@@ -142,7 +144,7 @@
           <option>Latest pipeline stage</option>
           <option>Investment vintage year</option>
         </select>
-        <div class="flex border border-slate-300 rounded overflow-hidden text-[11px]">
+        <div class="flex border border-slate-300 rounded overflow-hidden text-[12px]">
           <button class="px-2 py-0.5 bg-slate-900 text-white">A→Z</button>
           <button class="px-2 py-0.5 bg-white text-slate-600 hover:bg-slate-50 border-l border-slate-300">Z→A</button>
         </div>
@@ -153,7 +155,7 @@
       <button class="text-blue-600 hover:underline">＋ Add another grouping level</button>
       <button onclick="toggleGroupByCard()" class="ml-auto h-7 px-3 text-white bg-blue-600 hover:bg-blue-700 rounded">Done</button>
     </div>
-    <div class="text-[10px] text-slate-400 mt-2">Drag the <span>⋮⋮</span> handle to reorder levels. Up to four levels supported.</div>
+    <div class="text-[11px] text-slate-400 mt-2">Drag the <span>⋮⋮</span> handle to reorder levels. Up to four levels supported.</div>
   </div>
 
   <!-- ACTIVE FILTER CHIPS -->
@@ -221,39 +223,39 @@
           <td class="tabular-nums"><span class="sigma-out">2026-04-02</span></td>
         </tr>
         <tr class="leaf l1-active l2-active-solar">
-          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Aurora Cells</a><div class="text-[11px] text-slate-500">Tandem perovskite-silicon for utility solar</div></td>
+          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Aurora Cells</a><div class="text-[12px] text-slate-500">Tandem perovskite-silicon for utility solar</div></td>
           <td>Solar</td><td>WA · USA</td>
-          <td><span class="ladder-invested text-[11px] rounded px-2 py-0.5">Invested</span></td>
+          <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$400,000</td>
-          <td><span class="status-active text-[11px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Diligence Debrief</div><div class="text-[11px] text-slate-500">2026-04-02</div></td>
+          <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
+          <td><div>Diligence Debrief</div><div class="text-[12px] text-slate-500">2026-04-02</div></td>
           <td class="text-slate-500">2 d ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-solar">
-          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Photon Edge</a><div class="text-[11px] text-slate-500">Edge-of-grid solar inverters</div></td>
+          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Photon Edge</a><div class="text-[12px] text-slate-500">Edge-of-grid solar inverters</div></td>
           <td>Solar</td><td>CA · USA</td>
-          <td><span class="ladder-invested text-[11px] rounded px-2 py-0.5">Invested</span></td>
+          <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$325,000</td>
-          <td><span class="status-active text-[11px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Pitch</div><div class="text-[11px] text-slate-500">2026-03-18</div></td>
+          <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
+          <td><div>Pitch</div><div class="text-[12px] text-slate-500">2026-03-18</div></td>
           <td class="text-slate-500">1 wk ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-solar">
-          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Skyguard Energy</a><div class="text-[11px] text-slate-500">Hail-resistant tracker systems</div></td>
+          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Skyguard Energy</a><div class="text-[12px] text-slate-500">Hail-resistant tracker systems</div></td>
           <td>Solar</td><td>TX · USA</td>
-          <td><span class="ladder-invested text-[11px] rounded px-2 py-0.5">Invested</span></td>
+          <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$275,000</td>
-          <td><span class="status-active text-[11px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Investment Committee</div><div class="text-[11px] text-slate-500">2025-12-04</div></td>
+          <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
+          <td><div>Investment Committee</div><div class="text-[12px] text-slate-500">2025-12-04</div></td>
           <td class="text-slate-500">5 wk ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-solar">
-          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Helios Cell</a><div class="text-[11px] text-slate-500">Low-cost back-contact cell fab</div></td>
+          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Helios Cell</a><div class="text-[12px] text-slate-500">Low-cost back-contact cell fab</div></td>
           <td>Solar</td><td>ON · Canada</td>
-          <td><span class="ladder-invested text-[11px] rounded px-2 py-0.5">Invested</span></td>
+          <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$450,000</td>
-          <td><span class="status-active text-[11px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Diligence Debrief</div><div class="text-[11px] text-slate-500">2025-11-19</div></td>
+          <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
+          <td><div>Diligence Debrief</div><div class="text-[12px] text-slate-500">2025-11-19</div></td>
           <td class="text-slate-500">6 wk ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-solar">
@@ -277,39 +279,39 @@
           <td class="tabular-nums"><span class="sigma-out">2026-02-14</span></td>
         </tr>
         <tr class="leaf l1-active l2-active-ev">
-          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Voltaic Drive</a><div class="text-[11px] text-slate-500">Drop-in EV conversion kits for last-mile fleets</div></td>
+          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Voltaic Drive</a><div class="text-[12px] text-slate-500">Drop-in EV conversion kits for last-mile fleets</div></td>
           <td>Electric vehicles</td><td>WA · USA</td>
-          <td><span class="ladder-invested text-[11px] rounded px-2 py-0.5">Invested</span></td>
+          <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$425,000</td>
-          <td><span class="status-active text-[11px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Diligence Debrief</div><div class="text-[11px] text-slate-500">2026-02-14</div></td>
+          <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
+          <td><div>Diligence Debrief</div><div class="text-[12px] text-slate-500">2026-02-14</div></td>
           <td class="text-slate-500">3 d ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-ev">
-          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Mileage Labs</a><div class="text-[11px] text-slate-500">Fleet electrification telematics</div></td>
+          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Mileage Labs</a><div class="text-[12px] text-slate-500">Fleet electrification telematics</div></td>
           <td>Electric vehicles</td><td>OR · USA</td>
-          <td><span class="ladder-invested text-[11px] rounded px-2 py-0.5">Invested</span></td>
+          <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$300,000</td>
-          <td><span class="status-active text-[11px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Investment Committee</div><div class="text-[11px] text-slate-500">2026-01-15</div></td>
+          <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
+          <td><div>Investment Committee</div><div class="text-[12px] text-slate-500">2026-01-15</div></td>
           <td class="text-slate-500">12 d ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-ev">
-          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">PylonCharge</a><div class="text-[11px] text-slate-500">DC fast-charging networks</div></td>
+          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">PylonCharge</a><div class="text-[12px] text-slate-500">DC fast-charging networks</div></td>
           <td>EV charging</td><td>CA · USA</td>
-          <td><span class="ladder-invested text-[11px] rounded px-2 py-0.5">Invested</span></td>
+          <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$150,000</td>
-          <td><span class="status-active text-[11px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Pitch</div><div class="text-[11px] text-slate-500">2026-01-09</div></td>
+          <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
+          <td><div>Pitch</div><div class="text-[12px] text-slate-500">2026-01-09</div></td>
           <td class="text-slate-500">3 wk ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-ev">
-          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Sparkfleet</a><div class="text-[11px] text-slate-500">Software for commercial EV fleets</div></td>
+          <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Sparkfleet</a><div class="text-[12px] text-slate-500">Software for commercial EV fleets</div></td>
           <td>Electric vehicles</td><td>BC · Canada</td>
-          <td><span class="ladder-invested text-[11px] rounded px-2 py-0.5">Invested</span></td>
+          <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$250,000</td>
-          <td><span class="status-active text-[11px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Pitch</div><div class="text-[11px] text-slate-500">2024-05-14</div></td>
+          <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
+          <td><div>Pitch</div><div class="text-[12px] text-slate-500">2024-05-14</div></td>
           <td class="text-slate-500">14 wk ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-ev">

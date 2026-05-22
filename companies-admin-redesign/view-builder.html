@@ -7,7 +7,9 @@
 <title>Add filter — interactive demo</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  
+  html { font-size: 18px; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
   .seed-note         { background:#fef9c3; border:1px solid #fde68a; color:#713f12; }
   .filter-chip       { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
   .seg-btn           { background:#fff; color:#475569; border:1px solid #e2e8f0; }
@@ -26,16 +28,16 @@
   .field-row:hover   { background:#eff6ff; }
   .field-row.added   { opacity:0.45; cursor:default; background:#f8fafc; }
   .field-row.added:hover { background:#f8fafc; }
-  .field-row .fr-label { flex:1; font-size:13px; color:#0f172a; }
+  .field-row .fr-label { flex:1; font-size:14px; color:#0f172a; }
   .field-row.added .fr-label { color:#64748b; }
-  .group-label       { font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:#0f172a; font-weight:700; padding:10px 16px 8px; display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; }
+  .group-label       { font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:#0f172a; font-weight:700; padding:10px 16px 8px; display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; }
   .group-label:hover { background:#f8fafc; }
-  .group-label .gl-chevron { font-size:9px; color:#64748b; width:10px; display:inline-block; text-align:center; }
+  .group-label .gl-chevron { font-size:10px; color:#64748b; width:10px; display:inline-block; text-align:center; }
   .group-label .gl-rule  { flex:1; height:1px; background:#e2e8f0; }
-  .group-label .gl-count { font-size:10px; color:#94a3b8; font-weight:600; letter-spacing:0; background:#f1f5f9; padding:1px 6px; border-radius:8px; }
+  .group-label .gl-count { font-size:11px; color:#94a3b8; font-weight:600; letter-spacing:0; background:#f1f5f9; padding:1px 6px; border-radius:8px; }
   .group-label.first { padding-top:8px; }
-  .proposed-tag      { background:#fed7aa; color:#9a3412; font-size:9px; font-weight:600; padding:1px 5px; border-radius:3px; letter-spacing:0.02em; text-transform:uppercase; }
-  .recent-chip       { background:#f1f5f9; color:#334155; border:1px solid #e2e8f0; font-size:11px; padding:3px 8px; border-radius:12px; cursor:pointer; }
+  .proposed-tag      { background:#fed7aa; color:#9a3412; font-size:10px; font-weight:600; padding:1px 5px; border-radius:3px; letter-spacing:0.02em; text-transform:uppercase; }
+  .recent-chip       { background:#f1f5f9; color:#334155; border:1px solid #e2e8f0; font-size:12px; padding:3px 8px; border-radius:12px; cursor:pointer; }
   .recent-chip:hover { background:#e2e8f0; }
   .dd-panel          { position:absolute; z-index:30; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #cbd5e1; border-radius:6px; box-shadow:0 8px 24px rgba(0,0,0,0.08); display:none; }
   .dd-panel.open     { display:block; }
@@ -44,7 +46,7 @@
     0%   { box-shadow: 0 0 0 0 rgba(59,130,246,0.6); background:#eff6ff; }
     100% { box-shadow: 0 0 0 16px rgba(59,130,246,0); background:transparent; }
   }
-  .step-num { background:#1e293b; color:#fff; width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:600; flex-shrink:0; }
+  .step-num { background:#1e293b; color:#fff; width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; flex-shrink:0; }
 </style>
 </head>
 <body class="bg-white text-slate-900 text-sm">
@@ -93,9 +95,9 @@
             <button class="filter-close text-slate-400 hover:text-slate-700 ml-auto" onclick="removeFilter('invested')">×</button>
           </div>
           <div class="flex">
-            <button class="seg-btn on h-6 px-2.5 rounded-l-md text-[11px] whitespace-nowrap">Yes</button>
-            <button class="seg-btn h-6 px-2.5 border-l-0 text-[11px] whitespace-nowrap">No</button>
-            <button class="seg-btn h-6 px-2.5 border-l-0 rounded-r-md text-[11px] whitespace-nowrap">Either</button>
+            <button class="seg-btn on h-6 px-2.5 rounded-l-md text-[12px] whitespace-nowrap">Yes</button>
+            <button class="seg-btn h-6 px-2.5 border-l-0 text-[12px] whitespace-nowrap">No</button>
+            <button class="seg-btn h-6 px-2.5 border-l-0 rounded-r-md text-[12px] whitespace-nowrap">Either</button>
           </div>
         </div>
 
@@ -120,9 +122,9 @@
             <button class="filter-close text-slate-400 hover:text-slate-700 ml-auto" onclick="removeFilter('country')">×</button>
           </div>
           <div class="flex">
-            <button class="seg-btn on h-6 px-2.5 rounded-l-md text-[11px] whitespace-nowrap">All</button>
-            <button class="seg-btn h-6 px-2.5 border-l-0 text-[11px] whitespace-nowrap">US</button>
-            <button class="seg-btn h-6 px-2.5 border-l-0 rounded-r-md text-[11px] whitespace-nowrap">Canada</button>
+            <button class="seg-btn on h-6 px-2.5 rounded-l-md text-[12px] whitespace-nowrap">All</button>
+            <button class="seg-btn h-6 px-2.5 border-l-0 text-[12px] whitespace-nowrap">US</button>
+            <button class="seg-btn h-6 px-2.5 border-l-0 rounded-r-md text-[12px] whitespace-nowrap">Canada</button>
           </div>
         </div>
 
@@ -154,7 +156,7 @@
 
         <!-- ADD FILTER BUTTON -->
         <div class="p-2.5" id="addFilterCell">
-          <button onclick="openChooser()" class="w-full h-7 leading-[1.6rem] text-center text-blue-600 hover:bg-blue-50 rounded border border-dashed border-blue-300 text-[11px] font-medium">＋ Add filter</button>
+          <button onclick="openChooser()" class="w-full h-7 leading-[1.6rem] text-center text-blue-600 hover:bg-blue-50 rounded border border-dashed border-blue-300 text-[12px] font-medium">＋ Add filter</button>
         </div>
       </div>
     </aside>
@@ -201,7 +203,7 @@
 
     <!-- RECENTLY USED -->
     <div id="recentRow" class="px-4 py-2 border-b border-slate-100 flex items-center gap-2 flex-wrap">
-      <span class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mr-1">Recent</span>
+      <span class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mr-1">Recent</span>
       <button class="recent-chip" onclick="addFilter('demographics', 'Founder demographics')">Founder demographics</button>
       <button class="recent-chip" onclick="addFilter('total_invested', 'Total invested')">Total invested</button>
       <button class="recent-chip" onclick="addFilter('latest_pitch_date', 'Latest pitch date')">Latest pitch date</button>
@@ -213,7 +215,7 @@
 
     <!-- FOOTER -->
     <div class="border-t border-slate-100 p-2 flex items-center">
-      <div class="text-[10px] text-slate-400 ml-1">
+      <div class="text-[11px] text-slate-400 ml-1">
         <span class="proposed-tag mr-1">Proposed</span>
         not yet implemented — visible only during this design review.
       </div>
@@ -382,7 +384,7 @@
     const click = added ? '' : `onclick="addFilter('${escAttr(f.fid)}','${escAttr(f.label)}')"`;
     const cls = added ? 'field-row added' : 'field-row';
     const tag = f.proposed ? '<span class="proposed-tag">Proposed</span>' : '';
-    const addedTag = added ? '<span class="text-[10px] text-slate-500">already added</span>' : '';
+    const addedTag = added ? '<span class="text-[11px] text-slate-500">already added</span>' : '';
     return `<div class="${cls}" data-fid="${f.fid}" ${click}><span class="fr-label">${f.label}</span>${tag}${addedTag}</div>`;
   }
 
@@ -443,7 +445,7 @@
           </div>
           <div class="space-y-1.5 pl-4">
             <div class="relative">
-              <div class="text-[10px] text-slate-500 mb-0.5">Race / Ethnicity</div>
+              <div class="text-[11px] text-slate-500 mb-0.5">Race / Ethnicity</div>
               <button class="dd-trigger w-full h-7 px-2 rounded-md text-left flex items-center gap-1" onclick="toggleDD('demoRace')">
                 <span id="demoRace-summary" class="flex-1 truncate text-slate-400">Any</span>
                 <span class="text-slate-400">▾</span>
@@ -451,9 +453,9 @@
               <div class="dd-panel" id="demoRace-panel" style="position:absolute;">
                 <div class="p-2 border-b border-slate-100">
                   <input type="text" placeholder="Find…" autocomplete="off" data-lpignore="true" data-form-type="other"
-                         class="w-full h-6 px-2 border border-slate-300 rounded text-[11px]" oninput="ddSearch(this,'demoRace')" />
+                         class="w-full h-6 px-2 border border-slate-300 rounded text-[12px]" oninput="ddSearch(this,'demoRace')" />
                 </div>
-                <div class="max-h-40 overflow-auto p-1 text-[11px]" id="demoRace-list">
+                <div class="max-h-40 overflow-auto p-1 text-[12px]" id="demoRace-list">
                   <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Black or African American" onchange="ddUpdate('demoRace','Race/Ethnicity')" class="h-3 w-3"/><span>Black or African American</span></label>
                   <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Latino or Hispanic" onchange="ddUpdate('demoRace','Race/Ethnicity')" class="h-3 w-3"/><span>Latino or Hispanic</span></label>
                   <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Indigenous" onchange="ddUpdate('demoRace','Race/Ethnicity')" class="h-3 w-3"/><span>Indigenous</span></label>
@@ -463,27 +465,27 @@
                   <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="White" onchange="ddUpdate('demoRace','Race/Ethnicity')" class="h-3 w-3"/><span>White</span></label>
                 </div>
                 <div class="flex items-center justify-between border-t border-slate-100 p-1.5">
-                  <button class="text-[10px] text-slate-500 hover:text-slate-700" onclick="ddClear('demoRace')">Clear</button>
-                  <button class="text-[10px] text-blue-600 hover:underline" onclick="toggleDD('demoRace')">Done</button>
+                  <button class="text-[11px] text-slate-500 hover:text-slate-700" onclick="ddClear('demoRace')">Clear</button>
+                  <button class="text-[11px] text-blue-600 hover:underline" onclick="toggleDD('demoRace')">Done</button>
                 </div>
               </div>
             </div>
             <div class="relative">
-              <div class="text-[10px] text-slate-500 mb-0.5">Gender</div>
+              <div class="text-[11px] text-slate-500 mb-0.5">Gender</div>
               <button class="dd-trigger w-full h-7 px-2 rounded-md text-left flex items-center gap-1" onclick="toggleDD('demoGender')">
                 <span id="demoGender-summary" class="flex-1 truncate text-slate-400">Any</span>
                 <span class="text-slate-400">▾</span>
               </button>
               <div class="dd-panel" id="demoGender-panel" style="position:absolute;">
-                <div class="max-h-40 overflow-auto p-1 text-[11px]">
+                <div class="max-h-40 overflow-auto p-1 text-[12px]">
                   <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Woman" onchange="ddUpdate('demoGender','Gender')" class="h-3 w-3"/><span>Woman</span></label>
                   <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Man" onchange="ddUpdate('demoGender','Gender')" class="h-3 w-3"/><span>Man</span></label>
                   <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Non-binary" onchange="ddUpdate('demoGender','Gender')" class="h-3 w-3"/><span>Non-binary</span></label>
                   <label class="flex items-center gap-1.5 px-2 py-1 hover:bg-slate-50 rounded"><input type="checkbox" value="Prefer not to say" onchange="ddUpdate('demoGender','Gender')" class="h-3 w-3"/><span>Prefer not to say</span></label>
                 </div>
                 <div class="flex items-center justify-between border-t border-slate-100 p-1.5">
-                  <button class="text-[10px] text-slate-500 hover:text-slate-700" onclick="ddClear('demoGender')">Clear</button>
-                  <button class="text-[10px] text-blue-600 hover:underline" onclick="toggleDD('demoGender')">Done</button>
+                  <button class="text-[11px] text-slate-500 hover:text-slate-700" onclick="ddClear('demoGender')">Clear</button>
+                  <button class="text-[11px] text-blue-600 hover:underline" onclick="toggleDD('demoGender')">Done</button>
                 </div>
               </div>
             </div>

@@ -7,36 +7,38 @@
 <title>Edit company — Voltaic Drive</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  
+  html { font-size: 18px; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
   .status-active   { background:#bae6fd; color:#075985; }
   .stage-pill      { background:#f8fafc; color:#475569; border:1px solid #e2e8f0; }
   .ladder-invested { background:#bbf7d0; color:#065f46; }
   .ladder-dilig    { background:#fde68a; color:#854d0e; }
   .ladder-screen   { background:#e0e7ff; color:#3730a3; }
-  .badge           { background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:10px; padding:1px 6px; border-radius:3px; font-weight:600; }
+  .badge           { background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:11px; padding:1px 6px; border-radius:3px; font-weight:600; }
   .seed-note       { background:#fef9c3; border:1px solid #fde68a; color:#713f12; }
-  .edit-mode-badge { background:#fef3c7; color:#92400e; border:1px solid #fde68a; font-size:11px; padding:2px 8px; border-radius:10px; font-weight:600; letter-spacing:0.04em; }
-  .nav-item        { display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:4px; font-size:13px; color:#475569; }
+  .edit-mode-badge { background:#fef3c7; color:#92400e; border:1px solid #fde68a; font-size:12px; padding:2px 8px; border-radius:10px; font-weight:600; letter-spacing:0.04em; }
+  .nav-item        { display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:4px; font-size:14px; color:#475569; }
   .nav-item:hover  { background:#f1f5f9; color:#0f172a; }
   .nav-item.active { background:#eff6ff; color:#1d4ed8; font-weight:500; }
-  .nav-item .nav-count { color:#94a3b8; font-size:11px; margin-left:auto; }
+  .nav-item .nav-count { color:#94a3b8; font-size:12px; margin-left:auto; }
   .nav-item.readonly { color:#94a3b8; }
   .nav-item.readonly:hover { background:#f8fafc; }
 
   /* Section card */
   .section-card { background:#fff; border:1px solid #e2e8f0; border-radius:6px; padding:16px; }
   .section-h    { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
-  .section-h h2 { font-size:14px; font-weight:600; color:#0f172a; }
-  .section-h .section-count { color:#94a3b8; font-size:11px; font-weight:500; }
-  .section-h .readonly-tag { font-size:10px; text-transform:uppercase; letter-spacing:0.05em; color:#94a3b8; font-weight:600; }
+  .section-h h2 { font-size:15px; font-weight:600; color:#0f172a; }
+  .section-h .section-count { color:#94a3b8; font-size:12px; font-weight:500; }
+  .section-h .readonly-tag { font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#94a3b8; font-weight:600; }
 
   /* CompactRow */
   .crow { display:grid; grid-template-columns:160px 1fr; gap:12px; align-items:center; padding:5px 0; }
-  .crow > .crow-label { color:#475569; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; text-align:right; padding-top:5px; align-self:start; }
+  .crow > .crow-label { color:#475569; font-size:12px; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; text-align:right; padding-top:5px; align-self:start; }
 
   /* Inputs */
   input[type="text"], input[type="date"], input[type="number"], select, textarea {
-    background:#fff; border:1px solid #cbd5e1; border-radius:4px; padding:5px 8px; font-size:13px; color:#0f172a;
+    background:#fff; border:1px solid #cbd5e1; border-radius:4px; padding:5px 8px; font-size:14px; color:#0f172a;
     outline:none; transition:border-color 80ms, box-shadow 80ms;
   }
   input[type="text"]:focus, input[type="date"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
@@ -46,19 +48,19 @@
   .h7 { height:28px; padding-top:0; padding-bottom:0; }
   .w-150 { width:150px; }
   .w-200 { width:200px; }
-  .multi-trigger { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #cbd5e1; border-radius:4px; padding:3px 8px; font-size:12px; cursor:pointer; }
+  .multi-trigger { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #cbd5e1; border-radius:4px; padding:3px 8px; font-size:13px; cursor:pointer; }
   .multi-trigger:hover { border-color:#94a3b8; }
-  .multi-trigger .chev { color:#94a3b8; font-size:10px; }
-  .multi-trigger .selected-count { background:#1e293b; color:#fff; border-radius:8px; padding:0 5px; font-size:10px; font-weight:600; }
-  .checkbox-group { display:flex; gap:14px; padding:4px 0; font-size:13px; }
+  .multi-trigger .chev { color:#94a3b8; font-size:11px; }
+  .multi-trigger .selected-count { background:#1e293b; color:#fff; border-radius:8px; padding:0 5px; font-size:11px; font-weight:600; }
+  .checkbox-group { display:flex; gap:14px; padding:4px 0; font-size:14px; }
   .checkbox-group label { display:inline-flex; align-items:center; gap:5px; }
 
   /* Contact pills (editor) */
-  .contact-pill-edit { display:inline-flex; align-items:center; gap:5px; padding:3px 4px 3px 8px; border:1px solid #cbd5e1; border-radius:14px; font-size:12px; background:#fff; }
+  .contact-pill-edit { display:inline-flex; align-items:center; gap:5px; padding:3px 4px 3px 8px; border:1px solid #cbd5e1; border-radius:14px; font-size:13px; background:#fff; }
   .contact-pill-edit .x { color:#94a3b8; cursor:pointer; padding:0 4px; }
   .contact-pill-edit .x:hover { color:#b91c1c; }
   .contact-pill-edit.primary { border-color:#bae6fd; background:#f0f9ff; }
-  .add-pill-btn { padding:3px 10px; border:1px dashed #cbd5e1; border-radius:14px; font-size:12px; color:#475569; }
+  .add-pill-btn { padding:3px 10px; border:1px dashed #cbd5e1; border-radius:14px; font-size:13px; color:#475569; }
   .add-pill-btn:hover { color:#1d4ed8; border-color:#3b82f6; background:#eff6ff; }
 
   /* Application card (edit) */
@@ -71,9 +73,9 @@
 
   /* EditCard primitive (label above control) */
   .edit-card { background:#fff; border:1px solid #e2e8f0; border-radius:6px; padding:14px; margin-bottom:14px; }
-  .edit-card h3 { font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#475569; font-weight:700; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #e2e8f0; }
+  .edit-card h3 { font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:#475569; font-weight:700; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #e2e8f0; }
   .ec-field { display:flex; flex-direction:column; gap:4px; }
-  .ec-field > label { font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:#64748b; font-weight:600; }
+  .ec-field > label { font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:#64748b; font-weight:600; }
   .ec-field > input, .ec-field > select, .ec-field > textarea { width:100%; }
   .two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px 18px; }
   .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 18px; }
@@ -81,10 +83,10 @@
 
   /* Pitch deck (edit) */
   .pitch-deck-thumb { background:#1e293b; border-radius:4px; padding:24px; display:flex; align-items:center; justify-content:center; aspect-ratio:16/10; }
-  .pitch-deck-thumb .ph { background:#fff; width:80%; height:80%; border-radius:3px; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-size:24px; }
+  .pitch-deck-thumb .ph { background:#fff; width:80%; height:80%; border-radius:3px; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-size:25px; }
 
   /* Deal terms launcher */
-  .deal-terms-btn { background:#1e293b; color:#fff; padding:5px 12px; border-radius:4px; font-size:12px; align-self:flex-start; }
+  .deal-terms-btn { background:#1e293b; color:#fff; padding:5px 12px; border-radius:4px; font-size:13px; align-self:flex-start; }
   .deal-terms-btn:hover { background:#0f172a; }
 
   /* Dialog (wizard modal) */
@@ -99,15 +101,15 @@
   .note-editor { border:1px solid #cbd5e1; border-radius:6px; padding:10px; background:#fff; }
   .note-editor textarea { width:100%; min-height:80px; border:none; padding:0; }
   .note-editor textarea:focus { box-shadow:none; }
-  .note-toolbar { display:flex; gap:6px; padding-bottom:8px; border-bottom:1px solid #f1f5f9; margin-bottom:8px; font-size:12px; }
-  .note-toolbar select { height:24px; padding:0 6px; font-size:11px; }
+  .note-toolbar { display:flex; gap:6px; padding-bottom:8px; border-bottom:1px solid #f1f5f9; margin-bottom:8px; font-size:13px; }
+  .note-toolbar select { height:24px; padding:0 6px; font-size:12px; }
 
   /* Save bar (sticky at bottom) */
   .save-bar { position:sticky; bottom:0; background:#fff; border-top:1px solid #e2e8f0; padding:10px 16px; display:flex; align-items:center; gap:10px; margin-top:8px; z-index:30; box-shadow:0 -4px 16px rgba(0,0,0,0.05); border-radius:0 0 6px 6px; }
-  .btn-save { background:#1d4ed8; color:#fff; padding:6px 16px; border-radius:4px; font-size:13px; font-weight:500; }
+  .btn-save { background:#1d4ed8; color:#fff; padding:6px 16px; border-radius:4px; font-size:14px; font-weight:500; }
   .btn-save:hover { background:#1e40af; }
   .btn-save:disabled { background:#cbd5e1; color:#fff; cursor:not-allowed; }
-  .btn-cancel { padding:6px 12px; border:1px solid #cbd5e1; border-radius:4px; font-size:13px; color:#475569; }
+  .btn-cancel { padding:6px 12px; border:1px solid #cbd5e1; border-radius:4px; font-size:14px; color:#475569; }
   .btn-cancel:hover { border-color:#94a3b8; background:#f8fafc; }
 
 </style>
@@ -139,7 +141,7 @@
     <div class="min-w-0">
       <div class="flex items-center gap-2 flex-wrap">
         <h1 class="text-lg font-semibold">Voltaic Drive</h1>
-        <span class="status-active text-[11px] rounded px-2 py-0.5">Active</span>
+        <span class="status-active text-[12px] rounded px-2 py-0.5">Active</span>
         <span class="edit-mode-badge ml-2">EDIT MODE</span>
       </div>
       <div class="text-xs text-slate-500 mt-0.5">Electric vehicles · Seattle, WA · USA · <a href="https://voltaicdrive.com" class="text-blue-600 hover:underline">voltaicdrive.com</a></div>
@@ -165,7 +167,7 @@
         <a href="detail.html#emails"      class="nav-item readonly" title="Read-only in this view">Emails <span class="nav-count">24</span></a>
         <a href="detail.html#ratings"     class="nav-item readonly" title="Read-only in this view">Ratings &amp; decisions <span class="nav-count">3</span></a>
       </nav>
-      <div class="text-[10px] text-slate-400 mt-2 px-1 leading-relaxed">
+      <div class="text-[11px] text-slate-400 mt-2 px-1 leading-relaxed">
         Greyed sections are read-only and managed elsewhere (Investments via the valuation wizard; Events / Emails / Ratings are system-generated logs).
       </div>
     </aside>
@@ -268,7 +270,7 @@
           <span class="contact-pill-edit primary">
             <span class="font-medium">Adi Rao</span>
             <span class="text-slate-400">·</span><span class="text-slate-500 text-xs">Founder / CEO</span>
-            <span class="text-[9px] uppercase tracking-wider text-slate-500 ml-1">Primary</span>
+            <span class="text-[10px] uppercase tracking-wider text-slate-500 ml-1">Primary</span>
             <span class="x">×</span>
           </span>
           <span class="contact-pill-edit">
@@ -302,9 +304,9 @@
           <div class="app-card-head" onclick="toggleApp('app-2025-edit')">
             <span class="text-slate-400">▾</span>
             <span class="font-semibold text-sm">Apr 2025 · Application</span>
-            <span class="ladder-invested text-[11px] rounded px-1.5 py-0.5">Invested</span>
+            <span class="ladder-invested text-[12px] rounded px-1.5 py-0.5">Invested</span>
             <span class="badge">Closed</span>
-            <span class="text-[11px] text-slate-400 ml-auto">app_4f3a2b…</span>
+            <span class="text-[12px] text-slate-400 ml-auto">app_4f3a2b…</span>
           </div>
           <div class="app-card-body">
 
@@ -324,7 +326,7 @@
                   <label>Pitch deck</label>
                   <div class="flex items-start gap-3">
                     <div class="pitch-deck-thumb flex-shrink-0" style="width:100px; padding:6px; aspect-ratio:4/3;">
-                      <div class="ph" style="font-size:14px;">PDF</div>
+                      <div class="ph" style="font-size:15px;">PDF</div>
                     </div>
                     <div class="flex flex-col gap-1 text-xs">
                       <a href="#" class="text-blue-600 hover:underline">Download</a>
@@ -402,7 +404,7 @@
                 <div class="ec-field"><label>Use of funds</label><textarea>~$700K SKU-3 tooling. ~$400K installer expansion. ~$250K working capital. ~$150K eng hires.</textarea></div>
                 <div class="ec-field ec-full">
                   <label class="flex items-center justify-between">
-                    Deal terms <span class="text-slate-400 text-[10px] normal-case tracking-normal">paragraph generated from wizard data</span>
+                    Deal terms <span class="text-slate-400 text-[11px] normal-case tracking-normal">paragraph generated from wizard data</span>
                   </label>
                   <textarea>SAFE with a $12M post-money cap and 20% discount. Most-favored nation rights. Minimum check size $25K. Target close 2025-12-15. Climate Capital leading with $500K committed; pro-rata rights for existing investors.</textarea>
                   <button class="deal-terms-btn mt-2" onclick="document.getElementById('dealTermsModal').classList.add('open')" type="button">Edit Deal Terms</button>
@@ -451,9 +453,9 @@
           <div class="app-card-head" onclick="toggleApp('app-2024-edit')">
             <span class="text-slate-400">▸</span>
             <span class="font-semibold text-sm">Mar 2024 · Application</span>
-            <span class="ladder-dilig text-[11px] rounded px-1.5 py-0.5">Diligence Complete</span>
+            <span class="ladder-dilig text-[12px] rounded px-1.5 py-0.5">Diligence Complete</span>
             <span class="badge">Closed</span>
-            <span class="text-[11px] text-slate-400 ml-auto">app_8c1e9a…</span>
+            <span class="text-[12px] text-slate-400 ml-auto">app_8c1e9a…</span>
           </div>
         </div>
 
@@ -462,9 +464,9 @@
           <div class="app-card-head" onclick="toggleApp('app-2022-edit')">
             <span class="text-slate-400">▸</span>
             <span class="font-semibold text-sm">Feb 2022 · Application</span>
-            <span class="ladder-screen text-[11px] rounded px-1.5 py-0.5">Screen</span>
+            <span class="ladder-screen text-[12px] rounded px-1.5 py-0.5">Screen</span>
             <span class="badge">Closed</span>
-            <span class="text-[11px] text-slate-400 ml-auto">app_22d09f…</span>
+            <span class="text-[12px] text-slate-400 ml-auto">app_22d09f…</span>
           </div>
         </div>
       </section>
@@ -490,16 +492,16 @@
               <option>News</option>
               <option>Ask</option>
             </select>
-            <label class="text-[11px] ml-auto flex items-center gap-1 text-slate-600"><input type="checkbox" /> Confidential</label>
+            <label class="text-[12px] ml-auto flex items-center gap-1 text-slate-600"><input type="checkbox" /> Confidential</label>
           </div>
           <textarea placeholder="Write a note (Markdown supported)…"></textarea>
           <div class="flex items-center gap-2 mt-2">
-            <button class="text-[11px] px-2 py-1 border border-slate-300 rounded hover:bg-slate-50">Attach…</button>
-            <button class="ml-auto btn-save" style="padding:4px 12px; font-size:12px;">Add note</button>
+            <button class="text-[12px] px-2 py-1 border border-slate-300 rounded hover:bg-slate-50">Attach…</button>
+            <button class="ml-auto btn-save" style="padding:4px 12px; font-size:13px;">Add note</button>
           </div>
         </div>
 
-        <div class="text-[11px] text-slate-500 mb-2">Existing notes (click ✎ to edit, × to delete; 10-minute edit window after creation):</div>
+        <div class="text-[12px] text-slate-500 mb-2">Existing notes (click ✎ to edit, × to delete; 10-minute edit window after creation):</div>
 
         <!-- Existing notes (compact) -->
         <div class="border border-slate-200 rounded p-3 mb-2 text-xs">
@@ -542,7 +544,7 @@
     <div class="px-4 py-3 border-b border-slate-200 flex items-center gap-3">
       <div>
         <div class="font-semibold text-sm">Edit Deal Terms</div>
-        <div class="text-[11px] text-slate-500">2025 application · what type of investment are you seeking?</div>
+        <div class="text-[12px] text-slate-500">2025 application · what type of investment are you seeking?</div>
       </div>
       <div class="ml-auto flex items-center gap-3">
         <div class="progress-dots">
@@ -582,7 +584,7 @@
           <div class="text-xs text-slate-600">Free-text description, no structure required.</div>
         </button>
       </div>
-      <div class="text-[11px] text-slate-500">Steps 2–4 capture instrument-specific terms (cap, discount, MFN, valuation, etc.), close date, lead investor, and a review of all values. On save, the AI re-generates the deal-terms paragraph from the structured data.</div>
+      <div class="text-[12px] text-slate-500">Steps 2–4 capture instrument-specific terms (cap, discount, MFN, valuation, etc.), close date, lead investor, and a review of all values. On save, the AI re-generates the deal-terms paragraph from the structured data.</div>
     </div>
     <div class="border-t border-slate-100 p-3 flex items-center gap-2">
       <button onclick="document.getElementById('dealTermsModal').classList.remove('open')" class="btn-cancel">Cancel</button>
