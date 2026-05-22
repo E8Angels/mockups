@@ -299,8 +299,8 @@
       <div class="grid grid-cols-[100px_1fr] items-center gap-3">
         <label class="text-[13px] text-slate-600">Entity</label>
         <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px] w-fit">
-          <button type="button" data-newentity="501c6" class="newentity-btn px-2.5 py-1 rounded font-medium bg-white shadow-sm">E8 Angels (501c6)</button>
-          <button type="button" data-newentity="501c3" class="newentity-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">E8 Impact (501c3)</button>
+          <button type="button" data-newentity="501c6" class="newentity-btn px-2.5 py-1 rounded font-medium bg-white shadow-sm">E8 Angels · (c)6</button>
+          <button type="button" data-newentity="501c3" class="newentity-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">E8 Impact · (c)3</button>
           <button type="button" data-newentity="both"  class="newentity-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Both</button>
         </div>
       </div>
@@ -443,16 +443,20 @@ const fmtMoney = (cents, opts={}) => {
   if (opts.compact && dollars >= 1000) return '$' + Math.round(dollars/1000) + 'k';
   return '$' + dollars.toLocaleString();
 };
+const fmtMoneyFull = (cents) => {
+  if (cents == null) return '—';
+  return '$' + Math.round(cents/100).toLocaleString();
+};
 
 // Sponsors — drawn loosely from the master spreadsheet shape, not real PII.
 const SPONSORS = [
   { id:'spn_1',  name:'Microsoft AI for Good',     type:'corporate',  entity:'501c3', stage:'received',     ask:7500000,  commit:7500000, received:7500000, owner:'p_karin',    contact:'Brandon Middaugh',     campaign:'FY26 Annual Fund',  followup:daysFromToday(45), renewal_month:8, grant_deadline:null,           note:'Renewed for FY26 — full payment received Feb.' },
-  { id:'spn_2',  name:'Bullitt Foundation',         type:'foundation', entity:'501c3', stage:'committed',    ask:5000000,  commit:5000000, received:0,       owner:'p_karin',    contact:'Pat Forster',         campaign:'FY26 Annual Fund',  followup:daysFromToday(-3), renewal_month:null, grant_deadline:daysFromToday(28), note:'Signed LOI; check arriving Q2.' },
+  { id:'spn_2',  name:'Bullitt Foundation',         type:'foundation', entity:'501c3', stage:'committed',    ask:5000000,  commit:5000000, received:0,       owner:'p_karin',    contact:'Pat Forster, Denis Hayes',         campaign:'FY26 Annual Fund',  followup:daysFromToday(-3), renewal_month:null, grant_deadline:daysFromToday(28), note:'Signed LOI; check arriving Q2.' },
   { id:'spn_3',  name:'Stoel Rives LLP',            type:'corporate',  entity:'501c6', stage:'committed',    ask:1500000,  commit:1500000, received:0,       owner:'p_kathleen', contact:'Greg Jacobson',        campaign:'Member Events',     followup:daysFromToday(5),  renewal_month:9,  grant_deadline:null, note:'Underwriting Summit reception.' },
   { id:'spn_4',  name:'Schwabe Williamson',         type:'corporate',  entity:'501c6', stage:'proposal',     ask:2500000,  commit:0,        received:0,      owner:'p_kathleen', contact:'Connie Sun',      campaign:'Member Events',     followup:daysFromToday(2),  renewal_month:null, grant_deadline:null, note:'Sent proposal 4/28; partners reviewing.' },
   { id:'spn_5',  name:'Wilson Sonsini',             type:'corporate',  entity:'both',  stage:'conversation', ask:1000000,  commit:0,        received:0,      owner:'p_karin',    contact:'Mark Talley',         campaign:'Member Events',     followup:daysFromToday(7),  renewal_month:null, grant_deadline:null, note:'Mark is shopping internally for owner.' },
   { id:'spn_6',  name:'McKinstry',                  type:'corporate',  entity:'501c3', stage:'proposal',     ask:3000000,  commit:0,        received:0,      owner:'p_lee',      contact:'Ash Aiyar', campaign:'Fellowship Program', followup:daysFromToday(-1), renewal_month:null, grant_deadline:null, note:'Awaiting decision from foundation board.' },
-  { id:'spn_7',  name:'Walton Family Foundation',   type:'foundation', entity:'501c3', stage:'conversation', ask:10000000, commit:0,        received:0,      owner:'p_jordan',   contact:'Taylor Brugh',       campaign:'Fellowship Program', followup:daysFromToday(10), renewal_month:null, grant_deadline:daysFromToday(55), note:'Karin Kidder and Taylor met at GreenBiz; positive signals.' },
+  { id:'spn_7',  name:'Walton Family Foundation',   type:'foundation', entity:'501c3', stage:'conversation', ask:10000000, commit:0,        received:0,      owner:'p_jordan',   contact:'Taylor Brugh, Lukas Walton',       campaign:'Fellowship Program', followup:daysFromToday(10), renewal_month:null, grant_deadline:daysFromToday(55), note:'Karin Kidder and Taylor met at GreenBiz; positive signals.' },
   { id:'spn_8',  name:'Bezos Earth Fund',           type:'foundation', entity:'501c3', stage:'outreach',     ask:25000000, commit:0,        received:0,      owner:'p_jordan',   contact:'Andy Karsner',         campaign:'Fellowship Program', followup:daysFromToday(4),  renewal_month:null, grant_deadline:daysFromToday(40), note:'Cold intro through board.' },
   { id:'spn_9',  name:'Sea Mar Foundation',         type:'foundation', entity:'501c3', stage:'prospect',     ask:500000,   commit:0,        received:0,      owner:'p_karin',    contact:null,              campaign:'Fellowship Program', followup:null,             renewal_month:null, grant_deadline:daysFromToday(20), note:'Researching focus area fit.' },
   { id:'spn_10', name:'Starbucks',                  type:'corporate',  entity:'both',  stage:'conversation', ask:2000000,  commit:0,        received:0,      owner:'p_kathleen', contact:'Maria Lopez',        campaign:'Member Events',     followup:daysFromToday(3),  renewal_month:null, grant_deadline:null, note:'Coffee on us @ Summit; partnerships team interested.' },
@@ -539,9 +543,12 @@ function staffById(id) { return STAFF.find(s => s.id === id) || {initials:'?', n
 function typeById(id) { return TYPES.find(t => t.id === id) || {label:id, cls:''}; }
 function stageById(id) { return STAGES.find(s => s.id === id) || {label:id, cls:'', n:'?'}; }
 function entityChip(entity) {
-  if (entity === '501c6') return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c6">c6</span>`;
-  if (entity === '501c3') return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c3">c3</span>`;
-  return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-both">both</span>`;
+  const c6 = `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c6">(c)6</span>`;
+  const c3 = `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c3">(c)3</span>`;
+  if (entity === '501c6') return c6;
+  if (entity === '501c3') return c3;
+  // 'both' renders both tags instead of a 'both' label.
+  return c6 + ' ' + c3;
 }
 function fmtDate(iso) {
   if (!iso) return '';
@@ -558,6 +565,25 @@ function followupBadge(iso) {
   return `<span class="text-[11px] text-slate-500">→ ${fmtDate(iso)}</span>`;
 }
 
+// Footer for the kanban tile (4th band). Date colored by urgency:
+//   overdue → red + "overdue" suffix
+//   ≤ 7 days → amber
+//   future  → slate
+//   missing → muted "none scheduled"
+function followupFooter(iso) {
+  if (!iso) {
+    return `<div class="px-2.5 py-1.5 border-t border-slate-200 text-[12px] text-slate-400">Follow-up: <span>none scheduled</span></div>`;
+  }
+  const today = isoDate(TODAY);
+  if (iso < today) {
+    return `<div class="px-2.5 py-1.5 border-t border-slate-200 text-[12px] text-slate-600">Follow-up: <span class="font-medium text-red-700">${fmtDate(iso)} · overdue</span></div>`;
+  }
+  const due = new Date(iso + 'T12:00:00');
+  const days = Math.round((due - TODAY) / 86400000);
+  const cls = days <= 7 ? 'font-medium text-amber-700' : 'font-medium text-slate-800';
+  return `<div class="px-2.5 py-1.5 border-t border-slate-200 text-[12px] text-slate-600">Follow-up: <span class="${cls}">${fmtDate(iso)}</span></div>`;
+}
+
 function renderKanban() {
   const items = filteredSponsors();
   const board = document.getElementById('kanbanBoard');
@@ -571,23 +597,21 @@ function renderKanban() {
       </div>
       <div class="flex-1 overflow-y-auto scroll-thin p-2 space-y-2 bg-slate-50">
         ${stageItems.map(s => `
-          <a href="sponsor-detail.html" class="card-drag block bg-white border border-slate-200 rounded p-2 hover:border-blue-400 hover:shadow-sm transition no-underline text-inherit" draggable="true">
-            <div class="flex items-start gap-1.5">
-              <div class="text-[14px] font-medium leading-tight truncate flex-1">${s.name}</div>
-              ${entityChip(s.entity)}
-            </div>
-            <div class="flex items-center gap-1.5 mt-1">
+          <a href="sponsor-detail.html" class="card-drag block bg-white border border-slate-200 rounded hover:border-blue-400 hover:shadow-sm transition no-underline text-inherit overflow-hidden" draggable="true">
+            <!-- Header band: type + entity tags left, owner initials right -->
+            <div class="px-2.5 py-1.5 bg-slate-100 border-b border-slate-200 flex items-center gap-1.5">
               <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${typeById(s.type).cls}">${typeById(s.type).label}</span>
+              ${entityChip(s.entity)}
+              <span class="ml-auto w-5 h-5 rounded-full bg-slate-300 text-slate-700 text-[10px] flex items-center justify-center font-semibold" title="${staffById(s.owner).name}">${staffById(s.owner).initials}</span>
             </div>
-            <div class="text-[12px] text-slate-600 mt-1 flex items-center gap-1.5">
-              <span class="font-semibold">${fmtMoney(s.ask, {compact:true})}</span>
-              <span class="text-slate-400">ask</span>
-              ${s.contact ? `<span class="text-slate-400 ml-auto truncate max-w-[80px]">${s.contact}</span>` : ''}
+            <!-- Body: bold name, lighter contact line, ask amount -->
+            <div class="px-2.5 pt-2 pb-2.5">
+              <div class="text-[14px] font-semibold leading-tight text-slate-900">${s.name}</div>
+              <div class="text-[12px] ${s.contact ? 'text-slate-500' : 'text-slate-400 italic'} mt-0.5 truncate">${s.contact || 'No contact yet'}</div>
+              <div class="text-[16px] font-semibold tabular-nums text-slate-900 mt-2">${fmtMoneyFull(s.ask)}</div>
             </div>
-            <div class="flex items-center gap-1.5 mt-1.5">
-              <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] flex items-center justify-center font-semibold" title="${staffById(s.owner).name}">${staffById(s.owner).initials}</span>
-              ${followupBadge(s.followup)}
-            </div>
+            <!-- Separator + follow-up footer -->
+            ${followupFooter(s.followup)}
           </a>`).join('')}
         ${stageItems.length === 0 ? '<div class="text-[12px] text-slate-400 text-center py-4">No sponsors</div>' : ''}
       </div>

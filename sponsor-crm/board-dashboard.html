@@ -298,20 +298,20 @@ const STAFF = [
 
 // Sponsors — `contact` is the primary contact at this sponsor (surfaced in My Connections)
 const SPONSORS = [
-  { name:'Microsoft AI for Good',     type:'corporate',  stage:'received',     amount:'$75k', entity:'c3',  owner:'KK', contact:'Brandon Middaugh' },
-  { name:'Anonymous Individual',      type:'individual', stage:'received',     amount:'$25k', entity:'c3',  owner:'KK', contact:null },
-  { name:'Bullitt Foundation',        type:'foundation', stage:'committed',    amount:'$50k', entity:'c3',  owner:'KK', contact:'Pat Forster',     overdue:true, lisa:true, lastActivity:'4d' },
-  { name:'Stoel Rives LLP',           type:'corporate',  stage:'committed',    amount:'$15k', entity:'c6',  owner:'KO', contact:'Greg Jacobson' },
-  { name:'Convene Seattle (Venue)',   type:'in_kind',    stage:'committed',    amount:'$8k',  entity:'c6',  owner:'KO', contact:'Jen Reyes' },
-  { name:'Schwabe Williamson',        type:'corporate',  stage:'proposal',     amount:'$25k', entity:'c6',  owner:'KO', contact:'Connie Sun' },
-  { name:'McKinstry',                 type:'corporate',  stage:'proposal',     amount:'$30k', entity:'c3',  owner:'LO', contact:'Ash Aiyar', overdue:true },
-  { name:'Russell Family Foundation', type:'foundation', stage:'proposal',     amount:'$35k', entity:'c3',  owner:'LO', contact:'Erika Russell' },
-  { name:'Walton Family Foundation',  type:'foundation', stage:'conversation', amount:'$100k',entity:'c3',  owner:'JS', contact:'Taylor Brugh',    lisa:true, lastActivity:'2d' },
-  { name:'Wilson Sonsini',            type:'corporate',  stage:'conversation', amount:'$10k', entity:'both',owner:'KK', contact:'Mark Talley' },
-  { name:'Starbucks',                 type:'corporate',  stage:'conversation', amount:'$20k', entity:'both',owner:'KO', contact:'Maria Lopez' },
-  { name:'Bezos Earth Fund',          type:'foundation', stage:'outreach',     amount:'$250k',entity:'c3',  owner:'JS', contact:'Andy Karsner',    lisa:true, lastActivity:'8d' },
-  { name:'Patagonia',                 type:'corporate',  stage:'outreach',     amount:'$15k', entity:'c3',  owner:'JS', contact:'Cara Dolan' },
-  { name:'Sea Mar Foundation',        type:'foundation', stage:'prospect',     amount:'$5k',  entity:'c3',  owner:'KK', contact:null },
+  { name:'Microsoft AI for Good',     type:'corporate',  stage:'received',     amount:'$75,000',  entity:'c3',  owner:'KK', contact:'Brandon Middaugh',          lastActivity:'1w' },
+  { name:'Anonymous Individual',      type:'individual', stage:'received',     amount:'$25,000',  entity:'c3',  owner:'KK', contact:null,                        lastActivity:'2w' },
+  { name:'Bullitt Foundation',        type:'foundation', stage:'committed',    amount:'$50,000',  entity:'c3',  owner:'KK', contact:'Pat Forster, Denis Hayes',  overdue:true, lisa:true, lastActivity:'4d' },
+  { name:'Stoel Rives LLP',           type:'corporate',  stage:'committed',    amount:'$15,000',  entity:'c6',  owner:'KO', contact:'Greg Jacobson',             lastActivity:'5d' },
+  { name:'Convene Seattle (Venue)',   type:'in_kind',    stage:'committed',    amount:'$8,000',   entity:'c6',  owner:'KO', contact:'Jen Reyes',                 lastActivity:'1w' },
+  { name:'Schwabe Williamson',        type:'corporate',  stage:'proposal',     amount:'$25,000',  entity:'c6',  owner:'KO', contact:'Connie Sun',                lastActivity:'3d' },
+  { name:'McKinstry',                 type:'corporate',  stage:'proposal',     amount:'$30,000',  entity:'c3',  owner:'LO', contact:'Ash Aiyar',                 overdue:true },
+  { name:'Russell Family Foundation', type:'foundation', stage:'proposal',     amount:'$35,000',  entity:'c3',  owner:'LO', contact:'Erika Russell',             lastActivity:'6d' },
+  { name:'Walton Family Foundation',  type:'foundation', stage:'conversation', amount:'$100,000', entity:'c3',  owner:'JS', contact:'Taylor Brugh, Lukas Walton', lisa:true, lastActivity:'2d' },
+  { name:'Wilson Sonsini',            type:'corporate',  stage:'conversation', amount:'$10,000',  entity:'both',owner:'KK', contact:'Mark Talley',               lastActivity:'4d' },
+  { name:'Starbucks',                 type:'corporate',  stage:'conversation', amount:'$20,000',  entity:'both',owner:'KO', contact:'Maria Lopez',               lastActivity:'1w' },
+  { name:'Bezos Earth Fund',          type:'foundation', stage:'outreach',     amount:'$250,000', entity:'c3',  owner:'JS', contact:'Andy Karsner',              lisa:true, lastActivity:'8d' },
+  { name:'Patagonia',                 type:'corporate',  stage:'outreach',     amount:'$15,000',  entity:'c3',  owner:'JS', contact:'Cara Dolan',                lastActivity:'5d' },
+  { name:'Sea Mar Foundation',        type:'foundation', stage:'prospect',     amount:'$5,000',   entity:'c3',  owner:'KK', contact:null,                        lastActivity:null },
 ];
 
 const ACTIVITY = [
@@ -335,9 +335,12 @@ const GRANTS = [
 let entityFilter = 'all';
 
 function entityChip(e) {
-  if (e === 'c6') return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c6">c6</span>`;
-  if (e === 'c3') return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c3">c3</span>`;
-  return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-both">both</span>`;
+  const c6 = `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c6">(c)6</span>`;
+  const c3 = `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c3">(c)3</span>`;
+  if (e === 'c6') return c6;
+  if (e === 'c3') return c3;
+  // 'both' renders both tags instead of a 'both' label.
+  return c6 + ' ' + c3;
 }
 function stageChip(s) {
   const st = STAGES.find(x => x.id === s);
@@ -391,6 +394,25 @@ function renderSidebar() {
   }).join('');
 }
 
+// Board-view footer for a tile. No follow-up date in the board dataset,
+// so we synthesize a status line from the data we have: overdue flag,
+// last-activity age, or muted dash when neither is known.
+function tileFooter(s) {
+  if (s.overdue) {
+    return `<div class="px-2.5 py-1.5 border-t border-slate-200 text-[12px] text-slate-600">
+      Follow-up: <span class="font-medium text-red-700">overdue</span>
+    </div>`;
+  }
+  if (s.lastActivity) {
+    return `<div class="px-2.5 py-1.5 border-t border-slate-200 text-[12px] text-slate-600">
+      Last activity: <span class="font-medium text-slate-800">${s.lastActivity} ago</span>
+    </div>`;
+  }
+  return `<div class="px-2.5 py-1.5 border-t border-slate-200 text-[12px] text-slate-400">
+    Last activity: <span>—</span>
+  </div>`;
+}
+
 function renderKanban() {
   const items = filteredSponsors();
   const board = document.getElementById('kanbanBoard');
@@ -402,15 +424,21 @@ function renderKanban() {
         <span class="text-[12px] text-slate-400 ml-auto">${stageItems.length}</span>
       </div>
       <div class="p-2 space-y-1.5 max-h-[300px] overflow-y-auto scroll-thin bg-slate-50">
-        ${stageItems.map(s => `<a href="sponsor-detail.html" class="block bg-white border border-slate-200 rounded p-2 hover:border-blue-400">
-          <div class="flex items-start gap-1.5">
-            <div class="font-medium text-[13px] leading-tight flex-1 truncate">${s.name}</div>
+        ${stageItems.map(s => `<a href="sponsor-detail.html" class="block bg-white border border-slate-200 rounded hover:border-blue-400 transition no-underline text-inherit overflow-hidden">
+          <!-- Header band: type + entity tags left, owner initials right -->
+          <div class="px-2.5 py-1.5 bg-slate-100 border-b border-slate-200 flex items-center gap-1.5">
+            ${typeChip(TYPES.find(t => t.id === s.type)?.label || s.type)}
             ${entityChip(s.entity)}
+            <span class="ml-auto w-5 h-5 rounded-full bg-slate-300 text-slate-700 text-[10px] flex items-center justify-center font-semibold">${s.owner}</span>
           </div>
-          <div class="flex items-center gap-1.5 mt-1 text-[12px] text-slate-600">
-            <span class="font-semibold">${s.amount}</span>
-            <span class="ml-auto w-4 h-4 rounded-full bg-slate-200 text-slate-700 text-[10px] inline-flex items-center justify-center font-semibold">${s.owner}</span>
+          <!-- Body: bold name, lighter contact line, amount -->
+          <div class="px-2.5 pt-2 pb-2.5">
+            <div class="text-[13px] font-semibold leading-tight text-slate-900 truncate">${s.name}</div>
+            <div class="text-[12px] ${s.contact ? 'text-slate-500' : 'text-slate-400 italic'} mt-0.5 truncate">${s.contact || 'No contact yet'}</div>
+            <div class="text-[15px] font-semibold tabular-nums text-slate-900 mt-2">${s.amount}</div>
           </div>
+          <!-- Separator + status footer -->
+          ${tileFooter(s)}
         </a>`).join('')}
         ${stageItems.length === 0 ? '<div class="text-[12px] text-slate-400 text-center py-3">Empty</div>' : ''}
       </div>

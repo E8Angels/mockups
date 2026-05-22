@@ -327,7 +327,18 @@ Layout, top to bottom:
 
 - **Toolbar row**: `<result count>` left-aligned; right-aligned cluster of `Kanban / List / Grant calendar` view-mode toggle, then a divider, then **`+ New sponsor`** (primary blue), `Export CSV`, `Snapshot PDF` (desktop only).
 - **Overdue banner** — appears below the toolbar when overdue count > 0.
-- **View body**: Kanban / List / Grant calendar. Kanban columns = 7 pipeline stages; cards show sponsor name + type + ask + follow-up status + entity chip. **The entire card is a single clickable anchor** to the sponsor detail page. Drag a card to advance stage; a modal prompts for a note. In the List view the **entire row** navigates to the detail page on click. The Grant calendar shows the next 60 days of foundation grant deadlines.
+- **View body**: Kanban / List / Grant calendar. Kanban columns = 7 pipeline stages. Each Kanban card is a four-band tile (see §6a.i below). **The entire card is a single clickable anchor** to the sponsor detail page. Drag a card to advance stage; a modal prompts for a note. In the List view the **entire row** navigates to the detail page on click. The Grant calendar shows the next 60 days of foundation grant deadlines.
+
+#### 6a.i. Kanban tile layout
+
+Each card has four horizontal bands, top to bottom:
+
+1. **Header band** (slate-100 fill, hairline below) — sponsor-type chip and entity tag(s) on the left, the primary owner's initials avatar pinned to the right. When the sponsor's entity is `both` the band renders both `(c)6` and `(c)3` tags side by side rather than a single "both" label, so the same scan works whether the user filters by entity or not.
+2. **Entity name** — 14px semibold, the strongest text on the card.
+3. **Contact line** — 12px slate. Comma-separated when there are multiple primary contacts; rendered as muted italic `No contact yet` when empty (common for `Prospect`-stage rows).
+4. **Ask amount** — 16px semibold tabular numerals, full-dollar format (`$75,000`, no compact `k` suffix). Typical asks sit in the `$5,000`–`$100,000` range; the body has room for higher figures.
+
+Below the body, a hairline separator and a **follow-up footer**: `Follow-up: May 26`, with the date colored amber when due within seven days, red and tagged `· overdue` when past due, and a muted `none scheduled` when no follow-up exists. Date format is short month + numeric day.
 
 The `+ New sponsor` button opens the dialog described in §6f.
 
@@ -387,7 +398,7 @@ Multiple open follow-ups per sponsor are allowed but uncommon. The banner shows 
 
 #### 6b.iv. Visual style
 
-Stage colors are a single-hue progression: cool gray for early stages → blue for active stages → emerald for received → neutral gray for declined. Sponsor-type chips are a single neutral chip (`type-chip`) with the type label in text. Entity chips are visually distinct (`c6` = blue, `c3` = purple) since filtering by entity is a frequent action. Timeline event kind is conveyed by the colored dot on the rail and a small uppercase label.
+Stage colors are a single-hue progression: cool gray for early stages → blue for active stages → emerald for received → neutral gray for declined. Sponsor-type chips are a single neutral chip (`type-chip`) with the type label in text. Entity chips are visually distinct (`(c)6` = blue, `(c)3` = purple) since filtering by entity is a frequent action; sponsors tagged to both entities render both chips rather than a "both" label. Timeline event kind is conveyed by the colored dot on the rail and a small uppercase label.
 
 ### 6c. Board / Development Committee dashboard (`/board/sponsors`)
 
