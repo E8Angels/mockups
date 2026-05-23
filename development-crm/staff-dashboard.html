@@ -1,0 +1,1146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Development CRM — Staff Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scroll-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  .kanban-col { min-width: 270px; max-width: 270px; }
+
+  /* Stage palette — single-hue progression with semantic terminal states */
+  .stage-prospect    { background:#f1f5f9; color:#475569; }
+  .stage-outreach    { background:#e2e8f0; color:#334155; }
+  .stage-conversation{ background:#dbeafe; color:#1e3a8a; }
+  .stage-proposal    { background:#bfdbfe; color:#1d4ed8; }
+  .stage-committed   { background:#1d4ed8; color:#ffffff; }
+  .stage-received    { background:#059669; color:#ffffff; }
+  .stage-declined    { background:#f3f4f6; color:#6b7280; }
+
+  /* Legal-entity chips */
+  .entity-c6 { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; }
+  .entity-c3 { background:#faf5ff; color:#6b21a8; border:1px solid #e9d5ff; }
+
+  /* Entity-type chip (single neutral chip) */
+  .type-chip { background:#f8fafc; color:#475569; border:1px solid #e2e8f0; }
+
+  /* Opportunity type chips — one color per top-level type. Subtype is shown in the label, not by color. */
+  .opp-grant       { background:#ccfbf1; color:#115e59; border:1px solid #99f6e4; }  /* teal */
+  .opp-sponsorship { background:#dbeafe; color:#1e40af; border:1px solid #bfdbfe; }  /* blue */
+  .opp-gift        { background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; }  /* slate */
+
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+  .card-drag { cursor: grab; }
+  .card-drag:active { cursor: grabbing; }
+
+  /* Resizable rail */
+  .workspace { display:flex; gap:0; align-items:stretch; }
+  .workspace-rail { flex-shrink:0; padding-right:10px; }
+  .workspace-handle { width:6px; cursor:col-resize; flex-shrink:0; position:relative; background:transparent; }
+  .workspace-handle::before { content:''; position:absolute; top:0; bottom:0; left:2px; width:2px; background:#e2e8f0; }
+  .workspace-handle:hover::before, .workspace-handle.dragging::before { background:#3b82f6; left:1px; width:4px; }
+  .workspace-main { flex:1; min-width:0; padding-left:10px; display:flex; flex-direction:column; min-height:0; }
+
+  /* Collapsed rail */
+  .rail-collapsed-btn { width:36px; flex-shrink:0; border:1px solid #e2e8f0; border-radius:6px; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:14px 0; cursor:pointer; }
+  .rail-collapsed-btn:hover { background:#f8fafc; }
+  .rail-collapsed-btn .rcb-chev { color:#64748b; font-size:14px; line-height:1; }
+  .rail-collapsed-btn:hover .rcb-chev { color:#0f172a; }
+  .rail-collapsed-btn .rcb-label { writing-mode:vertical-rl; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:#475569; }
+  .rail-collapsed-btn:hover .rcb-label { color:#0f172a; }
+  .rail-collapsed-btn .rcb-icon { color:#64748b; }
+  .rail-collapsed-btn:hover .rcb-icon { color:#0f172a; }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    #kanbanBoard { scroll-snap-type: x mandatory; }
+    .kanban-col { scroll-snap-align: start; min-width: 85vw; max-width: 85vw; }
+    .workspace { flex-direction: column; }
+    .workspace-rail { width: auto !important; padding-right: 0; padding-bottom: 10px; }
+    .workspace-handle { display: none; }
+    .workspace-main { padding-left: 0; }
+    .rail-collapsed-btn { width: 100%; flex-direction: row; padding: 8px 14px; }
+    .rail-collapsed-btn .rcb-label { writing-mode: horizontal-tb; }
+  }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 text-sm">
+
+<!-- KPI STRIP -->
+<section class="px-3 md:px-4 pt-3 pb-2 grid grid-cols-2 md:grid-cols-6 gap-2 md:gap-3">
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[12px] uppercase tracking-wide text-slate-500">Received vs. goal</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5" id="kpiRaised">—</div>
+    <div class="h-1.5 bg-slate-200 rounded-full mt-1.5 overflow-hidden"><div id="kpiBar" class="h-full bg-emerald-500" style="width:0%"></div></div>
+    <div class="text-[12px] text-slate-500 mt-1"><span id="kpiPct">—</span> of <span id="kpiGoal">—</span></div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[12px] uppercase tracking-wide text-slate-500">In pipeline</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5 text-blue-700" id="kpiPipeline">—</div>
+    <div class="text-[12px] text-slate-500 mt-1">Outreach → Committed asks</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[12px] uppercase tracking-wide text-slate-500">Active opportunities</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5" id="kpiActive">—</div>
+    <div class="text-[12px] text-slate-500 mt-1">Outreach → Proposal</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[12px] uppercase tracking-wide text-slate-500">Overdue follow-ups</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5 text-red-700" id="kpiOverdue">—</div>
+    <div class="text-[12px] text-slate-500 mt-1">Across all owners</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[12px] uppercase tracking-wide text-slate-500">Avg gift (received)</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5" id="kpiAvg">—</div>
+    <div class="text-[12px] text-slate-500 mt-1"><span id="kpiAvgN">—</span> gifts FY26</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[12px] uppercase tracking-wide text-slate-500">Reporting due 30d</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5 text-amber-700" id="kpiReporting">—</div>
+    <div class="text-[12px] text-slate-500 mt-1">Active grants</div>
+  </div>
+</section>
+
+<!-- WORKSPACE -->
+<div class="workspace px-3 md:px-4 pb-3" id="workspace">
+
+  <!-- COLLAPSED RAIL BUTTON -->
+  <button id="workspaceRailCollapsed"
+          type="button"
+          onclick="expandRail()"
+          title="Open filters"
+          class="rail-collapsed-btn"
+          style="display:none;">
+    <span class="rcb-chev">›</span>
+    <span class="rcb-label">Filters</span>
+    <svg class="rcb-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+    </svg>
+  </button>
+
+  <!-- LEFT RAIL -->
+  <aside class="workspace-rail" id="workspaceRail" style="width:280px;">
+    <div class="bg-white border border-slate-200 rounded-md overflow-hidden">
+
+      <div class="flex items-center justify-between px-2 py-1 border-b border-slate-100">
+        <span class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Filters</span>
+        <button type="button" onclick="collapseRail()" title="Collapse filters" class="text-slate-400 hover:text-slate-700 text-[13px] leading-none px-1">‹</button>
+      </div>
+
+      <div class="p-2.5 space-y-3 max-h-[calc(100vh-180px)] overflow-y-auto scroll-thin">
+
+        <!-- SEARCH -->
+        <div class="relative">
+          <svg class="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"/></svg>
+          <input id="searchInput" type="text" placeholder="Search entities, opportunities, contacts…"
+                 autocomplete="off" data-lpignore="true" data-form-type="other"
+                 class="w-full h-8 pl-8 pr-2 border border-slate-300 rounded text-[13px] focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+        </div>
+
+        <!-- LEGAL ENTITY -->
+        <div>
+          <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1">Legal entity</div>
+          <div class="flex items-center bg-slate-100 rounded-md p-0.5">
+            <button data-entity="all"   class="entity-btn flex-1 px-2 py-1 rounded font-medium bg-white shadow-sm text-[12px]">All</button>
+            <button data-entity="501c6" class="entity-btn flex-1 px-2 py-1 rounded font-medium text-slate-600 hover:bg-white text-[12px]">501c6</button>
+            <button data-entity="501c3" class="entity-btn flex-1 px-2 py-1 rounded font-medium text-slate-600 hover:bg-white text-[12px]">501c3</button>
+          </div>
+        </div>
+
+        <!-- OPPORTUNITY TYPE (3 top-level options: Grant / Sponsorship / Gift; sponsorship subtype lives on the opportunity detail page) -->
+        <details open>
+          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+            <span>Opportunity type</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+          </summary>
+          <ul class="text-[13px] space-y-0.5 mt-1" id="kindFilter"></ul>
+        </details>
+
+        <!-- ENTITY TYPE -->
+        <details>
+          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+            <span>Entity type</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+          </summary>
+          <ul class="text-[13px] space-y-0.5 mt-1" id="typeFilter"></ul>
+        </details>
+
+        <!-- PIPELINE STAGE -->
+        <details open>
+          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+            <span>Pipeline stage</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+          </summary>
+          <ul class="text-[13px] space-y-0.5 mt-1" id="stageFilter"></ul>
+        </details>
+
+        <!-- ASSIGNED TO -->
+        <details>
+          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+            <span>Assigned to</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+          </summary>
+          <ul class="text-[13px] space-y-0.5 mt-1" id="ownerFilter"></ul>
+        </details>
+
+        <!-- FOLLOW-UP -->
+        <details>
+          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+            <span>Follow-up</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+          </summary>
+          <ul class="text-[13px] space-y-0.5 mt-1">
+            <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded"/><span class="text-red-700">Overdue</span></label></li>
+            <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded"/><span>Due in 7 days</span></label></li>
+            <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded"/><span class="text-slate-500">None scheduled</span></label></li>
+          </ul>
+        </details>
+
+        <!-- FISCAL YEAR -->
+        <details>
+          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+            <span>Fiscal year</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+          </summary>
+          <select class="w-full h-8 border border-slate-300 rounded px-2 text-[13px] mt-1">
+            <option>Current FY (FY26)</option>
+            <option>Prior FY (FY25)</option>
+            <option>Two FYs back (FY24)</option>
+            <option>All fiscal years</option>
+          </select>
+        </details>
+
+        <!-- REPORTING -->
+        <details>
+          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+            <span>Reporting</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+          </summary>
+          <ul class="text-[13px] space-y-0.5 mt-1">
+            <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded"/><span class="text-amber-700">Reporting due 30d</span></label></li>
+            <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded"/><span class="text-red-700">Reporting overdue</span></label></li>
+          </ul>
+        </details>
+
+      </div>
+    </div>
+  </aside>
+
+  <!-- Drag handle -->
+  <div class="workspace-handle" id="workspaceHandle" title="Drag to resize"></div>
+
+  <!-- MAIN PANE -->
+  <main class="workspace-main">
+
+    <!-- Toolbar -->
+    <div class="bg-white border border-slate-200 rounded-md px-3 py-2 flex items-center gap-2 mb-2 flex-wrap">
+      <div class="text-[13px] text-slate-500 whitespace-nowrap" id="resultCount">—</div>
+
+      <div class="ml-auto flex items-center gap-2 flex-wrap">
+        <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px]">
+          <button data-mode="kanban"   class="mode-btn px-2.5 py-1 font-medium rounded bg-white shadow-sm">Kanban</button>
+          <button data-mode="list"     class="mode-btn px-2.5 py-1 font-medium rounded text-slate-600 hover:bg-white">List</button>
+          <button data-mode="grants"   class="mode-btn px-2.5 py-1 font-medium rounded text-slate-600 hover:bg-white">Grant calendar</button>
+          <button data-mode="entities" class="mode-btn px-2.5 py-1 font-medium rounded text-slate-600 hover:bg-white">Entities</button>
+        </div>
+        <div class="w-px h-5 bg-slate-200"></div>
+        <button id="newOppBtn" class="h-7 px-2.5 text-[13px] font-medium text-white bg-blue-600 hover:bg-blue-700 rounded inline-flex items-center gap-1 whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
+          New opportunity
+        </button>
+        <button class="h-7 px-2.5 text-[13px] font-medium border border-slate-300 bg-white hover:bg-slate-50 rounded whitespace-nowrap">Export CSV</button>
+        <button class="h-7 px-2.5 text-[13px] font-medium border border-slate-300 bg-white hover:bg-slate-50 rounded whitespace-nowrap hidden md:inline-block">Snapshot PDF</button>
+      </div>
+    </div>
+
+    <!-- Overdue banner -->
+    <div id="overdueBanner" class="px-3 md:px-4 py-2 bg-red-50 border border-red-200 rounded-md text-red-800 text-[13px] flex items-center gap-2 hidden mb-2">
+      <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a1 1 0 011 1v4a1 1 0 11-2 0V6a1 1 0 011-1zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+      <span><strong id="overdueCount">—</strong> follow-ups overdue. <a href="#" class="underline">Review</a></span>
+    </div>
+
+    <!-- View bodies -->
+    <div class="flex-1 min-h-0 bg-white border border-slate-200 rounded-md overflow-hidden flex flex-col">
+      <div id="kanbanView" class="flex-1 overflow-x-auto overflow-y-hidden bg-slate-50 p-3">
+        <div id="kanbanBoard" class="flex gap-3 h-full"></div>
+      </div>
+      <div id="listView" class="flex-1 overflow-auto bg-white hidden">
+        <table class="w-full text-[14px] border-collapse">
+          <thead class="bg-slate-50 sticky top-0 z-10">
+            <tr class="text-left text-[12px] uppercase tracking-wider text-slate-500">
+              <th class="px-3 py-2 font-semibold">Opportunity</th>
+              <th class="px-3 py-2 font-semibold">Entity</th>
+              <th class="px-3 py-2 font-semibold">Kind</th>
+              <th class="px-3 py-2 font-semibold">Legal entity</th>
+              <th class="px-3 py-2 font-semibold">Stage</th>
+              <th class="px-3 py-2 font-semibold text-right">Ask</th>
+              <th class="px-3 py-2 font-semibold text-right">Received</th>
+              <th class="px-3 py-2 font-semibold">FY</th>
+              <th class="px-3 py-2 font-semibold">Owner</th>
+              <th class="px-3 py-2 font-semibold">Advocate</th>
+              <th class="px-3 py-2 font-semibold">Next follow-up</th>
+            </tr>
+          </thead>
+          <tbody id="listBody"></tbody>
+        </table>
+      </div>
+      <div id="grantsView" class="flex-1 overflow-auto bg-slate-50 p-3 hidden">
+        <div class="text-[13px] text-slate-500 mb-2">Foundation grant deadlines · next 60 days</div>
+        <div id="grantList" class="space-y-1.5"></div>
+      </div>
+      <div id="entitiesView" class="flex-1 overflow-auto bg-white hidden">
+        <table class="w-full text-[14px] border-collapse">
+          <thead class="bg-slate-50 sticky top-0 z-10">
+            <tr class="text-left text-[12px] uppercase tracking-wider text-slate-500">
+              <th class="px-3 py-2 font-semibold">Entity</th>
+              <th class="px-3 py-2 font-semibold">Type</th>
+              <th class="px-3 py-2 font-semibold">Primary contact</th>
+              <th class="px-3 py-2 font-semibold text-right">Opps</th>
+              <th class="px-3 py-2 font-semibold text-right">Lifetime received</th>
+              <th class="px-3 py-2 font-semibold">Last activity</th>
+            </tr>
+          </thead>
+          <tbody id="entitiesBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Stage-change modal stub -->
+<div id="stageModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-md shadow-xl w-full max-w-md">
+    <div class="px-4 py-3 border-b border-slate-200 font-semibold">Move stage</div>
+    <div class="px-4 py-3 space-y-2 text-sm">
+      <div class="text-slate-600 text-[13px]">Moving <strong id="modalOpp">—</strong> from <span id="modalFrom" class="chip"></span> to <span id="modalTo" class="chip"></span></div>
+      <label class="block text-[13px] text-slate-600 mt-2">Note (optional)</label>
+      <textarea autocomplete="off" data-lpignore="true" rows="3" class="w-full border border-slate-300 rounded p-2 text-sm" placeholder="Why this move?"></textarea>
+      <label class="block text-[13px] text-slate-600 mt-2">Auto-suggest follow-up <span class="text-slate-400">(stage default)</span></label>
+      <input type="date" class="!w-[150px] border border-slate-300 rounded p-1 text-sm" id="modalFollowup" />
+    </div>
+    <div class="px-4 py-3 border-t border-slate-200 flex justify-end gap-2">
+      <button onclick="document.getElementById('stageModal').classList.add('hidden'); document.getElementById('stageModal').classList.remove('flex')" class="h-8 px-3 text-[13px] border border-slate-300 rounded">Cancel</button>
+      <button class="h-8 px-3 text-[13px] bg-blue-600 text-white rounded">Confirm move</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Opportunity dialog -->
+<div id="newOppModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-md shadow-xl w-full max-w-lg">
+    <div class="px-4 py-3 border-b border-slate-200 flex items-center">
+      <div class="font-semibold">New opportunity</div>
+      <button onclick="closeNewOpp()" class="ml-auto text-slate-400 hover:text-slate-700" aria-label="Close">
+        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+      </button>
+    </div>
+    <div class="px-4 py-3 space-y-3 text-sm max-h-[70vh] overflow-y-auto scroll-thin">
+
+      <!-- Entity picker -->
+      <div class="grid grid-cols-[110px_1fr] items-start gap-3">
+        <label class="text-[13px] text-slate-600 pt-1.5">Entity</label>
+        <div class="space-y-1.5 flex-1">
+          <input type="text" placeholder="Search existing entities or type a new name…" autocomplete="off" data-lpignore="true" data-form-type="other"
+                 class="block w-full border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+          <div class="text-[12px] text-slate-400">No match? <a href="#" class="text-blue-700 hover:underline">+ Create new entity</a> inline.</div>
+        </div>
+      </div>
+
+      <!-- Opportunity name -->
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label for="newOppName" class="text-[13px] text-slate-600">Name</label>
+        <input id="newOppName" type="text" autocomplete="off" data-lpignore="true" data-form-type="other"
+               placeholder="e.g. Wilmington Scholarship 2026, FY27 Sponsorship"
+               class="border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+      </div>
+
+      <!-- Type -->
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Type</label>
+        <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px] w-fit">
+          <button type="button" data-newtype="grant"       class="newtype-btn px-2.5 py-1 rounded font-medium bg-white shadow-sm">Grant</button>
+          <button type="button" data-newtype="sponsorship" class="newtype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Sponsorship</button>
+          <button type="button" data-newtype="gift"        class="newtype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Gift</button>
+        </div>
+      </div>
+
+      <!-- Subtype (Sponsorship only) -->
+      <div id="newSubtypeRow" class="grid grid-cols-[110px_1fr] items-center gap-3 hidden">
+        <label class="text-[13px] text-slate-600">Subtype</label>
+        <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px] w-fit">
+          <button type="button" data-newsubtype="annual" class="newsubtype-btn px-2.5 py-1 rounded font-medium bg-white shadow-sm">Annual</button>
+          <button type="button" data-newsubtype="event"  class="newsubtype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Event</button>
+          <button type="button" data-newsubtype="other"  class="newsubtype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Other</button>
+        </div>
+      </div>
+
+      <!-- Legal entity -->
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Legal entity</label>
+        <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px] w-fit">
+          <button type="button" data-newentity="501c6" class="newentity-btn px-2.5 py-1 rounded font-medium bg-white shadow-sm">E8 Angels · (c)6</button>
+          <button type="button" data-newentity="501c3" class="newentity-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">E8 Impact · (c)3</button>
+          <button type="button" data-newentity="both"  class="newentity-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Both</button>
+        </div>
+      </div>
+
+      <!-- Stage -->
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Stage</label>
+        <select class="h-8 border border-slate-300 rounded px-2 text-[13px] w-[200px]">
+          <option value="prospect">Prospect</option>
+          <option value="outreach">Outreach</option>
+          <option value="conversation">Conversation</option>
+          <option value="proposal">Proposal</option>
+          <option value="committed">Committed</option>
+          <option value="received">Received</option>
+        </select>
+      </div>
+
+      <!-- Owner -->
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Owner</label>
+        <select class="h-8 border border-slate-300 rounded px-2 text-[13px] w-[200px]">
+          <option>Karin Kidder (me)</option>
+          <option>Kathleen Olson</option>
+          <option>Lee O'Connor</option>
+          <option>Jordan Schwartz</option>
+        </select>
+      </div>
+
+      <!-- Advocate (optional; internal E8 person helping move this opp forward) -->
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Advocate</label>
+        <input type="text" placeholder="Search board members or staff…" autocomplete="off" data-lpignore="true" data-form-type="other"
+               class="border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+      </div>
+
+      <!-- Optional collapsible -->
+      <details>
+        <summary class="text-[13px] text-slate-600 cursor-pointer select-none py-1 hover:text-slate-900">More details (optional)</summary>
+        <div class="space-y-3 mt-2 pt-2 border-t border-slate-100">
+
+          <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+            <label class="text-[13px] text-slate-600">Source</label>
+            <input type="text" placeholder="Repeat funder / warm intro / event / cold" autocomplete="off" data-lpignore="true" data-form-type="other"
+                   class="border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+          </div>
+
+          <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+            <label class="text-[13px] text-slate-600">Campaign</label>
+            <select class="h-8 border border-slate-300 rounded px-2 text-[13px] w-[200px]">
+              <option value="">— none —</option>
+              <option>FY26 Annual Fund</option>
+              <option>Fellowship Program</option>
+              <option>Member Events</option>
+            </select>
+          </div>
+
+          <!-- Ask amounts (multi-line; supports mixing cash + in-kind at create time) -->
+          <div class="grid grid-cols-[110px_1fr] items-start gap-3">
+            <label class="text-[13px] text-slate-600 pt-1.5">Ask amounts</label>
+            <div class="flex-1 min-w-0">
+              <div id="askLines" class="space-y-1.5"></div>
+              <button type="button" id="addAskLineBtn" class="mt-1.5 text-[12px] text-blue-700 hover:text-blue-900 inline-flex items-center gap-1">
+                <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
+                Add another line
+              </button>
+              <div id="askSubtotal" class="text-[11px] text-slate-500 mt-1 hidden"></div>
+            </div>
+          </div>
+
+          <!-- Grant / Sponsorship: application deadline -->
+          <div id="newDeadlineRow" class="grid grid-cols-[110px_1fr] items-center gap-3">
+            <label class="text-[13px] text-slate-600">App deadline</label>
+            <input type="date" autocomplete="off" data-lpignore="true"
+                   class="!w-[150px] border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+          </div>
+
+          <!-- Grant: decision expected -->
+          <div id="newDecisionRow" class="grid grid-cols-[110px_1fr] items-center gap-3">
+            <label class="text-[13px] text-slate-600">Decision exp.</label>
+            <input type="date" autocomplete="off" data-lpignore="true"
+                   class="!w-[150px] border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+          </div>
+
+          <!-- Grant / Sponsorship: application URL -->
+          <div id="newUrlRow" class="grid grid-cols-[110px_1fr] items-center gap-3">
+            <label class="text-[13px] text-slate-600">Application URL</label>
+            <input type="url" placeholder="https://…" autocomplete="off" data-lpignore="true" data-form-type="other"
+                   class="border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+          </div>
+
+          <!-- Sponsorship: term start / end -->
+          <div id="newTermRow" class="grid grid-cols-[110px_1fr] items-center gap-3 hidden">
+            <label class="text-[13px] text-slate-600">Term</label>
+            <div class="flex items-center gap-2">
+              <input type="date" autocomplete="off" data-lpignore="true"
+                     class="!w-[150px] border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+              <span class="text-slate-400">→</span>
+              <input type="date" autocomplete="off" data-lpignore="true"
+                     class="!w-[150px] border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+            </div>
+          </div>
+
+          <!-- Grant: restricted -->
+          <div id="newRestrictedRow" class="grid grid-cols-[110px_1fr] items-center gap-3">
+            <label class="text-[13px] text-slate-600">Restricted</label>
+            <div class="flex items-center gap-2 flex-1">
+              <input type="checkbox" class="rounded"/>
+              <input type="text" placeholder="Restriction notes (program code, allowed uses…)" autocomplete="off" data-lpignore="true" data-form-type="other"
+                     class="flex-1 border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+            </div>
+          </div>
+
+          <!-- Grant: reporting -->
+          <div id="newReportingRow" class="grid grid-cols-[110px_1fr] items-center gap-3">
+            <label class="text-[13px] text-slate-600">Reporting</label>
+            <div class="flex items-center gap-2 flex-1">
+              <input type="checkbox" class="rounded"/>
+              <span class="text-[13px] text-slate-600">Required by</span>
+              <input type="date" autocomplete="off" data-lpignore="true"
+                     class="!w-[150px] border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+            </div>
+          </div>
+
+          <!-- Renewal of -->
+          <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+            <label class="text-[13px] text-slate-600">Renewal of</label>
+            <input type="text" placeholder="Prior opportunity (autocomplete)…" autocomplete="off" data-lpignore="true" data-form-type="other"
+                   class="border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+          </div>
+
+        </div>
+      </details>
+    </div>
+
+    <div class="px-4 py-3 border-t border-slate-200 flex items-center justify-end gap-2">
+      <button onclick="closeNewOpp()" class="h-8 px-3 text-[13px] border border-slate-300 rounded">Cancel</button>
+      <button class="h-8 px-3 text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Create &amp; open</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============== DATA ==============
+const STAGES = [
+  { id:'prospect',     label:'Prospect',     cls:'stage-prospect' },
+  { id:'outreach',     label:'Outreach',     cls:'stage-outreach' },
+  { id:'conversation', label:'Conversation', cls:'stage-conversation' },
+  { id:'proposal',     label:'Proposal',     cls:'stage-proposal' },
+  { id:'committed',    label:'Committed',    cls:'stage-committed' },
+  { id:'received',     label:'Received',     cls:'stage-received' },
+  { id:'declined',     label:'Declined',     cls:'stage-declined' },
+];
+const ENTITY_TYPES = [
+  { id:'corporate',  label:'Corporate' },
+  { id:'foundation', label:'Foundation' },
+  { id:'individual', label:'Individual' },
+  { id:'government', label:'Government' },
+];
+// Opportunity types are 3 top-level options (grant / sponsorship / gift).
+// Sponsorship subtype (annual / event / other) is a detail-level field surfaced only on
+// the opportunity detail page; it does NOT appear as a top-level tag, chip, or filter.
+const TYPES = [
+  { type:'grant',       label:'Grant',       cls:'opp-grant' },
+  { type:'sponsorship', label:'Sponsorship', cls:'opp-sponsorship' },
+  { type:'gift',        label:'Gift',        cls:'opp-gift' },
+];
+const matchType = (o, t) => o.type === t.type;
+const STAFF = [
+  { id:'p_karin',    initials:'KK', name:'Karin Kidder' },
+  { id:'p_kathleen', initials:'KO', name:'Kathleen Olson' },
+  { id:'p_lee',      initials:'LO', name:"Lee O'Connor" },
+  { id:'p_jordan',   initials:'JS', name:'Jordan Schwartz' },
+];
+const TODAY = new Date('2026-05-22');
+const isoDate = d => d.toISOString().slice(0,10);
+const daysFromToday = n => { const d = new Date(TODAY); d.setDate(d.getDate()+n); return isoDate(d); };
+const fmtMoney = (cents, opts={}) => {
+  if (cents == null) return '—';
+  const dollars = Math.round(cents/100);
+  if (opts.compact && dollars >= 1000) return '$' + Math.round(dollars/1000) + 'k';
+  return '$' + dollars.toLocaleString();
+};
+const fmtMoneyFull = (cents) => {
+  if (cents == null) return '—';
+  return '$' + Math.round(cents/100).toLocaleString();
+};
+
+// Entities. The durable relationship records.
+const ENTITIES = [
+  { id:'dent_1',  name:'Microsoft AI for Good',     type:'corporate',  primaryContact:'Brandon Middaugh' },
+  { id:'dent_2',  name:'Bullitt Foundation',         type:'foundation', primaryContact:'Pat Forster' },
+  { id:'dent_3',  name:'Stoel Rives LLP',            type:'corporate',  primaryContact:'Greg Jacobson' },
+  { id:'dent_4',  name:'Schwabe Williamson',         type:'corporate',  primaryContact:'Connie Sun' },
+  { id:'dent_5',  name:'Wilson Sonsini',             type:'corporate',  primaryContact:'Mark Talley' },
+  { id:'dent_6',  name:'McKinstry',                  type:'corporate',  primaryContact:'Ash Aiyar' },
+  { id:'dent_7',  name:'Walton Family Foundation',   type:'foundation', primaryContact:'Taylor Brugh' },
+  { id:'dent_8',  name:'Bezos Earth Fund',           type:'foundation', primaryContact:'Andy Karsner' },
+  { id:'dent_9',  name:'Sea Mar Foundation',         type:'foundation', primaryContact:null },
+  { id:'dent_10', name:'Starbucks',                  type:'corporate',  primaryContact:'Maria Lopez' },
+  { id:'dent_11', name:'JP Morgan Climate',          type:'corporate',  primaryContact:'Reed Phillips' },
+  { id:'dent_12', name:'Anonymous Major Donor',      type:'individual', primaryContact:null },
+  { id:'dent_13', name:'Convene Seattle',            type:'corporate',  primaryContact:'Jen Reyes' },
+  { id:'dent_14', name:'Russell Family Foundation',  type:'foundation', primaryContact:'Erika Russell' },
+  { id:'dent_15', name:'Patagonia',                  type:'corporate',  primaryContact:'Cara Dolan' },
+];
+const entityById = (id) => ENTITIES.find(e => e.id === id);
+
+// Opportunities — the working set. Each one lives on the Kanban.
+// Patterns to notice:
+//   1. Walton has a 2025 grant (declined) AND a 2026 grant (conversation) — same entity, two opps.
+//   2. Microsoft has FY26 (received) AND FY27 (proposal) — same entity, renewal cycle.
+//   3. Some sponsorships pay in cash (Microsoft, Stoel Rives); others pay in-kind (Starbucks coffee,
+//      Convene venue). In-kind is a nature on the underlying amount rows, not an opportunity type.
+//   4. `advocate` is an internal E8 person (typically a board member) helping move the opp forward.
+//      Zero, one, or — rarely — more per opp. Surfaced on the Kanban tile and the opp detail page.
+const OPPS = [
+  // Microsoft: two consecutive sponsorship cycles, both annual cash
+  { id:'dopp_1',  name:'Microsoft FY26 Sponsorship',         entity_id:'dent_1',  type:'sponsorship', subtype:'annual', stage:'received',     legal_entity:'501c3', ask:7500000,  commit:7500000, received:7500000, fy:2026, term_start:'2025-08-01', term_end:'2026-07-31', deadline:null, reporting_due:null, owner:'p_karin',    advocate:'Kathleen Hebert', campaign:'FY26 Annual Fund', followup:daysFromToday(45) },
+  { id:'dopp_2',  name:'Microsoft FY27 Sponsorship',         entity_id:'dent_1',  type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c3', ask:8500000,  commit:0,        received:0,       fy:2027, term_start:'2026-08-01', term_end:'2027-07-31', deadline:null, reporting_due:null, owner:'p_karin',    advocate:'Kathleen Hebert', campaign:'FY27 Annual Fund', followup:daysFromToday(7) },
+
+  { id:'dopp_3',  name:'Bullitt Climate Justice Grant 2026', entity_id:'dent_2', type:'grant',       subtype:null,     stage:'committed',    legal_entity:'501c3', ask:5000000,  commit:5000000, received:0,       fy:2026, term_start:'2026-07-01', term_end:'2027-06-30', deadline:daysFromToday(-30), reporting_due:daysFromToday(45), owner:'p_karin',    advocate:null,              campaign:'Fellowship Program', followup:daysFromToday(-3) },
+  { id:'dopp_4',  name:'Stoel Rives Summit Sponsorship 2026', entity_id:'dent_3', type:'sponsorship', subtype:'event',  stage:'committed',    legal_entity:'501c6', ask:1500000,  commit:1500000, received:0,       fy:2026, term_start:'2026-06-01', term_end:'2026-06-30', deadline:null, reporting_due:null, owner:'p_kathleen', advocate:'Mark Schwabe',    campaign:'Member Events', followup:daysFromToday(5) },
+  { id:'dopp_5',  name:'Schwabe FY26 Sponsorship',           entity_id:'dent_4', type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c6', ask:2500000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, owner:'p_kathleen', advocate:null,              campaign:'Member Events', followup:daysFromToday(2) },
+  { id:'dopp_6',  name:'Wilson Sonsini FY26 Sponsorship',    entity_id:'dent_5', type:'sponsorship', subtype:'annual', stage:'conversation', legal_entity:'both',  ask:1000000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, owner:'p_karin',    advocate:null,              campaign:'Member Events', followup:daysFromToday(7) },
+  { id:'dopp_7',  name:'McKinstry Fellowship FY26',          entity_id:'dent_6', type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c3', ask:3000000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, owner:'p_lee',      advocate:'Dean Allen',      campaign:'Fellowship Program', followup:daysFromToday(-1) },
+
+  // Walton: prior cycle (declined) + current cycle (in conversation)
+  { id:'dopp_8',  name:'Walton Fellowship Grant 2025',       entity_id:'dent_7', type:'grant',       subtype:null,     stage:'declined',     legal_entity:'501c3', ask:7500000,  commit:0,        received:0,      fy:2025, term_start:null, term_end:null, deadline:'2025-04-01', reporting_due:null, owner:'p_jordan',   advocate:null,              campaign:'Fellowship Program', followup:null },
+  { id:'dopp_9',  name:'Walton Fellowship Grant 2026',       entity_id:'dent_7', type:'grant',       subtype:null,     stage:'conversation', legal_entity:'501c3', ask:10000000, commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:daysFromToday(55), reporting_due:null, owner:'p_jordan',   advocate:'Lisa Rasmussen',  campaign:'Fellowship Program', followup:daysFromToday(10) },
+
+  { id:'dopp_10', name:'Bezos Climate Justice Grant 2026',   entity_id:'dent_8', type:'grant',       subtype:null,     stage:'outreach',     legal_entity:'501c3', ask:25000000, commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:daysFromToday(40), reporting_due:null, owner:'p_jordan',   advocate:'Lisa Rasmussen',  campaign:'Fellowship Program', followup:daysFromToday(4) },
+  { id:'dopp_11', name:'Sea Mar Health Equity Grant 2026',   entity_id:'dent_9', type:'grant',       subtype:null,     stage:'prospect',     legal_entity:'501c3', ask:500000,   commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:daysFromToday(20), reporting_due:null, owner:'p_karin',    advocate:null,              campaign:'Fellowship Program', followup:null },
+  // Starbucks: annual sponsorship paid in coffee (in-kind nature on amounts)
+  { id:'dopp_12', name:'Starbucks Coffee Sponsorship FY26',  entity_id:'dent_10',type:'sponsorship', subtype:'annual', stage:'conversation', legal_entity:'both',  ask:2000000,  commit:0,        received:0,      fy:2026, term_start:'2026-09-01', term_end:'2027-08-31', deadline:null, reporting_due:null, owner:'p_kathleen', advocate:null,              campaign:'Member Events', followup:daysFromToday(3) },
+  { id:'dopp_13', name:'JP Morgan Climate Grant 2026',       entity_id:'dent_11',type:'grant',       subtype:null,     stage:'declined',     legal_entity:'501c3', ask:5000000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, owner:'p_karin',    advocate:null,              campaign:'FY26 Annual Fund', followup:null },
+  { id:'dopp_14', name:'Anonymous Major Gift 2026',          entity_id:'dent_12',type:'gift',        subtype:null,     stage:'received',     legal_entity:'501c3', ask:2500000,  commit:2500000, received:2500000, fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, owner:'p_karin',    advocate:'Kathleen Hebert', campaign:'FY26 Annual Fund', followup:daysFromToday(90) },
+  // Convene: event sponsorship paid in venue space (in-kind nature on amounts)
+  { id:'dopp_15', name:'Convene Summit Venue 2026',          entity_id:'dent_13',type:'sponsorship', subtype:'event',  stage:'committed',    legal_entity:'501c6', ask:800000,   commit:800000,   received:0,      fy:2026, term_start:'2026-06-15', term_end:'2026-06-15', deadline:null, reporting_due:null, owner:'p_kathleen', advocate:null,              campaign:'Member Events', followup:daysFromToday(14) },
+  { id:'dopp_16', name:'Russell Fellowship Grant 2026',      entity_id:'dent_14',type:'grant',       subtype:null,     stage:'proposal',     legal_entity:'501c3', ask:3500000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:daysFromToday(12), reporting_due:null, owner:'p_lee',      advocate:null,              campaign:'Fellowship Program', followup:daysFromToday(8) },
+  { id:'dopp_17', name:'Patagonia FY26 Sponsorship',         entity_id:'dent_15',type:'sponsorship', subtype:'annual', stage:'outreach',     legal_entity:'501c3', ask:1500000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, owner:'p_jordan',   advocate:null,              campaign:'FY26 Annual Fund', followup:daysFromToday(6) },
+];
+
+// ============== STATE ==============
+let legalEntityFilter = 'all';
+let viewMode = 'kanban';
+
+// ============== HELPERS ==============
+function filteredOpps() {
+  const q = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+  return OPPS.filter(o => {
+    if (legalEntityFilter !== 'all' && !(o.legal_entity === legalEntityFilter || o.legal_entity === 'both')) return false;
+    if (q) {
+      const ent = entityById(o.entity_id);
+      const hay = (o.name + ' ' + (ent ? ent.name : '') + ' ' + (ent && ent.primaryContact ? ent.primaryContact : '')).toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+function staffById(id) { return STAFF.find(s => s.id === id) || {initials:'?', name:'?'}; }
+function entityTypeById(id) { return ENTITY_TYPES.find(t => t.id === id) || {label:id}; }
+function typeOf(o) { return TYPES.find(t => t.type === o.type) || {label:o.type, cls:''}; }
+function stageById(id) { return STAGES.find(s => s.id === id) || {label:id, cls:''}; }
+function legalEntityChip(e) {
+  const c6 = `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c6">(c)6</span>`;
+  const c3 = `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c3">(c)3</span>`;
+  if (e === '501c6') return c6;
+  if (e === '501c3') return c3;
+  return c6 + ' ' + c3;
+}
+function typeChip(o) {
+  const t = typeOf(o);
+  return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${t.cls}">${t.label}</span>`;
+}
+function fmtDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso + 'T12:00:00');
+  return d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+}
+function followupBadge(iso) {
+  if (!iso) return '<span class="text-[11px] text-slate-400">no follow-up</span>';
+  const today = isoDate(TODAY);
+  if (iso < today) return `<span class="text-[11px] font-medium text-red-700 bg-red-100 px-1 py-0.5 rounded">Overdue · ${fmtDate(iso)}</span>`;
+  const due = new Date(iso + 'T12:00:00');
+  const days = Math.round((due - TODAY) / 86400000);
+  if (days <= 7) return `<span class="text-[11px] font-medium text-amber-700 bg-amber-100 px-1 py-0.5 rounded">Due ${fmtDate(iso)}</span>`;
+  return `<span class="text-[11px] text-slate-500">→ ${fmtDate(iso)}</span>`;
+}
+function followupFooter(iso) {
+  if (!iso) return `<div class="px-2.5 py-1.5 border-t border-slate-200 text-[12px] text-slate-400">Follow-up: <span>none scheduled</span></div>`;
+  const today = isoDate(TODAY);
+  if (iso < today) return `<div class="px-2.5 py-1.5 border-t border-slate-200 text-[12px] text-slate-600">Follow-up: <span class="font-medium text-red-700">${fmtDate(iso)} · overdue</span></div>`;
+  const due = new Date(iso + 'T12:00:00');
+  const days = Math.round((due - TODAY) / 86400000);
+  const cls = days <= 7 ? 'font-medium text-amber-700' : 'font-medium text-slate-800';
+  return `<div class="px-2.5 py-1.5 border-t border-slate-200 text-[12px] text-slate-600">Follow-up: <span class="${cls}">${fmtDate(iso)}</span></div>`;
+}
+function reportingFooter(opp) {
+  if (!opp.reporting_due) return '';
+  const today = isoDate(TODAY);
+  const due = new Date(opp.reporting_due + 'T12:00:00');
+  const days = Math.round((due - TODAY) / 86400000);
+  let cls = 'text-slate-600';
+  let label = `Report due ${fmtDate(opp.reporting_due)}`;
+  if (opp.reporting_due < today) { cls = 'font-medium text-red-700'; label = `Report ${fmtDate(opp.reporting_due)} · overdue`; }
+  else if (days <= 30) { cls = 'font-medium text-amber-700'; }
+  else { return ''; } // only show on the card when due within 30d
+  return `<div class="px-2.5 py-1.5 border-t border-slate-100 text-[12px] text-slate-600"><span class="${cls}">${label}</span></div>`;
+}
+
+// ============== RENDER ==============
+function renderKPIs() {
+  const items = filteredOpps();
+  const received = items.filter(o => o.stage === 'received').reduce((a,o) => a + (o.received||0), 0);
+  const goal = legalEntityFilter === '501c6' ? 5000000_00 : legalEntityFilter === '501c3' ? 9000000_00 : 14000000_00;
+  const pipeline = items.filter(o => ['outreach','conversation','proposal','committed'].includes(o.stage)).reduce((a,o) => a + (o.ask||0), 0);
+  const active = items.filter(o => ['outreach','conversation','proposal'].includes(o.stage)).length;
+  const overdue = items.filter(o => o.followup && o.followup < isoDate(TODAY) && o.stage !== 'received' && o.stage !== 'declined').length;
+  const gifts = items.filter(o => o.stage === 'received');
+  const avg = gifts.length ? Math.round(gifts.reduce((a,o)=>a+(o.received||0),0) / gifts.length) : 0;
+  const reporting30 = items.filter(o => o.reporting_due && o.reporting_due >= isoDate(TODAY)).filter(o => {
+    const d = new Date(o.reporting_due+'T12:00:00');
+    return (d - TODAY) <= 30*86400000;
+  }).length;
+  document.getElementById('kpiRaised').textContent = fmtMoney(received, {compact:true});
+  document.getElementById('kpiGoal').textContent = fmtMoney(goal, {compact:true});
+  document.getElementById('kpiPct').textContent = Math.round((received/goal)*100) + '%';
+  document.getElementById('kpiBar').style.width = Math.min(100, Math.round((received/goal)*100)) + '%';
+  document.getElementById('kpiPipeline').textContent = fmtMoney(pipeline, {compact:true});
+  document.getElementById('kpiActive').textContent = active;
+  document.getElementById('kpiOverdue').textContent = overdue;
+  document.getElementById('kpiAvg').textContent = fmtMoney(avg, {compact:true});
+  document.getElementById('kpiAvgN').textContent = gifts.length;
+  document.getElementById('kpiReporting').textContent = reporting30;
+  const banner = document.getElementById('overdueBanner');
+  if (overdue > 0) { banner.classList.remove('hidden'); banner.classList.add('flex'); document.getElementById('overdueCount').textContent = overdue; }
+  else { banner.classList.add('hidden'); banner.classList.remove('flex'); }
+}
+
+function renderSidebar() {
+  const items = filteredOpps();
+  document.getElementById('kindFilter').innerHTML = TYPES.map(t => {
+    const n = items.filter(o => matchType(o, t)).length;
+    return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
+      <input type="checkbox" class="rounded" />
+      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${t.cls}">${t.label}</span>
+      <span class="ml-auto text-[12px] text-slate-400">${n}</span>
+    </label></li>`;
+  }).join('');
+  document.getElementById('typeFilter').innerHTML = ENTITY_TYPES.map(t => {
+    const n = items.filter(o => (entityById(o.entity_id)||{}).type === t.id).length;
+    return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
+      <input type="checkbox" class="rounded" />
+      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium type-chip">${t.label}</span>
+      <span class="ml-auto text-[12px] text-slate-400">${n}</span>
+    </label></li>`;
+  }).join('');
+  document.getElementById('stageFilter').innerHTML = STAGES.map(st => {
+    const n = items.filter(o => o.stage === st.id).length;
+    return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
+      <input type="checkbox" class="rounded" />
+      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[12px] font-medium ${st.cls}">${st.label}</span>
+      <span class="ml-auto text-[12px] text-slate-400">${n}</span>
+    </label></li>`;
+  }).join('');
+  document.getElementById('ownerFilter').innerHTML = STAFF.map(o => {
+    const n = items.filter(x => x.owner === o.id).length;
+    return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
+      <input type="checkbox" class="rounded" />
+      <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] flex items-center justify-center font-semibold">${o.initials}</span>
+      <span>${o.name}</span>
+      <span class="ml-auto text-[12px] text-slate-400">${n}</span>
+    </label></li>`;
+  }).join('');
+}
+
+function renderKanban() {
+  const items = filteredOpps();
+  const board = document.getElementById('kanbanBoard');
+  board.innerHTML = STAGES.map(st => {
+    const stageItems = items.filter(o => o.stage === st.id);
+    const askTotal = stageItems.reduce((a,o) => a + (o.ask||0), 0);
+    return `<div class="kanban-col bg-white border border-slate-200 rounded-md flex flex-col h-full" data-stage="${st.id}">
+      <div class="px-3 py-2 border-b border-slate-200 flex items-center gap-2">
+        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[12px] font-medium ${st.cls}">${st.label}</span>
+        <span class="text-[12px] text-slate-400 ml-auto">${fmtMoney(askTotal,{compact:true})}</span>
+      </div>
+      <div class="flex-1 overflow-y-auto scroll-thin p-2 space-y-2 bg-slate-50">
+        ${stageItems.map(o => {
+          const ent = entityById(o.entity_id) || {name:'?', type:'?'};
+          return `<a href="opportunity-detail.html" class="card-drag block bg-white border border-slate-200 rounded hover:border-blue-400 hover:shadow-sm transition no-underline text-inherit overflow-hidden" draggable="true">
+            <!-- Header band: type chip + legal-entity tags -->
+            <div class="px-2.5 py-1.5 bg-slate-100 border-b border-slate-200 flex items-center gap-1.5 flex-wrap">
+              ${typeChip(o)}
+              ${legalEntityChip(o.legal_entity)}
+            </div>
+            <!-- Body: opportunity name (primary), entity name (secondary), ask amount, optional advocate -->
+            <div class="px-2.5 pt-2 pb-2.5">
+              <div class="text-[14px] font-semibold leading-tight text-slate-900">${o.name}</div>
+              <div class="text-[12px] text-slate-500 mt-0.5 truncate flex items-center gap-1">
+                <svg class="w-3 h-3 text-slate-400 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/></svg>
+                <span class="truncate">${ent.name}</span>
+              </div>
+              <div class="text-[16px] font-semibold tabular-nums text-slate-900 mt-2">${fmtMoneyFull(o.ask)}</div>
+              ${o.advocate ? `<div class="text-[12px] text-slate-500 mt-1 truncate"><span class="text-slate-400">Advocate:</span> <span class="text-slate-700">${o.advocate}</span></div>` : ''}
+            </div>
+            <!-- Footer: follow-up + optional reporting due -->
+            ${followupFooter(o.followup)}
+            ${reportingFooter(o)}
+          </a>`;
+        }).join('')}
+        ${stageItems.length === 0 ? '<div class="text-[12px] text-slate-400 text-center py-4">No opportunities</div>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderList() {
+  const items = filteredOpps();
+  const tbody = document.getElementById('listBody');
+  tbody.innerHTML = items.map(o => {
+    const ent = entityById(o.entity_id) || {name:'?', type:'?'};
+    return `<tr class="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="window.location='opportunity-detail.html'">
+      <td class="px-3 py-2 font-medium">${o.name}</td>
+      <td class="px-3 py-2"><a href="entity-detail.html" class="hover:underline text-slate-700">${ent.name}</a></td>
+      <td class="px-3 py-2">${typeChip(o)}</td>
+      <td class="px-3 py-2">${legalEntityChip(o.legal_entity)}</td>
+      <td class="px-3 py-2"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${stageById(o.stage).cls}">${stageById(o.stage).label}</span></td>
+      <td class="px-3 py-2 text-right tabular-nums">${fmtMoney(o.ask,{compact:true})}</td>
+      <td class="px-3 py-2 text-right tabular-nums">${o.received ? fmtMoney(o.received,{compact:true}) : '<span class="text-slate-400">—</span>'}</td>
+      <td class="px-3 py-2 text-[12px] text-slate-500">FY${String(o.fy).slice(2)}</td>
+      <td class="px-3 py-2"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] inline-flex items-center justify-center font-semibold" title="${staffById(o.owner).name}">${staffById(o.owner).initials}</span></td>
+      <td class="px-3 py-2 text-[13px] text-slate-700">${o.advocate || '<span class="text-slate-400">—</span>'}</td>
+      <td class="px-3 py-2">${followupBadge(o.followup)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderGrants() {
+  const items = filteredOpps().filter(o => o.deadline && o.type === 'grant').sort((a,b) => a.deadline.localeCompare(b.deadline));
+  const list = document.getElementById('grantList');
+  list.innerHTML = items.map(o => {
+    const ent = entityById(o.entity_id) || {name:'?'};
+    return `<a href="opportunity-detail.html" class="block bg-white border border-slate-200 rounded p-3 hover:border-blue-400 hover:shadow-sm">
+      <div class="flex items-start gap-3">
+        <div class="text-center w-12 shrink-0">
+          <div class="text-[11px] uppercase text-slate-500">${new Date(o.deadline+'T12:00:00').toLocaleDateString('en-US',{month:'short'})}</div>
+          <div class="text-xl font-semibold">${new Date(o.deadline+'T12:00:00').getDate()}</div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="font-medium flex items-center gap-2 truncate">${o.name} ${legalEntityChip(o.legal_entity)}</div>
+          <div class="text-[12px] text-slate-500 mt-0.5">${ent.name} · Ask ${fmtMoney(o.ask,{compact:true})} · Stage ${stageById(o.stage).label}</div>
+        </div>
+        <div class="text-right">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] inline-flex items-center justify-center font-semibold">${staffById(o.owner).initials}</span>
+        </div>
+      </div>
+    </a>`;
+  }).join('') || '<div class="text-[13px] text-slate-500">No upcoming deadlines.</div>';
+}
+
+function renderEntities() {
+  const tbody = document.getElementById('entitiesBody');
+  // Roll up: opp count + lifetime received + last activity (proxied by max followup date) per entity.
+  tbody.innerHTML = ENTITIES.map(e => {
+    const opps = OPPS.filter(o => o.entity_id === e.id);
+    const oppCount = opps.length;
+    const lifetimeReceived = opps.reduce((a,o)=>a+(o.received||0), 0);
+    const lastFollowup = opps.map(o=>o.followup).filter(Boolean).sort().pop();
+    return `<tr class="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="window.location='entity-detail.html'">
+      <td class="px-3 py-2 font-medium">${e.name}</td>
+      <td class="px-3 py-2"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium type-chip">${entityTypeById(e.type).label}</span></td>
+      <td class="px-3 py-2 text-[13px] text-slate-600">${e.primaryContact || '<span class="text-slate-400 italic">none</span>'}</td>
+      <td class="px-3 py-2 text-right tabular-nums">${oppCount}</td>
+      <td class="px-3 py-2 text-right tabular-nums">${lifetimeReceived ? fmtMoney(lifetimeReceived,{compact:true}) : '<span class="text-slate-400">—</span>'}</td>
+      <td class="px-3 py-2 text-[13px] text-slate-500">${lastFollowup ? fmtDate(lastFollowup) : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAll() {
+  renderKPIs();
+  renderSidebar();
+  renderKanban();
+  renderList();
+  renderGrants();
+  renderEntities();
+  document.getElementById('resultCount').textContent = filteredOpps().length + ' opportunities';
+}
+
+// Legal-entity toggle
+document.querySelectorAll('.entity-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    legalEntityFilter = btn.dataset.entity;
+    document.querySelectorAll('.entity-btn').forEach(b => {
+      b.classList.remove('bg-white','shadow-sm');
+      b.classList.add('text-slate-600','hover:bg-white');
+    });
+    btn.classList.add('bg-white','shadow-sm');
+    btn.classList.remove('text-slate-600','hover:bg-white');
+    renderAll();
+  });
+});
+
+// View mode toggle
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    viewMode = btn.dataset.mode;
+    document.querySelectorAll('.mode-btn').forEach(b => {
+      b.classList.remove('bg-white','shadow-sm');
+      b.classList.add('text-slate-600','hover:bg-white');
+    });
+    btn.classList.add('bg-white','shadow-sm');
+    btn.classList.remove('text-slate-600','hover:bg-white');
+    document.getElementById('kanbanView').classList.toggle('hidden',   viewMode !== 'kanban');
+    document.getElementById('listView').classList.toggle('hidden',     viewMode !== 'list');
+    document.getElementById('grantsView').classList.toggle('hidden',   viewMode !== 'grants');
+    document.getElementById('entitiesView').classList.toggle('hidden', viewMode !== 'entities');
+  });
+});
+
+// Live search
+document.getElementById('searchInput').addEventListener('input', () => { renderAll(); });
+
+renderAll();
+
+// ============== NEW OPPORTUNITY DIALOG ==============
+const newOppModal = document.getElementById('newOppModal');
+function openNewOpp()  { newOppModal.classList.remove('hidden'); newOppModal.classList.add('flex'); document.getElementById('newOppName').focus(); }
+function closeNewOpp() { newOppModal.classList.add('hidden'); newOppModal.classList.remove('flex'); }
+document.getElementById('newOppBtn').addEventListener('click', openNewOpp);
+newOppModal.addEventListener('click', (e) => { if (e.target === newOppModal) closeNewOpp(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !newOppModal.classList.contains('hidden')) closeNewOpp(); });
+
+// Type-conditional rows in the New Opportunity dialog
+function applyNewType(t) {
+  document.querySelectorAll('.newtype-btn').forEach(b => {
+    const active = b.dataset.newtype === t;
+    b.classList.toggle('bg-white', active);
+    b.classList.toggle('shadow-sm', active);
+    b.classList.toggle('text-slate-600', !active);
+    b.classList.toggle('hover:bg-white', !active);
+  });
+  const isGrant       = t === 'grant';
+  const isSponsorship = t === 'sponsorship';
+  document.getElementById('newSubtypeRow').classList.toggle('hidden',    !isSponsorship);
+  document.getElementById('newDeadlineRow').classList.toggle('hidden',   !(isGrant || isSponsorship));
+  document.getElementById('newDecisionRow').classList.toggle('hidden',   !isGrant);
+  document.getElementById('newUrlRow').classList.toggle('hidden',        !(isGrant || isSponsorship));
+  document.getElementById('newTermRow').classList.toggle('hidden',       !isSponsorship);
+  document.getElementById('newRestrictedRow').classList.toggle('hidden', !isGrant);
+  document.getElementById('newReportingRow').classList.toggle('hidden',  !isGrant);
+}
+document.querySelectorAll('.newtype-btn').forEach(btn => btn.addEventListener('click', () => applyNewType(btn.dataset.newtype)));
+applyNewType('grant');
+
+// Subtype-button active toggle (visual only; only relevant when type=sponsorship)
+document.querySelectorAll('.newsubtype-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.newsubtype-btn').forEach(b => {
+      const active = b === btn;
+      b.classList.toggle('bg-white', active);
+      b.classList.toggle('shadow-sm', active);
+      b.classList.toggle('text-slate-600', !active);
+      b.classList.toggle('hover:bg-white', !active);
+    });
+  });
+});
+
+// ============== ASK AMOUNTS EDITOR (multi-line, cash + in-kind) ==============
+// Each line is one development_amounts row at submit time (kind='ask', nature + amount + optional in_kind_description).
+(function () {
+  const linesEl = document.getElementById('askLines');
+  const addBtn  = document.getElementById('addAskLineBtn');
+  const subtotalEl = document.getElementById('askSubtotal');
+  if (!linesEl || !addBtn) return;
+
+  let nextId = 0;
+  function parseDollars(str) {
+    const n = parseInt(String(str || '').replace(/[^0-9]/g, ''), 10);
+    return Number.isFinite(n) ? n : 0;
+  }
+  function fmt(dollars) { return '$' + dollars.toLocaleString(); }
+
+  function recomputeSubtotal() {
+    const rows = [...linesEl.querySelectorAll('.ask-line')];
+    if (rows.length < 2) { subtotalEl.classList.add('hidden'); return; }
+    let cashTotal = 0, inkindTotal = 0;
+    rows.forEach(r => {
+      const amt = parseDollars(r.querySelector('input[data-role="amount"]').value);
+      const nature = r.dataset.nature || 'cash';
+      if (nature === 'cash') cashTotal += amt; else inkindTotal += amt;
+    });
+    const total = cashTotal + inkindTotal;
+    if (total === 0) { subtotalEl.classList.add('hidden'); return; }
+    const parts = [];
+    if (cashTotal)   parts.push(`${fmt(cashTotal)} cash`);
+    if (inkindTotal) parts.push(`${fmt(inkindTotal)} in-kind`);
+    subtotalEl.textContent = `Total ask · ${fmt(total)} (${parts.join(' + ')})`;
+    subtotalEl.classList.remove('hidden');
+  }
+
+  function applyNatureUI(row, nature) {
+    row.dataset.nature = nature;
+    const cashBtn = row.querySelector('button[data-nature="cash"]');
+    const ikBtn   = row.querySelector('button[data-nature="in_kind"]');
+    const desc    = row.querySelector('input[data-role="desc"]');
+    const cashActive = nature === 'cash';
+    cashBtn.classList.toggle('bg-white', cashActive);
+    cashBtn.classList.toggle('shadow-sm', cashActive);
+    cashBtn.classList.toggle('text-slate-600', !cashActive);
+    ikBtn.classList.toggle('bg-white', !cashActive);
+    ikBtn.classList.toggle('shadow-sm', !cashActive);
+    ikBtn.classList.toggle('text-slate-600', cashActive);
+    desc.classList.toggle('hidden', cashActive);
+    if (cashActive) desc.value = '';
+  }
+
+  function refreshRemoveButtons() {
+    const rows = [...linesEl.querySelectorAll('.ask-line')];
+    rows.forEach(r => {
+      const rm = r.querySelector('button[data-role="remove"]');
+      if (rm) rm.classList.toggle('invisible', rows.length <= 1);
+    });
+  }
+
+  function addLine(initialNature) {
+    const id = ++nextId;
+    const wrap = document.createElement('div');
+    wrap.className = 'ask-line flex items-center gap-1.5';
+    wrap.dataset.nature = initialNature || 'cash';
+    wrap.innerHTML = `
+      <div class="flex items-center bg-slate-100 rounded p-0.5 text-[12px] shrink-0">
+        <button type="button" data-nature="cash"    class="px-2 py-0.5 rounded font-medium bg-white shadow-sm">Cash</button>
+        <button type="button" data-nature="in_kind" class="px-2 py-0.5 rounded font-medium text-slate-600 hover:bg-white">In-kind</button>
+      </div>
+      <div class="relative w-[120px] shrink-0">
+        <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-[13px]">$</span>
+        <input type="text" data-role="amount" placeholder="0" inputmode="numeric" autocomplete="off" data-lpignore="true" data-form-type="other"
+               class="block w-full border border-slate-300 rounded h-8 pl-5 pr-2 text-[13px] text-right tabular-nums"/>
+      </div>
+      <input type="text" data-role="desc" placeholder="Description (e.g. Case of wine, 12 bottles)" autocomplete="off" data-lpignore="true" data-form-type="other"
+             class="flex-1 min-w-0 border border-slate-300 rounded h-8 px-2 text-[13px] hidden"/>
+      <button type="button" data-role="remove" title="Remove this line" class="w-6 h-6 text-slate-400 hover:text-red-700 shrink-0 inline-flex items-center justify-center">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+      </button>
+    `;
+    linesEl.appendChild(wrap);
+    // Wire up controls
+    wrap.querySelectorAll('button[data-nature]').forEach(btn => {
+      btn.addEventListener('click', () => applyNatureUI(wrap, btn.dataset.nature));
+    });
+    wrap.querySelector('input[data-role="amount"]').addEventListener('input', recomputeSubtotal);
+    wrap.querySelector('input[data-role="desc"]').addEventListener('input', recomputeSubtotal);
+    wrap.querySelector('button[data-role="remove"]').addEventListener('click', () => {
+      wrap.remove();
+      refreshRemoveButtons();
+      recomputeSubtotal();
+    });
+    if (initialNature && initialNature !== 'cash') applyNatureUI(wrap, initialNature);
+    refreshRemoveButtons();
+  }
+
+  addBtn.addEventListener('click', () => addLine('cash'));
+  addLine('cash'); // start with one cash line
+})();
+
+document.querySelectorAll('.newentity-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.newentity-btn').forEach(b => {
+      const active = b === btn;
+      b.classList.toggle('bg-white', active);
+      b.classList.toggle('shadow-sm', active);
+      b.classList.toggle('text-slate-600', !active);
+      b.classList.toggle('hover:bg-white', !active);
+    });
+  });
+});
+
+// ============== RESIZABLE + COLLAPSIBLE LEFT RAIL ==============
+const RAIL_MIN_PX = 200;
+const RAIL_MAX_PX = 560;
+const COLLAPSE_THRESHOLD_PX = 160;
+const RAIL_WIDTH_KEY = 'e8.development.filterRailWidth';
+const RAIL_OPEN_KEY  = 'e8.development.filterRailOpen';
+
+function collapseRail() {
+  const rail = document.getElementById('workspaceRail');
+  const handle = document.getElementById('workspaceHandle');
+  const btn = document.getElementById('workspaceRailCollapsed');
+  if (rail) rail.style.display = 'none';
+  if (handle) handle.style.display = 'none';
+  if (btn) btn.style.display = '';
+  try { localStorage.setItem(RAIL_OPEN_KEY, '0'); } catch (e) {}
+}
+function expandRail() {
+  const rail = document.getElementById('workspaceRail');
+  const handle = document.getElementById('workspaceHandle');
+  const btn = document.getElementById('workspaceRailCollapsed');
+  if (rail) rail.style.display = '';
+  if (handle) handle.style.display = '';
+  if (btn) btn.style.display = 'none';
+  try { localStorage.setItem(RAIL_OPEN_KEY, '1'); } catch (e) {}
+}
+
+(function initResize() {
+  const handle = document.getElementById('workspaceHandle');
+  const rail   = document.getElementById('workspaceRail');
+  if (!handle || !rail) return;
+
+  try {
+    const savedW = parseInt(localStorage.getItem(RAIL_WIDTH_KEY) || '', 10);
+    if (Number.isFinite(savedW) && savedW >= RAIL_MIN_PX && savedW <= RAIL_MAX_PX) {
+      rail.style.width = savedW + 'px';
+    }
+    const open = localStorage.getItem(RAIL_OPEN_KEY);
+    if (open === '0') collapseRail();
+  } catch (e) {}
+
+  let resizing = false, startX = 0, startW = 0, lastW = 0;
+
+  handle.addEventListener('mousedown', (e) => {
+    resizing = true;
+    startX = e.clientX;
+    startW = rail.offsetWidth;
+    lastW  = startW;
+    handle.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!resizing) return;
+    const dx = e.clientX - startX;
+    const candidate = startW + dx;
+    if (candidate < COLLAPSE_THRESHOLD_PX) {
+      rail.style.width = Math.max(60, candidate) + 'px';
+    } else {
+      rail.style.width = Math.min(RAIL_MAX_PX, candidate) + 'px';
+    }
+    lastW = candidate;
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!resizing) return;
+    resizing = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+
+    if (lastW < COLLAPSE_THRESHOLD_PX) {
+      rail.style.width = '280px';
+      try { localStorage.setItem(RAIL_WIDTH_KEY, '280'); } catch (e) {}
+      collapseRail();
+    } else {
+      const finalW = Math.max(RAIL_MIN_PX, Math.min(RAIL_MAX_PX, lastW));
+      rail.style.width = finalW + 'px';
+      try { localStorage.setItem(RAIL_WIDTH_KEY, String(finalW)); } catch (e) {}
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

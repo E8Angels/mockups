@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Development CRM — Opportunity detail</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+
+  /* Stage palette */
+  .stage-prospect    { background:#f1f5f9; color:#475569; }
+  .stage-outreach    { background:#e2e8f0; color:#334155; }
+  .stage-conversation{ background:#dbeafe; color:#1e3a8a; }
+  .stage-proposal    { background:#bfdbfe; color:#1d4ed8; }
+  .stage-committed   { background:#1d4ed8; color:#ffffff; }
+  .stage-received    { background:#059669; color:#ffffff; }
+  .stage-declined    { background:#f3f4f6; color:#6b7280; }
+  .entity-c6 { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; }
+  .entity-c3 { background:#faf5ff; color:#6b21a8; border:1px solid #e9d5ff; }
+  .type-chip { background:#f8fafc; color:#475569; border:1px solid #e2e8f0; }
+
+  /* Opportunity type chips — one color per top-level type; subtype is in the label */
+  .opp-grant       { background:#ccfbf1; color:#115e59; border:1px solid #99f6e4; }
+  .opp-sponsorship { background:#dbeafe; color:#1e40af; border:1px solid #bfdbfe; }
+  .opp-gift        { background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; }
+
+  /* Timeline rail */
+  .timeline-dot::before {
+    content:''; position:absolute; left:-24px; top:9px; width:10px; height:10px;
+    border-radius:50%; background:#cbd5e1; border:2px solid white; box-shadow:0 0 0 1px #cbd5e1;
+  }
+  .timeline-dot.timeline-note::before    { background:#94a3b8; box-shadow:0 0 0 1px #94a3b8; }
+  .timeline-dot.timeline-email::before   { background:#0ea5e9; box-shadow:0 0 0 1px #0ea5e9; }
+  .timeline-dot.timeline-stage::before   { background:#1d4ed8; box-shadow:0 0 0 1px #1d4ed8; }
+  .timeline-dot.timeline-money::before   { background:#059669; box-shadow:0 0 0 1px #059669; }
+  .timeline-dot.timeline-file::before    { background:#a16207; box-shadow:0 0 0 1px #a16207; }
+  .timeline-dot.timeline-report::before  { background:#7c3aed; box-shadow:0 0 0 1px #7c3aed; }
+  .timeline-dot.timeline-owner::before   { background:#6b7280; box-shadow:0 0 0 1px #6b7280; }
+  .timeline-line { border-left: 1px solid #e2e8f0; }
+
+  /* Note body styles */
+  .note-body { line-height: 1.5; }
+  .note-body p { margin: 0 0 0.5em; }
+  .note-body p:last-child { margin-bottom: 0; }
+  .note-body ul, .note-body ol { margin: 0 0 0.5em 1.25em; }
+  .note-body ul { list-style: disc; }
+  .note-body ol { list-style: decimal; }
+  .note-body a  { color:#1d4ed8; text-decoration: underline; }
+
+  /* TipTap toolbar */
+  .tt-toolbar button { padding: 2px 6px; border-radius: 3px; color:#475569; }
+  .tt-toolbar button:hover { background:#f1f5f9; color:#0f172a; }
+  .tt-toolbar button.active { background:#e2e8f0; color:#0f172a; }
+
+  /* Hover-revealed inline edit pencil */
+  .editable-inline { position: relative; }
+  .editable-inline .edit-pencil { opacity: 0; transition: opacity 100ms; }
+  .editable-inline:hover .edit-pencil { opacity: 1; }
+  .row-hover-actions { position: relative; }
+  .row-hover-actions .row-actions { opacity: 0; transition: opacity 100ms; }
+  .row-hover-actions:hover .row-actions { opacity: 1; }
+
+  /* Email card */
+    .activity-meta { color:#64748b; font-size:12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .activity-note-card { margin-top:6px; padding:10px 36px 10px 12px; border:1px solid #cbd5e1; border-radius:8px; background:#fff; position:relative; }
+  .activity-note-card::after {
+    content:''; position:absolute; top:10px; right:12px; width:16px; height:16px;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20h9'/%3E%3Cpath d='M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z'/%3E%3C/svg%3E") center/16px 16px no-repeat;
+  }
+  .activity-change-card { margin-top:6px; padding:9px 11px; border:1px solid #bfdbfe; border-radius:8px; background:#f8fbff; }
+  .activity-money-card { margin-top:6px; padding:9px 11px; border:1px solid #bbf7d0; border-radius:8px; background:#f8fffb; }
+  .activity-file-card { margin-top:6px; padding:9px 11px; border:1px solid #fde68a; border-radius:8px; background:#fffdf5; }
+
+  .email-card { border:1px solid #bfdbfe; border-radius:10px; overflow:hidden; background:#fff; margin-top:6px; max-width:92%; }
+  .email-card.inbound { margin-right:auto; background:#f8fbff; }
+  .email-card.outbound { margin-left:auto; border-color:#bbf7d0; background:#f8fffb; }
+  .email-headers { background:rgba(248,250,252,.86); border-bottom:1px solid #e2e8f0; }
+  .email-summary { padding:9px 36px 8px 11px; position:relative; }
+  .email-summary::after {
+    content:''; position:absolute; top:10px; right:12px; width:16px; height:16px;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='20' height='16' x='2' y='4' rx='2'/%3E%3Cpath d='m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7'/%3E%3C/svg%3E") center/16px 16px no-repeat;
+  }
+  .email-card.outbound .email-summary::after {
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23059669' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m22 2-7 20-4-9-9-4Z'/%3E%3Cpath d='M22 2 11 13'/%3E%3C/svg%3E");
+  }
+  .email-route { color:#64748b; font-size:12px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .email-subject { margin-top:3px; color:#0f172a; font-size:14px; font-weight:600; }
+  .email-preview { margin-top:4px; color:#475569; font-size:13px; line-height:1.45; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.email-headers .hk { display: inline-block; width: 60px; color:#64748b; }
+  .email-body { white-space: pre-line; }
+  .email-body.collapsed {
+    display: none;
+  }
+
+  /* Scope toggle on Add-a-note form */
+  .scope-toggle .scope-btn[data-active="true"] { background:#fff; color:#0f172a; box-shadow:0 1px 2px rgba(0,0,0,0.04); }
+  .scope-toggle .scope-btn { padding:2px 8px; border-radius:4px; color:#64748b; font-size:12px; }
+
+  .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color:#64748b; font-weight: 700; }
+  .summary-card { border:1px solid #e2e8f0; background:#fff; border-radius:8px; }
+  .info-panel { border:1px solid #e2e8f0; background:#fff; border-radius:8px; }
+  .fact-label { font-size:11px; text-transform:uppercase; letter-spacing:.055em; color:#64748b; }
+  .quiet-link { color:#1d4ed8; text-underline-offset:2px; }
+  .quiet-link:hover { text-decoration:underline; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 text-sm">
+
+<!-- SLIM STICKY HEADER -->
+<header class="bg-white border-b border-slate-200 px-4 py-2 flex items-center gap-3 sticky top-0 z-30">
+  <a href="staff-dashboard.html" class="text-slate-500 hover:text-slate-900 flex items-center gap-1 text-[13px]">
+    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
+    <span class="hidden sm:inline">All opportunities</span>
+  </a>
+  <div class="ml-auto flex items-center gap-2">
+    <a href="mailto:taylor.brugh@waltonfamilyfoundation.org" class="h-7 px-2.5 text-[13px] border border-slate-300 bg-white hover:bg-slate-50 rounded inline-flex items-center hidden sm:inline-flex">Send email</a>
+    <!-- "Clone for next cycle" is only rendered when stage ∈ {Received, Declined} per plan §6h.
+         This opp is in Conversation, so the button is omitted. -->
+    <button id="editDetailsBtn" class="h-7 px-2.5 text-[13px] border border-slate-300 bg-white hover:bg-slate-50 rounded inline-flex items-center gap-1">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+      Edit details
+    </button>
+    <button class="h-7 px-2.5 text-[13px] bg-slate-100 hover:bg-slate-200 rounded text-slate-600">Archive</button>
+    <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 text-[13px] flex items-center justify-center font-semibold">KK</div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-3 md:px-5 pb-6">
+
+  <!-- OPPORTUNITY SUMMARY -->
+  <section class="summary-card mt-4 overflow-hidden">
+    <div class="px-5 py-4 md:px-6 md:py-5">
+      <div class="flex items-start gap-4 flex-wrap">
+        <div class="flex-1 min-w-[260px]">
+          <div class="flex items-center gap-2 text-[13px] text-slate-600 flex-wrap">
+            <a href="entity-detail.html" class="quiet-link font-medium">Walton Family Foundation</a>
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium type-chip">Foundation</span>
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c3">E8 Impact · (c)3</span>
+          </div>
+          <div class="mt-2 flex items-center gap-2 flex-wrap">
+            <h1 class="text-2xl md:text-[28px] leading-tight font-semibold tracking-tight">Walton Fellowship Grant 2026</h1>
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[12px] font-medium opp-grant">Grant</span>
+          </div>
+          <p class="mt-2 max-w-3xl text-[14px] leading-6 text-slate-700 editable-inline">
+            Walton's climate-justice priorities this cycle: regional impact and BIPOC founder pipeline. Taylor wants cohort outcomes broken out by year, not aggregated. Avoid pitching general operating support.
+            <button class="edit-pencil text-[11px] text-slate-400 hover:text-slate-700 ml-1 align-middle">Edit</button>
+          </p>
+        </div>
+
+        <div class="shrink-0 flex items-center gap-2">
+          <label for="stageSelect" class="fact-label">Stage</label>
+          <div class="relative">
+            <select id="stageSelect"
+                    class="appearance-none stage-conversation h-8 pl-2.5 pr-7 rounded text-[13px] font-medium cursor-pointer border-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    title="Change stage">
+              <option value="prospect">Prospect</option>
+              <option value="outreach">Outreach</option>
+              <option value="conversation" selected>Conversation</option>
+              <option value="proposal">Proposal</option>
+              <option value="committed">Committed</option>
+              <option value="received">Received</option>
+              <option value="declined">Declined</option>
+            </select>
+            <svg class="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+          <div class="fact-label">Ask</div>
+          <div class="mt-1 text-xl font-semibold tabular-nums">$100,000</div>
+          <div class="text-[12px] text-slate-500">Fellowship Program</div>
+        </div>
+        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+          <div class="fact-label">Application due</div>
+          <div class="mt-1 text-[15px] font-semibold">Jul 10, 2026</div>
+          <div class="text-[12px] text-slate-500">55 days</div>
+        </div>
+        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+          <div class="fact-label">Decision expected</div>
+          <div class="mt-1 text-[15px] font-semibold">Sep 30, 2026</div>
+          <div class="text-[12px] text-slate-500">No term set</div>
+        </div>
+        <div class="rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
+          <div class="fact-label text-amber-700">Next action</div>
+          <div class="mt-1 text-[15px] font-semibold text-slate-900">Jun 1</div>
+          <div class="text-[12px] text-slate-700">Send outcomes data + 3-year roadmap</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-t border-slate-200 bg-slate-50/70 px-5 py-3 md:px-6 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-3">
+      <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px]">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="fact-label shrink-0">Owner</span>
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] inline-flex items-center justify-center font-semibold">JS</span>
+          <span class="font-medium truncate">Jordan Schwartz</span>
+          <button class="text-slate-400 hover:text-slate-700 text-[12px] whitespace-nowrap" title="Change owner">Change</button>
+        </div>
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="fact-label shrink-0">Advocate</span>
+          <span class="w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[11px] inline-flex items-center justify-center font-semibold" title="Internal E8 person helping move this opp forward">LR</span>
+          <span class="font-medium whitespace-nowrap">Lisa Rasmussen</span>
+          <button class="text-slate-400 hover:text-slate-700 text-[12px] whitespace-nowrap">+ advocate</button>
+        </div>
+        <div class="min-w-0">
+          <span class="fact-label mr-1">Renewal</span>
+          <a href="#" class="quiet-link font-medium">Walton Fellowship Grant 2025</a>
+          <span class="inline-flex items-center px-1 py-0.5 rounded text-[10px] font-medium stage-declined ml-1">declined</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <button class="h-7 px-2 text-[12px] border border-amber-300 bg-white hover:bg-amber-50 rounded">Mark done</button>
+        <button class="h-7 px-2 text-[12px] border border-slate-300 bg-white hover:bg-slate-50 rounded">Edit follow-up</button>
+        <button class="h-7 px-2 text-[12px] text-slate-600 hover:bg-white rounded">+ another</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="mt-4 space-y-4">
+
+  <!-- REFERENCE PANELS -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+    <!-- Contacts (entity-scoped; read-only here) -->
+    <div class="bg-white border border-slate-200 rounded-md flex flex-col">
+      <div class="px-3 py-2 border-b border-slate-200 flex items-center">
+        <div class="text-[12px] uppercase tracking-wider text-slate-500 font-semibold">Contacts <span class="text-slate-400 font-normal">2</span></div>
+        <a href="entity-detail.html" class="ml-auto text-[12px] text-blue-700 hover:text-blue-900">Manage on entity →</a>
+      </div>
+      <ul class="divide-y divide-slate-100 flex-1">
+        <li class="px-3 py-2">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="font-medium text-[14px]">Taylor Brugh</span>
+            <span class="text-[11px] bg-blue-100 text-blue-800 px-1 rounded">Primary</span>
+          </div>
+          <div class="text-[13px] text-slate-600">Program Officer, Climate Justice</div>
+          <div class="text-[13px] text-slate-500"><a href="mailto:taylor.brugh@waltonfamilyfoundation.org" class="hover:underline">taylor.brugh@waltonfamilyfoundation.org</a></div>
+        </li>
+        <li class="px-3 py-2">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="font-medium text-[14px]">Caroline Avila</span>
+          </div>
+          <div class="text-[13px] text-slate-600">Director, Strategic Grants</div>
+          <div class="text-[13px] text-slate-500"><a href="mailto:caroline.avila@waltonfamilyfoundation.org" class="hover:underline">caroline.avila@waltonfamilyfoundation.org</a></div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Money (opp-scoped) -->
+    <div class="bg-white border border-slate-200 rounded-md flex flex-col">
+      <div class="px-3 py-2 border-b border-slate-200 flex items-center">
+        <div class="text-[12px] uppercase tracking-wider text-slate-500 font-semibold">Money</div>
+        <button class="ml-auto text-[12px] text-blue-700 hover:text-blue-900">+ Entry</button>
+      </div>
+      <ul class="divide-y divide-slate-100 text-[13px] flex-1">
+        <li class="row-hover-actions px-3 py-2 flex items-center gap-2">
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700">Ask</span>
+          <span class="font-semibold tabular-nums text-[14px]">$100,000</span>
+          <span class="text-slate-300">·</span>
+          <span class="text-slate-500">Apr 28, 2026</span>
+          <span class="row-actions ml-auto flex items-center gap-2 text-[11px]">
+            <button class="text-slate-500 hover:text-slate-900">Edit</button>
+            <button class="text-slate-400 hover:text-red-700">Remove</button>
+          </span>
+        </li>
+      </ul>
+      <div class="px-3 py-2 border-t border-slate-100 text-[13px] bg-slate-50 grid grid-cols-3 gap-1">
+        <div><div class="text-[11px] uppercase tracking-wider text-slate-500">Asked</div><div class="font-semibold tabular-nums">$100,000</div></div>
+        <div><div class="text-[11px] uppercase tracking-wider text-slate-500">Committed</div><div class="text-slate-400">—</div></div>
+        <div><div class="text-[11px] uppercase tracking-wider text-slate-500">Received</div><div class="text-slate-400">—</div></div>
+      </div>
+    </div>
+
+    <!-- Attachments (opp-scoped) -->
+    <div class="bg-white border border-slate-200 rounded-md flex flex-col">
+      <div class="px-3 py-2 border-b border-slate-200 flex items-center">
+        <div class="text-[12px] uppercase tracking-wider text-slate-500 font-semibold">Attachments <span class="text-slate-400 font-normal">2</span></div>
+        <button class="ml-auto text-[12px] text-blue-700 hover:text-blue-900">+ Upload</button>
+      </div>
+      <ul class="divide-y divide-slate-100 text-[13px] flex-1">
+        <li class="px-3 py-1.5 flex items-center gap-2 hover:bg-slate-50">
+          <svg class="w-4 h-4 text-red-500 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h6l4 4v10a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+          <a href="#" class="font-medium hover:underline truncate flex-1">E8 Fellowship Program Overview.pdf</a>
+          <span class="text-[11px] text-slate-400 whitespace-nowrap">2.4 MB</span>
+        </li>
+        <li class="px-3 py-1.5 flex items-center gap-2 hover:bg-slate-50">
+          <svg class="w-4 h-4 text-blue-500 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/></svg>
+          <a href="#" class="font-medium hover:underline truncate flex-1">Walton LOI draft (red-lined).docx</a>
+          <span class="text-[11px] text-slate-400 whitespace-nowrap">64 KB</span>
+        </li>
+      </ul>
+      <div class="px-3 py-1.5 border-t border-slate-100 text-[11px] text-slate-400">
+        Entity-level files (MSAs, brand kits) live on the <a href="entity-detail.html" class="text-blue-700 hover:underline">entity page</a>.
+      </div>
+    </div>
+  </section>
+
+  <!-- ADD A NOTE -->
+  <section class="bg-white border border-slate-200 rounded-md mt-3">
+    <div class="px-3 py-2 border-b border-slate-200 flex items-center gap-3 flex-wrap">
+      <div class="text-[12px] uppercase tracking-wider text-slate-500 font-semibold">Add a note</div>
+      <div class="scope-toggle inline-flex items-center bg-slate-100 rounded p-0.5" title="Where should this note attach?">
+        <button type="button" data-scope="opportunity" data-active="true" class="scope-btn">This opportunity</button>
+        <button type="button" data-scope="entity"      data-active="false" class="scope-btn">The relationship</button>
+      </div>
+      <div class="flex items-center gap-2 ml-auto">
+        <label class="text-[12px] text-slate-500">When</label>
+        <input type="date" value="2026-05-22" class="!w-[140px] border border-slate-300 rounded h-7 px-2 text-[13px]" autocomplete="off" data-lpignore="true"/>
+      </div>
+    </div>
+
+    <div class="tt-toolbar flex items-center gap-0.5 px-2 py-1 border-b border-slate-100 text-[13px]" role="toolbar" aria-label="Formatting">
+      <button type="button" title="Bold" aria-label="Bold" class="font-bold w-7 h-6">B</button>
+      <button type="button" title="Italic" aria-label="Italic" class="italic w-7 h-6">I</button>
+      <div class="w-px h-4 bg-slate-200 mx-1" aria-hidden="true"></div>
+      <button type="button" title="Bullet list" aria-label="Bullet list" class="w-7 h-6">
+        <svg class="w-3.5 h-3.5 inline" viewBox="0 0 20 20" fill="currentColor"><path d="M3 5a1 1 0 11-2 0 1 1 0 012 0zM3 10a1 1 0 11-2 0 1 1 0 012 0zM3 15a1 1 0 11-2 0 1 1 0 012 0zM6 5h11v1.5H6V5zm0 4.25h11v1.5H6v-1.5zm0 4.25h11V15H6v-1.5z"/></svg>
+      </button>
+      <button type="button" title="Numbered list" aria-label="Numbered list" class="w-7 h-6">
+        <svg class="w-3.5 h-3.5 inline" viewBox="0 0 20 20" fill="currentColor"><path d="M2 4h1v3H2V4zm0 5h1.5L2 11h1.5v1H2v-1H1v-1.5h1V9zm0 4h1.5v.5H2v.5h1.5V15H2v.5h1.5V16H1v-3h1v0zM6 5h11v1.5H6V5zm0 4.25h11v1.5H6v-1.5zm0 4.25h11V15H6v-1.5z"/></svg>
+      </button>
+      <div class="w-px h-4 bg-slate-200 mx-1" aria-hidden="true"></div>
+      <button type="button" title="Link" aria-label="Link" class="w-7 h-6">
+        <svg class="w-3.5 h-3.5 inline" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"/></svg>
+      </button>
+    </div>
+
+    <div id="ttEditor"
+         class="note-body min-h-[100px] px-3 py-2 text-[14px] outline-none focus:bg-slate-50/30"
+         contenteditable="true"></div>
+
+    <div class="px-3 py-2 border-t border-slate-100 flex items-center gap-2 flex-wrap">
+      <button id="addFollowupToggle" type="button" class="h-7 px-2 text-[13px] text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded inline-flex items-center gap-1">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
+        Add follow-up
+      </button>
+      <button class="ml-auto h-7 px-3 text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Save note</button>
+    </div>
+
+    <div id="followupRow" class="hidden border-t border-slate-100 px-3 py-2 grid grid-cols-1 sm:grid-cols-[140px_160px_1fr] gap-2 items-end bg-slate-50">
+      <div>
+        <label class="text-[12px] text-slate-500 block">Due</label>
+        <input type="date" class="!w-[140px] border border-slate-300 rounded h-7 px-2 text-[13px]" autocomplete="off" data-lpignore="true"/>
+      </div>
+      <div>
+        <label class="text-[12px] text-slate-500 block">Assignee</label>
+        <select class="w-full border border-slate-300 rounded h-7 px-2 text-[13px]">
+          <option>Jordan Schwartz (me)</option><option>Karin Kidder</option><option>Kathleen Olson</option><option>Lee O'Connor</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-[12px] text-slate-500 block">Reminder note</label>
+        <input type="text" autocomplete="off" data-lpignore="true" data-form-type="other" class="w-full border border-slate-300 rounded h-7 px-2 text-[13px]"/>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTIVITY FEED -->
+  <section class="bg-white border border-slate-200 rounded-md mt-3 mb-4">
+    <div class="px-4 py-2 border-b border-slate-200 flex items-center gap-2 flex-wrap">
+      <div class="text-[12px] uppercase tracking-wider text-slate-500 font-semibold">Activity <span class="text-slate-400 font-normal">9</span></div>
+      <label class="text-[12px] text-slate-500 inline-flex items-center gap-1 ml-2">
+        <input type="checkbox" class="rounded"/> Show entity activity
+      </label>
+      <div class="ml-auto flex items-center gap-1 text-[12px]">
+        <button class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">All</button>
+        <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Notes</button>
+        <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Email</button>
+        <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Stage</button>
+        <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Money</button>
+        <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Files</button>
+        <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Reporting</button>
+      </div>
+    </div>
+    <ol class="timeline-line ml-6 pl-5 my-4 mr-4 space-y-4">
+
+      <li class="timeline-dot timeline-note relative">
+        <div class="activity-meta">
+          <span>May 12, 2026 · 3:42 PM</span>
+          <span>· Jordan Schwartz</span>
+        </div>
+        <div class="activity-note-card note-body text-[14px] text-slate-800">
+          <p>Call with Taylor. They've narrowed to 3 climate-justice orgs; we're on the short list.</p>
+          <p>Next ask from them: outcomes broken out by <em>cohort year</em>, not aggregate. They want to see retention from Year 1 → 3.</p>
+        </div>
+        <div class="text-[11px] text-slate-400 mt-1.5"><a href="#" class="hover:underline">Edit</a></div>
+      </li>
+
+      <li class="timeline-dot timeline-stage relative">
+        <div class="activity-meta">
+          <span>May 12, 2026 · 3:38 PM</span>
+          <span>· Jordan Schwartz</span>
+        </div>
+        <div class="activity-change-card text-[14px] flex items-center gap-1.5 flex-wrap">
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-outreach">Outreach</span>
+          <svg class="w-3 h-3 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-conversation">Conversation</span>
+          <span class="text-slate-500 text-[13px]">— qualified after first real call</span>
+        </div>
+      </li>
+
+      <li class="timeline-dot timeline-email relative">
+        <div class="activity-meta">
+          <span>May 9, 2026 · 9:12 AM</span>
+        </div>
+        <div class="email-card inbound mt-1">
+          <div class="email-summary">
+            <div class="email-route"><span>Taylor Brugh</span><span>→</span><span>Jordan Schwartz</span></div>
+            <div class="email-subject">Re: E8 fellowship — quick call this week?</div>
+            <div class="email-preview">Yes, let's do Thursday 11am PT. Would love to hear how you measure cohort outcomes year-over-year.</div>
+          </div>
+          <div class="email-headers px-3 py-2 text-[13px] leading-relaxed hidden">
+            <div><span class="hk">To:</span><span class="text-slate-800">Jordan Schwartz</span></div>
+            <div><span class="hk">From:</span><span class="text-slate-800">Taylor Brugh</span></div>
+            <div><span class="hk">Subject:</span><span class="text-slate-800 font-semibold">Re: E8 fellowship — quick call this week?</span></div>
+          </div>
+          <div class="email-body collapsed px-3 py-2 text-[14px] text-slate-800">Yes, let's do Thursday 11am PT. I'll send a calendar invite.
+
+Would love to hear how you measure cohort outcomes year-over-year — that's the piece our climate-justice committee will push on hardest.
+
+A few specific things I'd like to cover:
+1. Retention from Year 1 → Year 3 (numbers, not just stories)
+2. How you screen for founder-fit on the climate side specifically
+3. Where Walton dollars would have the most marginal impact vs. your existing funder base
+
+If you can pre-share anything ahead of Thursday, even rough, that'd help me come prepared.
+
+Best,
+Taylor</div>
+          <button type="button" class="email-toggle text-[12px] text-blue-700 hover:text-blue-900 px-3 py-1.5 border-t border-slate-100 w-full text-left">View more</button>
+        </div>
+      </li>
+
+      <li class="timeline-dot timeline-note relative">
+        <div class="activity-meta">
+          <span>May 8, 2026</span>
+          <span>· Lisa Rasmussen</span>
+        </div>
+        <div class="activity-note-card note-body text-[14px] text-slate-800">
+          <p>Sat next to Taylor at the GreenBiz dinner. They've already evaluated three orgs in our space; we made the short list. Pat from Bullitt vouched for us.</p>
+        </div>
+      </li>
+
+      <li class="timeline-dot timeline-email relative">
+        <div class="activity-meta">
+          <span>May 5, 2026 · 4:02 PM</span>
+        </div>
+        <div class="email-card outbound mt-1">
+          <div class="email-summary">
+            <div class="email-route"><span>Jordan Schwartz</span><span>→</span><span>Taylor Brugh</span></div>
+            <div class="email-subject">E8 fellowship — intro &amp; deck</div>
+            <div class="email-preview">Karin suggested I reach out after your conversation at GreenBiz. Attaching our 1-pager on the fellowship program.</div>
+          </div>
+          <div class="email-headers px-3 py-2 text-[13px] leading-relaxed hidden">
+            <div><span class="hk">To:</span><span class="text-slate-800">Taylor Brugh</span></div>
+            <div><span class="hk">From:</span><span class="text-slate-800">Jordan Schwartz</span></div>
+            <div><span class="hk">Subject:</span><span class="text-slate-800 font-semibold">E8 fellowship — intro &amp; deck</span></div>
+          </div>
+          <div class="email-body collapsed px-3 py-2 text-[14px] text-slate-800">Hi Taylor —
+
+Karin suggested I reach out after your conversation at GreenBiz a couple weeks back. Attaching our 1-pager on the fellowship program.
+
+The short version: we're a 12-month founder fellowship for climate-tech entrepreneurs, currently in our 4th cohort. Walton's portfolio in climate justice would be a strong fit, particularly the work you've done on regional impact.
+
+Would love 30 minutes to walk through outcomes from the last three cohorts and where we see the next 12 months going. I'm flexible on time — afternoons Pacific work best for me but mornings work too if that's easier on your end.
+
+Best,
+Jordan</div>
+          <button type="button" class="email-toggle text-[12px] text-blue-700 hover:text-blue-900 px-3 py-1.5 border-t border-slate-100 w-full text-left">View more</button>
+          <ul class="border-t border-slate-100 divide-y divide-slate-100 text-[13px]">
+            <li class="px-3 py-1.5 flex items-center gap-2">
+              <svg class="w-4 h-4 text-red-500 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h6l4 4v10a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+              <a href="#" class="font-medium hover:underline truncate flex-1">E8-Fellowship-1pager.pdf</a>
+              <span class="text-[11px] text-slate-400 whitespace-nowrap">1.1 MB</span>
+            </li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="timeline-dot timeline-stage relative">
+        <div class="activity-meta">
+          <span>May 3, 2026</span>
+          <span>· Karin Kidder</span>
+        </div>
+        <div class="activity-change-card text-[14px] flex items-center gap-1.5 flex-wrap">
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-prospect">Prospect</span>
+          <svg class="w-3 h-3 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-outreach">Outreach</span>
+        </div>
+      </li>
+
+      <li class="timeline-dot timeline-money relative">
+        <div class="activity-meta">
+          <span>Apr 28, 2026</span>
+          <span>· Karin Kidder</span>
+        </div>
+        <div class="activity-money-card text-[14px] text-slate-800">
+          <span class="font-semibold">$100,000</span>
+          <span class="text-slate-500">ask</span>
+          <span class="text-slate-300">·</span>
+          <span class="text-slate-600">Fellowship Program</span>
+        </div>
+      </li>
+
+      <li class="timeline-dot timeline-file relative">
+        <div class="activity-meta">
+          <span>Apr 28, 2026</span>
+          <span>· Karin Kidder</span>
+        </div>
+        <div class="activity-file-card text-[14px] text-slate-800">Attached <a href="#" class="text-blue-700 hover:underline">E8 Fellowship Program Overview.pdf</a> <span class="text-slate-400">· 2.4 MB</span></div>
+      </li>
+
+      <li class="timeline-dot timeline-owner relative">
+        <div class="activity-meta">
+          <span>Apr 28, 2026</span>
+          <span>· Karin Kidder</span>
+        </div>
+        <div class="activity-change-card text-[14px] text-slate-800">
+          Renewed from <a href="#" class="text-blue-700 hover:underline">Walton Fellowship Grant 2025</a> · owner <strong>Jordan Schwartz</strong> · advocate <strong>Lisa Rasmussen</strong> · legal entity <strong>E8 Impact</strong>
+        </div>
+      </li>
+
+    </ol>
+  </section>
+  </div>
+
+</main>
+
+<!-- EDIT OPPORTUNITY DETAILS DIALOG -->
+<div id="editDetailsModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-md shadow-xl w-full max-w-lg">
+    <div class="px-4 py-3 border-b border-slate-200 flex items-center">
+      <div class="font-semibold">Edit opportunity details</div>
+      <button onclick="closeEditDetails()" class="ml-auto text-slate-400 hover:text-slate-700" aria-label="Close">
+        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+      </button>
+    </div>
+    <div class="px-4 py-3 space-y-3 text-sm max-h-[70vh] overflow-y-auto">
+
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label for="editOppName" class="text-[13px] text-slate-600">Name</label>
+        <input id="editOppName" type="text" value="Walton Fellowship Grant 2026" autocomplete="off" data-lpignore="true" data-form-type="other"
+               class="border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+      </div>
+
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Type</label>
+        <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px] w-fit">
+          <button type="button" data-edittype="grant"       class="edittype-btn px-2.5 py-1 rounded font-medium bg-white shadow-sm">Grant</button>
+          <button type="button" data-edittype="sponsorship" class="edittype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Sponsorship</button>
+          <button type="button" data-edittype="gift"        class="edittype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Gift</button>
+        </div>
+      </div>
+
+      <div id="editSubtypeRow" class="grid grid-cols-[110px_1fr] items-center gap-3 hidden">
+        <label class="text-[13px] text-slate-600">Subtype</label>
+        <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px] w-fit">
+          <button type="button" data-editsubtype="annual" class="editsubtype-btn px-2.5 py-1 rounded font-medium bg-white shadow-sm">Annual</button>
+          <button type="button" data-editsubtype="event"  class="editsubtype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Event</button>
+          <button type="button" data-editsubtype="other"  class="editsubtype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Other</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Legal entity</label>
+        <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px] w-fit">
+          <button type="button" data-editentity="501c6" class="editentity-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">E8 Angels · (c)6</button>
+          <button type="button" data-editentity="501c3" class="editentity-btn px-2.5 py-1 rounded font-medium bg-white shadow-sm">E8 Impact · (c)3</button>
+          <button type="button" data-editentity="both"  class="editentity-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Both</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Campaign</label>
+        <select class="h-8 border border-slate-300 rounded px-2 text-[13px] w-[220px]">
+          <option value="">— none —</option>
+          <option>FY26 Annual Fund</option>
+          <option selected>Fellowship Program</option>
+          <option>Member Events</option>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">App deadline</label>
+        <input type="date" value="2026-07-10" autocomplete="off" data-lpignore="true"
+               class="!w-[150px] border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+      </div>
+
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Decision exp.</label>
+        <input type="date" value="2026-09-30" autocomplete="off" data-lpignore="true"
+               class="!w-[150px] border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+      </div>
+
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">App URL</label>
+        <input type="url" value="https://waltonfamilyfoundation.fluxx.io/apply" autocomplete="off" data-lpignore="true" data-form-type="other"
+               class="border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+      </div>
+
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Restricted</label>
+        <div class="flex items-center gap-2 flex-1">
+          <input type="checkbox" checked class="rounded"/>
+          <input type="text" value="Fellowship Program direct costs only" autocomplete="off" data-lpignore="true" data-form-type="other"
+                 class="flex-1 border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Reporting</label>
+        <div class="flex items-center gap-2 flex-1">
+          <input type="checkbox" class="rounded"/>
+          <span class="text-[13px] text-slate-500">Required (set after award)</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
+        <label class="text-[13px] text-slate-600">Renewal of</label>
+        <input type="text" value="Walton Fellowship Grant 2025" autocomplete="off" data-lpignore="true" data-form-type="other"
+               class="border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+      </div>
+
+      <!-- Owner (single) + Advocates (0..n) live in the identity card with inline controls;
+           the Edit details modal handles the more structural fields. -->
+
+    </div>
+
+    <div class="px-4 py-3 border-t border-slate-200 flex items-center gap-2">
+      <button class="text-[11px] text-red-700 hover:text-red-900">Archive opportunity</button>
+      <div class="ml-auto flex items-center gap-2">
+        <button onclick="closeEditDetails()" class="h-8 px-3 text-[13px] border border-slate-300 rounded">Cancel</button>
+        <button class="h-8 px-3 text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const editor = document.getElementById('ttEditor');
+  if (!editor) return;
+  const toolbar = document.querySelector('.tt-toolbar');
+  if (toolbar) {
+    toolbar.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const title = btn.getAttribute('title');
+      editor.focus();
+      if (title === 'Bold') document.execCommand('bold');
+      else if (title === 'Italic') document.execCommand('italic');
+      else if (title === 'Bullet list') document.execCommand('insertUnorderedList');
+      else if (title === 'Numbered list') document.execCommand('insertOrderedList');
+      else if (title === 'Link') {
+        const url = prompt('Link URL:', 'https://');
+        if (url) document.execCommand('createLink', false, url);
+      }
+    });
+  }
+  const ftBtn = document.getElementById('addFollowupToggle');
+  const ftRow = document.getElementById('followupRow');
+  if (ftBtn && ftRow) {
+    ftBtn.addEventListener('click', () => {
+      ftRow.classList.toggle('hidden');
+      if (!ftRow.classList.contains('hidden')) {
+        const d = ftRow.querySelector('input[type="date"]');
+        if (d && !d.value) {
+          const t = new Date('2026-05-22'); t.setDate(t.getDate() + 7);
+          d.value = t.toISOString().slice(0,10);
+        }
+      }
+    });
+  }
+
+  document.querySelectorAll('.email-toggle').forEach(btn => {
+    const body = btn.parentElement.querySelector('.email-body');
+    if (!body) return;
+    btn.addEventListener('click', () => {
+      const collapsed = body.classList.toggle('collapsed');
+      const headers = btn.parentElement.querySelector('.email-headers');
+      const summary = btn.parentElement.querySelector('.email-summary');
+      if (headers) headers.classList.toggle('hidden', collapsed);
+      if (summary) summary.classList.toggle('hidden', !collapsed);
+      btn.textContent = collapsed ? 'View more' : 'View less';
+    });
+  });
+
+  document.querySelectorAll('.scope-toggle .scope-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.scope-toggle .scope-btn').forEach(b => b.dataset.active = (b === btn ? 'true' : 'false'));
+    });
+  });
+
+  // Stage dropdown: keep the select's stage-* class (color) in sync with its value.
+  const stageSelect = document.getElementById('stageSelect');
+  if (stageSelect) {
+    const STAGE_CLASSES = ['stage-prospect','stage-outreach','stage-conversation','stage-proposal','stage-committed','stage-received','stage-declined'];
+    stageSelect.addEventListener('change', () => {
+      STAGE_CLASSES.forEach(c => stageSelect.classList.remove(c));
+      stageSelect.classList.add('stage-' + stageSelect.value);
+      // In a real build, this also opens the stage-change modal (note prompt + suggested follow-up).
+    });
+  }
+})();
+
+(function () {
+  const modal = document.getElementById('editDetailsModal');
+  const trigger = document.getElementById('editDetailsBtn');
+  if (!modal || !trigger) return;
+  window.openEditDetails  = () => { modal.classList.remove('hidden'); modal.classList.add('flex'); document.getElementById('editOppName')?.focus(); };
+  window.closeEditDetails = () => { modal.classList.add('hidden'); modal.classList.remove('flex'); };
+  trigger.addEventListener('click', window.openEditDetails);
+  modal.addEventListener('click', (e) => { if (e.target === modal) window.closeEditDetails(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.classList.contains('hidden')) window.closeEditDetails(); });
+
+  function applyEditType(t) {
+    document.querySelectorAll('.edittype-btn').forEach(b => {
+      const active = b.dataset.edittype === t;
+      b.classList.toggle('bg-white', active);
+      b.classList.toggle('shadow-sm', active);
+      b.classList.toggle('text-slate-600', !active);
+      b.classList.toggle('hover:bg-white', !active);
+    });
+    document.getElementById('editSubtypeRow').classList.toggle('hidden', t !== 'sponsorship');
+  }
+  document.querySelectorAll('.edittype-btn').forEach(btn => btn.addEventListener('click', () => applyEditType(btn.dataset.edittype)));
+  document.querySelectorAll('.editsubtype-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.editsubtype-btn').forEach(b => {
+        const active = b === btn;
+        b.classList.toggle('bg-white', active);
+        b.classList.toggle('shadow-sm', active);
+        b.classList.toggle('text-slate-600', !active);
+        b.classList.toggle('hover:bg-white', !active);
+      });
+    });
+  });
+  document.querySelectorAll('.editentity-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.editentity-btn').forEach(b => {
+        const active = b === btn;
+        b.classList.toggle('bg-white', active);
+        b.classList.toggle('shadow-sm', active);
+        b.classList.toggle('text-slate-600', !active);
+        b.classList.toggle('hover:bg-white', !active);
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>

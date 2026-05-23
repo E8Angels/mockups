@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Development CRM - Entity detail</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+
+  .stage-prospect    { background:#f1f5f9; color:#475569; }
+  .stage-outreach    { background:#e2e8f0; color:#334155; }
+  .stage-conversation{ background:#dbeafe; color:#1e3a8a; }
+  .stage-proposal    { background:#bfdbfe; color:#1d4ed8; }
+  .stage-committed   { background:#1d4ed8; color:#ffffff; }
+  .stage-received    { background:#059669; color:#ffffff; }
+  .stage-declined    { background:#f3f4f6; color:#6b7280; }
+
+  .type-chip { background:#f8fafc; color:#475569; border:1px solid #e2e8f0; }
+  .opp-grant { background:#ccfbf1; color:#115e59; border:1px solid #99f6e4; }
+
+  .timeline-dot::before {
+    content:''; position:absolute; left:-24px; top:9px; width:10px; height:10px;
+    border-radius:50%; background:#cbd5e1; border:2px solid white; box-shadow:0 0 0 1px #cbd5e1;
+  }
+  .timeline-dot.timeline-note::before   { background:#94a3b8; box-shadow:0 0 0 1px #94a3b8; }
+  .timeline-dot.timeline-email::before  { background:#0ea5e9; box-shadow:0 0 0 1px #0ea5e9; }
+  .timeline-dot.timeline-stage::before  { background:#1d4ed8; box-shadow:0 0 0 1px #1d4ed8; }
+  .timeline-dot.timeline-money::before  { background:#059669; box-shadow:0 0 0 1px #059669; }
+  .timeline-dot.timeline-file::before   { background:#a16207; box-shadow:0 0 0 1px #a16207; }
+  .timeline-dot.timeline-owner::before  { background:#6b7280; box-shadow:0 0 0 1px #6b7280; }
+  .timeline-line { border-left:1px solid #e2e8f0; }
+
+  .note-body { line-height:1.5; }
+  .note-body p { margin:0 0 .5em; }
+  .note-body p:last-child { margin-bottom:0; }
+    .activity-meta { color:#64748b; font-size:12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .activity-note-card { margin-top:6px; padding:10px 36px 10px 12px; border:1px solid #cbd5e1; border-radius:8px; background:#fff; position:relative; }
+  .activity-note-card::after {
+    content:''; position:absolute; top:10px; right:12px; width:16px; height:16px;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20h9'/%3E%3Cpath d='M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z'/%3E%3C/svg%3E") center/16px 16px no-repeat;
+  }
+  .activity-change-card { margin-top:6px; padding:9px 11px; border:1px solid #bfdbfe; border-radius:8px; background:#f8fbff; }
+  .activity-money-card { margin-top:6px; padding:9px 11px; border:1px solid #bbf7d0; border-radius:8px; background:#f8fffb; }
+  .activity-file-card { margin-top:6px; padding:9px 11px; border:1px solid #fde68a; border-radius:8px; background:#fffdf5; }
+
+  .email-card { border:1px solid #bfdbfe; border-radius:10px; overflow:hidden; background:#fff; margin-top:6px; max-width:92%; }
+  .email-card.inbound { margin-right:auto; background:#f8fbff; }
+  .email-card.outbound { margin-left:auto; border-color:#bbf7d0; background:#f8fffb; }
+  .email-headers { background:rgba(248,250,252,.86); border-bottom:1px solid #e2e8f0; }
+  .email-summary { padding:9px 36px 8px 11px; position:relative; }
+  .email-summary::after {
+    content:''; position:absolute; top:10px; right:12px; width:16px; height:16px;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='20' height='16' x='2' y='4' rx='2'/%3E%3Cpath d='m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7'/%3E%3C/svg%3E") center/16px 16px no-repeat;
+  }
+  .email-card.outbound .email-summary::after {
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23059669' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m22 2-7 20-4-9-9-4Z'/%3E%3Cpath d='M22 2 11 13'/%3E%3C/svg%3E");
+  }
+  .email-route { color:#64748b; font-size:12px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .email-subject { margin-top:3px; color:#0f172a; font-size:14px; font-weight:600; }
+  .email-preview { margin-top:4px; color:#475569; font-size:13px; line-height:1.45; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.email-headers .hk { display:inline-block; width:60px; color:#64748b; }
+  .email-body { white-space:pre-line; }
+  .email-body.collapsed {
+    display:none;
+  }
+  .opp-tag {
+    display:inline-flex; align-items:center; gap:2px;
+    padding:0 4px; border-radius:3px;
+    background:#f1f5f9; color:#475569; font-size:11px; font-weight:500;
+    text-decoration:none;
+  }
+  .opp-tag:hover { background:#e2e8f0; color:#0f172a; }
+
+  .section-title { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#64748b; font-weight:700; }
+  .fact-label { font-size:11px; text-transform:uppercase; letter-spacing:.055em; color:#64748b; }
+  .panel { background:#fff; border:1px solid #e2e8f0; border-radius:8px; }
+  .quiet-link { color:#1d4ed8; text-underline-offset:2px; }
+  .quiet-link:hover { text-decoration:underline; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 text-sm">
+
+<header class="bg-white border-b border-slate-200 px-4 py-2 flex items-center gap-3 sticky top-0 z-30">
+  <a href="staff-dashboard.html" class="text-slate-500 hover:text-slate-900 flex items-center gap-1 text-[13px]">
+    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
+    <span class="hidden sm:inline">All entities</span>
+  </a>
+  <div class="ml-auto flex items-center gap-2">
+    <a href="mailto:taylor.brugh@waltonfamilyfoundation.org" class="h-7 px-2.5 text-[13px] border border-slate-300 bg-white hover:bg-slate-50 rounded inline-flex items-center hidden sm:inline-flex">Send email</a>
+    <button id="editEntityBtn" class="h-7 px-2.5 text-[13px] border border-slate-300 bg-white hover:bg-slate-50 rounded inline-flex items-center gap-1">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+      Edit details
+    </button>
+    <button class="h-7 px-2.5 text-[13px] bg-slate-100 hover:bg-slate-200 rounded text-slate-600">Archive</button>
+    <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 text-[13px] flex items-center justify-center font-semibold">KK</div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-3 md:px-5 pb-6">
+
+  <section class="panel mt-4 overflow-hidden">
+    <div class="px-5 py-4 md:px-6 md:py-5">
+      <div class="flex items-start gap-4 flex-wrap">
+        <div class="flex-1 min-w-[260px]">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-2xl md:text-[28px] leading-tight font-semibold tracking-tight">Walton Family Foundation</h1>
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[12px] font-medium type-chip">Foundation</span>
+          </div>
+          <p class="mt-2 max-w-3xl text-[14px] leading-6 text-slate-700">
+            Family foundation focused on climate justice, K-12 education, and watershed protection. Bentonville HQ; West Coast program team based in Seattle. Prefers 1-3 year grants over single-year awards.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-5 grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+          <div class="fact-label">Lifetime asks</div>
+          <div class="mt-1 text-xl font-semibold tabular-nums">$175,000</div>
+        </div>
+        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+          <div class="fact-label">Lifetime received</div>
+          <div class="mt-1 text-xl font-semibold tabular-nums">$0</div>
+        </div>
+        <div class="rounded-md border border-blue-200 bg-blue-50 px-3 py-2">
+          <div class="fact-label text-blue-700">Active opportunity</div>
+          <div class="mt-1 text-[15px] font-semibold">Conversation</div>
+          <div class="text-[12px] text-slate-600">$100,000</div>
+        </div>
+        <div class="rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
+          <div class="fact-label text-amber-700">Next action</div>
+          <div class="mt-1 text-[15px] font-semibold">Jun 1, 2026</div>
+          <div class="text-[12px] text-slate-700">Send cohort outcomes to Taylor</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <div class="mt-4 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-4 items-start">
+    <div class="space-y-4 min-w-0">
+
+      <section class="panel overflow-hidden">
+        <div class="px-4 py-3 border-b border-slate-200 flex items-center gap-3">
+          <div>
+            <div class="section-title">Opportunities</div>
+          </div>
+          <a href="opportunity-detail.html" class="ml-auto h-7 px-2.5 text-[13px] border border-slate-300 bg-white hover:bg-slate-50 rounded inline-flex items-center gap-1 no-underline">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
+            New
+          </a>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-[14px]">
+            <thead class="bg-slate-50">
+              <tr class="text-left text-[11px] uppercase tracking-wider text-slate-500">
+                <th class="px-4 py-2 font-semibold">Opportunity</th>
+                <th class="px-3 py-2 font-semibold">Stage</th>
+                <th class="px-3 py-2 font-semibold">Legal entity</th>
+                <th class="px-3 py-2 font-semibold text-right">Ask</th>
+                <th class="px-3 py-2 font-semibold">Key date</th>
+                <th class="px-3 py-2 font-semibold">Owner</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-t border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="window.location='opportunity-detail.html'">
+                <td class="px-4 py-3 min-w-[240px]">
+                  <a href="opportunity-detail.html" class="quiet-link font-semibold">Walton Fellowship Grant 2026</a>
+                  <div class="mt-1 flex items-center gap-1.5">
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium opp-grant">Grant</span>
+                    <span class="text-[12px] text-slate-500">Fellowship Program</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-conversation">Conversation</span></td>
+                <td class="px-3 py-3 text-[13px] text-slate-700">E8 Impact</td>
+                <td class="px-3 py-3 text-right font-semibold tabular-nums">$100,000</td>
+                <td class="px-3 py-3 text-[13px] text-slate-700">App due Jul 10</td>
+                <td class="px-3 py-3 text-[13px] text-slate-700">Jordan Schwartz</td>
+              </tr>
+              <tr class="border-t border-slate-100 hover:bg-slate-50">
+                <td class="px-4 py-3 min-w-[240px]">
+                  <a href="#" class="quiet-link font-semibold text-slate-700">Walton Fellowship Grant 2025</a>
+                  <div class="mt-1 flex items-center gap-1.5">
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium opp-grant">Grant</span>
+                    <span class="text-[12px] text-slate-500">Renewed into FY26 cycle</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-declined">Declined</span></td>
+                <td class="px-3 py-3 text-[13px] text-slate-700">E8 Impact</td>
+                <td class="px-3 py-3 text-right font-semibold tabular-nums">$75,000</td>
+                <td class="px-3 py-3 text-[13px] text-slate-500">Declined Mar 15</td>
+                <td class="px-3 py-3 text-[13px] text-slate-700">Jordan Schwartz</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="px-4 py-2 border-b border-slate-200 flex items-center gap-2 flex-wrap">
+          <div class="section-title">Activity <span class="text-slate-400 font-normal">10</span></div>
+          <div class="ml-auto flex items-center gap-1 text-[12px]">
+            <button class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">All</button>
+            <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Notes</button>
+            <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Email</button>
+            <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Stage</button>
+            <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Money</button>
+            <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Files</button>
+          </div>
+        </div>
+        <ol class="timeline-line ml-6 pl-5 my-4 mr-4 space-y-4">
+          <li class="timeline-dot timeline-note relative">
+            <div class="activity-meta">
+              <span>May 12, 2026 - 3:42 PM</span>
+              <span>Jordan Schwartz</span>
+              <a href="opportunity-detail.html" class="opp-tag">Walton Fellowship Grant 2026</a>
+            </div>
+            <div class="activity-note-card note-body text-[14px] text-slate-800">
+              <p>Call with Taylor. They've narrowed to 3 climate-justice orgs; we're on the short list.</p>
+              <p>Next ask from them: outcomes broken out by <em>cohort year</em>, not aggregate. They want retention from Year 1 to Year 3.</p>
+            </div>
+          </li>
+
+          <li class="timeline-dot timeline-stage relative">
+            <div class="activity-meta">
+              <span>May 12, 2026 - 3:38 PM</span>
+              <span>Jordan Schwartz</span>
+              <a href="opportunity-detail.html" class="opp-tag">Walton Fellowship Grant 2026</a>
+            </div>
+            <div class="activity-change-card text-[14px] flex items-center gap-1.5 flex-wrap">
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-outreach">Outreach</span>
+              <span class="text-slate-400">to</span>
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-conversation">Conversation</span>
+              <span class="text-slate-500 text-[13px]">qualified after first real call</span>
+            </div>
+          </li>
+
+          <li class="timeline-dot timeline-email relative">
+            <div class="activity-meta">
+              <span>May 9, 2026 - 9:12 AM</span>
+              <a href="opportunity-detail.html" class="opp-tag">Walton Fellowship Grant 2026</a>
+            </div>
+            <div class="email-card inbound mt-1">
+              <div class="email-summary">
+                <div class="email-route"><span>Taylor Brugh</span><span>→</span><span>Jordan Schwartz</span></div>
+                <div class="email-subject">Re: E8 fellowship - quick call this week?</div>
+                <div class="email-preview">Yes, let's do Thursday 11am PT. Would love to hear how you measure cohort outcomes year-over-year.</div>
+              </div>
+              <div class="email-headers px-3 py-2 text-[13px] leading-relaxed hidden">
+                <div><span class="hk">To:</span><span class="text-slate-800">Jordan Schwartz</span></div>
+                <div><span class="hk">From:</span><span class="text-slate-800">Taylor Brugh</span></div>
+                <div><span class="hk">Subject:</span><span class="text-slate-800 font-semibold">Re: E8 fellowship - quick call this week?</span></div>
+              </div>
+              <div class="email-body collapsed px-3 py-2 text-[14px] text-slate-800">Yes, let's do Thursday 11am PT. I'll send a calendar invite.
+
+Would love to hear how you measure cohort outcomes year-over-year. That's the piece our climate-justice committee will push on hardest.
+
+A few specific things I'd like to cover:
+1. Retention from Year 1 to Year 3
+2. How you screen for founder-fit on the climate side specifically
+3. Where Walton dollars would have the most marginal impact
+
+Best,
+Taylor</div>
+              <button type="button" class="email-toggle text-[12px] text-blue-700 hover:text-blue-900 px-3 py-1.5 border-t border-slate-100 w-full text-left">View more</button>
+            </div>
+          </li>
+
+          <li class="timeline-dot timeline-note relative">
+            <div class="activity-meta">
+              <span>May 8, 2026</span>
+              <span>Lisa Rasmussen</span>
+            </div>
+            <div class="activity-note-card note-body text-[14px] text-slate-800">
+              <p>Sat next to Taylor at the GreenBiz dinner. They've already evaluated three orgs in our space; we made the short list. Pat from Bullitt vouched for us.</p>
+            </div>
+          </li>
+
+          <li class="timeline-dot timeline-email relative">
+            <div class="activity-meta">
+              <span>May 5, 2026 - 4:02 PM</span>
+              <a href="opportunity-detail.html" class="opp-tag">Walton Fellowship Grant 2026</a>
+            </div>
+            <div class="email-card outbound mt-1">
+              <div class="email-summary">
+                <div class="email-route"><span>Jordan Schwartz</span><span>→</span><span>Taylor Brugh</span></div>
+                <div class="email-subject">E8 fellowship - intro &amp; deck</div>
+                <div class="email-preview">Karin suggested I reach out after your conversation at GreenBiz. Attaching our 1-pager on the fellowship program.</div>
+              </div>
+              <div class="email-headers px-3 py-2 text-[13px] leading-relaxed hidden">
+                <div><span class="hk">To:</span><span class="text-slate-800">Taylor Brugh</span></div>
+                <div><span class="hk">From:</span><span class="text-slate-800">Jordan Schwartz</span></div>
+                <div><span class="hk">Subject:</span><span class="text-slate-800 font-semibold">E8 fellowship - intro &amp; deck</span></div>
+              </div>
+              <div class="email-body collapsed px-3 py-2 text-[14px] text-slate-800">Hi Taylor -
+
+Karin suggested I reach out after your conversation at GreenBiz. Attaching our 1-pager on the fellowship program.
+
+The short version: we're a 12-month founder fellowship for climate-tech entrepreneurs, currently in our 4th cohort. Walton's portfolio in climate justice would be a strong fit.
+
+Best,
+Jordan</div>
+              <button type="button" class="email-toggle text-[12px] text-blue-700 hover:text-blue-900 px-3 py-1.5 border-t border-slate-100 w-full text-left">View more</button>
+            </div>
+          </li>
+
+          <li class="timeline-dot timeline-stage relative">
+            <div class="activity-meta">
+              <span>May 3, 2026</span>
+              <span>Karin Kidder</span>
+              <a href="opportunity-detail.html" class="opp-tag">Walton Fellowship Grant 2026</a>
+            </div>
+            <div class="activity-change-card text-[14px] flex items-center gap-1.5 flex-wrap">
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-prospect">Prospect</span>
+              <span class="text-slate-400">to</span>
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-outreach">Outreach</span>
+            </div>
+          </li>
+
+          <li class="timeline-dot timeline-money relative">
+            <div class="activity-meta">
+              <span>Apr 28, 2026</span>
+              <span>Karin Kidder</span>
+              <a href="opportunity-detail.html" class="opp-tag">Walton Fellowship Grant 2026</a>
+            </div>
+            <div class="activity-money-card text-[14px] text-slate-800">
+              <span class="font-semibold">$100,000</span>
+              <span class="text-slate-500">ask</span>
+              <span class="text-slate-300">-</span>
+              <span class="text-slate-600">Fellowship Program</span>
+            </div>
+          </li>
+
+          <li class="timeline-dot timeline-file relative">
+            <div class="activity-meta">
+              <span>Apr 28, 2026</span>
+              <span>Karin Kidder</span>
+              <a href="opportunity-detail.html" class="opp-tag">Walton Fellowship Grant 2026</a>
+            </div>
+            <div class="activity-file-card text-[14px] text-slate-800">Attached <a href="#" class="quiet-link">E8 Fellowship Program Overview.pdf</a> <span class="text-slate-400">- 2.4 MB</span></div>
+          </li>
+
+          <li class="timeline-dot timeline-stage relative">
+            <div class="activity-meta">
+              <span>Mar 15, 2025</span>
+              <span>Jordan Schwartz</span>
+              <a href="#" class="opp-tag">Walton Fellowship Grant 2025</a>
+            </div>
+            <div class="activity-change-card text-[14px] flex items-center gap-1.5 flex-wrap">
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-proposal">Proposal</span>
+              <span class="text-slate-400">to</span>
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-declined">Declined</span>
+              <span class="text-slate-500 text-[13px]">focus area mismatch; encouraged to reapply in 2026</span>
+            </div>
+          </li>
+
+          <li class="timeline-dot timeline-owner relative">
+            <div class="activity-meta">
+              <span>Dec 5, 2024</span>
+              <span>Karin Kidder</span>
+            </div>
+            <div class="activity-change-card text-[14px] text-slate-800">Primary contact <strong>Taylor Brugh</strong></div>
+          </li>
+        </ol>
+      </section>
+
+    </div>
+
+    <aside class="space-y-4">
+      <section class="panel">
+        <div class="px-4 py-3 border-b border-slate-200 flex items-center">
+          <div>
+            <div class="section-title">Contacts</div>
+          </div>
+          <button class="ml-auto h-7 px-2.5 text-[13px] border border-slate-300 bg-white hover:bg-slate-50 rounded">+ New</button>
+        </div>
+        <div class="divide-y divide-slate-100">
+          <div class="px-4 py-3">
+            <div class="min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <a href="#" class="quiet-link font-semibold text-slate-900">Taylor Brugh</a>
+                  <span class="text-[11px] bg-blue-100 text-blue-800 px-1 rounded">Primary</span>
+                </div>
+                <div class="text-[13px] text-slate-600 mt-0.5">Program Officer, Climate Justice</div>
+                <a href="mailto:taylor.brugh@waltonfamilyfoundation.org" class="quiet-link text-[13px] break-all">taylor.brugh@waltonfamilyfoundation.org</a>
+	            </div>
+	          </div>
+	          <div class="px-4 py-3">
+	            <div class="min-w-0">
+                <a href="#" class="quiet-link font-semibold text-slate-900">Caroline Avila</a>
+                <div class="text-[13px] text-slate-600 mt-0.5">Director, Strategic Grants</div>
+                <a href="mailto:caroline.avila@waltonfamilyfoundation.org" class="quiet-link text-[13px] break-all">caroline.avila@waltonfamilyfoundation.org</a>
+	            </div>
+	          </div>
+	        </div>
+	      </section>
+
+      <section class="panel">
+        <div class="px-4 py-3 border-b border-slate-200">
+          <div class="section-title">Relationship details</div>
+        </div>
+        <div class="px-4 py-3 grid grid-cols-1 gap-3 text-[13px]">
+          <div>
+            <div class="fact-label">Relationship owner</div>
+            <div class="mt-1 font-medium">Jordan Schwartz</div>
+          </div>
+          <div>
+            <div class="fact-label">Current advocate</div>
+            <div class="mt-1 font-medium">Lisa Rasmussen</div>
+            <div class="text-[12px] text-slate-500 mt-1">Advocate on Walton Fellowship Grant 2026</div>
+          </div>
+          <div>
+            <div class="fact-label">Typical grant range</div>
+            <div class="mt-1 font-medium">$50k-$500k</div>
+          </div>
+          <div>
+            <div class="fact-label">Known preferences</div>
+            <div class="mt-1 text-slate-700 leading-5">Regional impact, climate justice, and BIPOC founder pipeline. Annual reporting is expected after award.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="px-4 py-3 border-b border-slate-200 flex items-center">
+          <div class="section-title">Files</div>
+          <button class="ml-auto h-7 px-2.5 text-[13px] border border-slate-300 bg-white hover:bg-slate-50 rounded">Upload</button>
+        </div>
+        <div class="px-4 py-3 flex items-center gap-2 text-[13px]">
+          <svg class="w-4 h-4 text-red-500 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h6l4 4v10a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+          <div class="min-w-0 flex-1">
+            <a href="#" class="quiet-link font-medium truncate block">Walton Funder Profile.pdf</a>
+          </div>
+          <span class="text-[11px] text-slate-400">412 KB</span>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+</main>
+
+<script>
+document.querySelectorAll('.email-toggle').forEach(btn => {
+  const body = btn.parentElement.querySelector('.email-body');
+  if (!body) return;
+  btn.addEventListener('click', () => {
+    const collapsed = body.classList.toggle('collapsed');
+    const headers = btn.parentElement.querySelector('.email-headers');
+    const summary = btn.parentElement.querySelector('.email-summary');
+    if (headers) headers.classList.toggle('hidden', collapsed);
+    if (summary) summary.classList.toggle('hidden', !collapsed);
+    btn.textContent = collapsed ? 'View more' : 'View less';
+  });
+});
+</script>
+</body>
+</html>

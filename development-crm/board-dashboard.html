@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Development CRM — Development overview (board)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scroll-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  .kanban-col { min-width: 230px; max-width: 230px; }
+
+  .stage-prospect    { background:#f1f5f9; color:#475569; }
+  .stage-outreach    { background:#e2e8f0; color:#334155; }
+  .stage-conversation{ background:#dbeafe; color:#1e3a8a; }
+  .stage-proposal    { background:#bfdbfe; color:#1d4ed8; }
+  .stage-committed   { background:#1d4ed8; color:#ffffff; }
+  .stage-received    { background:#059669; color:#ffffff; }
+
+  .entity-c6 { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; }
+  .entity-c3 { background:#faf5ff; color:#6b21a8; border:1px solid #e9d5ff; }
+
+  .type-chip { background:#f8fafc; color:#475569; border:1px solid #e2e8f0; }
+
+  .opp-grant       { background:#ccfbf1; color:#115e59; border:1px solid #99f6e4; }
+  .opp-sponsorship { background:#dbeafe; color:#1e40af; border:1px solid #bfdbfe; }
+  .opp-gift        { background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; }
+
+  .activity-gift             { background:#d1fae5; color:#065f46; }
+  .activity-commitment       { background:#dbeafe; color:#1d4ed8; }
+  .activity-new_opportunity  { background:#f1f5f9; color:#475569; }
+  .activity-stage_advanced   { background:#e0f2fe; color:#075985; }
+
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+
+  /* Resizable rail */
+  .workspace { display:flex; gap:0; align-items:stretch; }
+  .workspace-rail { flex-shrink:0; padding-right:10px; }
+  .workspace-handle { width:6px; cursor:col-resize; flex-shrink:0; position:relative; background:transparent; }
+  .workspace-handle::before { content:''; position:absolute; top:0; bottom:0; left:2px; width:2px; background:#e2e8f0; }
+  .workspace-handle:hover::before, .workspace-handle.dragging::before { background:#3b82f6; left:1px; width:4px; }
+  .workspace-main { flex:1; min-width:0; padding-left:10px; display:flex; flex-direction:column; min-height:0; }
+
+  .rail-collapsed-btn { width:36px; flex-shrink:0; border:1px solid #e2e8f0; border-radius:6px; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:14px 0; cursor:pointer; }
+  .rail-collapsed-btn:hover { background:#f8fafc; }
+  .rail-collapsed-btn .rcb-chev { color:#64748b; font-size:14px; line-height:1; }
+  .rail-collapsed-btn:hover .rcb-chev { color:#0f172a; }
+  .rail-collapsed-btn .rcb-label { writing-mode:vertical-rl; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:#475569; }
+  .rail-collapsed-btn:hover .rcb-label { color:#0f172a; }
+  .rail-collapsed-btn .rcb-icon { color:#64748b; }
+  .rail-collapsed-btn:hover .rcb-icon { color:#0f172a; }
+
+  @media (max-width: 768px) {
+    #kanbanBoard { scroll-snap-type: x mandatory; }
+    .kanban-col { scroll-snap-align: start; min-width: 85vw; max-width: 85vw; }
+    .workspace { flex-direction: column; }
+    .workspace-rail { width: auto !important; padding-right: 0; padding-bottom: 10px; }
+    .workspace-handle { display: none; }
+    .workspace-main { padding-left: 0; }
+    .rail-collapsed-btn { width: 100%; flex-direction: row; padding: 8px 14px; }
+    .rail-collapsed-btn .rcb-label { writing-mode: horizontal-tb; }
+  }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 text-sm">
+
+<!-- PAGE TITLE BAR -->
+<div class="bg-white border-b border-slate-200 px-3 md:px-4 py-3">
+  <h1 class="text-lg md:text-xl font-semibold text-slate-900">Development overview</h1>
+  <div class="text-[12px] text-slate-500 mt-0.5">FY26 fundraising progress, pipeline, and your connections</div>
+</div>
+
+<!-- KPI STRIP -->
+<section class="px-3 md:px-4 pt-3 pb-2 grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3">
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[12px] uppercase tracking-wide text-slate-500">Raised vs goal</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5 text-emerald-700">$1,000k</div>
+    <div class="h-1.5 bg-slate-200 rounded-full mt-1.5 overflow-hidden"><div class="h-full bg-emerald-500" style="width:71%"></div></div>
+    <div class="text-[12px] text-slate-500 mt-1">71% of $1.4M FY26 combined</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[12px] uppercase tracking-wide text-slate-500">Pipeline value</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5 text-blue-700">$570k</div>
+    <div class="text-[12px] text-slate-500 mt-1">Outreach → Committed asks</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[12px] uppercase tracking-wide text-slate-500">Active opportunities</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5">9</div>
+    <div class="text-[12px] text-slate-500 mt-1">Outreach → Proposal</div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[12px] uppercase tracking-wide text-slate-500">Overdue follow-ups</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5 text-red-700">2</div>
+    <div class="text-[12px] text-slate-500 mt-1">Where staff may need board help</div>
+  </div>
+  <div class="col-span-2 md:col-span-1 bg-white border border-slate-200 rounded-md p-3">
+    <div class="text-[12px] uppercase tracking-wide text-slate-500">Avg gift received</div>
+    <div class="text-xl md:text-2xl font-semibold mt-0.5">$333k</div>
+    <div class="text-[12px] text-slate-500 mt-1">3 gifts FY26</div>
+  </div>
+</section>
+
+<!-- WORKSPACE -->
+<div class="workspace px-3 md:px-4 pb-3" id="workspace">
+
+  <!-- COLLAPSED RAIL BUTTON -->
+  <button id="workspaceRailCollapsed" type="button" onclick="expandRail()" title="Open filters" class="rail-collapsed-btn" style="display:none;">
+    <span class="rcb-chev">›</span>
+    <span class="rcb-label">Filters</span>
+    <svg class="rcb-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+    </svg>
+  </button>
+
+  <!-- LEFT RAIL -->
+  <aside class="workspace-rail" id="workspaceRail" style="width:280px;">
+    <div class="bg-white border border-slate-200 rounded-md overflow-hidden">
+      <div class="flex items-center justify-between px-2 py-1 border-b border-slate-100">
+        <span class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Filters</span>
+        <button type="button" onclick="collapseRail()" title="Collapse filters" class="text-slate-400 hover:text-slate-700 text-[13px] leading-none px-1">‹</button>
+      </div>
+      <div class="p-2.5 space-y-3 max-h-[calc(100vh-180px)] overflow-y-auto scroll-thin">
+
+        <div class="relative">
+          <svg class="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"/></svg>
+          <input id="searchInput" type="text" placeholder="Search opportunities, entities, contacts…"
+                 autocomplete="off" data-lpignore="true" data-form-type="other"
+                 class="w-full h-8 pl-8 pr-2 border border-slate-300 rounded text-[13px] focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+        </div>
+
+        <!-- LEGAL ENTITY -->
+        <div>
+          <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1">Legal entity</div>
+          <div class="flex items-center bg-slate-100 rounded-md p-0.5">
+            <button data-entity="all"   class="entity-btn flex-1 px-2 py-1 rounded font-medium bg-white shadow-sm text-[12px]">All</button>
+            <button data-entity="501c6" class="entity-btn flex-1 px-2 py-1 rounded font-medium text-slate-600 hover:bg-white text-[12px]">501c6</button>
+            <button data-entity="501c3" class="entity-btn flex-1 px-2 py-1 rounded font-medium text-slate-600 hover:bg-white text-[12px]">501c3</button>
+          </div>
+        </div>
+
+        <!-- OPPORTUNITY TYPE -->
+        <details open>
+          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+            <span>Opportunity type</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+          </summary>
+          <ul class="text-[13px] space-y-0.5 mt-1" id="oppTypeFilter"></ul>
+        </details>
+
+        <!-- ENTITY TYPE -->
+        <details>
+          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+            <span>Entity type</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+          </summary>
+          <ul class="text-[13px] space-y-0.5 mt-1" id="entityTypeFilter"></ul>
+        </details>
+
+        <!-- PIPELINE STAGE -->
+        <details open>
+          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+            <span>Pipeline stage</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+          </summary>
+          <ul class="text-[13px] space-y-0.5 mt-1" id="stageFilter"></ul>
+        </details>
+
+        <!-- OWNER -->
+        <details>
+          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
+            <span>Owner</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+          </summary>
+          <ul class="text-[13px] space-y-0.5 mt-1" id="ownerFilter"></ul>
+        </details>
+
+      </div>
+    </div>
+  </aside>
+
+  <div class="workspace-handle" id="workspaceHandle" title="Drag to resize"></div>
+
+  <!-- MAIN PANE -->
+  <main class="workspace-main">
+
+    <div class="bg-white border border-slate-200 rounded-md px-3 py-2 flex items-center gap-2 mb-2 flex-wrap">
+      <div class="text-[13px] text-slate-500 whitespace-nowrap"><span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold mr-1">Board view</span>read-only</div>
+      <div class="ml-auto flex items-center gap-2 flex-wrap">
+        <button id="logInteractionBtn" class="h-7 px-2.5 text-[13px] font-medium bg-blue-600 hover:bg-blue-700 text-white rounded inline-flex items-center gap-1 whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
+          Log my interaction
+        </button>
+        <button class="h-7 px-2.5 text-[13px] font-medium border border-slate-300 bg-white hover:bg-slate-50 rounded whitespace-nowrap">Export board report</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-3">
+
+      <!-- LEFT: pipeline + recent activity + grants -->
+      <div class="space-y-3 min-w-0">
+
+        <section class="bg-white border border-slate-200 rounded-md">
+          <div class="px-3 py-2 border-b border-slate-200 flex items-center">
+            <div class="text-[12px] uppercase tracking-wider text-slate-500 font-semibold">Pipeline</div>
+            <div class="ml-auto text-[12px] text-slate-500">Each card is an opportunity · click for detail</div>
+          </div>
+          <div class="overflow-x-auto p-3 bg-slate-50">
+            <div id="kanbanBoard" class="flex gap-2.5"></div>
+          </div>
+        </section>
+
+        <section class="bg-white border border-slate-200 rounded-md">
+          <div class="px-3 py-2 border-b border-slate-200 flex items-center">
+            <div class="text-[12px] uppercase tracking-wider text-slate-500 font-semibold">Recent activity · last 30 days</div>
+          </div>
+          <ul class="divide-y divide-slate-100" id="activityFeed"></ul>
+        </section>
+
+        <section class="bg-white border border-slate-200 rounded-md">
+          <div class="px-3 py-2 border-b border-slate-200 flex items-center">
+            <div class="text-[12px] uppercase tracking-wider text-slate-500 font-semibold">Foundation grant deadlines · next 60 days</div>
+          </div>
+          <div class="p-3 space-y-2" id="grantList"></div>
+        </section>
+      </div>
+
+      <!-- RIGHT: my connections (entity-level) -->
+      <aside class="space-y-3 xl:sticky xl:top-3 xl:self-start">
+        <section class="bg-white border border-slate-200 rounded-md">
+          <div class="px-3 py-2 border-b border-slate-200 flex items-center">
+            <div class="text-[12px] uppercase tracking-wider text-slate-500 font-semibold">My connections</div>
+            <div class="ml-auto text-[12px] text-slate-400" id="myConnectionsCount">—</div>
+          </div>
+          <div class="px-3 py-1.5 border-b border-slate-100 text-[11px] text-slate-400">Entities you introduced or have logged a note on.</div>
+          <ul class="divide-y divide-slate-100" id="myConnections"></ul>
+        </section>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<!-- LOG INTERACTION MODAL -->
+<div id="logModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-md shadow-xl w-full max-w-lg">
+    <div class="px-4 py-3 border-b border-slate-200 flex items-center">
+      <div class="font-semibold">Log my interaction</div>
+      <button onclick="closeModal()" class="ml-auto text-slate-400 hover:text-slate-700">
+        <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+      </button>
+    </div>
+    <div class="px-4 py-3 space-y-3 text-sm">
+      <!-- Scope toggle: opportunity vs entity -->
+      <div>
+        <label class="text-[12px] text-slate-500 block mb-1">Attach to</label>
+        <div class="flex items-center bg-slate-100 rounded p-0.5 w-fit">
+          <button type="button" id="logScopeOpp" class="px-2.5 py-1 rounded text-[13px] font-medium bg-white shadow-sm">An opportunity</button>
+          <button type="button" id="logScopeEnt" class="px-2.5 py-1 rounded text-[13px] font-medium text-slate-600 hover:bg-white">The relationship</button>
+        </div>
+      </div>
+      <div>
+        <label class="text-[12px] text-slate-500 block mb-1" id="logTargetLabel">Opportunity</label>
+        <input type="text" autocomplete="off" data-lpignore="true" data-form-type="other" placeholder="Type to search…" value="Walton Fellowship Grant 2026" class="w-full border border-slate-300 rounded px-2 h-8 text-sm" />
+      </div>
+      <div>
+        <label class="text-[12px] text-slate-500 block mb-1">When</label>
+        <input type="date" value="2026-05-22" class="!w-[150px] border border-slate-300 rounded px-2 h-8 text-sm" autocomplete="off" data-lpignore="true"/>
+      </div>
+      <div>
+        <label class="text-[12px] text-slate-500 block mb-1">Summary <span class="text-[11px] text-slate-400">(max 500 chars)</span></label>
+        <textarea rows="3" maxlength="500" autocomplete="off" data-lpignore="true" data-form-type="other" class="w-full border border-slate-300 rounded px-2 py-1 text-sm" placeholder="What did you discuss? (visible to E8 staff)"></textarea>
+      </div>
+      <div>
+        <label class="text-[12px] text-slate-500 block mb-1">Outcome / next step (optional)</label>
+        <input type="text" autocomplete="off" data-lpignore="true" data-form-type="other" class="w-full border border-slate-300 rounded px-2 h-8 text-sm" placeholder="e.g. Karin to send follow-up deck" />
+      </div>
+      <div class="bg-slate-50 border border-slate-200 rounded p-2 text-[12px] text-slate-600">
+        Submitting will tag this note as logged by you. The owner will be notified.
+      </div>
+    </div>
+    <div class="px-4 py-3 border-t border-slate-200 flex justify-end gap-2">
+      <button onclick="closeModal()" class="h-8 px-3 text-[13px] border border-slate-300 rounded">Cancel</button>
+      <button class="h-8 px-3 text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Save note</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STAGES = [
+  { id:'prospect',     label:'Prospect',     cls:'stage-prospect' },
+  { id:'outreach',     label:'Outreach',     cls:'stage-outreach' },
+  { id:'conversation', label:'Conversation', cls:'stage-conversation' },
+  { id:'proposal',     label:'Proposal',     cls:'stage-proposal' },
+  { id:'committed',    label:'Committed',    cls:'stage-committed' },
+  { id:'received',     label:'Received',     cls:'stage-received' },
+];
+const ENTITY_TYPES = [
+  { id:'corporate',  label:'Corporate' },
+  { id:'foundation', label:'Foundation' },
+  { id:'individual', label:'Individual' },
+  { id:'government', label:'Government' },
+];
+// Three top-level opportunity types. Sponsorship subtype (annual/event/other) is a
+// detail-level field surfaced only on the opportunity detail page.
+const TYPES = [
+  { type:'grant',       label:'Grant',       cls:'opp-grant' },
+  { type:'sponsorship', label:'Sponsorship', cls:'opp-sponsorship' },
+  { type:'gift',        label:'Gift',        cls:'opp-gift' },
+];
+const matchType = (o, t) => o.type === t.type;
+const STAFF = [
+  { id:'KK', name:'Karin Kidder' },
+  { id:'KO', name:'Kathleen Olson' },
+  { id:'LO', name:"Lee O'Connor" },
+  { id:'JS', name:'Jordan Schwartz' },
+];
+
+const ENTITIES = [
+  { id:'dent_1',  name:'Microsoft AI for Good',     type:'corporate',  primaryContact:'Brandon Middaugh' },
+  { id:'dent_2',  name:'Bullitt Foundation',         type:'foundation', primaryContact:'Pat Forster' },
+  { id:'dent_3',  name:'Stoel Rives LLP',            type:'corporate',  primaryContact:'Greg Jacobson' },
+  { id:'dent_4',  name:'Schwabe Williamson',         type:'corporate',  primaryContact:'Connie Sun' },
+  { id:'dent_5',  name:'Wilson Sonsini',             type:'corporate',  primaryContact:'Mark Talley' },
+  { id:'dent_6',  name:'McKinstry',                  type:'corporate',  primaryContact:'Ash Aiyar' },
+  { id:'dent_7',  name:'Walton Family Foundation',   type:'foundation', primaryContact:'Taylor Brugh' },
+  { id:'dent_8',  name:'Bezos Earth Fund',           type:'foundation', primaryContact:'Andy Karsner' },
+  { id:'dent_9',  name:'Sea Mar Foundation',         type:'foundation', primaryContact:null },
+  { id:'dent_10', name:'Starbucks',                  type:'corporate',  primaryContact:'Maria Lopez' },
+  { id:'dent_12', name:'Anonymous Major Donor',      type:'individual', primaryContact:null },
+  { id:'dent_13', name:'Convene Seattle',            type:'corporate',  primaryContact:'Jen Reyes' },
+  { id:'dent_14', name:'Russell Family Foundation',  type:'foundation', primaryContact:'Erika Russell' },
+  { id:'dent_15', name:'Patagonia',                  type:'corporate',  primaryContact:'Cara Dolan' },
+];
+const entityById = (id) => ENTITIES.find(e => e.id === id);
+
+// `advocate` is an internal E8 person (typically a board member) helping move the opp forward.
+// Zero, one, or — rarely — more per opp. Surfaced on the Kanban tile and the opp detail page.
+const OPPS = [
+  { id:'dopp_1',  name:'Microsoft FY26 Sponsorship',         entity_id:'dent_1',  type:'sponsorship', subtype:'annual', stage:'received',     legal_entity:'501c3', amount:'$75k',  owner:'KK', advocate:'Kathleen Hebert', overdue:false, lastActivity:'1w' },
+  { id:'dopp_2',  name:'Microsoft FY27 Sponsorship',         entity_id:'dent_1',  type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c3', amount:'$85k',  owner:'KK', advocate:'Kathleen Hebert', overdue:false, lastActivity:'3d' },
+  { id:'dopp_3',  name:'Bullitt Climate Justice Grant 2026', entity_id:'dent_2',  type:'grant',       subtype:null,     stage:'committed',    legal_entity:'501c3', amount:'$50k',  owner:'KK', advocate:null,              overdue:true,  lastActivity:'4d', lisa:true },
+  { id:'dopp_4',  name:'Stoel Rives Summit Sponsorship 2026', entity_id:'dent_3', type:'sponsorship', subtype:'event',  stage:'committed',    legal_entity:'501c6', amount:'$15k',  owner:'KO', advocate:'Mark Schwabe',    overdue:false, lastActivity:'5d' },
+  { id:'dopp_5',  name:'Schwabe FY26 Sponsorship',           entity_id:'dent_4',  type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c6', amount:'$25k',  owner:'KO', advocate:null,              overdue:false, lastActivity:'3d' },
+  { id:'dopp_6',  name:'Wilson Sonsini FY26 Sponsorship',    entity_id:'dent_5',  type:'sponsorship', subtype:'annual', stage:'conversation', legal_entity:'both',  amount:'$10k',  owner:'KK', advocate:null,              overdue:false, lastActivity:'4d' },
+  { id:'dopp_7',  name:'McKinstry Fellowship FY26',          entity_id:'dent_6',  type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c3', amount:'$30k',  owner:'LO', advocate:'Dean Allen',      overdue:true,  lastActivity:'2d' },
+  { id:'dopp_9',  name:'Walton Fellowship Grant 2026',       entity_id:'dent_7',  type:'grant',       subtype:null,     stage:'conversation', legal_entity:'501c3', amount:'$100k', owner:'JS', advocate:'Lisa Rasmussen',  overdue:false, lastActivity:'2d', lisa:true },
+  { id:'dopp_10', name:'Bezos Climate Justice Grant 2026',   entity_id:'dent_8',  type:'grant',       subtype:null,     stage:'outreach',     legal_entity:'501c3', amount:'$250k', owner:'JS', advocate:'Lisa Rasmussen',  overdue:false, lastActivity:'8d', lisa:true },
+  { id:'dopp_11', name:'Sea Mar Health Equity Grant 2026',   entity_id:'dent_9',  type:'grant',       subtype:null,     stage:'prospect',     legal_entity:'501c3', amount:'$5k',   owner:'KK', advocate:null,              overdue:false, lastActivity:null },
+  { id:'dopp_12', name:'Starbucks Coffee Sponsorship FY26',  entity_id:'dent_10', type:'sponsorship', subtype:'annual', stage:'conversation', legal_entity:'both',  amount:'$20k',  owner:'KO', advocate:null,              overdue:false, lastActivity:'1w' },
+  { id:'dopp_14', name:'Anonymous Major Gift 2026',          entity_id:'dent_12', type:'gift',        subtype:null,     stage:'received',     legal_entity:'501c3', amount:'$25k',  owner:'KK', advocate:'Kathleen Hebert', overdue:false, lastActivity:'2w' },
+  { id:'dopp_15', name:'Convene Summit Venue 2026',          entity_id:'dent_13', type:'sponsorship', subtype:'event',  stage:'committed',    legal_entity:'501c6', amount:'$8k',   owner:'KO', advocate:null,              overdue:false, lastActivity:'1w' },
+  { id:'dopp_16', name:'Russell Fellowship Grant 2026',      entity_id:'dent_14', type:'grant',       subtype:null,     stage:'proposal',     legal_entity:'501c3', amount:'$35k',  owner:'LO', advocate:null,              overdue:false, lastActivity:'6d' },
+  { id:'dopp_17', name:'Patagonia FY26 Sponsorship',         entity_id:'dent_15', type:'sponsorship', subtype:'annual', stage:'outreach',     legal_entity:'501c3', amount:'$15k',  owner:'JS', advocate:null,              overdue:false, lastActivity:'5d' },
+];
+
+// Activity feed — opportunity-level events for the board to skim.
+const ACTIVITY = [
+  { kind:'commitment',      opp:'Bullitt Climate Justice Grant 2026',      entity:'Bullitt Foundation',         text:'committed $50,000',                       amount:'$50k', at:'May 14' },
+  { kind:'gift',            opp:'Microsoft FY26 Sponsorship',              entity:'Microsoft AI for Good',      text:'gift received',                           amount:'$75k', at:'May 11' },
+  { kind:'stage_advanced',  opp:'Walton Fellowship Grant 2026',            entity:'Walton Family Foundation',   text:'moved Outreach → Conversation',           amount:null,   at:'May 12' },
+  { kind:'commitment',      opp:'Stoel Rives Summit Sponsorship 2026',     entity:'Stoel Rives LLP',            text:'committed underwriting for Summit',       amount:'$15k', at:'May 9' },
+  { kind:'new_opportunity', opp:'Bezos Climate Justice Grant 2026',        entity:'Bezos Earth Fund',           text:'added to pipeline',                       amount:null,   at:'May 8' },
+  { kind:'gift',            opp:'Anonymous Major Gift 2026',               entity:'Anonymous Major Donor',      text:'gift received',                           amount:'$25k', at:'May 4' },
+  { kind:'stage_advanced',  opp:'Starbucks Coffee Sponsorship FY26',       entity:'Starbucks',                  text:'moved Outreach → Conversation',           amount:null,   at:'May 2' },
+];
+
+const GRANT_DEADLINES = [
+  { opp:'Russell Fellowship Grant 2026',     entity:'Russell Family Foundation', stage:'Proposal',     amount:'$35k',  owner:'LO', due:'May 28', daysLeft:6 },
+  { opp:'Sea Mar Health Equity Grant 2026',  entity:'Sea Mar Foundation',        stage:'Prospect',     amount:'$5k',   owner:'KK', due:'Jun 11', daysLeft:20 },
+  { opp:'Bezos Climate Justice Grant 2026',  entity:'Bezos Earth Fund',          stage:'Outreach',     amount:'$250k', owner:'JS', due:'Jul 1',  daysLeft:40 },
+  { opp:'Walton Fellowship Grant 2026',      entity:'Walton Family Foundation',  stage:'Conversation', amount:'$100k', owner:'JS', due:'Jul 16', daysLeft:55 },
+];
+
+let legalEntityFilter = 'all';
+
+function legalEntityChip(e) {
+  const c6 = `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c6">(c)6</span>`;
+  const c3 = `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c3">(c)3</span>`;
+  if (e === '501c6') return c6;
+  if (e === '501c3') return c3;
+  return c6 + ' ' + c3;
+}
+function stageChip(s) {
+  const st = STAGES.find(x => x.id === s) || {label:s, cls:''};
+  return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${st.cls}">${st.label}</span>`;
+}
+function typeOf(o) {
+  return TYPES.find(t => t.type === o.type) || {label:o.type, cls:''};
+}
+function typeChip(o) {
+  const t = typeOf(o);
+  return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${t.cls}">${t.label}</span>`;
+}
+
+function filteredOpps() {
+  const q = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+  return OPPS.filter(o => {
+    if (legalEntityFilter !== 'all' && !(o.legal_entity === legalEntityFilter || o.legal_entity === 'both')) return false;
+    if (q) {
+      const ent = entityById(o.entity_id);
+      const hay = (o.name + ' ' + (ent ? ent.name : '') + ' ' + (ent && ent.primaryContact ? ent.primaryContact : '')).toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function renderSidebar() {
+  const items = filteredOpps();
+  document.getElementById('oppTypeFilter').innerHTML = TYPES.map(t => {
+    const n = items.filter(o => matchType(o, t)).length;
+    return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
+      <input type="checkbox" class="rounded" />
+      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${t.cls}">${t.label}</span>
+      <span class="ml-auto text-[12px] text-slate-400">${n}</span>
+    </label></li>`;
+  }).join('');
+  document.getElementById('entityTypeFilter').innerHTML = ENTITY_TYPES.map(t => {
+    const n = items.filter(o => (entityById(o.entity_id)||{}).type === t.id).length;
+    return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
+      <input type="checkbox" class="rounded" />
+      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium type-chip">${t.label}</span>
+      <span class="ml-auto text-[12px] text-slate-400">${n}</span>
+    </label></li>`;
+  }).join('');
+  document.getElementById('stageFilter').innerHTML = STAGES.map(st => {
+    const n = items.filter(o => o.stage === st.id).length;
+    return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
+      <input type="checkbox" class="rounded" />
+      ${stageChip(st.id)}
+      <span class="ml-auto text-[12px] text-slate-400">${n}</span>
+    </label></li>`;
+  }).join('');
+  document.getElementById('ownerFilter').innerHTML = STAFF.map(o => {
+    const n = items.filter(x => x.owner === o.id).length;
+    return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
+      <input type="checkbox" class="rounded" />
+      <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] flex items-center justify-center font-semibold">${o.id}</span>
+      <span>${o.name}</span>
+      <span class="ml-auto text-[12px] text-slate-400">${n}</span>
+    </label></li>`;
+  }).join('');
+}
+
+function tileFooter(o) {
+  if (o.overdue) {
+    return `<div class="px-2.5 py-1.5 border-t border-slate-200 text-[12px] text-slate-600">
+      Follow-up: <span class="font-medium text-red-700">overdue</span>
+    </div>`;
+  }
+  if (o.lastActivity) {
+    return `<div class="px-2.5 py-1.5 border-t border-slate-200 text-[12px] text-slate-600">
+      Last activity: <span class="font-medium text-slate-800">${o.lastActivity} ago</span>
+    </div>`;
+  }
+  return `<div class="px-2.5 py-1.5 border-t border-slate-200 text-[12px] text-slate-400">
+    Last activity: <span>—</span>
+  </div>`;
+}
+
+function renderKanban() {
+  const items = filteredOpps();
+  const board = document.getElementById('kanbanBoard');
+  board.innerHTML = STAGES.map(st => {
+    const stageItems = items.filter(o => o.stage === st.id);
+    return `<div class="kanban-col bg-white border border-slate-200 rounded">
+      <div class="px-2.5 py-1.5 border-b border-slate-200 flex items-center gap-1.5">
+        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[12px] font-medium ${st.cls}">${st.label}</span>
+      </div>
+      <div class="p-2 space-y-1.5 max-h-[320px] overflow-y-auto scroll-thin bg-slate-50">
+        ${stageItems.map(o => {
+          const ent = entityById(o.entity_id) || {name:'?'};
+          return `<a href="opportunity-detail.html" class="block bg-white border border-slate-200 rounded hover:border-blue-400 transition no-underline text-inherit overflow-hidden">
+            <div class="px-2.5 py-1.5 bg-slate-100 border-b border-slate-200 flex items-center gap-1.5 flex-wrap">
+              ${typeChip(o)}
+              ${legalEntityChip(o.legal_entity)}
+            </div>
+            <div class="px-2.5 pt-2 pb-2.5">
+              <div class="text-[13px] font-semibold leading-tight text-slate-900 truncate">${o.name}</div>
+              <div class="text-[12px] text-slate-500 mt-0.5 truncate">${ent.name}</div>
+              <div class="text-[15px] font-semibold tabular-nums text-slate-900 mt-2">${o.amount}</div>
+              ${o.advocate ? `<div class="text-[12px] text-slate-500 mt-1 truncate"><span class="text-slate-400">Advocate:</span> <span class="text-slate-700">${o.advocate}</span></div>` : ''}
+            </div>
+            ${tileFooter(o)}
+          </a>`;
+        }).join('')}
+        ${stageItems.length === 0 ? '<div class="text-[12px] text-slate-400 text-center py-3">Empty</div>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderActivity() {
+  const feed = document.getElementById('activityFeed');
+  feed.innerHTML = ACTIVITY.map(a => {
+    const cls = `activity-${a.kind}`;
+    const label = a.kind === 'commitment' ? 'Committed' : a.kind === 'gift' ? 'Gift received' : a.kind === 'new_opportunity' ? 'New opportunity' : 'Stage advanced';
+    return `<li class="px-3 py-2.5 hover:bg-slate-50 flex items-center gap-3">
+      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${cls} w-[100px] justify-center">${label}</span>
+      <div class="flex-1 min-w-0 text-[14px]">
+        <a href="opportunity-detail.html" class="font-medium hover:underline">${a.opp}</a>
+        <span class="text-slate-500"> · </span>
+        <a href="entity-detail.html" class="text-slate-600 hover:underline">${a.entity}</a>
+        <span class="text-slate-600"> ${a.text}</span>
+        ${a.amount ? `<span class="font-semibold ml-1">${a.amount}</span>` : ''}
+      </div>
+      <span class="text-[12px] text-slate-500 whitespace-nowrap">${a.at}</span>
+    </li>`;
+  }).join('');
+}
+
+function renderGrants() {
+  const list = document.getElementById('grantList');
+  list.innerHTML = GRANT_DEADLINES.map(g => `
+    <a href="opportunity-detail.html" class="flex items-center gap-3 hover:bg-slate-50 rounded p-1.5 -m-1.5">
+      <div class="w-12 text-center shrink-0">
+        <div class="text-[11px] uppercase text-slate-500">${g.due.split(' ')[0]}</div>
+        <div class="text-lg font-semibold leading-none">${g.due.split(' ')[1]}</div>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-[14px] font-medium truncate">${g.opp}</div>
+        <div class="text-[12px] text-slate-500 truncate">${g.entity} · ${g.stage} · Ask ${g.amount} · ${g.daysLeft} days left</div>
+      </div>
+      <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] inline-flex items-center justify-center font-semibold">${g.owner}</span>
+    </a>`).join('');
+}
+
+function renderConnections() {
+  // Connections are entity-level: any entity where the board member (Lisa) is the source or has logged a note.
+  // We derive from opportunities tagged `lisa:true` and roll up by entity.
+  const list = document.getElementById('myConnections');
+  const lisaEntityIds = [...new Set(OPPS.filter(o => o.lisa).map(o => o.entity_id))];
+  document.getElementById('myConnectionsCount').textContent = lisaEntityIds.length;
+  list.innerHTML = lisaEntityIds.map(entId => {
+    const ent = entityById(entId);
+    const entOpps = OPPS.filter(o => o.entity_id === entId);
+    const activeCount = entOpps.filter(o => ['outreach','conversation','proposal','committed'].includes(o.stage)).length;
+    const overdue = entOpps.some(o => o.overdue);
+    const lastActivity = entOpps.map(o => o.lastActivity).filter(Boolean).sort()[0]; // crude
+    return `<li class="px-3 py-2.5 hover:bg-slate-50">
+      <a href="entity-detail.html" class="block">
+        <div class="flex items-center gap-1.5">
+          <div class="font-medium text-[14px] flex-1 truncate">${ent.name}</div>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium type-chip">${ENTITY_TYPES.find(t=>t.id===ent.type)?.label || ent.type}</span>
+        </div>
+        ${ent.primaryContact ? `<div class="text-[13px] text-slate-700 truncate">${ent.primaryContact}</div>` : ''}
+        <div class="flex items-center gap-1.5 mt-1 text-[12px]">
+          <span class="text-slate-600">${activeCount} active · ${entOpps.length} total opp${entOpps.length === 1 ? '' : 's'}</span>
+          ${overdue
+            ? '<span class="ml-auto text-red-700 font-medium">Overdue follow-up</span>'
+            : `<span class="ml-auto text-slate-500">Last ${lastActivity || '—'} ago</span>`}
+        </div>
+      </a>
+    </li>`;
+  }).join('');
+}
+
+function renderAll() {
+  renderSidebar();
+  renderKanban();
+  renderActivity();
+  renderGrants();
+  renderConnections();
+}
+
+// Legal-entity toggle
+document.querySelectorAll('.entity-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    legalEntityFilter = btn.dataset.entity;
+    document.querySelectorAll('.entity-btn').forEach(b => {
+      b.classList.remove('bg-white','shadow-sm');
+      b.classList.add('text-slate-600','hover:bg-white');
+    });
+    btn.classList.add('bg-white','shadow-sm');
+    btn.classList.remove('text-slate-600','hover:bg-white');
+    renderAll();
+  });
+});
+
+document.getElementById('searchInput').addEventListener('input', renderAll);
+
+// Log Interaction modal
+function openModal()  { const m = document.getElementById('logModal'); m.classList.remove('hidden'); m.classList.add('flex'); }
+function closeModal() { const m = document.getElementById('logModal'); m.classList.add('hidden'); m.classList.remove('flex'); }
+document.getElementById('logInteractionBtn').addEventListener('click', openModal);
+
+// Log scope toggle (opportunity vs entity)
+const logOppBtn = document.getElementById('logScopeOpp');
+const logEntBtn = document.getElementById('logScopeEnt');
+const logLabel  = document.getElementById('logTargetLabel');
+function setLogScope(scope) {
+  const oppActive = scope === 'opp';
+  logOppBtn.classList.toggle('bg-white', oppActive);
+  logOppBtn.classList.toggle('shadow-sm', oppActive);
+  logOppBtn.classList.toggle('text-slate-600', !oppActive);
+  logEntBtn.classList.toggle('bg-white', !oppActive);
+  logEntBtn.classList.toggle('shadow-sm', !oppActive);
+  logEntBtn.classList.toggle('text-slate-600', oppActive);
+  logLabel.textContent = oppActive ? 'Opportunity' : 'Entity';
+}
+logOppBtn.addEventListener('click', () => setLogScope('opp'));
+logEntBtn.addEventListener('click', () => setLogScope('ent'));
+
+renderAll();
+
+// ============== RESIZABLE + COLLAPSIBLE LEFT RAIL ==============
+const RAIL_MIN_PX = 200;
+const RAIL_MAX_PX = 560;
+const COLLAPSE_THRESHOLD_PX = 160;
+const RAIL_WIDTH_KEY = 'e8.development.board.filterRailWidth';
+const RAIL_OPEN_KEY  = 'e8.development.board.filterRailOpen';
+
+function collapseRail() {
+  const rail = document.getElementById('workspaceRail');
+  const handle = document.getElementById('workspaceHandle');
+  const btn = document.getElementById('workspaceRailCollapsed');
+  if (rail) rail.style.display = 'none';
+  if (handle) handle.style.display = 'none';
+  if (btn) btn.style.display = '';
+  try { localStorage.setItem(RAIL_OPEN_KEY, '0'); } catch (e) {}
+}
+function expandRail() {
+  const rail = document.getElementById('workspaceRail');
+  const handle = document.getElementById('workspaceHandle');
+  const btn = document.getElementById('workspaceRailCollapsed');
+  if (rail) rail.style.display = '';
+  if (handle) handle.style.display = '';
+  if (btn) btn.style.display = 'none';
+  try { localStorage.setItem(RAIL_OPEN_KEY, '1'); } catch (e) {}
+}
+
+(function initResize() {
+  const handle = document.getElementById('workspaceHandle');
+  const rail   = document.getElementById('workspaceRail');
+  if (!handle || !rail) return;
+  try {
+    const savedW = parseInt(localStorage.getItem(RAIL_WIDTH_KEY) || '', 10);
+    if (Number.isFinite(savedW) && savedW >= RAIL_MIN_PX && savedW <= RAIL_MAX_PX) {
+      rail.style.width = savedW + 'px';
+    }
+    const open = localStorage.getItem(RAIL_OPEN_KEY);
+    if (open === '0') collapseRail();
+  } catch (e) {}
+  let resizing = false, startX = 0, startW = 0, lastW = 0;
+  handle.addEventListener('mousedown', (e) => {
+    resizing = true;
+    startX = e.clientX;
+    startW = rail.offsetWidth;
+    lastW  = startW;
+    handle.classList.add('dragging');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!resizing) return;
+    const dx = e.clientX - startX;
+    const candidate = startW + dx;
+    if (candidate < COLLAPSE_THRESHOLD_PX) rail.style.width = Math.max(60, candidate) + 'px';
+    else rail.style.width = Math.min(RAIL_MAX_PX, candidate) + 'px';
+    lastW = candidate;
+  });
+  document.addEventListener('mouseup', () => {
+    if (!resizing) return;
+    resizing = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    if (lastW < COLLAPSE_THRESHOLD_PX) {
+      rail.style.width = '280px';
+      try { localStorage.setItem(RAIL_WIDTH_KEY, '280'); } catch (e) {}
+      collapseRail();
+    } else {
+      const finalW = Math.max(RAIL_MIN_PX, Math.min(RAIL_MAX_PX, lastW));
+      rail.style.width = finalW + 'px';
+      try { localStorage.setItem(RAIL_WIDTH_KEY, String(finalW)); } catch (e) {}
+    }
+  });
+})();
+</script>
+</body>
+</html>
