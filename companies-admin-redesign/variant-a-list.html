@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Companies workspace — v4</title>
+<title>Companies workspace</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   
@@ -21,7 +21,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
   .status-exited     { background:#bbf7d0; color:#065f46; }
   .status-closed     { background:#e5e7eb; color:#4b5563; }
   .filter-chip       { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
-  .seed-note         { background:#fef9c3; border:1px solid #fde68a; color:#713f12; }
   .seg-btn           { background:#fff; color:#475569; border:1px solid #e2e8f0; }
   .seg-btn.on        { background:#1e293b; color:#fff; border-color:#1e293b; }
   details > summary { list-style: none; cursor: pointer; }
@@ -133,10 +132,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 <body class="bg-white text-slate-900 text-sm">
 
 <div class="mockup-nav bg-slate-800 text-slate-100 px-4 py-2 text-xs flex items-center gap-3 sticky top-0 z-50">
-  <span class="font-semibold">Mockup v5</span>
-  <span class="text-slate-300">Companies workspace — view builder pane</span>
+  <span class="font-semibold">Companies workspace</span>
   <span class="ml-auto"><a class="text-blue-300 hover:underline" href="variant-a-groupby.html">Grouped example →</a></span>
-  <span><a class="text-blue-300 hover:underline" href="view-builder.html">Filter chooser demo →</a></span>
+  <span><a class="text-blue-300 hover:underline" href="view-builder.html">Filter chooser →</a></span>
   <span><a class="text-blue-300 hover:underline" href="detail.html" onclick="openDetailPanel(event)">Detail →</a></span>
   <span><a class="text-blue-300 hover:underline" href="plan.md">plan.md</a></span>
 </div>
@@ -277,7 +275,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <span class="view-setting-label">Columns</span>
               <span class="view-setting-value">8 shown</span>
             </button>
-            <a href="variant-a-groupby.html" class="view-setting-row" title="Mockup link; production opens this as a view setting on the same page">
+            <a href="variant-a-groupby.html" class="view-setting-row">
               <span class="view-setting-icon">▦</span>
               <span class="view-setting-label">Group by</span>
               <span class="view-setting-value">None</span>
@@ -987,8 +985,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
   }
 
   function newView() {
-    // would open the save-as dialog
-    alert("Open the save dialog (see view-builder.html for the dialog mock).");
+    setModified(true);
+    closeAllPopovers();
   }
 
   function filterViews(q) {

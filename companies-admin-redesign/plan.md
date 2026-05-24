@@ -2,8 +2,9 @@
 title: Companies Admin Redesign
 status: draft
 owner: jordan
+created: 2026-05-23
 home: variant-a-list
-last_updated: 2026-05-23
+last_updated: 2026-05-24
 ---
 
 # Companies admin redesign
@@ -266,7 +267,7 @@ Companies   [ All companies · modified ▾ ]   [ Save ▾ ]   1,247 total · �
 `Save ▾` opens a small menu:
 
 - **Update "All companies"** — enabled only if the user owns the current view, or is an admin acting on a shared view.
-- **Save as new view** — opens the save dialog (in `view-builder.html`): name, Personal or Shared, optional color.
+- **Save as new view** — opens a save dialog with name, Personal or Shared, and optional color. The dialog follows the same compact modal styling as the Add Filter dialog shown in `view-builder.html`.
 - **Discard changes** — reverts to the saved view's filter / column / sort / summary state.
 
 If the user navigates away or switches views while modified, prompt: **"Save this view for later?"** Actions: **Update current view** (enabled when allowed), **Save as new personal view** (default for most users), **Save as new shared view** (permissioned), **Discard changes**, and **Cancel**. The prompt uses `AlertDialog` and a plain `Button` for async save actions; it must not use `AlertDialogAction` for save/update.
@@ -456,7 +457,7 @@ The single largest engineering prerequisite is **adding `company_events` to `ROL
 
 ### 15.3 The Add Filter dialog
 
-The dialog's `FILTERS` array in `view-builder.html` is the canonical list, with 70+ entries across five domains. Notable inclusions:
+The dialog's `FILTERS` array in `view-builder.html` is the mockup reference list, with 70+ entries across five domains. The production source of truth remains `lib/admin-grid-config.js` plus the proposed rollups in §15.2. Notable inclusions:
 
 - **All 14 pitch-content long-text fields** from `applications` (Tagline, Problem, Solution, Business Model, Market, Go to Market, Competitive Advantage, Traction, Competitors, Future Milestones, Patentable Ideas, Environmental Impact, Team, Management Qualifications) — each filterable as a full-text search; plus an "Application content (full-text)" wrapper that searches across all of them at once for the "match anywhere in the pitch" case.
 - **The fundraising / files / metadata columns** on `applications`: Cap table, Data room, Deal terms, Diligence folder, Financial position, Funding to date amount, Lead investor, Slack channel, Status (per application), Use of funds, Dealum ID.
@@ -485,7 +486,7 @@ The dialog's `FILTERS` array in `view-builder.html` is the canonical list, with 
 
 ### 16.2 Application history mini-table
 
-Three columns: **Applied · Furthest stage · Pitch date.** See §7 for column definitions. Whole application row is clickable and opens the detail pane at `/admin/company/<id>#app-<id>`.
+Three columns: **Applied · Furthest stage · Pitch date.** See §7 for column definitions. Whole application row is clickable and opens the detail pane with the selected company and application reflected in URL state.
 
 ### 16.3 Kebab menu on each company row
 
@@ -507,7 +508,7 @@ Closed by clicking outside or pressing Escape. Positioned absolute relative to t
 
 The company list/detail header uses `companies.blurb` for company-level descriptive text, clamped to two lines via the `tagline-clamp` CSS class where space is tight. Application tagline (`applications.tagline`) is not used as company header copy; it appears inside the selected application tab.
 
-### 16.5 Logo placeholder
+### 16.5 Logo handling
 
 The list row does not show a logo or initials placeholder. The company detail header can still show a logo (or initials fallback). When `companies.logo_drive_file_id` is set, render `<img src="/api/files/<logo_drive_file_id>">` (proxied per AGENTS.md, never raw Drive URL).
 
@@ -538,7 +539,7 @@ The redesigned detail page replaces both today's `/admin/company/<id>` (`EditCom
 - **`variant-a-list.html` detail pane** — primary read workflow. Opens `detail.html` over the company list without losing table state.
 - **`view-builder.html`** — focused Add Filter / filter chooser interaction for the Companies list left rail.
 - **`detail.html`** — read-mostly **view** of one company. Every section visible; every section is what a staff person would *consume* (read) about the company. Some fields can be edited in place (pencil hover) but the page's role is to inform. It is pane-ready and does not include a list breadcrumb/back header.
-- **`detail-edit.html`** — full **edit form**. Same sections, same field set, all editable. Reached from `detail.html` via an `Edit` button in the company tile or via a per-section ✎ icon.
+- **`detail-edit.html`** — edit-form density and control-pattern reference. It is not the canonical source for detail-page read layout or sample data; the implementation should use the field grouping rules in §17.4 and §17.6.
 
 Switching between view and edit preserves scroll position and the section anchor.
 
@@ -551,8 +552,7 @@ Order on `detail.html`:
 1. **Company header** — single compact company summary. Shows logo, company name, portfolio-company tag when applicable, category/subcategory, HQ, website, company blurb, company status, conditional invested amount, and conditional current stage. It must not repeat the same facts in a second profile card below.
 2. **Investments panel** — collapsible, open by default. Uses the same content model as Application Review's `InvestmentsSection` on `application-review?tab=details&section=investments`. Investments are never nested under an application tab because E8 invests in companies, not applications.
 3. **Applications workspace** — one tab per application, sorted newest first. Application tabs are the primary way to read pipeline submissions.
-4. **Company events panel** — collapsible, open by default when included. Chronological `company_events` list across all applications.
-5. **Right rail** — stacked accordion panels following the `application-review?tab=diligence` right-rail model. Notes and Emails are first-class panels in this stack, not small cards. Application-scoped document and recording panels live inside the selected application tab instead.
+4. **Right rail** — stacked accordion panels following the `application-review?tab=diligence` right-rail model. Notes and Emails are first-class panels in this stack, not small cards. Application-scoped document and recording panels live inside the selected application tab instead.
 
 All major panels use the same disclosure pattern: chevron + title + one-line summary in the header; body hidden when collapsed. Default open/closed state is a product setting, not hard-coded to the component.
 
@@ -644,7 +644,7 @@ Within the active tab, the layout is:
 
 1. **Application section menu** — fixed-width left rail on desktop, stacked above content on mobile. It mirrors the section model on `/application-review?tab=details`: selecting one menu item replaces the right-side content with that section. It is not an accordion and does not show multiple sections at once.
 2. **Application content area** — main column. Shows only the selected section. The default selected section is **Basics**.
-3. **Application edit link** — available from the tab or active application header, linking to `detail-edit.html#application-<record_id>`.
+3. **Application edit link** — available from the tab or active application header, linking to the edit route with `?application=<application_record_id>`.
 
 Application section menu options, in order:
 
@@ -804,20 +804,16 @@ Each collapsed email row shows a scan summary:
 
 Clicking a row expands it inline into an email-like view. Expanded rows show From, To, Subject, Date, and then the body text. Do not add a "Body" or "Content" label above the body. Attachments render below the body when `attachments_json` is non-empty.
 
-### 17.11 Events section
-
-Chronological company-level panel below the Applications workspace. Each row: date · event type (Pitch / Follow-On Pitch / Pre-Screening / Screening / Diligence Debrief / Investment Committee / …) · application year · member lead · attached links (recording, zoom, questions doc). The pitch-meeting parent (via `parent_meeting_id`) is shown as a small "linked to Member Meeting · 2026-04-12" footer on Pitch / Follow-On Pitch rows.
-
-### 17.12 Date formats
+### 17.11 Date formats
 
 - **`YYYY-MM-DD`** for date inputs and most read-display dates (e.g., investment date, follow-up, round close, diligence date formed, note date).
 - **`Mon D, YYYY`** ("Mar 12, 2026") for the Companies list **Latest event** column.
 - **`Mon YYYY`** ("Apr 2026") for application month-of-applied and round date summaries.
 - **"N days ago"** / **"N wk ago"** / **"N mo ago"** for the Last touch column.
 
-### 17.14 Edit page (detail-edit.html)
+### 17.12 Edit page (detail-edit.html)
 
-Same section layout as `detail.html`. Each field becomes an input. Field grouping mirrors `EditCompanyIsland`'s `CompactRow` pattern (160px right-aligned uppercase label · multi-input row). For the application card, grouping mirrors `EditApplicationIsland`'s 2-column grid for the pitch-content fields plus the special Deal Terms launcher.
+`detail-edit.html` demonstrates edit density and form controls. The production edit page should keep the same company/application URL state as the view page, but it does not need to copy the old edit mockup's left nav or sample company data. Each field becomes an input. Field grouping mirrors `EditCompanyIsland`'s `CompactRow` pattern (160px right-aligned uppercase label · multi-input row). For application fields, grouping mirrors `EditApplicationIsland`'s 2-column grid for pitch-content fields plus the special Deal Terms launcher.
 
 Header actions on the edit page:
 
@@ -825,14 +821,14 @@ Header actions on the edit page:
 - Save (PATCH only changed fields, per the diff-based pattern `buildChangedFieldsPayload` already uses)
 - Cancel (discard changes, prompt if dirty)
 
-### 17.15 Routes
+### 17.13 Routes
 
 - List view: `/admin/companies`; selecting a company opens the detail pane without leaving this route.
 - Direct view: `/admin/company/<co_record_id>` renders the same detail component as a full page for reloads, deep links, and external links.
 - Edit: `/admin/company/<co_record_id>/edit`
-- Deep links to a section: `#overview`, `#profile`, `#contacts`, `#applications`, `#app-<app_record_id>` (auto-expands that application card), `#investments`, `#notes`, `#emails`, `#events`, `#ratings`
+- Deep links use URL state for the exact detail-pane state: `?company=<co_record_id>&application=<app_record_id>&section=<section_id>`. The supported `section` values are `basics`, `team`, `raise`, `screening`, `diligence-team`, `discussions`, `documents`, `ai-insights`, `ask-ai`, and `history`.
 
-Legacy `/admin/application/<app_record_id>` redirects to `/admin/company/<co_record_id>#app-<app_record_id>` for read view or `/admin/company/<co_record_id>/edit#app-<app_record_id>` for edit actions.
+Legacy `/admin/application/<app_record_id>` redirects to `/admin/company/<co_record_id>?application=<app_record_id>&section=basics` for read view or `/admin/company/<co_record_id>/edit?application=<app_record_id>` for edit actions.
 
 ## 18. Design Guide Compliance checklist
 

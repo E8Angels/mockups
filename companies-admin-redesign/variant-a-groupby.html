@@ -4,13 +4,12 @@
 <meta charset="utf-8" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Companies workspace — group-by mode (v6)</title>
+<title>Companies workspace - group-by</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   
   html { font-size: 18px; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-  .seed-note         { background:#fef9c3; border:1px solid #fde68a; color:#713f12; }
   .stage-pill        { background:#f8fafc; color:#475569; border:1px solid #e2e8f0; }
   .ladder-screen     { background:#e0e7ff; color:#3730a3; }
   .ladder-pitch      { background:#fef3c7; color:#92400e; }
@@ -74,18 +73,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 <body class="bg-white text-slate-900 text-sm">
 
 <div class="bg-slate-800 text-slate-100 px-4 py-2 text-xs flex items-center gap-3 sticky top-0 z-50">
-  <span class="font-semibold">Mockup v6</span>
-  <span class="text-slate-300">Companies workspace — group-by with per-column summaries</span>
+  <span class="font-semibold">Companies workspace</span>
+  <span class="text-slate-300">Group-by with per-column summaries</span>
   <span class="ml-auto"><a class="text-blue-300 hover:underline" href="variant-a-list.html">← List view</a></span>
   <span><a class="text-blue-300 hover:underline" href="view-builder.html">Add filter →</a></span>
   <span><a class="text-blue-300 hover:underline" href="plan.md">plan.md</a></span>
 </div>
 
 <div class="max-w-[1500px] mx-auto px-4 py-4">
-
-  <div class="seed-note rounded-md px-3 py-2 mb-3 text-xs">
-    <span class="font-semibold">v6 changes:</span> Group-by is Airtable-style. The dedicated "# companies / Total deployed / Avg per group" columns are gone. Instead, every column can have its own summary chosen from the picker at that column's footer cell. <b>Look at the table footer:</b> Capital is set to <b>sum</b>, Last touch is set to <b>latest</b>, and the other columns show <b>＋ Summary</b> as a dashed button — click any to open the aggregation picker for that column. The Capital picker is open by default in this mockup. Multi-level grouping is supported via the Group-by panel above (currently: Status → Sector).
-  </div>
 
   <!-- TITLE ROW -->
   <div class="flex items-center gap-2 mb-3">
@@ -204,7 +199,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td class="text-right tabular-nums"><span class="sigma-out">$70,600,000</span></td>
           <td></td>
           <td></td>
-          <td class="tabular-nums"><span class="sigma-out">2026-04-12</span></td>
+          <td class="tabular-nums"><span class="sigma-out">Apr 12, 2026</span></td>
         </tr>
 
         <!-- ===== Active > Solar (level 2) ===== -->
@@ -220,7 +215,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td class="text-right tabular-nums"><span class="sigma-out">$18,400,000</span></td>
           <td></td>
           <td></td>
-          <td class="tabular-nums"><span class="sigma-out">2026-04-02</span></td>
+          <td class="tabular-nums"><span class="sigma-out">Apr 2, 2026</span></td>
         </tr>
         <tr class="leaf l1-active l2-active-solar">
           <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Aurora Cells</a><div class="text-[12px] text-slate-500">Tandem perovskite-silicon for utility solar</div></td>
@@ -228,7 +223,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$400,000</td>
           <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Diligence Debrief</div><div class="text-[12px] text-slate-500">2026-04-02</div></td>
+          <td><div>Diligence Debrief</div><div class="text-[12px] text-slate-500">Apr 2, 2026</div></td>
           <td class="text-slate-500">2 d ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-solar">
@@ -237,7 +232,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$325,000</td>
           <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Pitch</div><div class="text-[12px] text-slate-500">2026-03-18</div></td>
+          <td><div>Pitch</div><div class="text-[12px] text-slate-500">Mar 18, 2026</div></td>
           <td class="text-slate-500">1 wk ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-solar">
@@ -246,7 +241,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$275,000</td>
           <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Investment Committee</div><div class="text-[12px] text-slate-500">2025-12-04</div></td>
+          <td><div>Investment Committee</div><div class="text-[12px] text-slate-500">Dec 4, 2025</div></td>
           <td class="text-slate-500">5 wk ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-solar">
@@ -255,7 +250,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$450,000</td>
           <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Diligence Debrief</div><div class="text-[12px] text-slate-500">2025-11-19</div></td>
+          <td><div>Diligence Debrief</div><div class="text-[12px] text-slate-500">Nov 19, 2025</div></td>
           <td class="text-slate-500">6 wk ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-solar">
@@ -276,7 +271,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td class="text-right tabular-nums"><span class="sigma-out">$8,400,000</span></td>
           <td></td>
           <td></td>
-          <td class="tabular-nums"><span class="sigma-out">2026-02-14</span></td>
+          <td class="tabular-nums"><span class="sigma-out">Feb 14, 2026</span></td>
         </tr>
         <tr class="leaf l1-active l2-active-ev">
           <td class="indent-leaf-cell"><a href="detail.html" class="font-medium text-slate-900 hover:underline">Voltaic Drive</a><div class="text-[12px] text-slate-500">Drop-in EV conversion kits for last-mile fleets</div></td>
@@ -284,7 +279,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$425,000</td>
           <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Diligence Debrief</div><div class="text-[12px] text-slate-500">2026-02-14</div></td>
+          <td><div>Diligence Debrief</div><div class="text-[12px] text-slate-500">Feb 14, 2026</div></td>
           <td class="text-slate-500">3 d ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-ev">
@@ -293,7 +288,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$300,000</td>
           <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Investment Committee</div><div class="text-[12px] text-slate-500">2026-01-15</div></td>
+          <td><div>Investment Committee</div><div class="text-[12px] text-slate-500">Jan 15, 2026</div></td>
           <td class="text-slate-500">12 d ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-ev">
@@ -302,7 +297,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$150,000</td>
           <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Pitch</div><div class="text-[12px] text-slate-500">2026-01-09</div></td>
+          <td><div>Pitch</div><div class="text-[12px] text-slate-500">Jan 9, 2026</div></td>
           <td class="text-slate-500">3 wk ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-ev">
@@ -311,7 +306,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
           <td class="text-right tabular-nums font-medium">$250,000</td>
           <td><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
-          <td><div>Pitch</div><div class="text-[12px] text-slate-500">2024-05-14</div></td>
+          <td><div>Pitch</div><div class="text-[12px] text-slate-500">May 14, 2024</div></td>
           <td class="text-slate-500">14 wk ago</td>
         </tr>
         <tr class="leaf l1-active l2-active-ev">
@@ -329,7 +324,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td></td><td></td><td></td>
           <td class="text-right tabular-nums"><span class="sigma-out">$9,200,000</span></td>
           <td></td><td></td>
-          <td class="tabular-nums"><span class="sigma-out">2026-04-12</span></td>
+          <td class="tabular-nums"><span class="sigma-out">Apr 12, 2026</span></td>
         </tr>
         <tr class="group-l2 l1-active collapsed" data-l2="active-capture">
           <td class="indent-l2" onclick="toggleL2('active-capture')">
@@ -340,7 +335,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td></td><td></td><td></td>
           <td class="text-right tabular-nums"><span class="sigma-out">$5,100,000</span></td>
           <td></td><td></td>
-          <td class="tabular-nums"><span class="sigma-out">2026-03-08</span></td>
+          <td class="tabular-nums"><span class="sigma-out">Mar 8, 2026</span></td>
         </tr>
         <tr class="group-l2 l1-active collapsed" data-l2="active-bldg">
           <td class="indent-l2" onclick="toggleL2('active-bldg')">
@@ -351,7 +346,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td></td><td></td><td></td>
           <td class="text-right tabular-nums"><span class="sigma-out">$5,650,000</span></td>
           <td></td><td></td>
-          <td class="tabular-nums"><span class="sigma-out">2026-01-22</span></td>
+          <td class="tabular-nums"><span class="sigma-out">Jan 22, 2026</span></td>
         </tr>
         <tr class="group-l2 l1-active collapsed text-slate-200">
           <td class="indent-l2">
@@ -362,7 +357,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td></td><td></td><td></td>
           <td class="text-right tabular-nums"><span class="sigma-out">$23,850,000</span></td>
           <td></td><td></td>
-          <td class="tabular-nums"><span class="sigma-out">2026-04-10</span></td>
+          <td class="tabular-nums"><span class="sigma-out">Apr 10, 2026</span></td>
         </tr>
 
         <!-- ============== EXITED GROUP (level 1, collapsed) ============== -->
@@ -375,7 +370,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td></td><td></td><td></td>
           <td class="text-right tabular-nums"><span class="sigma-out">$4,700,000</span></td>
           <td></td><td></td>
-          <td class="tabular-nums"><span class="sigma-out">2025-12-19</span></td>
+          <td class="tabular-nums"><span class="sigma-out">Dec 19, 2025</span></td>
         </tr>
 
         <!-- ============== CLOSED GROUP (level 1, collapsed) ============== -->
@@ -388,7 +383,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td></td><td></td><td></td>
           <td class="text-right tabular-nums"><span class="sigma-out">$2,900,000</span></td>
           <td></td><td></td>
-          <td class="tabular-nums"><span class="sigma-out">2024-08-30</span></td>
+          <td class="tabular-nums"><span class="sigma-out">Aug 30, 2024</span></td>
         </tr>
 
       </tbody>
@@ -406,7 +401,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <td class="sigma-cell" onclick="toggleSigmaMenu(event,'status')"><button class="sigma-empty-btn">＋ Summary</button></td>
           <td class="sigma-cell" onclick="toggleSigmaMenu(event,'event')"><button class="sigma-empty-btn">＋ Summary</button></td>
           <td class="tabular-nums sigma-cell" onclick="toggleSigmaMenu(event,'lasttouch')">
-            <span class="sigma-label">latest</span><span class="sigma-out">2026-04-12</span><span class="sigma-chev">▾</span>
+            <span class="sigma-label">latest</span><span class="sigma-out">Apr 12, 2026</span><span class="sigma-chev">▾</span>
           </td>
         </tr>
       </tfoot>
