@@ -49,6 +49,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
   .row-dot { width:10px; text-align:center; color:transparent; }
   .row-menu-btn { opacity:0; }
   .view-row:hover .row-menu-btn { opacity:1; }
+  .view-builder-card { border:1px solid #cbd5e1; border-radius:6px; background:#fff; overflow:visible; box-shadow:0 1px 2px rgba(15,23,42,0.04); }
+  .view-builder-head { background:#f8fafc; border-bottom:1px solid #e2e8f0; padding:8px; }
+  .view-setting-row { display:flex; align-items:center; gap:8px; width:100%; min-height:30px; padding:6px 10px; text-align:left; }
+  .view-setting-row:hover { background:#f8fafc; }
+  .view-setting-label { color:#334155; font-weight:600; }
+  .view-setting-value { margin-left:auto; color:#64748b; font-size:12px; max-width:145px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .view-setting-icon { color:#94a3b8; width:15px; text-align:center; }
+  .view-section-title { padding:8px 10px 4px; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; font-weight:700; }
 
   /* Resizable rail */
   .workspace { display:flex; gap:0; align-items:stretch; }
@@ -57,19 +65,28 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
   .workspace-handle::before { content:''; position:absolute; top:0; bottom:0; left:2px; width:2px; background:#e2e8f0; }
   .workspace-handle:hover::before, .workspace-handle.dragging::before { background:#3b82f6; left:1px; width:4px; }
   .workspace-main { flex:1; min-width:0; padding-left:10px; }
+  .detail-drawer {
+    width:min(96vw, 1320px);
+    transform:translateX(100%);
+    transition:transform .18s ease;
+  }
+  #detailOverlay.flex .detail-drawer { transform:translateX(0); }
+  .detail-close-btn { position:absolute; left:-44px; top:12px; z-index:10; }
 
   /* Collapsed rail — thin vertical button (mirrors diligence RightRail) */
   .rail-collapsed-btn { width:36px; flex-shrink:0; border-right:1px solid #e2e8f0; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:14px 0; cursor:pointer; }
   .rail-collapsed-btn:hover { background:#f8fafc; }
   .rail-collapsed-btn .rcb-chev { color:#64748b; font-size:15px; line-height:1; }
   .rail-collapsed-btn:hover .rcb-chev { color:#0f172a; }
-  .rail-collapsed-btn .rcb-label { writing-mode:vertical-rl; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:#475569; }
+  .rail-collapsed-btn .rcb-label { writing-mode:vertical-rl; font-size:12px; font-weight:600; letter-spacing:0.02em; color:#475569; }
   .rail-collapsed-btn:hover .rcb-label { color:#0f172a; }
   .rail-collapsed-btn .rcb-icon { color:#64748b; }
   .rail-collapsed-btn:hover .rcb-icon { color:#0f172a; }
 
   /* Row interactions */
   tbody tr.table-row { cursor:pointer; }
+  .row-expand-btn { width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; }
+  .row-expand-btn:hover { background:#e2e8f0; }
   .row-chev { font-size:14px; color:#475569; line-height:1; display:inline-block; width:14px; text-align:center; }
   .row-chev:hover { color:#0f172a; }
 
@@ -103,135 +120,33 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
   .kebab-item.danger { color:#b91c1c; }
   .kebab-item.danger:hover { background:#fee2e2; }
   .kebab-divider { border-top:1px solid #f1f5f9; margin:4px 0; }
+  @media (max-width:700px) {
+    html, body { max-width:100%; overflow-x:hidden; }
+    .mockup-nav { overflow-x:auto; }
+    .workspace { display:block; overflow:hidden; }
+    .workspace-rail { width:auto !important; padding-right:0; }
+    .workspace-handle { display:none; }
+    .workspace-main { padding-left:0; margin-top:10px; overflow-x:auto; }
+  }
 </style>
 </head>
 <body class="bg-white text-slate-900 text-sm">
 
-<div class="bg-slate-800 text-slate-100 px-4 py-2 text-xs flex items-center gap-3 sticky top-0 z-50">
-  <span class="font-semibold">Mockup v4</span>
-  <span class="text-slate-300">Companies workspace — list view</span>
-  <span class="ml-auto"><a class="text-blue-300 hover:underline" href="variant-a-groupby.html">Group-by →</a></span>
-  <span><a class="text-blue-300 hover:underline" href="view-builder.html">Add filter demo →</a></span>
-  <span><a class="text-blue-300 hover:underline" href="detail.html">Detail →</a></span>
+<div class="mockup-nav bg-slate-800 text-slate-100 px-4 py-2 text-xs flex items-center gap-3 sticky top-0 z-50">
+  <span class="font-semibold">Mockup v5</span>
+  <span class="text-slate-300">Companies workspace — view builder pane</span>
+  <span class="ml-auto"><a class="text-blue-300 hover:underline" href="variant-a-groupby.html">Grouped example →</a></span>
+  <span><a class="text-blue-300 hover:underline" href="view-builder.html">Filter chooser demo →</a></span>
+  <span><a class="text-blue-300 hover:underline" href="detail.html" onclick="openDetailPanel(event)">Detail →</a></span>
   <span><a class="text-blue-300 hover:underline" href="plan.md">plan.md</a></span>
 </div>
 
 <div class="max-w-[1500px] mx-auto px-4 py-4">
 
-  <!-- TITLE ROW with view picker -->
+  <!-- TITLE ROW -->
   <div class="flex items-center gap-2 mb-3">
     <h1 class="text-lg font-semibold">Companies</h1>
-
-    <!-- VIEW PICKER -->
-    <div class="relative">
-      <button onclick="toggleViewPicker(event)" id="viewBtn"
-              class="dd-trigger h-7 px-2.5 rounded-md flex items-center gap-1.5 text-xs">
-        <span class="font-medium" id="viewBtnName">All companies</span>
-        <span id="viewBtnMod" class="hidden text-slate-500 text-[12px]">· modified</span>
-        <span class="text-slate-400 text-[11px]">▾</span>
-      </button>
-
-      <div id="viewPicker" class="popover" style="left:0; min-width:300px;">
-        <div class="p-2 border-b border-slate-100">
-          <input type="text" placeholder="Find a view…" autocomplete="off" data-lpignore="true" data-form-type="other"
-                 class="w-full h-7 px-2 border border-slate-300 rounded text-xs" oninput="filterViews(this.value)" />
-        </div>
-
-        <div class="px-2 pt-2 pb-1 text-[11px] uppercase tracking-wide text-slate-500 font-semibold">Shared</div>
-        <div class="px-1 pb-1" id="sharedViews">
-          <div class="view-row active" onclick="selectView('All companies', true)">
-            <span class="row-dot">●</span>
-            <span class="flex-1">All companies <span class="text-[11px] text-slate-400 font-normal">default</span></span>
-            <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
-          </div>
-          <div class="view-row" onclick="selectView('Active portfolio', true)">
-            <span class="row-dot"> </span><span class="flex-1">Active portfolio</span>
-            <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
-          </div>
-          <div class="view-row" onclick="selectView('Active diligence', true)">
-            <span class="row-dot"> </span><span class="flex-1">Active diligence</span>
-            <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
-          </div>
-          <div class="view-row" onclick="selectView('Pitched · last 2y', true)">
-            <span class="row-dot"> </span><span class="flex-1">Pitched · last 2y</span>
-            <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
-          </div>
-          <div class="view-row" onclick="selectView('Underrepresented portfolio', true)">
-            <span class="row-dot"> </span><span class="flex-1">Underrepresented portfolio</span>
-            <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
-          </div>
-          <div class="view-row" onclick="selectView('Canadian portfolio', true)">
-            <span class="row-dot"> </span><span class="flex-1">Canadian portfolio</span>
-            <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
-          </div>
-        </div>
-
-        <div class="flex items-center px-2 pt-2 pb-1 border-t border-slate-100">
-          <div class="text-[11px] uppercase tracking-wide text-slate-500 font-semibold">Mine</div>
-          <button class="ml-auto text-[12px] text-blue-600 hover:underline" onclick="event.stopPropagation(); newView()">＋ New</button>
-        </div>
-        <div class="px-1 pb-2" id="myViews">
-          <div class="view-row" onclick="selectView('Decarbon8 vintage analysis', false)">
-            <span class="row-dot"> </span><span class="flex-1">Decarbon8 vintage analysis</span>
-            <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
-          </div>
-          <div class="view-row" onclick="selectView('PNW only', false)">
-            <span class="row-dot"> </span><span class="flex-1">PNW only</span>
-            <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
-          </div>
-          <div class="view-row" onclick="selectView('EV deep-dive — sponsor outreach', false)">
-            <span class="row-dot"> </span><span class="flex-1">EV deep-dive — sponsor outreach</span>
-            <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
-          </div>
-        </div>
-
-        <div class="border-t border-slate-100 p-2">
-          <button class="text-[12px] text-slate-600 hover:text-slate-900 hover:underline">Manage all views</button>
-        </div>
-      </div>
-
-      <!-- Per-row menu popover (shared instance) -->
-      <div id="rowMenu" class="popover" style="left:0; min-width:200px;">
-        <div class="py-1 text-xs">
-          <button class="w-full text-left px-3 py-1.5 hover:bg-slate-50">Rename</button>
-          <button class="w-full text-left px-3 py-1.5 hover:bg-slate-50">Set as my default</button>
-          <button class="w-full text-left px-3 py-1.5 hover:bg-slate-50">Duplicate</button>
-          <button class="w-full text-left px-3 py-1.5 hover:bg-slate-50">Make personal</button>
-          <div class="border-t border-slate-100 my-1"></div>
-          <button class="w-full text-left px-3 py-1.5 hover:bg-slate-50 text-red-600">Delete</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- SAVE BUTTON (only when modified) -->
-    <div class="relative hidden" id="saveBtnWrap">
-      <button onclick="toggleSaveMenu(event)" class="h-7 px-2.5 rounded-md text-xs bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-1">
-        Save <span class="text-[11px]">▾</span>
-      </button>
-      <div id="saveMenu" class="popover" style="left:0; min-width:260px;">
-        <div class="py-1 text-xs">
-          <button id="updateBtn" class="w-full text-left px-3 py-1.5 hover:bg-slate-50">
-            <div>Update "<span id="updateBtnName">All companies</span>"</div>
-            <div id="updateBtnNote" class="text-[11px] text-slate-500">Only the owner or an admin can update</div>
-          </button>
-          <button class="w-full text-left px-3 py-1.5 hover:bg-slate-50">Save as new view…</button>
-          <div class="border-t border-slate-100 my-1"></div>
-          <button class="w-full text-left px-3 py-1.5 hover:bg-slate-50 text-slate-600" onclick="toggleSimulateModified()">Discard changes</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="text-slate-500 text-xs ml-2">1,247 total · 312 invested · 84 active applications</div>
-
-    <div class="ml-auto flex items-center gap-2">
-      <button class="h-8 px-3 text-xs font-medium border border-slate-300 rounded-md hover:bg-slate-50">Columns</button>
-      <a href="variant-a-groupby.html" class="h-8 px-3 text-xs font-medium border border-slate-300 rounded-md hover:bg-slate-50 flex items-center">Group by</a>
-    </div>
-  </div>
-
-  <!-- SORT ROW -->
-  <div class="flex items-center justify-end mb-3">
-    <button class="h-8 px-3 text-xs font-medium border border-slate-300 rounded-md hover:bg-slate-50 whitespace-nowrap">Sort: Last touch ↓</button>
+    <div class="text-slate-500 text-xs ml-2">1,247 companies</div>
   </div>
 
   <div class="workspace" id="workspace">
@@ -240,22 +155,142 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     <button id="workspaceRailCollapsed"
             type="button"
             onclick="expandRail()"
-            title="Open filters"
+            title="Open view builder"
             class="rail-collapsed-btn"
             style="display:none;">
       <span class="rcb-chev">›</span>
-      <span class="rcb-label">Filters</span>
+      <span class="rcb-label">View: All companies</span>
       <svg class="rcb-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
       </svg>
     </button>
 
-    <!-- LEFT RAIL FILTERS -->
+    <!-- LEFT RAIL VIEW BUILDER -->
     <aside class="workspace-rail text-xs" id="workspaceRail" style="width:280px;">
-      <div class="flex items-center justify-end mb-1.5">
-        <button type="button" onclick="collapseRail()" title="Collapse filters" class="text-slate-400 hover:text-slate-700 text-xs leading-none px-1">‹</button>
-      </div>
-      <div class="border border-slate-200 rounded-md bg-white divide-y divide-slate-200">
+      <div class="view-builder-card">
+        <div class="view-builder-head">
+          <div class="flex items-center mb-1.5">
+            <div class="text-[11px] uppercase tracking-wide text-slate-500 font-semibold">View</div>
+            <button type="button" onclick="collapseRail()" title="Collapse view builder" class="ml-auto text-slate-400 hover:text-slate-700 text-xs leading-none px-1">‹</button>
+          </div>
+          <div class="relative">
+            <button onclick="toggleViewPicker(event)" id="viewBtn"
+                    class="dd-trigger w-full h-8 px-2.5 rounded-md flex items-center gap-1.5 text-xs text-left">
+              <span class="font-semibold truncate flex-1" id="viewBtnName">All companies</span>
+              <span id="viewBtnMod" class="hidden text-slate-500 text-[12px]">· modified</span>
+              <span class="text-slate-400 text-[11px]">▾</span>
+            </button>
+
+            <div id="viewPicker" class="popover" style="left:0; min-width:300px;">
+              <div class="p-2 border-b border-slate-100">
+                <input type="text" placeholder="Find a view…" autocomplete="off" data-lpignore="true" data-form-type="other"
+                       class="w-full h-7 px-2 border border-slate-300 rounded text-xs" oninput="filterViews(this.value)" />
+              </div>
+
+              <div class="px-2 pt-2 pb-1 text-[11px] uppercase tracking-wide text-slate-500 font-semibold">Shared</div>
+              <div class="px-1 pb-1" id="sharedViews">
+                <div class="view-row active" onclick="selectView('All companies', true)">
+                  <span class="row-dot">●</span>
+                  <span class="flex-1">All companies <span class="text-[11px] text-slate-400 font-normal">default</span></span>
+                  <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
+                </div>
+                <div class="view-row" onclick="selectView('Active portfolio', true)">
+                  <span class="row-dot"> </span><span class="flex-1">Active portfolio</span>
+                  <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
+                </div>
+                <div class="view-row" onclick="selectView('Active diligence', true)">
+                  <span class="row-dot"> </span><span class="flex-1">Active diligence</span>
+                  <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
+                </div>
+                <div class="view-row" onclick="selectView('Pitched · last 2y', true)">
+                  <span class="row-dot"> </span><span class="flex-1">Pitched · last 2y</span>
+                  <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
+                </div>
+                <div class="view-row" onclick="selectView('Underrepresented portfolio', true)">
+                  <span class="row-dot"> </span><span class="flex-1">Underrepresented portfolio</span>
+                  <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
+                </div>
+                <div class="view-row" onclick="selectView('Canadian portfolio', true)">
+                  <span class="row-dot"> </span><span class="flex-1">Canadian portfolio</span>
+                  <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
+                </div>
+              </div>
+
+              <div class="flex items-center px-2 pt-2 pb-1 border-t border-slate-100">
+                <div class="text-[11px] uppercase tracking-wide text-slate-500 font-semibold">Mine</div>
+                <button class="ml-auto text-[12px] text-blue-600 hover:underline" onclick="event.stopPropagation(); newView()">＋ New</button>
+              </div>
+              <div class="px-1 pb-2" id="myViews">
+                <div class="view-row" onclick="selectView('Decarbon8 vintage analysis', false)">
+                  <span class="row-dot"> </span><span class="flex-1">Decarbon8 vintage analysis</span>
+                  <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
+                </div>
+                <div class="view-row" onclick="selectView('PNW only', false)">
+                  <span class="row-dot"> </span><span class="flex-1">PNW only</span>
+                  <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
+                </div>
+                <div class="view-row" onclick="selectView('EV deep-dive — sponsor outreach', false)">
+                  <span class="row-dot"> </span><span class="flex-1">EV deep-dive — sponsor outreach</span>
+                  <button class="row-menu-btn text-slate-400 hover:text-slate-700 text-xs" onclick="event.stopPropagation(); toggleRowMenu(this)">⋯</button>
+                </div>
+              </div>
+
+              <div class="border-t border-slate-100 p-2">
+                <button class="text-[12px] text-slate-600 hover:text-slate-900 hover:underline">Manage all views</button>
+              </div>
+            </div>
+
+            <div id="rowMenu" class="popover" style="left:0; min-width:200px;">
+              <div class="py-1 text-xs">
+                <button class="w-full text-left px-3 py-1.5 hover:bg-slate-50">Rename</button>
+                <button class="w-full text-left px-3 py-1.5 hover:bg-slate-50">Set as my default</button>
+                <button class="w-full text-left px-3 py-1.5 hover:bg-slate-50">Duplicate</button>
+                <button class="w-full text-left px-3 py-1.5 hover:bg-slate-50">Make personal</button>
+                <div class="border-t border-slate-100 my-1"></div>
+                <button class="w-full text-left px-3 py-1.5 hover:bg-slate-50 text-red-600">Delete</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative hidden mt-2" id="saveBtnWrap">
+            <button onclick="toggleSaveMenu(event)" class="w-full h-7 px-2.5 rounded-md text-xs bg-blue-600 text-white hover:bg-blue-700 flex items-center justify-center gap-1">
+              Save view <span class="text-[11px]">▾</span>
+            </button>
+            <div id="saveMenu" class="popover" style="left:0; min-width:260px;">
+              <div class="py-1 text-xs">
+                <button id="updateBtn" class="w-full text-left px-3 py-1.5 hover:bg-slate-50">
+                  <div>Update "<span id="updateBtnName">All companies</span>"</div>
+                  <div id="updateBtnNote" class="text-[11px] text-slate-500">Only the owner or an admin can update</div>
+                </button>
+                <button class="w-full text-left px-3 py-1.5 hover:bg-slate-50">Save as new view…</button>
+                <div class="border-t border-slate-100 my-1"></div>
+                <button class="w-full text-left px-3 py-1.5 hover:bg-slate-50 text-slate-600" onclick="toggleSimulateModified()">Discard changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divide-y divide-slate-200">
+          <div>
+            <button class="view-setting-row" type="button">
+              <span class="view-setting-icon">▥</span>
+              <span class="view-setting-label">Columns</span>
+              <span class="view-setting-value">8 shown</span>
+            </button>
+            <a href="variant-a-groupby.html" class="view-setting-row" title="Mockup link; production opens this as a view setting on the same page">
+              <span class="view-setting-icon">▦</span>
+              <span class="view-setting-label">Group by</span>
+              <span class="view-setting-value">None</span>
+            </a>
+            <button class="view-setting-row" type="button">
+              <span class="view-setting-icon">↓</span>
+              <span class="view-setting-label">Sort</span>
+              <span class="view-setting-value">Most recent app</span>
+            </button>
+          </div>
+
+          <div>
+            <div class="view-section-title">Filters</div>
 
         <!-- SEARCH -->
         <div class="filter-block p-2.5">
@@ -272,60 +307,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           </div>
         </div>
 
-        <!-- HAVE WE INVESTED? -->
-        <div class="filter-block p-2.5">
-          <div class="flex items-center gap-1.5 mb-1.5">
-            <span class="drag-handle">⋮⋮</span>
-            <span class="font-semibold text-slate-700">Have we invested?</span>
-            <button class="filter-close text-slate-400 hover:text-slate-700 ml-auto">×</button>
-          </div>
-          <div class="flex">
-            <button class="seg-btn on h-6 px-2.5 rounded-l-md text-[12px] whitespace-nowrap">Yes</button>
-            <button class="seg-btn h-6 px-2.5 border-l-0 text-[12px] whitespace-nowrap">No</button>
-            <button class="seg-btn h-6 px-2.5 border-l-0 rounded-r-md text-[12px] whitespace-nowrap">Either</button>
-          </div>
-        </div>
-
-        <!-- SECTOR -->
-        <div class="filter-block p-2.5">
-          <div class="flex items-center gap-1.5 mb-1.5">
-            <span class="drag-handle">⋮⋮</span>
-            <span class="font-semibold text-slate-700">Sector</span>
-            <button class="filter-close text-slate-400 hover:text-slate-700 ml-auto">×</button>
-          </div>
-          <button class="dd-trigger w-full h-7 px-2 rounded-md text-left flex items-center gap-1">
-            <span class="flex-1 truncate">Electric vehicles, EV charging infra (+2)</span>
-            <span class="text-slate-400">▾</span>
-          </button>
-        </div>
-
-        <!-- COUNTRY -->
-        <div class="filter-block p-2.5">
-          <div class="flex items-center gap-1.5 mb-1.5">
-            <span class="drag-handle">⋮⋮</span>
-            <span class="font-semibold text-slate-700">Country</span>
-            <button class="filter-close text-slate-400 hover:text-slate-700 ml-auto">×</button>
-          </div>
-          <div class="flex">
-            <button class="seg-btn on h-6 px-2.5 rounded-l-md text-[12px] whitespace-nowrap">All</button>
-            <button class="seg-btn h-6 px-2.5 border-l-0 text-[12px] whitespace-nowrap">US</button>
-            <button class="seg-btn h-6 px-2.5 border-l-0 rounded-r-md text-[12px] whitespace-nowrap">Canada</button>
-          </div>
-        </div>
-
-        <!-- STATE / PROVINCE -->
-        <div class="filter-block p-2.5">
-          <div class="flex items-center gap-1.5 mb-1.5">
-            <span class="drag-handle">⋮⋮</span>
-            <span class="font-semibold text-slate-700">State / Province</span>
-            <button class="filter-close text-slate-400 hover:text-slate-700 ml-auto">×</button>
-          </div>
-          <button class="dd-trigger w-full h-7 px-2 rounded-md text-left flex items-center gap-1">
-            <span class="flex-1 truncate text-slate-400">All</span>
-            <span class="text-slate-400">▾</span>
-          </button>
-        </div>
-
         <!-- FURTHEST STAGE -->
         <div class="filter-block p-2.5">
           <div class="flex items-center gap-1.5 mb-1.5">
@@ -336,20 +317,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           </div>
           <button class="dd-trigger w-full h-7 px-2 rounded-md text-left flex items-center gap-1">
             <span class="flex-1 truncate text-slate-400">Any stage</span>
-            <span class="text-slate-400">▾</span>
-          </button>
-        </div>
-
-        <!-- STATUS -->
-        <div class="filter-block p-2.5">
-          <div class="flex items-center gap-1.5 mb-1.5">
-            <span class="drag-handle">⋮⋮</span>
-            <span class="font-semibold text-slate-700">Status</span>
-            <span class="text-slate-400 text-[11px] ml-1" title="The lifecycle of our investment. Active: at least one open position. Exited: position realized. Closed: position written off. Blank: we have not invested.">ⓘ</span>
-            <button class="filter-close text-slate-400 hover:text-slate-700 ml-auto">×</button>
-          </div>
-          <button class="dd-trigger w-full h-7 px-2 rounded-md text-left flex items-center gap-1">
-            <span class="flex-1 truncate text-slate-400">All</span>
             <span class="text-slate-400">▾</span>
           </button>
         </div>
@@ -378,35 +345,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           </div>
         </div>
 
-        <!-- FOUNDER DEMOGRAPHICS -->
-        <div class="filter-block p-2.5">
-          <div class="flex items-center gap-1.5 mb-1.5">
-            <span class="drag-handle">⋮⋮</span>
-            <span class="font-semibold text-slate-700">Founder demographics</span>
-            <span class="text-slate-400 text-[11px] ml-1" title="Self-reported by the applicant about their founding team.">ⓘ</span>
-            <button class="filter-close text-slate-400 hover:text-slate-700 ml-auto">×</button>
-          </div>
-          <div class="space-y-1.5 pl-4">
-            <div>
-              <div class="text-[11px] text-slate-500 mb-0.5">Race / Ethnicity</div>
-              <button class="dd-trigger w-full h-7 px-2 rounded-md text-left flex items-center gap-1">
-                <span class="flex-1 truncate text-slate-400">Any</span>
-                <span class="text-slate-400">▾</span>
-              </button>
-            </div>
-            <div>
-              <div class="text-[11px] text-slate-500 mb-0.5">Gender</div>
-              <button class="dd-trigger w-full h-7 px-2 rounded-md text-left flex items-center gap-1">
-                <span class="flex-1 truncate text-slate-400">Any</span>
-                <span class="text-slate-400">▾</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
         <!-- ADD FILTER BUTTON -->
         <div class="p-2.5">
           <a href="view-builder.html" class="block h-7 leading-[1.6rem] text-center text-blue-600 hover:bg-blue-50 rounded border border-dashed border-blue-300 text-[12px] font-medium">＋ Add filter</a>
+        </div>
+          </div>
         </div>
       </div>
     </aside>
@@ -458,7 +401,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <td class="sigma-cell px-2" onclick="toggleSigmaMenu(event,'status')"><button class="sigma-empty-btn">＋ Summary</button></td>
               <td class="sigma-cell px-2" onclick="toggleSigmaMenu(event,'event')"><button class="sigma-empty-btn">＋ Summary</button></td>
               <td class="tabular-nums sigma-cell px-2" onclick="toggleSigmaMenu(event,'lasttouch')">
-                <span class="sigma-label">latest</span><span class="sigma-out" id="sumLastTouch">2026-01-15</span><span class="sigma-chev">▾</span>
+                <span class="sigma-label">latest</span><span class="sigma-out" id="sumLastTouch">Jan 15, 2026</span><span class="sigma-chev">▾</span>
               </td>
               <td></td>
             </tr>
@@ -466,23 +409,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
           <tbody id="rowsBody" class="divide-y divide-slate-100">
 
             <!-- VOLTAIC DRIVE -->
-            <tr class="table-row" data-company-name="Voltaic Drive" data-tagline="Drop-in EV conversion kits for last-mile fleets" onclick="expandRow(this)">
-              <td class="px-1.5 py-1.5"><span class="row-chev">▾</span></td>
+            <tr class="table-row" data-company-name="Voltaic Drive" data-tagline="Drop-in EV conversion kits for last-mile fleets" onclick="openCompanyRow(event, this)">
+              <td class="px-1.5 py-1.5"><button type="button" class="row-expand-btn" onclick="toggleRowExpansion(event, this)" aria-label="Toggle application history"><span class="row-chev">▾</span></button></td>
               <td class="px-2 py-1.5">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded bg-emerald-100 text-emerald-700 grid place-items-center text-[11px] font-semibold flex-shrink-0">VD</div>
-                  <div class="min-w-0 flex-1">
-                    <a href="detail.html" onclick="event.stopPropagation()" class="font-medium text-slate-900 hover:underline">Voltaic Drive</a>
+                <div class="min-w-0">
+                    <a href="detail.html" onclick="openDetailPanel(event)" class="font-medium text-slate-900 hover:underline">Voltaic Drive</a>
                     <div class="text-[12px] text-slate-500 tagline-clamp" title="Drop-in EV conversion kits for last-mile fleets">Drop-in EV conversion kits for last-mile fleets</div>
                   </div>
-                </div>
               </td>
               <td class="px-2 py-1.5">EV</td>
               <td class="px-2 py-1.5">WA · USA</td>
               <td class="px-2 py-1.5"><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
               <td class="px-2 py-1.5 text-right tabular-nums font-medium">$425,000</td>
               <td class="px-2 py-1.5"><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
-              <td class="px-2 py-1.5"><div>Diligence Debrief</div><div class="text-[12px] text-slate-500">2025-09-22</div></td>
+              <td class="px-2 py-1.5"><div>Diligence Debrief</div><div class="text-[12px] text-slate-500">Sep 22, 2025</div></td>
               <td class="px-2 py-1.5 text-slate-500">3 days ago</td>
               <td class="px-1 py-1.5 text-center"><button class="kebab-btn" onclick="event.stopPropagation(); openKebab(event)" aria-label="Row actions">⋯</button></td>
             </tr>
@@ -491,35 +431,32 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <td colspan="9" class="px-2 pb-2 bg-slate-50/50">
                 <table class="w-full text-[12px] bg-white border border-slate-200 rounded">
                   <thead class="text-slate-500">
-                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Outcome</th></tr>
+                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Pitch date</th></tr>
                   </thead>
                   <tbody class="divide-y divide-slate-100">
-                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="location.href='detail.html#app-2025'"><td class="px-2 py-1">Apr 2025</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1">Invested</td></tr>
-                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="location.href='detail.html#app-2024'"><td class="px-2 py-1">Mar 2024</td><td class="px-2 py-1"><span class="ladder-dilig rounded px-1.5 py-0.5">Diligence Complete</span></td><td class="px-2 py-1">Passed</td></tr>
-                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="location.href='detail.html#app-2022'"><td class="px-2 py-1">Feb 2022</td><td class="px-2 py-1"><span class="ladder-screen rounded px-1.5 py-0.5">Screen</span></td><td class="px-2 py-1">Passed</td></tr>
+                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-2 py-1">Apr 2025</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1 tabular-nums">2025-07-12</td></tr>
+                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-2 py-1">Mar 2024</td><td class="px-2 py-1"><span class="ladder-dilig rounded px-1.5 py-0.5">Diligence Complete</span></td><td class="px-2 py-1 tabular-nums">2024-05-18</td></tr>
+                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-2 py-1">Feb 2022</td><td class="px-2 py-1"><span class="ladder-screen rounded px-1.5 py-0.5">Screen</span></td><td class="px-2 py-1"></td></tr>
                   </tbody>
                 </table>
               </td>
             </tr>
 
             <!-- MILEAGE LABS -->
-            <tr class="table-row" data-company-name="Mileage Labs" data-tagline="Fleet electrification telematics" onclick="expandRow(this)">
-              <td class="px-1.5 py-1.5"><span class="row-chev">▸</span></td>
+            <tr class="table-row" data-company-name="Mileage Labs" data-tagline="Fleet electrification telematics" onclick="openCompanyRow(event, this)">
+              <td class="px-1.5 py-1.5"><button type="button" class="row-expand-btn" onclick="toggleRowExpansion(event, this)" aria-label="Toggle application history"><span class="row-chev">▸</span></button></td>
               <td class="px-2 py-1.5">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded bg-sky-100 text-sky-700 grid place-items-center text-[11px] font-semibold flex-shrink-0">ML</div>
-                  <div class="min-w-0 flex-1">
-                    <a href="detail.html" onclick="event.stopPropagation()" class="font-medium text-slate-900 hover:underline">Mileage Labs</a>
+                <div class="min-w-0">
+                    <a href="detail.html" onclick="openDetailPanel(event)" class="font-medium text-slate-900 hover:underline">Mileage Labs</a>
                     <div class="text-[12px] text-slate-500 tagline-clamp" title="Fleet electrification telematics">Fleet electrification telematics</div>
                   </div>
-                </div>
               </td>
               <td class="px-2 py-1.5">EV</td>
               <td class="px-2 py-1.5">OR · USA</td>
               <td class="px-2 py-1.5"><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
               <td class="px-2 py-1.5 text-right tabular-nums font-medium">$300,000</td>
               <td class="px-2 py-1.5"><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
-              <td class="px-2 py-1.5"><div>Investment Committee</div><div class="text-[12px] text-slate-500">2026-01-15</div></td>
+              <td class="px-2 py-1.5"><div>Investment Committee</div><div class="text-[12px] text-slate-500">Jan 15, 2026</div></td>
               <td class="px-2 py-1.5 text-slate-500">12 days ago</td>
               <td class="px-1 py-1.5 text-center"><button class="kebab-btn" onclick="event.stopPropagation(); openKebab(event)" aria-label="Row actions">⋯</button></td>
             </tr>
@@ -528,31 +465,28 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <td colspan="9" class="px-2 pb-2 bg-slate-50/50">
                 <table class="w-full text-[12px] bg-white border border-slate-200 rounded">
                   <thead class="text-slate-500">
-                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Outcome</th></tr>
+                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Pitch date</th></tr>
                   </thead>
-                  <tbody><tr class="hover:bg-slate-50 cursor-pointer" onclick="location.href='detail.html'"><td class="px-2 py-1">Sep 2025</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1">Invested</td></tr></tbody>
+                  <tbody><tr class="hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-2 py-1">Sep 2025</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1">2025-09-18</td></tr></tbody>
                 </table>
               </td>
             </tr>
 
             <!-- PYLONCHARGE -->
-            <tr class="table-row" data-company-name="PylonCharge" data-tagline="DC fast-charging networks for mid-density corridors" onclick="expandRow(this)">
-              <td class="px-1.5 py-1.5"><span class="row-chev">▸</span></td>
+            <tr class="table-row" data-company-name="PylonCharge" data-tagline="DC fast-charging networks for mid-density corridors" onclick="openCompanyRow(event, this)">
+              <td class="px-1.5 py-1.5"><button type="button" class="row-expand-btn" onclick="toggleRowExpansion(event, this)" aria-label="Toggle application history"><span class="row-chev">▸</span></button></td>
               <td class="px-2 py-1.5">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded bg-amber-100 text-amber-700 grid place-items-center text-[11px] font-semibold flex-shrink-0">PC</div>
-                  <div class="min-w-0 flex-1">
-                    <a href="detail.html" onclick="event.stopPropagation()" class="font-medium text-slate-900 hover:underline">PylonCharge</a>
+                <div class="min-w-0">
+                    <a href="detail.html" onclick="openDetailPanel(event)" class="font-medium text-slate-900 hover:underline">PylonCharge</a>
                     <div class="text-[12px] text-slate-500 tagline-clamp" title="DC fast-charging networks for mid-density corridors">DC fast-charging networks for mid-density corridors</div>
                   </div>
-                </div>
               </td>
               <td class="px-2 py-1.5">EV charging</td>
               <td class="px-2 py-1.5">CA · USA</td>
               <td class="px-2 py-1.5"><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
               <td class="px-2 py-1.5 text-right tabular-nums font-medium">$150,000</td>
               <td class="px-2 py-1.5"><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
-              <td class="px-2 py-1.5"><div>Pitch</div><div class="text-[12px] text-slate-500">2026-01-09</div></td>
+              <td class="px-2 py-1.5"><div>Pitch</div><div class="text-[12px] text-slate-500">Jan 9, 2026</div></td>
               <td class="px-2 py-1.5 text-slate-500">3 wk ago</td>
               <td class="px-1 py-1.5 text-center"><button class="kebab-btn" onclick="event.stopPropagation(); openKebab(event)" aria-label="Row actions">⋯</button></td>
             </tr>
@@ -561,34 +495,31 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <td colspan="9" class="px-2 pb-2 bg-slate-50/50">
                 <table class="w-full text-[12px] bg-white border border-slate-200 rounded">
                   <thead class="text-slate-500">
-                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Outcome</th></tr>
+                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Pitch date</th></tr>
                   </thead>
                   <tbody class="divide-y divide-slate-100">
-                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="location.href='detail.html'"><td class="px-2 py-1">Sep 2025</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1">Invested</td></tr>
-                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="location.href='detail.html'"><td class="px-2 py-1">Apr 2023</td><td class="px-2 py-1"><span class="ladder-screen rounded px-1.5 py-0.5">Screen</span></td><td class="px-2 py-1">Passed</td></tr>
+                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-2 py-1">Sep 2025</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1">2025-09-18</td></tr>
+                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-2 py-1">Apr 2023</td><td class="px-2 py-1"><span class="ladder-screen rounded px-1.5 py-0.5">Screen</span></td><td class="px-2 py-1"></td></tr>
                   </tbody>
                 </table>
               </td>
             </tr>
 
             <!-- CATHODE CYCLE -->
-            <tr class="table-row" data-company-name="Cathode Cycle" data-tagline="Cathode metal recovery from end-of-life EV batteries" onclick="expandRow(this)">
-              <td class="px-1.5 py-1.5"><span class="row-chev">▸</span></td>
+            <tr class="table-row" data-company-name="Cathode Cycle" data-tagline="Cathode metal recovery from end-of-life EV batteries" onclick="openCompanyRow(event, this)">
+              <td class="px-1.5 py-1.5"><button type="button" class="row-expand-btn" onclick="toggleRowExpansion(event, this)" aria-label="Toggle application history"><span class="row-chev">▸</span></button></td>
               <td class="px-2 py-1.5">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded bg-rose-100 text-rose-700 grid place-items-center text-[11px] font-semibold flex-shrink-0">CC</div>
-                  <div class="min-w-0 flex-1">
-                    <a href="detail.html" onclick="event.stopPropagation()" class="font-medium text-slate-900 hover:underline">Cathode Cycle</a>
+                <div class="min-w-0">
+                    <a href="detail.html" onclick="openDetailPanel(event)" class="font-medium text-slate-900 hover:underline">Cathode Cycle</a>
                     <div class="text-[12px] text-slate-500 tagline-clamp" title="Cathode metal recovery from end-of-life EV batteries">Cathode metal recovery from end-of-life EV batteries</div>
                   </div>
-                </div>
               </td>
               <td class="px-2 py-1.5">EV recycling</td>
               <td class="px-2 py-1.5">MA · USA</td>
               <td class="px-2 py-1.5"><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
               <td class="px-2 py-1.5 text-right tabular-nums font-medium">$175,000</td>
               <td class="px-2 py-1.5"><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
-              <td class="px-2 py-1.5"><div>Diligence Debrief</div><div class="text-[12px] text-slate-500">2025-11-04</div></td>
+              <td class="px-2 py-1.5"><div>Diligence Debrief</div><div class="text-[12px] text-slate-500">Nov 4, 2025</div></td>
               <td class="px-2 py-1.5 text-slate-500">5 wk ago</td>
               <td class="px-1 py-1.5 text-center"><button class="kebab-btn" onclick="event.stopPropagation(); openKebab(event)" aria-label="Row actions">⋯</button></td>
             </tr>
@@ -597,31 +528,28 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <td colspan="9" class="px-2 pb-2 bg-slate-50/50">
                 <table class="w-full text-[12px] bg-white border border-slate-200 rounded">
                   <thead class="text-slate-500">
-                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Outcome</th></tr>
+                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Pitch date</th></tr>
                   </thead>
-                  <tbody><tr class="hover:bg-slate-50 cursor-pointer" onclick="location.href='detail.html'"><td class="px-2 py-1">Aug 2025</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1">Invested</td></tr></tbody>
+                  <tbody><tr class="hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-2 py-1">Aug 2025</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1">2025-09-18</td></tr></tbody>
                 </table>
               </td>
             </tr>
 
             <!-- SPARKFLEET -->
-            <tr class="table-row" data-company-name="Sparkfleet" data-tagline="Software for commercial EV fleets" onclick="expandRow(this)">
-              <td class="px-1.5 py-1.5"><span class="row-chev">▸</span></td>
+            <tr class="table-row" data-company-name="Sparkfleet" data-tagline="Software for commercial EV fleets" onclick="openCompanyRow(event, this)">
+              <td class="px-1.5 py-1.5"><button type="button" class="row-expand-btn" onclick="toggleRowExpansion(event, this)" aria-label="Toggle application history"><span class="row-chev">▸</span></button></td>
               <td class="px-2 py-1.5">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded bg-teal-100 text-teal-700 grid place-items-center text-[11px] font-semibold flex-shrink-0">SF</div>
-                  <div class="min-w-0 flex-1">
-                    <a href="detail.html" onclick="event.stopPropagation()" class="font-medium text-slate-900 hover:underline">Sparkfleet</a>
+                <div class="min-w-0">
+                    <a href="detail.html" onclick="openDetailPanel(event)" class="font-medium text-slate-900 hover:underline">Sparkfleet</a>
                     <div class="text-[12px] text-slate-500 tagline-clamp" title="Software for commercial EV fleets">Software for commercial EV fleets</div>
                   </div>
-                </div>
               </td>
               <td class="px-2 py-1.5">EV</td>
               <td class="px-2 py-1.5">BC · Canada</td>
               <td class="px-2 py-1.5"><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
               <td class="px-2 py-1.5 text-right tabular-nums font-medium">$250,000</td>
               <td class="px-2 py-1.5"><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
-              <td class="px-2 py-1.5"><div>Pitch</div><div class="text-[12px] text-slate-500">2024-05-14</div></td>
+              <td class="px-2 py-1.5"><div>Pitch</div><div class="text-[12px] text-slate-500">May 14, 2024</div></td>
               <td class="px-2 py-1.5 text-slate-500">14 wk ago</td>
               <td class="px-1 py-1.5 text-center"><button class="kebab-btn" onclick="event.stopPropagation(); openKebab(event)" aria-label="Row actions">⋯</button></td>
             </tr>
@@ -630,31 +558,28 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <td colspan="9" class="px-2 pb-2 bg-slate-50/50">
                 <table class="w-full text-[12px] bg-white border border-slate-200 rounded">
                   <thead class="text-slate-500">
-                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Outcome</th></tr>
+                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Pitch date</th></tr>
                   </thead>
-                  <tbody><tr class="hover:bg-slate-50 cursor-pointer" onclick="location.href='detail.html'"><td class="px-2 py-1">Mar 2024</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1">Invested</td></tr></tbody>
+                  <tbody><tr class="hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-2 py-1">Mar 2024</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1">2025-09-18</td></tr></tbody>
                 </table>
               </td>
             </tr>
 
             <!-- TRANSITGRID -->
-            <tr class="table-row" data-company-name="TransitGrid" data-tagline="Depot charging optimizers for municipal bus fleets" onclick="expandRow(this)">
-              <td class="px-1.5 py-1.5"><span class="row-chev">▸</span></td>
+            <tr class="table-row" data-company-name="TransitGrid" data-tagline="Depot charging optimizers for municipal bus fleets" onclick="openCompanyRow(event, this)">
+              <td class="px-1.5 py-1.5"><button type="button" class="row-expand-btn" onclick="toggleRowExpansion(event, this)" aria-label="Toggle application history"><span class="row-chev">▸</span></button></td>
               <td class="px-2 py-1.5">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded bg-orange-100 text-orange-700 grid place-items-center text-[11px] font-semibold flex-shrink-0">TG</div>
-                  <div class="min-w-0 flex-1">
-                    <a href="detail.html" onclick="event.stopPropagation()" class="font-medium text-slate-900 hover:underline">TransitGrid</a>
+                <div class="min-w-0">
+                    <a href="detail.html" onclick="openDetailPanel(event)" class="font-medium text-slate-900 hover:underline">TransitGrid</a>
                     <div class="text-[12px] text-slate-500 tagline-clamp" title="Depot charging optimizers for municipal bus fleets">Depot charging optimizers for municipal bus fleets</div>
                   </div>
-                </div>
               </td>
               <td class="px-2 py-1.5">EV charging</td>
               <td class="px-2 py-1.5">IL · USA</td>
               <td class="px-2 py-1.5"><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
               <td class="px-2 py-1.5 text-right tabular-nums font-medium">$1,900,000</td>
               <td class="px-2 py-1.5"><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
-              <td class="px-2 py-1.5"><div>Pitch</div><div class="text-[12px] text-slate-500">2024-09-17</div></td>
+              <td class="px-2 py-1.5"><div>Pitch</div><div class="text-[12px] text-slate-500">Sep 17, 2024</div></td>
               <td class="px-2 py-1.5 text-slate-500">6 mo ago</td>
               <td class="px-1 py-1.5 text-center"><button class="kebab-btn" onclick="event.stopPropagation(); openKebab(event)" aria-label="Row actions">⋯</button></td>
             </tr>
@@ -663,34 +588,31 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <td colspan="9" class="px-2 pb-2 bg-slate-50/50">
                 <table class="w-full text-[12px] bg-white border border-slate-200 rounded">
                   <thead class="text-slate-500">
-                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Outcome</th></tr>
+                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Pitch date</th></tr>
                   </thead>
                   <tbody class="divide-y divide-slate-100">
-                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="location.href='detail.html'"><td class="px-2 py-1">Jun 2024</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1">Invested</td></tr>
-                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="location.href='detail.html'"><td class="px-2 py-1">Mar 2023</td><td class="px-2 py-1"><span class="ladder-dilig rounded px-1.5 py-0.5">Diligence Complete</span></td><td class="px-2 py-1">Passed</td></tr>
+                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-2 py-1">Jun 2024</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1">2025-09-18</td></tr>
+                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-2 py-1">Mar 2023</td><td class="px-2 py-1"><span class="ladder-dilig rounded px-1.5 py-0.5">Diligence Complete</span></td><td class="px-2 py-1"></td></tr>
                   </tbody>
                 </table>
               </td>
             </tr>
 
             <!-- COPPICE MOBILITY -->
-            <tr class="table-row" data-company-name="Coppice Mobility" data-tagline="Micro-haul EV fleets for same-day urban delivery" onclick="expandRow(this)">
-              <td class="px-1.5 py-1.5"><span class="row-chev">▸</span></td>
+            <tr class="table-row" data-company-name="Coppice Mobility" data-tagline="Micro-haul EV fleets for same-day urban delivery" onclick="openCompanyRow(event, this)">
+              <td class="px-1.5 py-1.5"><button type="button" class="row-expand-btn" onclick="toggleRowExpansion(event, this)" aria-label="Toggle application history"><span class="row-chev">▸</span></button></td>
               <td class="px-2 py-1.5">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded bg-violet-100 text-violet-700 grid place-items-center text-[11px] font-semibold flex-shrink-0">CM</div>
-                  <div class="min-w-0 flex-1">
-                    <a href="detail.html" onclick="event.stopPropagation()" class="font-medium text-slate-900 hover:underline">Coppice Mobility</a>
+                <div class="min-w-0">
+                    <a href="detail.html" onclick="openDetailPanel(event)" class="font-medium text-slate-900 hover:underline">Coppice Mobility</a>
                     <div class="text-[12px] text-slate-500 tagline-clamp" title="Micro-haul EV fleets for same-day urban delivery">Micro-haul EV fleets for same-day urban delivery</div>
                   </div>
-                </div>
               </td>
               <td class="px-2 py-1.5">EV (last-mile)</td>
               <td class="px-2 py-1.5">NY · USA</td>
               <td class="px-2 py-1.5"><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
               <td class="px-2 py-1.5 text-right tabular-nums font-medium">$100,000</td>
               <td class="px-2 py-1.5"><span class="status-active text-[12px] rounded px-2 py-0.5">Active</span></td>
-              <td class="px-2 py-1.5"><div>Pitch</div><div class="text-[12px] text-slate-500">2025-12-02</div></td>
+              <td class="px-2 py-1.5"><div>Pitch</div><div class="text-[12px] text-slate-500">Dec 2, 2025</div></td>
               <td class="px-2 py-1.5 text-slate-500">8 wk ago</td>
               <td class="px-1 py-1.5 text-center"><button class="kebab-btn" onclick="event.stopPropagation(); openKebab(event)" aria-label="Row actions">⋯</button></td>
             </tr>
@@ -699,31 +621,28 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <td colspan="9" class="px-2 pb-2 bg-slate-50/50">
                 <table class="w-full text-[12px] bg-white border border-slate-200 rounded">
                   <thead class="text-slate-500">
-                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Outcome</th></tr>
+                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Pitch date</th></tr>
                   </thead>
-                  <tbody><tr class="hover:bg-slate-50 cursor-pointer" onclick="location.href='detail.html'"><td class="px-2 py-1">Oct 2025</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1">Invested</td></tr></tbody>
+                  <tbody><tr class="hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-2 py-1">Oct 2025</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1">2025-09-18</td></tr></tbody>
                 </table>
               </td>
             </tr>
 
             <!-- HELIAX MOBILITY — Closed -->
-            <tr class="table-row" data-company-name="Heliax Mobility" data-tagline="Hub-and-spoke EV depot SaaS" onclick="expandRow(this)">
-              <td class="px-1.5 py-1.5"><span class="row-chev">▸</span></td>
+            <tr class="table-row" data-company-name="Heliax Mobility" data-tagline="Hub-and-spoke EV depot SaaS" onclick="openCompanyRow(event, this)">
+              <td class="px-1.5 py-1.5"><button type="button" class="row-expand-btn" onclick="toggleRowExpansion(event, this)" aria-label="Toggle application history"><span class="row-chev">▸</span></button></td>
               <td class="px-2 py-1.5">
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded bg-stone-200 text-stone-700 grid place-items-center text-[11px] font-semibold flex-shrink-0">HM</div>
-                  <div class="min-w-0 flex-1">
-                    <a href="detail.html" onclick="event.stopPropagation()" class="font-medium text-slate-900 hover:underline">Heliax Mobility</a>
+                <div class="min-w-0">
+                    <a href="detail.html" onclick="openDetailPanel(event)" class="font-medium text-slate-900 hover:underline">Heliax Mobility</a>
                     <div class="text-[12px] text-slate-500 tagline-clamp" title="Hub-and-spoke EV depot SaaS">Hub-and-spoke EV depot SaaS</div>
                   </div>
-                </div>
               </td>
               <td class="px-2 py-1.5">EV</td>
               <td class="px-2 py-1.5">TX · USA</td>
               <td class="px-2 py-1.5"><span class="ladder-invested text-[12px] rounded px-2 py-0.5">Invested</span></td>
               <td class="px-2 py-1.5 text-right tabular-nums font-medium">$175,000</td>
               <td class="px-2 py-1.5"><span class="status-closed text-[12px] rounded px-2 py-0.5">Closed</span></td>
-              <td class="px-2 py-1.5"><div>Diligence Debrief</div><div class="text-[12px] text-slate-500">2022-04-30</div></td>
+              <td class="px-2 py-1.5"><div>Diligence Debrief</div><div class="text-[12px] text-slate-500">Apr 30, 2022</div></td>
               <td class="px-2 py-1.5 text-slate-500">2024-08</td>
               <td class="px-1 py-1.5 text-center"><button class="kebab-btn" onclick="event.stopPropagation(); openKebab(event)" aria-label="Row actions">⋯</button></td>
             </tr>
@@ -732,9 +651,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
               <td colspan="9" class="px-2 pb-2 bg-slate-50/50">
                 <table class="w-full text-[12px] bg-white border border-slate-200 rounded">
                   <thead class="text-slate-500">
-                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Outcome</th></tr>
+                    <tr><th class="text-left font-medium px-2 py-1 w-24">Applied</th><th class="text-left font-medium px-2 py-1 w-44">Furthest stage</th><th class="text-left font-medium px-2 py-1">Pitch date</th></tr>
                   </thead>
-                  <tbody><tr class="hover:bg-slate-50 cursor-pointer" onclick="location.href='detail.html'"><td class="px-2 py-1">Feb 2022</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1">Invested</td></tr></tbody>
+                  <tbody><tr class="hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-2 py-1">Feb 2022</td><td class="px-2 py-1"><span class="ladder-invested rounded px-1.5 py-0.5">Invested</span></td><td class="px-2 py-1">2025-09-18</td></tr></tbody>
                 </table>
               </td>
             </tr>
@@ -795,8 +714,50 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
   <div class="kebab-item danger">Delete company…</div>
 </div>
 
+<!-- Company detail pane -->
+<div id="detailOverlay" class="fixed inset-0 z-50 hidden items-stretch justify-end bg-slate-950/25">
+  <section class="detail-drawer relative h-full bg-slate-50 shadow-2xl border-l border-slate-200">
+    <button id="closeDetailPanelBtn" type="button" class="detail-close-btn h-8 w-8 rounded-md bg-white border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 inline-flex items-center justify-center shadow-sm" aria-label="Close detail panel">
+      <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+    </button>
+    <iframe id="detailFrame" title="Company detail" class="h-full w-full border-0 bg-slate-50"></iframe>
+  </section>
+</div>
+
 <script>
-  function expandRow(row) {
+  function openCompanyRow(e, row) {
+    if (e.defaultPrevented) return;
+    openDetailPanel(e);
+  }
+
+  const detailOverlay = document.getElementById('detailOverlay');
+  const detailFrame = document.getElementById('detailFrame');
+  function openDetailPanel(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    if (!detailFrame.src || !detailFrame.src.endsWith('/detail.html')) {
+      detailFrame.src = 'detail.html';
+    }
+    detailOverlay.classList.remove('hidden');
+    detailOverlay.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDetailPanel() {
+    detailOverlay.classList.add('hidden');
+    detailOverlay.classList.remove('flex');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('closeDetailPanelBtn').addEventListener('click', closeDetailPanel);
+  detailOverlay.addEventListener('click', (event) => {
+    if (event.target === detailOverlay) closeDetailPanel();
+  });
+
+  function toggleRowExpansion(e, button) {
+    e.preventDefault();
+    e.stopPropagation();
+    const row = button.closest('tr.table-row');
     const next = row.nextElementSibling;
     if (!next || !next.classList.contains('expansion')) return;
     const isHidden = next.classList.toggle('hidden');
@@ -1012,6 +973,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 
   function selectView(name, isShared) {
     document.getElementById('viewBtnName').textContent = name;
+    document.querySelector('#workspaceRailCollapsed .rcb-label').textContent = `View: ${name}`;
     document.querySelectorAll('#viewPicker .view-row').forEach(r => r.classList.remove('active'));
     document.querySelectorAll('#viewPicker .view-row .row-dot').forEach(d => d.textContent = ' ');
     // mark the clicked row

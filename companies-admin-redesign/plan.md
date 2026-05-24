@@ -1,7 +1,9 @@
 ---
 title: Companies Admin Redesign
+status: draft
 owner: jordan
 home: variant-a-list
+last_updated: 2026-05-23
 ---
 
 # Companies admin redesign
@@ -17,6 +19,7 @@ The `/explore-companies` page is the closest existing answer to the same problem
 - **One Companies surface, no top-level tabs.**
 - **Four dimensions** — Company, Application, Investment, Event.
 - **Built on the existing `/explore-companies` patterns** wherever those patterns already work. New UI inherits the MultiSelectDropdown component, the Furthest Stage algorithm, the Investment Since slider, the as-you-type filter, and the "dynamic columns" idea (when a filter is active, the matching column appears).
+- **Views are the question layer.** Common staff questions are saved views, not hard-coded starter buttons. Views capture filters, columns, sort, grouping, and summary footer settings. The system ships with shared views that preserve today's useful company/application/admin views; users can create personal views without cluttering the shared list.
 - **Plain English in all user-facing UI.** Filter labels and field descriptions are plain English. Users never see `boolean`, `rollup`, `EXISTS`, table or column names, type tags, or SQL previews. This rule applies everywhere — chooser dialogs, custom column builder, tooltips, error messages.
 - **Three independent status-like columns** that do not conflate concepts:
   - **Furthest stage** (rollup) — the farthest pipeline point any of this company's applications reached, computed identically to explore-companies.
@@ -48,7 +51,7 @@ Notes:
 | Event | `company_events` row | |
 | Pipeline stage | `pipeline_stages.stage` | per-application, current state |
 | Furthest stage | derived rollup | see §6 |
-| Status | derived rollup | see §3 |
+| Status | derived rollup | see §3. Keep the short label in the UI. |
 | $ Invested | derived rollup | `Σ deployments.amount_cents` |
 
 Users never see `lead_stage`, `instrument`, `record_type`, `record_id`, `co_*`, `app_*`, table or column names, or any `aTable.aField` notation in the UI. Tooltips that explain a field do so in plain English.
@@ -98,60 +101,67 @@ The max furthest stage across **all the company's applications**, then the Inves
 
 ## 7. Row expansion — application history inline
 
-Clicking anywhere on a company row toggles its inline expansion (the chevron is a visual indicator only, not the click target). The expansion is a single inline table showing every application, sorted newest first. Three columns:
+Clicking the chevron at the left of a company row toggles its inline expansion. Clicking anywhere else on the row opens the company detail pane over the list. The expansion is a single inline table showing every application, sorted newest first. It answers "what has this company submitted, and did any submission pitch?" without pulling investment details into the row.
 
-| Applied | Furthest stage | Outcome |
+| Applied | Furthest stage | Pitch date |
 |---|---|---|
-| Apr 2025 | Diligence Complete | Invested |
-| Mar 2024 | Diligence Complete | Passed |
-| Feb 2022 | Screen | Passed |
+| Apr 2025 | Diligence Complete | 2025-07-12 |
+| Mar 2024 | Diligence Complete | 2024-05-18 |
+| Feb 2022 | Screen |  |
 
 - **Applied** — month + year, derived from `applications.date_added`. Same `formatAppliedMonth` formatter as explore-companies; pre-2022-07 reads "unknown."
 - **Furthest stage** — per-application furthest, computed identically to §6.1.
-- **Outcome** — one of:
-  - **Invested** — at least one deployment ties to this application (or its company).
-  - **Passed** — the application's pipeline_stage is terminal and no deployment exists.
-  - **In progress** — pipeline_stage is non-terminal.
-- The whole application row is clickable and navigates to the application's anchor on the detail page.
+- **Pitch date** — the first Pitch / D8 Pitch / Follow-On Pitch date tied to that application. Blank when the application did not pitch.
+- The whole application row is clickable and opens the company detail pane at that application's anchor.
 
-If a company has zero applications, the expansion shows a small placeholder. If a company has investments but no application row (rare; some legacy direct investments), it's noted.
+Investment data stays on the company/application detail page and in investment-focused columns, filters, and summaries. If a company has zero applications, the expansion shows a small placeholder. If a company has investments but no application row (rare; some legacy direct investments), it's noted.
 
 ## 8. The Companies surface — layout
 
 ### 8.1 Default columns (in order)
 
-1. **Company** — name + favicon (or initials placeholder). Click → detail. Two-line clamped tagline beneath, with full text in the `title` tooltip.
+1. **Company** — name + two-line clamped tagline beneath, with full text in the `title` tooltip. No logo / initials box in the list row.
 2. **Sector** — primary category pill.
 3. **HQ** — state + country.
 4. **Furthest stage** — pill.
 5. **$ Invested** — right-aligned. Blank if 0.
 6. **Status** — Active / Exited / Closed / blank. (§3)
-7. **Latest event** — event name + date (most recent `company_events` row).
+7. **Latest event** — event name + date (most recent `company_events` row). Date displays as `Mon D, YYYY`, e.g. `Mar 12, 2026`.
 8. **Last touch** — derived.
 
 Dynamic columns: when a filter is active for a field that isn't already shown, the matching column appears automatically (e.g. filter by Race/Ethnicity → that column appears; filter by State → that column appears). Pattern lifted from explore-companies (`DYNAMIC_COLUMN_DEFS` ~line 203).
 
 Each row carries a `⋯` kebab menu at its right edge (§17.3).
 
-### 8.2 Left rail — search, filters, and applied state
+Column interactions:
 
-The left rail is the single representation of what is filtered. Its contents, top to bottom:
+- **Reorder** — column headers show a small grip handle on hover. Dragging the grip reorders columns in the current view.
+- **Resize** — dragging the divider between two column headers resizes the column width. The table preserves the user's chosen widths as part of the saved view.
+- **Auto-size** — double-clicking a column divider auto-sizes the column to fit visible header and cell content, within sensible min/max widths so the table does not become unusable.
+- **Reset** — the Columns control includes a reset action that returns column order and widths to the saved view defaults.
+- These interactions update the modified view state, so Save view / discard behavior applies.
 
-1. **Search** — as-you-type input across company name, tagline, primary contact, application content fields, and event notes. Lives in the rail; there is no separate top-of-page search bar.
-2. **Have we invested?** — Yes / No / Either toggle.
-3. **Sector** — multi-select dropdown (checkboxes).
-4. **Country** — US / Canada toggle. (We only accept applications from these two.)
-5. **State / Province** — multi-select dropdown (searchable; appears below Country, populated from US + CA combined).
-6. **Furthest stage** — multi-select dropdown.
-7. **Status** (Active / Exited / Closed) — multi-select dropdown.
-8. **Investment Since** — slider with stops: N/A · 1 year · 2 years · 3 years · 5 years · Ever. (Lifted from explore-companies.)
-9. **Founder demographics** — opens to two sub-pickers: *Race / Ethnicity* and *Gender*, both multi-select dropdowns.
+### 8.2 Left rail — view builder pane
+
+The left rail is the view builder pane. It is the parent control for the table on the right, because a view is filters plus structure. Its contents, top to bottom:
+
+1. **View picker** — current saved view, modified state, shared/personal view picker, and Save view actions.
+2. **Columns, Group by, Sort** — view structure controls. These affect the layout and interpretation of the table, so they live with the filters instead of floating above the table.
+3. **Filters** — Search and active filter controls.
+
+Default `All companies` view:
+
+- **Search** — as-you-type input across company name, tagline, primary contact, application content fields, and event notes. Lives in the rail; there is no separate top-of-page search bar.
+- **Furthest stage** — multi-select dropdown, set to the broadest value (`Any stage`).
+- **Investment Since** — slider with stops: N/A · 1 year · 2 years · 3 years · 5 years · Ever, set to `Ever`.
+
+The default sort is **Most recent application ↓**. Other filters are added from the chooser only when the user needs them. This keeps the default page from looking like a schema browser while still making the two most useful broad filters easy to experiment with.
 
 A drag handle (`⋮⋮`) on each filter group lets the user reorder filters in the rail. Each group has a "remove" affordance (×) that returns it to the chooser. A `＋ Add filter` button at the bottom of the rail opens the chooser (see `view-builder.html`). The user's filter order persists on their profile.
 
-The rail is **collapsible**. A `‹` button at the top-right collapses it to a thin vertical button; clicking the vertical button re-expands. Drag the resize handle all the way left also collapses. State persists in `localStorage`. The drag handle between rail and main is 6px, highlights blue on hover/drag, and resizes the rail from 200px to 560px (default 280px).
+The rail is **collapsible**. A `‹` button at the top-right collapses it to a thin vertical button; clicking the vertical button re-expands. The collapsed vertical label reads `View: {view name}` (for example, `View: All companies`) and updates when the selected view changes. Drag the resize handle all the way left also collapses. State persists in `localStorage`. The drag handle between rail and main is 6px, highlights blue on hover/drag, and resizes the rail from 200px to 560px (default 280px).
 
-Because the left rail expresses the entire filter state, there is no horizontal chip bar above the table.
+Because the left rail expresses the entire view state, there is no horizontal chip bar above the table and no separate top-right Columns / Group by / Sort controls.
 
 ### 8.3 Summary footer on the main table
 
@@ -177,11 +187,13 @@ The footer renders dark (slate-900) with white text; unset cells show a `＋ Sum
 
 The column header gets a subtle **Σ** indicator when a summary is active, so the user can see at a glance which columns are summarized.
 
-This footer is the only summary surface — there is no separate "Matching: N companies · Total deployed · Avg / company" strip above the table.
+Summary configuration lives in the footer cells themselves, not in the left view-builder pane. Summary settings are still part of the saved view.
+
+This footer is the only summary surface — there is no separate "Matching: N companies · Total deployed · Avg / company" strip above the table. Different users care about different summaries, so saved views own the summary footer configuration instead of the product assuming the same answer bar for everyone.
 
 ### 8.4 Group-by mode
 
-A **Group by** button at the top-right of the page navigates to `variant-a-groupby.html`, the group-by view of the same data.
+**Group by** is a view setting on the same Companies surface, not a separate destination. The mockup keeps `variant-a-groupby.html` only as a design convenience to show the grouped layout. In production, toggling group-by updates the current view state in place.
 
 In group-by mode, the user picks **one or more grouping levels** in a Group-by popover. Each level has a dimension and a sort direction. Levels are ordered top to bottom (level 1 is the outermost grouping). The table renders as:
 
@@ -191,16 +203,28 @@ In group-by mode, the user picks **one or more grouping levels** in a Group-by p
 - **Leaf rows** are the underlying company rows, indented under the deepest sub-group they belong to.
 - **Chevrons** expand / collapse at every level independently.
 
-The Group-by popover supports picking the dimension at each level from the same list of groupable fields (Sector, Country, Lead stage, Latest pipeline stage, Investment year, Fund family, Investment status, Founder demographics, Decarbon8 candidate, etc.), per-level sort direction, drag-to-reorder, remove, and `＋ Add another grouping level`.
+The Group-by popover supports picking the dimension at each level from the same list of groupable fields (Sector, Country, Lead stage, Latest pipeline stage, Investment year, Fund family, Status, Founder demographics, Decarbon8 candidate, etc.), per-level sort direction, drag-to-reorder, remove, and `＋ Add another grouping level`.
 
-The summary footer of group-by is the table-level aggregate; level-1 and level-2 headers each show the same aggregations applied to their slice. The mockup `variant-a-groupby.html` shows a full example: filter `Invested = Yes`, group by **Status → Sector**, with summary aggregations set on **$ Invested (Sum)** and **Last touch (Latest)**.
+The summary footer of group-by is the table-level aggregate; level-1 and level-2 headers each show the same aggregations applied to their slice. The mockup `variant-a-groupby.html` shows a full example of the same page state with filter `Invested = Yes`, group by **Status → Sector**, and summary aggregations set on **$ Invested (Sum)** and **Last touch (Latest)**.
 
 ### 8.5 Saved views — picker, modified state, explicit save
 
-**Compact picker, next to the page title:**
+Views are the main way staff return to common questions. A view includes filters, search text, visible columns and column order, sort, group-by levels, summary footer aggregations, and left-rail filter order.
+
+Views can be **shared** or **personal**. Shared views are curated for the whole staff; personal views belong to one user and never appear in the shared namespace.
+
+**Compact picker, at the top of the view builder pane:**
 
 ```
-Companies   [ All companies ▾ ]   1,247 total · 312 invested · 84 active applications
+[ All companies ▾ ]
+Structure
+  Columns      8 shown
+  Group by     None
+  Sort         Most recent app
+Filters
+  Search
+  Furthest stage
+  Investment Since
 ```
 
 The button shows the current view's name and a `▾`. Click opens a popover.
@@ -233,7 +257,7 @@ The button shows the current view's name and a `▾`. Click opens a popover.
 - **＋ New** in the *Mine* header creates a new personal view from the current filter state.
 - **Search.** As-you-type filter over view names.
 
-**Modified state and the explicit save flow.** When the user loads a view and changes any filter, sort, column, grouping, or summary aggregation, the page enters a **modified** state. The picker button shows it inline; a Save button appears to its right:
+**Modified state and the explicit save flow.** When the user loads a view and changes any filter, search, sort, column, grouping, left-rail order, or summary aggregation, the page enters a **modified** state. The picker button shows it inline; a Save button appears to its right:
 
 ```
 Companies   [ All companies · modified ▾ ]   [ Save ▾ ]   1,247 total · …
@@ -245,13 +269,32 @@ Companies   [ All companies · modified ▾ ]   [ Save ▾ ]   1,247 total · �
 - **Save as new view** — opens the save dialog (in `view-builder.html`): name, Personal or Shared, optional color.
 - **Discard changes** — reverts to the saved view's filter / column / sort / summary state.
 
-Switching views while modified pops a confirmation: *"Discard changes to the current view?"*
+If the user navigates away or switches views while modified, prompt: **"Save this view for later?"** Actions: **Update current view** (enabled when allowed), **Save as new personal view** (default for most users), **Save as new shared view** (permissioned), **Discard changes**, and **Cancel**. The prompt uses `AlertDialog` and a plain `Button` for async save actions; it must not use `AlertDialogAction` for save/update.
 
 **View management dialog.** Reached from the bottom of the popover via "Manage all views". Lets the user rename, reorder within their personal section, change visibility, and delete in bulk.
 
 **URL state.** The current view is captured by a slug (`?view=ev-portfolio-analysis`). Modifications append filter state to the URL so the user can share a one-off (`?view=ev-portfolio-analysis&country=ca`). Sharing a modified URL gives the recipient the modified view but doesn't change the saved view.
 
 The summary settings (per column) and the grouping levels are part of the saved view (along with filters, columns, sort).
+
+### 8.6 Seeded shared views
+
+The new interface should launch with shared views that preserve today's useful admin views, translated into company-centered language. Exact names can be tuned with staff, but the seed set should include analogs of:
+
+| Seeded shared view | Purpose |
+|---|---|
+| **All companies** | Default. All companies, sorted by most recent application. Minimal rail: Search, Furthest stage = any, Investment Since = ever. |
+| **Companies** | Analog of today's Companies grid view. Company profile fields emphasized. |
+| **Applications** | Analog of today's Applications grid view, but rows are still companies; application columns are visible and latest application is the primary sort. |
+| **Investments** | Analog of today's Deployments view using UI language "Investments"; investment amount/date/fund columns and investment summaries visible. |
+| **Pitch history** | Companies with Pitch / D8 Pitch / Follow-On Pitch events; pitch date column visible; sorted newest pitch first. |
+| **Screening history** | Companies with screening events; screening date / decision columns visible. |
+| **All events** | Companies with latest event and event-count columns; event filters available in the rail. |
+| **Pipeline** | Active pipeline companies, grouped or sorted by current pipeline stage. |
+| **Explore companies** | Staff-friendly company discovery view matching the useful parts of `/explore-companies`. |
+| **Screening review** | Companies/applications currently in screening; screening rating columns visible where relevant. |
+
+During implementation, audit the existing saved company/application/admin views and map each one to one of these shared views or to a narrower seeded view. Existing user-created private views should migrate to personal views when ownership can be identified.
 
 ## 9. The view builder — what users see
 
@@ -265,13 +308,31 @@ For each available filter:
 - **One-line explanation** when needed: "The most recent application's current pipeline stage", "True if any of our investments was made via an SPV".
 - (Optional) **A small grouping label** above the field: "About the company", "About our investments", etc.
 
-### 9.2 Live click-through
+### 9.2 View builder mockup
 
-`view-builder.html` includes a working interactive demo: click "+ Add filter", browse the chooser, click "Founder demographics", and the filter is added to the left rail. The user can then expand its dropdown, pick race/ethnicity values, and see the filter reflected in the left rail.
+`view-builder.html` is the implementation reference for the left rail's Add Filter flow. It shows the filter rail, the `+ Add filter` control, the chooser dialog, domain-vs-A-Z sorting, recent filters, collapsible domain headings, already-added states, and the way a chosen filter is inserted back into the rail.
+
+The list mockups (`variant-a-list.html` and `variant-a-groupby.html`) show the view builder rail in context. `view-builder.html` isolates the chooser interaction so implementation details that are difficult to see in the list surface remain explicit.
 
 ### 9.3 Custom column builder
 
 For the rare case where the user wants something the pre-rolled set doesn't cover: a guided form that asks for a name, what to count/sum/find-latest-of, and which records to include. Hidden behind an "Advanced" disclosure.
+
+### 9.4 Date and event filters
+
+Date filters are first-class because many real questions are event-window questions, not status questions. The chooser includes:
+
+| Filter | User control |
+|---|---|
+| **Applied date** | Between two dates; quick presets: this year, last year, last 12 months, all time |
+| **Pitch date** | Between two dates; event types include Pitch, D8 Pitch, Follow-On Pitch |
+| **Screening date** | Between two dates |
+| **Diligence date** | Between two dates; includes diligence formed / complete / debrief events |
+| **Investment date** | Between two dates |
+| **Latest event date** | Between two dates |
+| **Last touch** | Between two dates or relative window |
+
+The date control is compact: `From [date]  To [date]` plus a small preset dropdown. Presets only set the dates; users can override either date manually.
 
 ## 10. Workflow catalog
 
@@ -293,6 +354,8 @@ The validation set; each must work:
 14. **Active diligence right now** — Pipeline stage = Diligence.
 15. **Furthest a company reached** — Furthest stage = Pitch (or Diligence Complete), Have we invested? = No. Answers "we passed but they got to pitch / diligence."
 16. **Companies invested in the last year** — Investment Since slider = 1 year.
+17. **Companies that pitched in a chosen window** — Pitch date between start/end dates.
+18. **Companies with application text matching a term and investments in a chosen window** — Application content contains term; Investment date between start/end dates; summary footer on $ Invested = Sum.
 
 ## 11. Adopted from `/explore-companies`
 
@@ -415,13 +478,14 @@ The dialog's `FILTERS` array in `view-builder.html` is the canonical list, with 
 
 ### 16.1 Row click and expansion
 
-- Clicking anywhere on a company row toggles its expansion (application history). The chevron at the left is a visual indicator of expand state (▸ collapsed, ▾ expanded), not the click target.
-- Inline links inside the row (company name → detail page, kebab `⋯` button) call `event.stopPropagation()` so they don't also trigger the expand.
+- Clicking the chevron at the left toggles expansion (application history). The chevron is the only expand/collapse target.
+- Clicking anywhere else on the company row opens the company detail pane.
+- Inline controls inside the row, such as the kebab `⋯` button, call `event.stopPropagation()` so they don't open the pane.
 - The expansion is a small inline table directly under the row.
 
 ### 16.2 Application history mini-table
 
-Three columns: **Applied · Furthest stage · Outcome.** See §7 for column definitions. Whole application row is clickable and navigates to `/admin/company/<id>#app-<id>`.
+Three columns: **Applied · Furthest stage · Pitch date.** See §7 for column definitions. Whole application row is clickable and opens the detail pane at `/admin/company/<id>#app-<id>`.
 
 ### 16.3 Kebab menu on each company row
 
@@ -439,62 +503,111 @@ Right-most column on each row holds a `⋯` button. Click opens a small dropdown
 
 Closed by clicking outside or pressing Escape. Positioned absolute relative to the trigger button.
 
-### 16.4 Tagline clamp under company name
+### 16.4 Company blurb clamp under company name
 
-The tagline (`applications.tagline` for the latest application, or `companies.blurb` as fallback) renders under the company name in muted text, **clamped to two lines** via the `tagline-clamp` CSS class. The full text is in the `title` attribute so the native browser tooltip shows on hover.
+The company list/detail header uses `companies.blurb` for company-level descriptive text, clamped to two lines via the `tagline-clamp` CSS class where space is tight. Application tagline (`applications.tagline`) is not used as company header copy; it appears inside the selected application tab.
 
 ### 16.5 Logo placeholder
 
-The colored square next to each company name with the initials is a **logo placeholder**. When `companies.logo_drive_file_id` is set, the cell renders `<img src="/api/files/<logo_drive_file_id>">` in its place (proxied per AGENTS.md, never raw Drive URL). When no logo exists, the initials placeholder with a deterministic color hash stays.
+The list row does not show a logo or initials placeholder. The company detail header can still show a logo (or initials fallback). When `companies.logo_drive_file_id` is set, render `<img src="/api/files/<logo_drive_file_id>">` (proxied per AGENTS.md, never raw Drive URL).
 
 ### 16.6 Resizable, collapsible rail
 
 The left filter rail and the main table are separated by a 6px vertical drag handle. Hovering or dragging the handle highlights it in blue. Drag horizontally to resize the rail (min 200px, max 560px; default 280px). A `‹` button at the top-right of the rail collapses it to a thin vertical button; clicking that button re-expands. Width and open/closed state persist in `localStorage`.
 
+### 16.7 Company detail pane from the list
+
+Opening a company from `variant-a-list.html` does not navigate away from the companies table. Row clicks, company-name links, application-history rows, and the header Detail link open a right-side detail pane over the list. The pane uses the same interaction model as the Development CRM relationship detail drawer:
+
+- Fixed overlay aligned to the right with a subtle page scrim.
+- Width is `min(96vw, 1320px)`.
+- The detail content is `detail.html` rendered inside an iframe in the mockup; implementation can render the detail route/component directly.
+- Close button sits outside the detail content at the top-right of the pane.
+- Clicking the scrim closes the pane.
+- While the pane is open, background page scrolling is locked.
+- The table state, filters, expanded rows, and scroll position remain intact behind the pane.
+
+Direct URLs for `/admin/company/<company_record_id>` can still render the same detail component, but the primary list workflow is an in-place detail pane.
+
 ## 17. Company detail page (view + edit)
 
 The redesigned detail page replaces both today's `/admin/company/<id>` (`EditCompanyIsland`) and `/admin/application/<id>` (`EditApplicationIsland`) routes. One company; all of its data accessible without leaving the page.
 
-### 17.1 Two pages
+### 17.1 Detail surfaces
 
-- **`detail.html`** — read-mostly **view** of one company. Every section visible; every section is what a staff person would *consume* (read) about the company. Some fields can be edited in place (pencil hover) but the page's role is to inform.
-- **`detail-edit.html`** — full **edit form**. Same sections, same field set, all editable. Reached from `detail.html` via an `Edit` button in the header (top-right) or via a per-section ✎ icon (drops you into edit mode anchored at that section).
+- **`variant-a-list.html` detail pane** — primary read workflow. Opens `detail.html` over the company list without losing table state.
+- **`view-builder.html`** — focused Add Filter / filter chooser interaction for the Companies list left rail.
+- **`detail.html`** — read-mostly **view** of one company. Every section visible; every section is what a staff person would *consume* (read) about the company. Some fields can be edited in place (pencil hover) but the page's role is to inform. It is pane-ready and does not include a list breadcrumb/back header.
+- **`detail-edit.html`** — full **edit form**. Same sections, same field set, all editable. Reached from `detail.html` via an `Edit` button in the company tile or via a per-section ✎ icon.
 
 Switching between view and edit preserves scroll position and the section anchor.
 
-### 17.2 Sections (left-rail nav, in order)
+### 17.2 Detail page information architecture
 
-1. **Overview** — header banner facts + last-touch feed (5 most recent notes / emails / events).
-2. **Profile** — long-lived company facts.
-3. **Contacts** — people associated with the company (`company_contacts` → `people`).
-4. **Applications** — one card per application, each with all 28+ application fields.
-5. **Investments** — deployments + linked instruments + marks, in one ledger.
-6. **Notes** — `company_notes` for this company (and its applications), as a feed.
-7. **Emails** — `person_communications` scoped to this company.
-8. **Events** — `company_events` chronological list.
-9. **Ratings & Decisions** — screening ratings + decision messages per application.
+The detail page is company-first. The top of the page must establish the durable company identity before showing any application-specific content. Administrators often think in terms of "the company" even when the data comes from an application, so the UI makes the boundary visible without forcing the user to understand the schema.
 
-Notes and Emails are first-class scrollable sections on the detail page itself.
+Order on `detail.html`:
+
+1. **Company header** — single compact company summary. Shows logo, company name, portfolio-company tag when applicable, category/subcategory, HQ, website, company blurb, company status, conditional invested amount, and conditional current stage. It must not repeat the same facts in a second profile card below.
+2. **Investments panel** — collapsible, open by default. Uses the same content model as Application Review's `InvestmentsSection` on `application-review?tab=details&section=investments`. Investments are never nested under an application tab because E8 invests in companies, not applications.
+3. **Applications workspace** — one tab per application, sorted newest first. Application tabs are the primary way to read pipeline submissions.
+4. **Company events panel** — collapsible, open by default when included. Chronological `company_events` list across all applications.
+5. **Right rail** — stacked accordion panels following the `application-review?tab=diligence` right-rail model. Notes and Emails are first-class panels in this stack, not small cards. Application-scoped document and recording panels live inside the selected application tab instead.
+
+All major panels use the same disclosure pattern: chevron + title + one-line summary in the header; body hidden when collapsed. Default open/closed state is a product setting, not hard-coded to the component.
+
+### 17.2.1 Detail page data provenance
+
+Do not invent display text or metrics. Every label/value on the detail page must come from one of these sources or be hidden.
+
+| Display | Source / generation rule |
+|---|---|
+| Company name | `companies.name` |
+| Logo | `companies.logo_drive_file_id` rendered via `/api/files/<id>`; initials fallback only when empty |
+| Category | `companies.category` |
+| Subcategory tags | parse `companies.secondary_category`; supports JSON arrays and legacy strings |
+| HQ | `companies.city`, `companies.state`, `companies.country` |
+| Website | `companies.website` |
+| Company blurb | `companies.blurb`; if empty, omit the blurb area. Do not substitute an application tagline unless explicitly labeled as latest application tagline. |
+| Company status | `companies.status`; display as its own field only, never combine into invented labels such as "Active investment" |
+| Portfolio company tag | show when `SUM(deployments.amount_cents WHERE company_record_id = companies.record_id AND record_type='deployment') > 0` |
+| Invested amount | `SUM(deployments.amount_cents WHERE company_record_id = companies.record_id AND record_type='deployment')`; show `Invested: $x` if and only if the sum is greater than zero |
+| Deployment rows | `deployments` rows sorted newest first by `investment_date` |
+| Instrument count/status | `instruments` rows for `company_record_id`; count by `instruments.status`, label exactly from normalized status |
+| Current stage | latest/current `pipeline_stages.stage` for an application in a non-terminal stage. Terminal stages are exactly `Invested`, `Not Moving Forward`, and empty/null stage. Show `Current stage: <stage>` if and only if at least one application is in a non-terminal stage; otherwise omit it. Do not call it company role. |
+| Furthest stage | derived from `company_events` and investments using the Furthest Stage rules in §6. If implementation cannot compute it confidently, omit the company-level rollup and show per-application stage pills only. |
+| Notes count/list | `company_notes` rows by `company_record_id`, plus `application_record_id` when scoped to an app |
+| Emails count/list | `person_communications` rows by `company_record_id` |
+| Application documents | Application-scoped document/link sources only: pitch deck fields on `applications`, current diligence/supporting-document endpoints, and `reference_documents` by `application_record_id` where applicable. Do not aggregate unlabeled application documents into a company-level document list. |
+| Application recordings/transcripts | Application-scoped recording/transcript sources only. Every row must show which application it belongs to when shown outside the selected application context. |
+
+The mockup uses staging data from Embue (`companies.record_id = rec4vI3UkomccgqII`) as a realism reference. Implementation must query the current company at runtime and hide unavailable fields instead of carrying over Embue text.
 
 ### 17.3 Header banner
 
-Always at the top, sticky:
+Always at the top of the page content:
 
-- Logo (or initials placeholder, per §16.5)
-- Company name (h1)
-- **Status** pill — **Active / Exited / Closed** (or blank). The Status definition (§3) is the single source of truth. "Portfolio" is not a value.
-- Sector · HQ · Website link
-- Right side: key stats — `$ Invested · N investments · Latest application: year + stage · Last touch: date`
-- `Edit` button (top right) → flips to `detail-edit.html` (or to edit mode)
+- Logo image via `/api/files/<logo_drive_file_id>` or initials fallback, never a raw Google Drive URL.
+- Company name (`h1`).
+- Portfolio-company tag when the company has one or more deployment rows with `record_type='deployment'`. This is a derived tag, not a stored status.
+- Company status from `companies.status` as a separate plain field when present.
+- `Invested: $x` directly after company status if and only if total deployment amount is greater than zero.
+- `Current stage: <stage>` directly after invested amount if and only if a non-terminal application stage exists.
+- Primary category and subcategory tags.
+- Company blurb from `companies.blurb` directly under the name when present. Do not show application tagline here.
+- HQ and website link.
+- Edit affordance is a small pencil icon that appears on hover over the company tile. It links to `detail-edit.html` and does not reserve layout space before hover.
+- Do not show an `Add note` button in the company tile. New notes are created from the Notes rail header action.
 
-### 17.4 Profile section (view + edit)
+### 17.4 Company summary and edit fields
 
-Fields, with the grouping rendered in edit mode (mirroring `EditCompanyIsland`'s `CompactRow` 160px-label pattern):
+The view page should not have a second Company Profile panel that repeats the header. Company facts appear once, in the compact company summary at the top. Edit mode still needs the full company-owned field set, with grouping rendered in edit mode (mirroring `EditCompanyIsland`'s `CompactRow` 160px-label pattern):
 
 | Row label | Controls on the same row |
 |---|---|
-| Name | Name · Website |
-| Sector | Primary sector (single-select) · Secondary sector (multi-select) |
+| Name | Name · Logo · Website |
+| Blurb | Company blurb (`companies.blurb`) |
+| Sector | Primary category (single-select) · Subcategory (multi-select) |
 | HQ | City · State / Province · Country (3 inputs) |
 | Founder demographics | Race / Ethnicity (multi) · Gender (multi) |
 | Underrepresented | Yes / No checkbox |
@@ -503,40 +616,105 @@ Fields, with the grouping rendered in edit mode (mirroring `EditCompanyIsland`'s
 | Internal leads | Multi-people picker |
 | Follow-up date | Date input (YYYY-MM-DD) |
 
-The "Lead & Source" card from today's `EditCompanyIsland` is renamed simply **Profile**. Status is derived (§3) and displayed only in the header banner; not editable in the Profile section.
+Company `status` is displayed exactly from `companies.status` when present. Portfolio-company state is a derived tag from investments and is not editable here.
 
 ### 17.5 Contacts section
 
 `ContactPillsEditor`-style. Each contact is a pill: name + title + role badge (Primary / Other). Inline `+ Add contact` opens a person picker. Each pill has a small `×` to remove; clicking a pill opens the person detail.
 
-### 17.6 Applications section
+### 17.6 Applications workspace
 
-One card per application, sorted newest first. Header:
+The Applications workspace uses tabs, not stacked cards. Each tab represents one application, sorted newest first. Tab labels are intentionally compact:
 
-- Year · month applied (e.g. **Apr 2025**)
-- Furthest stage pill
-- Outcome (Invested / Passed / In progress) per §16.2
-- Decarbon8 / Follow-on / Locked / Draft badges if true
-- `Edit` icon → drops into the application's edit anchor on `detail-edit.html`
+- Month/year from `applications.date_added`, formatted `Mon YYYY`.
+- One tag for the application form/source: `E8`, `D8`, `Returning`, or `Dealum`.
+- Do not include stage, outcome, close date, or extra descriptive microcopy in the tab label.
 
-Body — **all 28 editable application fields** organized into the same cards `EditApplicationIsland` uses:
+Application form/source tag generation:
 
-**Basics card** (3-col top row + 2-col grid for the 14 pitch fields):
+- `D8` when `applications.decarbon8` is true.
+- `Returning` when `applications.follow_on` is true.
+- `Dealum` when `applications.dealum_id` is non-empty.
+- `E8` otherwise.
+- Precedence is exactly `D8`, `Returning`, `Dealum`, `E8`.
 
-- Top row: Company (read-only link) · Dealum ID · Pitch Deck (upload widget — in edit; embedded viewer — in view)
-- Two-column pairs: Tagline · Problem · Solution · Business Model · Market · Go to Market · Competitive Advantage · Traction · Competitors · Future Milestones · Patentable Ideas · Environmental Impact (full-width row of its own)
+If a company has zero applications, the workspace shows an empty state with the company profile/investments still visible. Do not show a `New application` button in the read-only detail mockup.
 
-**Raise details card** (2-col):
+Within the active tab, the layout is:
 
-- Funding To Date · Funding To Date Amount
-- Capital Seeking · Raise Instrument
-- Lead Investor · Financial Position
-- Use Of Funds · **Deal Terms**
-- Round Close Date · (Cap Table spans full)
+1. **Application section menu** — fixed-width left rail on desktop, stacked above content on mobile. It mirrors the section model on `/application-review?tab=details`: selecting one menu item replaces the right-side content with that section. It is not an accordion and does not show multiple sections at once.
+2. **Application content area** — main column. Shows only the selected section. The default selected section is **Basics**.
+3. **Application edit link** — available from the tab or active application header, linking to `detail-edit.html#application-<record_id>`.
 
-**Team card** (2-col):
+Application section menu options, in order:
 
-- Team · Management Qualifications
+| Menu item | Contents | Source |
+|---|---|---|
+| **Basics** | Pitch deck/video area, tagline, problem, solution, business model, market, go to market, competitive advantage, traction, competitors, future milestones, patentable ideas, environmental impact, application notes | `applications`, pitch deck file fields |
+| **Team** | Team and management qualifications | `applications.team`, `applications.management_qualifications` |
+| **Raise Details** | Funding to date, funding-to-date amount, non-dilutive amount, capital seeking, raise instrument, have lead, lead investor, round close date, financial position, use of funds, employee count, deal terms, cap table | `applications`; structured deal-term metadata comes from `application_instruments.metadata_json` when present |
+| **Screening** | Applied date, current stage, application form/source, Decarbon8 flag, follow-on flag, screening notes/ratings when available | `applications`, `pipeline_stages`, existing screening rating/detail endpoints |
+| **Diligence Team** | Diligence lead and member assignments | existing diligence team/membership data keyed by `application_record_id` |
+| **Discussions** | Application-scoped discussion threads and unread count | existing application discussion endpoints keyed by `application_record_id` |
+| **Documents** | Application-scoped supporting documents only. Empty state when none exist. | Application document endpoints / `reference_documents.application_record_id` / current diligence document sources |
+| **AI Insights** | Generated application insight content when present | existing AI insight fields/endpoints keyed by `application_record_id` |
+| **Ask the AI** | Application-scoped AI question surface | existing Ask AI application context |
+| **History** | Application event timeline | `company_events` filtered by `application_record_id`, ordered by event date |
+
+The menu uses a compact light selected state: blue-tinted background, subtle border, and a 3px blue inset bar on the left. It does not use a dark active background. Optional counts, such as Discussions or Documents, appear as small quiet badges aligned to the right of the menu item. On mobile, menu items wrap into a compact two-column grid above the selected section.
+
+Investments do not appear in the application section menu because E8 invests in companies, not applications. Company-level investments are shown only in the top Investments panel. Ratings do not appear as a company-level placeholder panel; screening and rating-related data belongs in the selected application's **Screening** section.
+
+The active company, active application, and active application section must be reflected in the URL so admins can copy a link to the exact state. The implementation can use query params or route params, but it must encode:
+
+- `company` — `companies.record_id`
+- `application` — `applications.record_id` for the selected application tab
+- `section` — the selected application section id, matching the left menu item
+
+Changing the selected company, application tab, or application section updates the URL without a full page reload. Loading a deep link opens the company detail pane, selects the matching application tab, and selects the matching application section. If a URL references an application that does not belong to the company, fall back to the newest application and default **Basics** section.
+
+Empty application sections use short factual empty states derived from zero records, such as `No supporting documents are attached to this application.` or `No diligence team records.` Do not add instructional copy.
+
+Body — **all editable application fields** remain visible somewhere on the active application tab. Fields with no value render a quiet `Not provided` state so implementers and admins can see that the field exists. Application tagline is a real current column, `applications.tagline`, and appears as **Tagline** inside the application tab. Company blurb is `companies.blurb` and appears only in the company summary.
+
+**Application content fields shown in the main content area:**
+
+- `applications.tagline` — label: Tagline
+- `applications.problem` — Problem
+- `applications.solution` — Solution
+- `applications.business_model` — Business Model
+- `applications.market` — Market
+- `applications.go_to_market` — Go To Market
+- `applications.competitive_advantage` — Competitive Advantage
+- `applications.traction` — Traction
+- `applications.competitors` — Competitors
+- `applications.future_milestones` — Future Milestones
+- `applications.patentable_ideas` — Patentable Ideas
+- `applications.environmental_impact` — Environmental Impact
+- `applications.team` — Team
+- `applications.management_qualifications` — Management Qualifications
+- `applications.deal_terms` — Deal Terms
+- `applications.cap_table` — Cap Table
+- `applications.notes` — Application Notes
+
+**Application raise/background fields shown in the section menu content:**
+
+- `applications.date_added`
+- `applications.dealum_id`
+- `applications.decarbon8`
+- `applications.follow_on`
+- `applications.pitch_deck_drive_file_id`
+- `applications.funding_to_date`
+- `applications.funding_to_date_amount_cents`
+- `applications.non_dilutive_amount_cents`
+- `applications.capital_seeking`
+- `applications.raise_instrument`
+- `applications.have_lead`
+- `applications.lead_investor`
+- `applications.round_close_date`
+- `applications.financial_position`
+- `applications.use_of_funds`
+- `applications.num_employees`
 
 **Pitch Deck** — embedded PDF viewer (per `PitchDeckTile.jsx`): header bar with "Pitch Deck" label, page counter (`{currentPage} / {numPages}`), Expand, Download. Body renders the PDF via `pdfjs-dist` into a `<canvas>`. Bottom-overlaid prev/next page nav. Keyboard left/right cycles pages, Escape collapses. In edit mode, a Replace / Remove control is added; the embedded viewer stays.
 
@@ -546,40 +724,98 @@ Body — **all 28 editable application fields** organized into the same cards `E
 
 ### 17.7 Investments section
 
-One row per deployment, sorted newest first. Columns: Date · Fund / member · Amount · Instrument · Terms / status · Current mark. Each row expands inline to show:
+Company-level panel near the top of the detail page. It should match `src/components/application-review/InvestmentsSection.jsx` rather than the old deployment-row grid.
 
-- Instrument lifecycle events (conversions, exits, dissolutions)
-- Mark history (valuation_events) for that instrument
-- Linked Annual-Fund ledger transaction (if any)
+Header/body behavior:
 
-A summary at the top of the section: Total deployed · Total returned · Net invested · Number of investments.
+- The surrounding company-detail panel remains collapsible.
+- Inside the expanded body, render the Application Review investments summary:
+  - `Total invested: $x` when total invested is greater than zero.
+  - `First investment: Month YYYY` when `firstInvestDate` exists.
+  - Empty state text from the existing section when there is no investment data and the company/application context is not follow-on.
 
-### 17.8 Notes section
+Rounds table:
 
-First-class, inline. Loads `company_notes` for this company plus any application-scoped notes (`application_record_id` set). Filtering toolbar: scope (All / Company-only / Application:YYYY), type (Note / Referral / News / Ask / AI Summary / Company Authored), date range. `+ New note` opens an inline TipTap editor; the editor supports markdown, attachments, confidential toggle, optional reply-thread (one level), assignment to an author. Save endpoint: `/admin/api/company-updates/companies/:id/notes`. Note rendering uses the same `<NotesPanel>` primitive as today's side-sheet.
+| Column | Source / rule |
+|---|---|
+| Round | `round.roundName` from `/screening-review/api/company-rounds-summary?companyRecordId=<company_record_id>` |
+| Investors | Admin/permissioned users see `round.investorNames`; otherwise show `round.investorCount` |
+| Date | `round.earliestDate`, formatted `Mon YYYY`; `-` when blank |
+| Amount | `round.totalAmount`, formatted with no cents; `-` when zero |
+| Est Value | `round.estimatedValue`, formatted with no cents; `-` when zero |
 
-### 17.9 Emails section
+The table has the same compact styling as Application Review: plain text rows, subtle bottom borders, right-aligned monospaced currency columns, `Est Value` separated by a left border, and a bold Total row. The Total row sums `totalAmount`, sums `estimatedValue`, and shows unique investor count (`N unique` for permissioned/admin users or `N` for count-only users).
 
-Chronological list of `person_communications` rows scoped by `company_record_id`. Each row: date · sender · recipient · channel (email / screening decision / portal message) · subject · snippet. Click to expand the full body inline; expanded view shows attachments. Read-only log. Endpoint: `/person-emails/api/company/:companyRecordId`.
+Data source details:
 
-### 17.10 Events section
+- Fetch rounds from `/screening-review/api/company-rounds-summary?companyRecordId=<company_record_id>`.
+- This endpoint is backed by `cacheManager.getCompanyRoundsSummary(companyRecordId)`.
+- Do not build this panel directly from raw `deployments` rows. Deployment-level rows are not the intended display here.
+- Include instrument/round rows even when the amount is zero, matching the current Application Review behavior.
 
-Chronological list of `company_events`. Each row: date · event type (Pitch / Follow-On Pitch / Pre-Screening / Screening / Diligence Debrief / Investment Committee / …) · application year · member lead · attached links (recording, zoom, questions doc). The pitch-meeting parent (via `parent_meeting_id`) is shown as a small "linked to Member Meeting · 2026-04-12" footer on Pitch / Follow-On Pitch rows.
+### 17.8 Company right rail accordion
 
-### 17.11 Ratings & Decisions section
+Use the same scaling model as the diligence right rail (`src/islands/diligence-tab/RightRail.jsx`):
 
-Per-application sub-strip (All applications | 2026 | 2025 | …). Within each:
+- Fixed right-side rail on desktop, top-aligned with the company tile. It must not sit lower than the left column content.
+- Full-width stacked below main content on narrow screens.
+- Default state on `detail.html` is collapsed.
+- Rail width defaults to 380px in the mockup. Implementation should persist the user's chosen width in local storage.
+- The rail has a draggable left resize handle. Dragging left/right resizes the rail between the minimum and maximum widths. Dragging narrower than the collapse threshold collapses the whole rail.
+- When the rail is collapsed, it becomes a 36px vertical band on the right with count badges at the top, a vertical "Activity" label, and an open chevron. Collapsed count badges include an icon inside the badge so users can distinguish notes from email without opening the rail. These badges should be allowed to be vertical ovals or compact rounded rectangles; do not force the icon and number into a tight circle. Clicking the band restores the prior open rail width.
+- One panel may be expanded at a time. Opening Emails collapses Notes; opening Notes collapses Emails.
+- Clicking the heading of the currently expanded panel collapses it, leaving the rail open with only panel headers visible.
+- Panel headers use a light background, chevron, title, colored count badge, and optional action button. Do not use dark/black header bars.
+- Count badge colors are semantic and consistent in both the collapsed band and expanded panel headers: gray/quiet when the count is zero, green when notes count is greater than zero, and yellow when emails count is greater than zero.
+- The rail has a full-height scrollable body for the active panel.
+- Target panels for this company detail page:
+  - Notes
+  - Emails
 
-- **Screening ratings** — `screening_rating_submissions` + `screening_rating_responses` rolled up. Show: N submissions, average rating, recommend / don't-recommend counts. Click to expand individual ratings.
-- **Decision messages** — `decision_messages` for AI-generated drafts; `screening_drafts.decision` for the final outcome (Pass / Too Early / Advance).
+Do not put application-scoped documents, transcripts, or recordings in the company right rail. Those belong inside the selected application tab's section menu so older application material does not get mixed with newer application material.
+
+### 17.9 Notes rail panel
+
+Loads `company_notes` for this company plus application-scoped notes where `company_record_id` matches. Sort newest first by `date DESC, created_at DESC`.
+
+Each note summary shows:
+
+- Author avatar/photo when available, otherwise initials.
+- Author name resolved from `author_person_record_id`.
+- Type pill from `company_notes.type`.
+- Markdown note preview rendered with the shared notes renderer.
+- `Read More...` affordance when the note is truncated.
+- Quiet footer metadata: created date/time from `created_at` or `date`, and stage from `company_notes.stage` when present.
+- Application scope when `application_record_id` is set.
+
+`+` in the panel header opens the same note composer behavior as the current company notes sheet. Attachments come from `company_note_attachments`.
+
+### 17.10 Emails rail panel
+
+Chronological list of `person_communications` rows scoped by `company_record_id`, sorted `sent_at DESC`. This panel is read-only.
+
+Each collapsed email row shows a scan summary:
+
+- Sender and recipient: `sender_name`/`sender_email` → `recipient_name`/`recipient_email`
+- Date and time from `sent_at`, formatted in the user locale
+- Subject from `subject`; if null, omit the subject line rather than generating one
+- Preview from `body_text`, stripped of HTML/markdown and truncated
+- Message kind from `source`/`channel` using the same mapping as `getEmailKindLabel()` in `src/islands/shared/EmailsPanel.jsx`
+
+Clicking a row expands it inline into an email-like view. Expanded rows show From, To, Subject, Date, and then the body text. Do not add a "Body" or "Content" label above the body. Attachments render below the body when `attachments_json` is non-empty.
+
+### 17.11 Events section
+
+Chronological company-level panel below the Applications workspace. Each row: date · event type (Pitch / Follow-On Pitch / Pre-Screening / Screening / Diligence Debrief / Investment Committee / …) · application year · member lead · attached links (recording, zoom, questions doc). The pitch-meeting parent (via `parent_meeting_id`) is shown as a small "linked to Member Meeting · 2026-04-12" footer on Pitch / Follow-On Pitch rows.
 
 ### 17.12 Date formats
 
 - **`YYYY-MM-DD`** for date inputs and most read-display dates (e.g., investment date, follow-up, round close, diligence date formed, note date).
+- **`Mon D, YYYY`** ("Mar 12, 2026") for the Companies list **Latest event** column.
 - **`Mon YYYY`** ("Apr 2026") for application month-of-applied and round date summaries.
 - **"N days ago"** / **"N wk ago"** / **"N mo ago"** for the Last touch column.
 
-### 17.13 Edit page (detail-edit.html)
+### 17.14 Edit page (detail-edit.html)
 
 Same section layout as `detail.html`. Each field becomes an input. Field grouping mirrors `EditCompanyIsland`'s `CompactRow` pattern (160px right-aligned uppercase label · multi-input row). For the application card, grouping mirrors `EditApplicationIsland`'s 2-column grid for the pitch-content fields plus the special Deal Terms launcher.
 
@@ -589,13 +825,14 @@ Header actions on the edit page:
 - Save (PATCH only changed fields, per the diff-based pattern `buildChangedFieldsPayload` already uses)
 - Cancel (discard changes, prompt if dirty)
 
-### 17.14 Routes
+### 17.15 Routes
 
-- View: `/admin/company/<co_record_id>`
+- List view: `/admin/companies`; selecting a company opens the detail pane without leaving this route.
+- Direct view: `/admin/company/<co_record_id>` renders the same detail component as a full page for reloads, deep links, and external links.
 - Edit: `/admin/company/<co_record_id>/edit`
 - Deep links to a section: `#overview`, `#profile`, `#contacts`, `#applications`, `#app-<app_record_id>` (auto-expands that application card), `#investments`, `#notes`, `#emails`, `#events`, `#ratings`
 
-Legacy `/admin/application/<app_record_id>` redirects to `/admin/company/<co_record_id>/edit#app-<app_record_id>`.
+Legacy `/admin/application/<app_record_id>` redirects to `/admin/company/<co_record_id>#app-<app_record_id>` for read view or `/admin/company/<co_record_id>/edit#app-<app_record_id>` for edit actions.
 
 ## 18. Design Guide Compliance checklist
 

@@ -4,13 +4,12 @@
 <meta charset="utf-8" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Add filter — interactive demo</title>
+<title>View builder</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   
   html { font-size: 18px; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-  .seed-note         { background:#fef9c3; border:1px solid #fde68a; color:#713f12; }
   .filter-chip       { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
   .seg-btn           { background:#fff; color:#475569; border:1px solid #e2e8f0; }
   .seg-btn.on        { background:#1e293b; color:#fff; border-color:#1e293b; }
@@ -46,28 +45,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     0%   { box-shadow: 0 0 0 0 rgba(59,130,246,0.6); background:#eff6ff; }
     100% { box-shadow: 0 0 0 16px rgba(59,130,246,0); background:transparent; }
   }
-  .step-num { background:#1e293b; color:#fff; width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; flex-shrink:0; }
 </style>
 </head>
 <body class="bg-white text-slate-900 text-sm">
 
-<div class="bg-slate-800 text-slate-100 px-4 py-2 text-xs flex items-center gap-3 sticky top-0 z-50">
-  <span class="font-semibold">Mockup v5</span>
-  <span class="text-slate-300">Add filter — interactive click-through</span>
-  <span class="ml-auto"><a class="text-blue-300 hover:underline" href="variant-a-list.html">← List view</a></span>
-  <span><a class="text-blue-300 hover:underline" href="variant-a-groupby.html">Group-by →</a></span>
-  <span><a class="text-blue-300 hover:underline" href="plan.md">plan.md</a></span>
-</div>
-
 <div class="max-w-[1400px] mx-auto px-4 py-4">
-
-  <div class="seed-note rounded-md px-3 py-2 mb-3 text-xs">
-    <span class="font-semibold">v5 changes:</span> Dialog rebuilt from the real fields in <code>lib/admin-grid-config.js</code> — now including the 14 pitch-content long-text fields and the rest of the application columns (Dealum ID, deal terms, lead investor, financial position, use of funds, etc.). Rollups not yet implemented are tagged <span class="proposed-tag">Proposed</span> — see plan §16 for the audit + engineering prerequisites. <b>Domain headings are collapsible</b>; by default only "About the company" is expanded. Typing a search query auto-expands any domain whose fields match. <b>A–Z mode is a flat alphabetical list</b> — no domain or letter headings. "Recent" chip strip lives at the top.<br>
-    <span class="font-semibold">Try it:</span>
-    <span class="step-num ml-1">1</span> Click <b>＋ Add filter</b>.
-    <span class="step-num ml-2">2</span> Click a collapsed domain heading to expand it, or type "pitch" / "deal" / "race" to auto-expand matching domains.
-    <span class="step-num ml-2">3</span> Toggle to A–Z to see the flat list.
-  </div>
 
   <!-- TITLE -->
   <div class="flex items-center gap-3 mb-3">
@@ -163,11 +145,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 
     <!-- MAIN -->
     <main class="col-span-9">
-      <div class="bg-slate-50 border border-slate-200 rounded-md px-3 py-2 mb-2 text-xs flex items-center gap-5">
-        <div><span class="text-slate-500">Matching: </span><span class="font-semibold tabular-nums" id="matchCount">312</span> <span class="text-slate-500">companies</span></div>
-        <div><span class="text-slate-500">Investments: </span><span class="font-semibold tabular-nums" id="invCount">410</span></div>
-        <div><span class="text-slate-500">Total deployed: </span><span class="font-semibold tabular-nums" id="depTotal">$78,200,000</span></div>
-      </div>
       <div class="border border-slate-200 rounded-md p-6 text-center text-slate-400 text-xs">
         <p>Table is shown in <a href="variant-a-list.html" class="text-blue-600 hover:underline">variant-a-list.html</a>.</p>
       </div>
@@ -585,13 +562,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     updateCounts();
   }
   function updateCounts() {
-    // simulate: more filters = fewer rows
-    let n = 312;
-    document.querySelectorAll('#activeChips .filter-chip').forEach(c => { n = Math.max(8, Math.floor(n * 0.55)); });
-    document.getElementById('matchCount').textContent = String(n);
-    document.getElementById('invCount').textContent = String(Math.floor(n * 1.3));
-    const dep = n * 250000;
-    document.getElementById('depTotal').textContent = '$' + dep.toLocaleString('en-US');
   }
 
   // close dropdown panels on outside click
