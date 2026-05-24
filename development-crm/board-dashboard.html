@@ -266,7 +266,7 @@
       </div>
       <div>
         <label class="text-[12px] text-slate-500 block mb-1">Summary <span class="text-[11px] text-slate-400">(max 500 chars)</span></label>
-        <textarea rows="3" maxlength="500" autocomplete="off" data-lpignore="true" data-form-type="other" class="w-full border border-slate-300 rounded px-2 py-1 text-sm" placeholder="What did you discuss? (visible to E8 staff)"></textarea>
+        <textarea rows="3" maxlength="500" data-lpignore="true" data-form-type="other" class="w-full border border-slate-300 rounded px-2 py-1 text-sm" placeholder="What did you discuss? (visible to E8 staff)"></textarea>
       </div>
       <div>
         <label class="text-[12px] text-slate-500 block mb-1">Outcome / next step (optional)</label>
@@ -468,7 +468,7 @@ function renderKanban() {
       <div class="p-2 space-y-1.5 max-h-[320px] overflow-y-auto scroll-thin bg-slate-50">
         ${stageItems.map(o => {
           const ent = entityById(o.entity_id) || {name:'?'};
-          return `<a href="opportunity-detail.html" class="block bg-white border border-slate-200 rounded hover:border-blue-400 transition no-underline text-inherit overflow-hidden">
+          return `<a href="entity-detail.html" class="block bg-white border border-slate-200 rounded hover:border-blue-400 transition no-underline text-inherit overflow-hidden">
             <div class="px-2.5 py-1.5 bg-slate-100 border-b border-slate-200 flex items-center gap-1.5 flex-wrap">
               ${typeChip(o)}
               ${legalEntityChip(o.legal_entity)}
@@ -496,7 +496,7 @@ function renderActivity() {
     return `<li class="px-3 py-2.5 hover:bg-slate-50 flex items-center gap-3">
       <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${cls} w-[100px] justify-center">${label}</span>
       <div class="flex-1 min-w-0 text-[14px]">
-        <a href="opportunity-detail.html" class="font-medium hover:underline">${a.opp}</a>
+        <a href="entity-detail.html" class="font-medium hover:underline">${a.opp}</a>
         <span class="text-slate-500"> · </span>
         <a href="entity-detail.html" class="text-slate-600 hover:underline">${a.entity}</a>
         <span class="text-slate-600"> ${a.text}</span>
@@ -510,7 +510,7 @@ function renderActivity() {
 function renderGrants() {
   const list = document.getElementById('grantList');
   list.innerHTML = GRANT_DEADLINES.map(g => `
-    <a href="opportunity-detail.html" class="flex items-center gap-3 hover:bg-slate-50 rounded p-1.5 -m-1.5">
+    <a href="entity-detail.html" class="flex items-center gap-3 hover:bg-slate-50 rounded p-1.5 -m-1.5">
       <div class="w-12 text-center shrink-0">
         <div class="text-[11px] uppercase text-slate-500">${g.due.split(' ')[0]}</div>
         <div class="text-lg font-semibold leading-none">${g.due.split(' ')[1]}</div>

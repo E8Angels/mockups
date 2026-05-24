@@ -45,6 +45,23 @@
   .workspace-handle::before { content:''; position:absolute; top:0; bottom:0; left:2px; width:2px; background:#e2e8f0; }
   .workspace-handle:hover::before, .workspace-handle.dragging::before { background:#3b82f6; left:1px; width:4px; }
   .workspace-main { flex:1; min-width:0; padding-left:10px; display:flex; flex-direction:column; min-height:0; }
+  .detail-drawer {
+    width:min(95vw, 1280px);
+    transform:translateX(100%);
+    transition:transform .18s ease;
+  }
+  #detailOverlay.flex .detail-drawer { transform:translateX(0); }
+  .calendar-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)) minmax(110px,.6fr); border-top:1px solid #e2e8f0; border-left:1px solid #e2e8f0; }
+  .calendar-cell { min-height:112px; border-right:1px solid #e2e8f0; border-bottom:1px solid #e2e8f0; padding:6px; background:#fff; }
+  .calendar-head { min-height:auto; background:#f8fafc; color:#64748b; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+  .calendar-weekend { display:grid; grid-template-rows:1fr 1fr; padding:0; }
+  .calendar-weekend > div { padding:6px; }
+  .calendar-weekend > div + div { border-top:1px solid #e2e8f0; }
+  .cal-item { display:block; border:1px solid #cbd5e1; border-radius:4px; padding:3px 5px; margin-top:4px; font-size:12px; line-height:1.25; background:#fff; color:#0f172a; }
+  .cal-deadline { background:#eff6ff; border-color:#bfdbfe; }
+  .cal-report { background:#faf5ff; border-color:#e9d5ff; }
+  .cal-task { background:#fff7ed; border-color:#fed7aa; }
+  .cal-overdue { background:#fef2f2; border-color:#fecaca; color:#991b1b; }
 
   /* Collapsed rail */
   .rail-collapsed-btn { width:36px; flex-shrink:0; border:1px solid #e2e8f0; border-radius:6px; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:14px 0; cursor:pointer; }
@@ -56,6 +73,18 @@
   .rail-collapsed-btn .rcb-icon { color:#64748b; }
   .rail-collapsed-btn:hover .rcb-icon { color:#0f172a; }
 
+  /* New opportunity wizard */
+  .wizard-step { display:none; }
+  .wizard-step.active { display:block; }
+  .wizard-dot { width:8px; height:8px; border-radius:999px; background:#cbd5e1; }
+  .wizard-dot.active { background:#2563eb; }
+  .wizard-choice { border:1px solid #e2e8f0; border-radius:8px; background:#fff; padding:10px 12px; text-align:left; }
+  .wizard-choice.active { border-color:#2563eb; box-shadow:0 0 0 2px rgba(37,99,235,.12); background:#eff6ff; }
+  .wizard-field { display:grid; grid-template-columns:140px minmax(0,1fr); gap:12px; align-items:start; }
+  .wizard-label { color:#475569; font-size:13px; padding-top:7px; }
+  .wizard-input { border:1px solid #cbd5e1; border-radius:6px; min-height:34px; padding:6px 8px; font-size:13px; background:#fff; width:100%; }
+  .wizard-editor { min-height:92px; border:1px solid #cbd5e1; border-radius:0 0 6px 6px; padding:8px 10px; background:#fff; line-height:1.5; outline:none; }
+
   /* Mobile */
   @media (max-width: 768px) {
     #kanbanBoard { scroll-snap-type: x mandatory; }
@@ -66,6 +95,8 @@
     .workspace-main { padding-left: 0; }
     .rail-collapsed-btn { width: 100%; flex-direction: row; padding: 8px 14px; }
     .rail-collapsed-btn .rcb-label { writing-mode: horizontal-tb; }
+    .wizard-field { grid-template-columns:1fr; gap:5px; }
+    .wizard-label { padding-top:0; }
   }
 </style>
 </head>
@@ -137,14 +168,14 @@
         <!-- SEARCH -->
         <div class="relative">
           <svg class="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"/></svg>
-          <input id="searchInput" type="text" placeholder="Search entities, opportunities, contacts…"
+          <input id="searchInput" type="text" placeholder="Search opportunities, organizations, contacts..."
                  autocomplete="off" data-lpignore="true" data-form-type="other"
                  class="w-full h-8 pl-8 pr-2 border border-slate-300 rounded text-[13px] focus:outline-none focus:ring-2 focus:ring-blue-500"/>
         </div>
 
         <!-- LEGAL ENTITY -->
         <div>
-          <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1">Legal entity</div>
+          <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1">E8 organization</div>
           <div class="flex items-center bg-slate-100 rounded-md p-0.5">
             <button data-entity="all"   class="entity-btn flex-1 px-2 py-1 rounded font-medium bg-white shadow-sm text-[12px]">All</button>
             <button data-entity="501c6" class="entity-btn flex-1 px-2 py-1 rounded font-medium text-slate-600 hover:bg-white text-[12px]">501c6</button>
@@ -163,7 +194,7 @@
         <!-- ENTITY TYPE -->
         <details>
           <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
-            <span>Entity type</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+            <span>Relationship type</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
           </summary>
           <ul class="text-[13px] space-y-0.5 mt-1" id="typeFilter"></ul>
         </details>
@@ -238,8 +269,7 @@
         <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px]">
           <button data-mode="kanban"   class="mode-btn px-2.5 py-1 font-medium rounded bg-white shadow-sm">Kanban</button>
           <button data-mode="list"     class="mode-btn px-2.5 py-1 font-medium rounded text-slate-600 hover:bg-white">List</button>
-          <button data-mode="grants"   class="mode-btn px-2.5 py-1 font-medium rounded text-slate-600 hover:bg-white">Grant calendar</button>
-          <button data-mode="entities" class="mode-btn px-2.5 py-1 font-medium rounded text-slate-600 hover:bg-white">Entities</button>
+          <button data-mode="grants"   class="mode-btn px-2.5 py-1 font-medium rounded text-slate-600 hover:bg-white">Calendar</button>
         </div>
         <div class="w-px h-5 bg-slate-200"></div>
         <button id="newOppBtn" class="h-7 px-2.5 text-[13px] font-medium text-white bg-blue-600 hover:bg-blue-700 rounded inline-flex items-center gap-1 whitespace-nowrap">
@@ -267,9 +297,9 @@
           <thead class="bg-slate-50 sticky top-0 z-10">
             <tr class="text-left text-[12px] uppercase tracking-wider text-slate-500">
               <th class="px-3 py-2 font-semibold">Opportunity</th>
-              <th class="px-3 py-2 font-semibold">Entity</th>
+              <th class="px-3 py-2 font-semibold">Organization</th>
               <th class="px-3 py-2 font-semibold">Kind</th>
-              <th class="px-3 py-2 font-semibold">Legal entity</th>
+              <th class="px-3 py-2 font-semibold">E8 organization</th>
               <th class="px-3 py-2 font-semibold">Stage</th>
               <th class="px-3 py-2 font-semibold text-right">Ask</th>
               <th class="px-3 py-2 font-semibold text-right">Received</th>
@@ -283,23 +313,37 @@
         </table>
       </div>
       <div id="grantsView" class="flex-1 overflow-auto bg-slate-50 p-3 hidden">
-        <div class="text-[13px] text-slate-500 mb-2">Foundation grant deadlines · next 60 days</div>
-        <div id="grantList" class="space-y-1.5"></div>
-      </div>
-      <div id="entitiesView" class="flex-1 overflow-auto bg-white hidden">
-        <table class="w-full text-[14px] border-collapse">
-          <thead class="bg-slate-50 sticky top-0 z-10">
-            <tr class="text-left text-[12px] uppercase tracking-wider text-slate-500">
-              <th class="px-3 py-2 font-semibold">Entity</th>
-              <th class="px-3 py-2 font-semibold">Type</th>
-              <th class="px-3 py-2 font-semibold">Primary contact</th>
-              <th class="px-3 py-2 font-semibold text-right">Opps</th>
-              <th class="px-3 py-2 font-semibold text-right">Lifetime received</th>
-              <th class="px-3 py-2 font-semibold">Last activity</th>
-            </tr>
-          </thead>
-          <tbody id="entitiesBody"></tbody>
-        </table>
+        <div class="bg-white border border-slate-200 rounded-md overflow-hidden">
+          <div class="px-3 py-2 border-b border-slate-200 flex items-center gap-2 flex-wrap">
+            <button class="h-7 w-7 border border-slate-300 rounded text-slate-500 hover:bg-slate-50" title="Previous month">‹</button>
+            <div class="font-semibold min-w-[110px] text-center">May 2026</div>
+            <button class="h-7 w-7 border border-slate-300 rounded text-slate-500 hover:bg-slate-50" title="Next month">›</button>
+            <button class="h-7 px-2.5 text-[13px] border border-slate-300 rounded bg-white hover:bg-slate-50">Today</button>
+            <div class="ml-auto flex items-center bg-slate-100 rounded-md p-0.5 text-[13px]">
+              <button class="calendar-mode-btn px-2.5 py-1 font-medium rounded bg-slate-950 text-white">Month</button>
+              <button class="calendar-mode-btn px-2.5 py-1 font-medium rounded text-slate-600 hover:bg-white">Week</button>
+              <button class="calendar-mode-btn px-2.5 py-1 font-medium rounded text-slate-600 hover:bg-white">Table</button>
+            </div>
+          </div>
+          <div class="calendar-grid">
+            <div class="calendar-cell calendar-head">Mon</div><div class="calendar-cell calendar-head">Tue</div><div class="calendar-cell calendar-head">Wed</div><div class="calendar-cell calendar-head">Thu</div><div class="calendar-cell calendar-head">Fri</div><div class="calendar-cell calendar-head">Sat / Sun</div>
+            <div class="calendar-cell text-slate-300">27</div><div class="calendar-cell text-slate-300">28</div><div class="calendar-cell text-slate-300">29</div><div class="calendar-cell text-slate-300">30</div><div class="calendar-cell"><div class="text-slate-500">1</div></div><div class="calendar-cell calendar-weekend"><div><span>2</span></div><div><span>3</span></div></div>
+            <div class="calendar-cell"><div class="text-slate-500">4</div><a href="entity-detail.html" class="cal-item cal-overdue no-underline">Bullitt follow-up<br><span class="text-[11px]">Karin · overdue</span></a></div><div class="calendar-cell"><div class="text-slate-500">5</div></div><div class="calendar-cell"><div class="text-slate-500">6</div></div><div class="calendar-cell"><div class="text-slate-500">7</div><a href="entity-detail.html" class="cal-item cal-task no-underline">Microsoft FY27 follow-up<br><span class="text-[11px]">Karin</span></a></div><div class="calendar-cell"><div class="text-slate-500">8</div></div><div class="calendar-cell calendar-weekend"><div><span>9</span></div><div><span>10</span></div></div>
+            <div class="calendar-cell"><div class="text-slate-500">11</div></div><div class="calendar-cell"><div class="text-slate-500">12</div><a href="entity-detail.html" class="cal-item cal-task no-underline">Walton outcomes packet<br><span class="text-[11px]">Jordan</span></a></div><div class="calendar-cell"><div class="text-slate-500">13</div></div><div class="calendar-cell"><div class="text-slate-500">14</div></div><div class="calendar-cell"><div class="text-slate-500">15</div><a href="entity-detail.html" class="cal-item cal-report no-underline">Bullitt report due</a></div><div class="calendar-cell calendar-weekend"><div><span>16</span></div><div><span>17</span></div></div>
+            <div class="calendar-cell"><div class="text-slate-500">18</div></div><div class="calendar-cell"><div class="text-slate-500">19</div></div><div class="calendar-cell"><div class="text-slate-500">20</div><a href="entity-detail.html" class="cal-item cal-deadline no-underline">Sea Mar application due</a></div><div class="calendar-cell"><div class="text-slate-500">21</div></div><div class="calendar-cell"><div class="text-slate-500">22</div></div><div class="calendar-cell calendar-weekend"><div><span>23</span></div><div><span>24</span></div></div>
+            <div class="calendar-cell"><div class="text-slate-500">25</div></div><div class="calendar-cell"><div class="text-slate-500">26</div></div><div class="calendar-cell"><div class="text-slate-500">27</div></div><div class="calendar-cell"><div class="text-slate-500">28</div></div><div class="calendar-cell"><div class="text-slate-500">29</div><a href="entity-detail.html" class="cal-item cal-task no-underline">Walton call prep<br><span class="text-[11px]">Lisa</span></a></div><div class="calendar-cell calendar-weekend"><div><span>30</span></div><div><span>31</span></div></div>
+          </div>
+        </div>
+        <div class="mt-3 bg-white border border-slate-200 rounded-md overflow-hidden">
+          <table class="w-full text-[13px]">
+            <thead class="bg-slate-50 text-left text-[11px] uppercase tracking-wider text-slate-500"><tr><th class="px-3 py-2">Date</th><th class="px-3 py-2">Item</th><th class="px-3 py-2">Type</th><th class="px-3 py-2">Owner</th></tr></thead>
+            <tbody>
+              <tr class="border-t border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-3 py-2">May 12</td><td class="px-3 py-2"><a href="entity-detail.html" class="quiet-link">Walton outcomes packet</a></td><td class="px-3 py-2">Follow-up</td><td class="px-3 py-2">Jordan</td></tr>
+              <tr class="border-t border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-3 py-2">May 15</td><td class="px-3 py-2"><a href="entity-detail.html" class="quiet-link">Bullitt report due</a></td><td class="px-3 py-2">Reporting</td><td class="px-3 py-2">Karin</td></tr>
+              <tr class="border-t border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-3 py-2">May 20</td><td class="px-3 py-2"><a href="entity-detail.html" class="quiet-link">Sea Mar application due</a></td><td class="px-3 py-2">Deadline</td><td class="px-3 py-2">Karin</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>
@@ -312,7 +356,7 @@
     <div class="px-4 py-3 space-y-2 text-sm">
       <div class="text-slate-600 text-[13px]">Moving <strong id="modalOpp">—</strong> from <span id="modalFrom" class="chip"></span> to <span id="modalTo" class="chip"></span></div>
       <label class="block text-[13px] text-slate-600 mt-2">Note (optional)</label>
-      <textarea autocomplete="off" data-lpignore="true" rows="3" class="w-full border border-slate-300 rounded p-2 text-sm" placeholder="Why this move?"></textarea>
+      <textarea data-lpignore="true" rows="3" class="w-full border border-slate-300 rounded p-2 text-sm" placeholder="Why this move?"></textarea>
       <label class="block text-[13px] text-slate-600 mt-2">Auto-suggest follow-up <span class="text-slate-400">(stage default)</span></label>
       <input type="date" class="!w-[150px] border border-slate-300 rounded p-1 text-sm" id="modalFollowup" />
     </div>
@@ -323,198 +367,289 @@
   </div>
 </div>
 
-<!-- New Opportunity dialog -->
+<!-- New Opportunity wizard -->
 <div id="newOppModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4">
-  <div class="bg-white rounded-md shadow-xl w-full max-w-lg">
-    <div class="px-4 py-3 border-b border-slate-200 flex items-center">
-      <div class="font-semibold">New opportunity</div>
+  <div class="bg-white rounded-md shadow-xl w-full max-w-3xl">
+    <div class="px-5 py-4 border-b border-slate-200 flex items-start gap-4">
+      <div>
+        <div class="font-semibold text-[15px]">New opportunity</div>
+        <div id="wizardContext" class="text-[12px] text-slate-500 mt-0.5"></div>
+      </div>
+      <div class="ml-auto flex items-center gap-2 pt-1" aria-label="Wizard progress">
+        <span class="wizard-dot active" data-progress="1" aria-hidden="true">&nbsp;</span>
+        <span class="wizard-dot" data-progress="2" aria-hidden="true">&nbsp;</span>
+        <span class="wizard-dot" data-progress="3" aria-hidden="true">&nbsp;</span>
+        <span class="wizard-dot" data-progress="4" aria-hidden="true">&nbsp;</span>
+      </div>
       <button onclick="closeNewOpp()" class="ml-auto text-slate-400 hover:text-slate-700" aria-label="Close">
         <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
       </button>
     </div>
-    <div class="px-4 py-3 space-y-3 text-sm max-h-[70vh] overflow-y-auto scroll-thin">
 
-      <!-- Entity picker -->
-      <div class="grid grid-cols-[110px_1fr] items-start gap-3">
-        <label class="text-[13px] text-slate-600 pt-1.5">Entity</label>
-        <div class="space-y-1.5 flex-1">
-          <input type="text" placeholder="Search existing entities or type a new name…" autocomplete="off" data-lpignore="true" data-form-type="other"
-                 class="block w-full border border-slate-300 rounded h-8 px-2 text-[13px]"/>
-          <div class="text-[12px] text-slate-400">No match? <a href="#" class="text-blue-700 hover:underline">+ Create new entity</a> inline.</div>
-        </div>
-      </div>
+    <div class="px-5 py-4 text-sm max-h-[72vh] overflow-y-auto scroll-thin">
 
-      <!-- Opportunity name -->
-      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
-        <label for="newOppName" class="text-[13px] text-slate-600">Name</label>
-        <input id="newOppName" type="text" autocomplete="off" data-lpignore="true" data-form-type="other"
-               placeholder="e.g. Wilmington Scholarship 2026, FY27 Sponsorship"
-               class="border border-slate-300 rounded h-8 px-2 text-[13px]"/>
-      </div>
-
-      <!-- Type -->
-      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
-        <label class="text-[13px] text-slate-600">Type</label>
-        <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px] w-fit">
-          <button type="button" data-newtype="grant"       class="newtype-btn px-2.5 py-1 rounded font-medium bg-white shadow-sm">Grant</button>
-          <button type="button" data-newtype="sponsorship" class="newtype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Sponsorship</button>
-          <button type="button" data-newtype="gift"        class="newtype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Gift</button>
-        </div>
-      </div>
-
-      <!-- Subtype (Sponsorship only) -->
-      <div id="newSubtypeRow" class="grid grid-cols-[110px_1fr] items-center gap-3 hidden">
-        <label class="text-[13px] text-slate-600">Subtype</label>
-        <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px] w-fit">
-          <button type="button" data-newsubtype="annual" class="newsubtype-btn px-2.5 py-1 rounded font-medium bg-white shadow-sm">Annual</button>
-          <button type="button" data-newsubtype="event"  class="newsubtype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Event</button>
-          <button type="button" data-newsubtype="other"  class="newsubtype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Other</button>
-        </div>
-      </div>
-
-      <!-- Legal entity -->
-      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
-        <label class="text-[13px] text-slate-600">Legal entity</label>
-        <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px] w-fit">
-          <button type="button" data-newentity="501c6" class="newentity-btn px-2.5 py-1 rounded font-medium bg-white shadow-sm">E8 Angels · (c)6</button>
-          <button type="button" data-newentity="501c3" class="newentity-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">E8 Impact · (c)3</button>
-          <button type="button" data-newentity="both"  class="newentity-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Both</button>
-        </div>
-      </div>
-
-      <!-- Stage -->
-      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
-        <label class="text-[13px] text-slate-600">Stage</label>
-        <select class="h-8 border border-slate-300 rounded px-2 text-[13px] w-[200px]">
-          <option value="prospect">Prospect</option>
-          <option value="outreach">Outreach</option>
-          <option value="conversation">Conversation</option>
-          <option value="proposal">Proposal</option>
-          <option value="committed">Committed</option>
-          <option value="received">Received</option>
-        </select>
-      </div>
-
-      <!-- Owner -->
-      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
-        <label class="text-[13px] text-slate-600">Owner</label>
-        <select class="h-8 border border-slate-300 rounded px-2 text-[13px] w-[200px]">
-          <option>Karin Kidder (me)</option>
-          <option>Kathleen Olson</option>
-          <option>Lee O'Connor</option>
-          <option>Jordan Schwartz</option>
-        </select>
-      </div>
-
-      <!-- Advocate (optional; internal E8 person helping move this opp forward) -->
-      <div class="grid grid-cols-[110px_1fr] items-center gap-3">
-        <label class="text-[13px] text-slate-600">Advocate</label>
-        <input type="text" placeholder="Search board members or staff…" autocomplete="off" data-lpignore="true" data-form-type="other"
-               class="border border-slate-300 rounded h-8 px-2 text-[13px]"/>
-      </div>
-
-      <!-- Optional collapsible -->
-      <details>
-        <summary class="text-[13px] text-slate-600 cursor-pointer select-none py-1 hover:text-slate-900">More details (optional)</summary>
-        <div class="space-y-3 mt-2 pt-2 border-t border-slate-100">
-
-          <div class="grid grid-cols-[110px_1fr] items-center gap-3">
-            <label class="text-[13px] text-slate-600">Source</label>
-            <input type="text" placeholder="Repeat funder / warm intro / event / cold" autocomplete="off" data-lpignore="true" data-form-type="other"
-                   class="border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+      <section class="wizard-step active" data-step="1">
+        <div class="grid md:grid-cols-2 gap-3">
+          <div role="button" tabindex="0" class="wizard-choice active cursor-pointer" data-entity-mode="existing">
+            <div class="font-semibold">Use an existing relationship</div>
           </div>
+          <div role="button" tabindex="0" class="wizard-choice cursor-pointer" data-entity-mode="new">
+            <div class="font-semibold">Create a new relationship</div>
+          </div>
+        </div>
 
-          <div class="grid grid-cols-[110px_1fr] items-center gap-3">
-            <label class="text-[13px] text-slate-600">Campaign</label>
-            <select class="h-8 border border-slate-300 rounded px-2 text-[13px] w-[200px]">
-              <option value="">— none —</option>
-              <option>FY26 Annual Fund</option>
-              <option>Fellowship Program</option>
-              <option>Member Events</option>
+        <div id="existingEntityPane" class="mt-4 space-y-3">
+          <div class="wizard-field">
+            <label class="wizard-label" for="entitySearch">Organization</label>
+            <div>
+              <input id="entitySearch" type="text" value="Walton" autocomplete="off" data-lpignore="true" data-form-type="other"
+                     class="wizard-input" placeholder="Type to search..." />
+              <div class="mt-1 border border-slate-200 rounded-md overflow-hidden bg-white shadow-sm">
+                <button type="button" class="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between">
+                  <span><span class="font-medium">Walton Family Foundation</span><span class="text-slate-500"> - Foundation</span></span>
+                  <span class="text-[12px] text-blue-700">Selected</span>
+                </button>
+                <button type="button" class="w-full px-3 py-2 text-left hover:bg-slate-50 border-t border-slate-100">
+                  Walton Family Foundation - Environment Program
+                </button>
+                <button type="button" class="w-full px-3 py-2 text-left hover:bg-slate-50 border-t border-slate-100">
+                  Walton Enterprises - Corporate
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="newEntityPane" class="mt-4 space-y-3 hidden">
+          <div class="wizard-field">
+            <label class="wizard-label" for="newEntityName">Name</label>
+            <input id="newEntityName" type="text" class="wizard-input" placeholder="e.g. Bullitt Foundation" autocomplete="off" data-lpignore="true" data-form-type="other" />
+          </div>
+          <div class="wizard-field">
+            <label class="wizard-label">Type</label>
+            <select class="wizard-input max-w-[240px]">
+              <option>Foundation</option>
+              <option>Corporate</option>
+              <option>Individual</option>
+              <option>Government</option>
             </select>
           </div>
+          <div class="wizard-field">
+            <label class="wizard-label" for="newEntityDescription">Description</label>
+            <textarea id="newEntityDescription" rows="3" class="wizard-input" placeholder="Focus area, relationship context, geography, or other useful background."></textarea>
+          </div>
+        </div>
 
-          <!-- Ask amounts (multi-line; supports mixing cash + in-kind at create time) -->
-          <div class="grid grid-cols-[110px_1fr] items-start gap-3">
-            <label class="text-[13px] text-slate-600 pt-1.5">Ask amounts</label>
-            <div class="flex-1 min-w-0">
+        <div class="mt-5 border-t border-slate-100 pt-4">
+          <div class="flex items-center">
+            <div>
+              <div class="text-[13px] font-semibold">Contacts</div>
+            </div>
+            <button type="button" id="addContactBtn" class="ml-auto h-8 px-3 text-[13px] border border-slate-300 rounded bg-white hover:bg-slate-50">+ Add contact</button>
+          </div>
+          <div id="contactList" class="mt-2 space-y-2">
+            <div class="rounded-md border border-slate-200 px-3 py-2 flex items-center gap-3">
+              <div class="min-w-0">
+                <div class="font-medium">Taylor Brugh</div>
+                <div class="text-[12px] text-slate-500">Program Officer - taylor.brugh@waltonfamilyfoundation.org</div>
+              </div>
+              <span class="ml-auto text-[11px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">Primary</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="wizard-step" data-step="2">
+        <div class="space-y-4">
+          <div class="wizard-field">
+            <label for="newOppName" class="wizard-label">Opportunity name</label>
+            <input id="newOppName" type="text" autocomplete="off" data-lpignore="true" data-form-type="other"
+                   placeholder="e.g. Walton Fellowship Grant 2026"
+                   class="wizard-input"/>
+          </div>
+
+          <div class="wizard-field">
+            <label class="wizard-label">Type</label>
+            <div class="flex flex-wrap gap-2">
+              <div role="button" tabindex="0" data-newtype="grant" class="wizard-choice newtype-btn active cursor-pointer min-w-[120px]">
+                <div class="font-semibold text-center">Grant</div>
+              </div>
+              <div role="button" tabindex="0" data-newtype="sponsorship" class="wizard-choice newtype-btn cursor-pointer min-w-[120px]">
+                <div class="font-semibold text-center">Sponsorship</div>
+              </div>
+              <div role="button" tabindex="0" data-newtype="gift" class="wizard-choice newtype-btn cursor-pointer min-w-[120px]">
+                <div class="font-semibold text-center">Gift</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="newSubtypeRow" class="wizard-field hidden">
+            <label class="wizard-label">Subtype</label>
+            <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px] w-fit">
+              <button type="button" data-newsubtype="annual" class="newsubtype-btn px-2.5 py-1 rounded font-medium bg-white shadow-sm">Annual</button>
+              <button type="button" data-newsubtype="event"  class="newsubtype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Event</button>
+              <button type="button" data-newsubtype="other"  class="newsubtype-btn px-2.5 py-1 rounded font-medium text-slate-600 hover:bg-white">Other</button>
+            </div>
+          </div>
+
+          <div class="wizard-field">
+            <label class="wizard-label">E8 organization</label>
+            <div class="flex flex-wrap gap-2">
+              <div role="button" tabindex="0" data-newentity="501c6" class="wizard-choice newentity-btn active cursor-pointer min-w-[130px]">
+                <div class="font-semibold text-center">E8 Angels</div>
+              </div>
+              <div role="button" tabindex="0" data-newentity="501c3" class="wizard-choice newentity-btn cursor-pointer min-w-[130px]">
+                <div class="font-semibold text-center">E8 Impact</div>
+              </div>
+              <div role="button" tabindex="0" data-newentity="both" class="wizard-choice newentity-btn cursor-pointer min-w-[130px]">
+                <div class="font-semibold text-center">Both</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="wizard-field">
+            <label class="wizard-label">Owner</label>
+            <select class="wizard-input max-w-[260px]">
+              <option>Karin Kidder (me)</option>
+              <option>Kathleen Olson</option>
+              <option>Lee O'Connor</option>
+              <option>Jordan Schwartz</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="wizard-step" data-step="3">
+        <div class="grid lg:grid-cols-[minmax(0,1fr)_280px] gap-5">
+          <div class="space-y-4 min-w-0">
+            <div>
+              <label class="block text-[13px] text-slate-600 mb-1">Ask</label>
               <div id="askLines" class="space-y-1.5"></div>
-              <button type="button" id="addAskLineBtn" class="mt-1.5 text-[12px] text-blue-700 hover:text-blue-900 inline-flex items-center gap-1">
+              <button type="button" id="addAskLineBtn" class="mt-2 text-[12px] text-blue-700 hover:text-blue-900 inline-flex items-center gap-1">
                 <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
-                Add another line
+                Add ask component
               </button>
               <div id="askSubtotal" class="text-[11px] text-slate-500 mt-1 hidden"></div>
             </div>
-          </div>
 
-          <!-- Grant / Sponsorship: application deadline -->
-          <div id="newDeadlineRow" class="grid grid-cols-[110px_1fr] items-center gap-3">
-            <label class="text-[13px] text-slate-600">App deadline</label>
-            <input type="date" autocomplete="off" data-lpignore="true"
-                   class="!w-[150px] border border-slate-300 rounded h-8 px-2 text-[13px]"/>
-          </div>
-
-          <!-- Grant: decision expected -->
-          <div id="newDecisionRow" class="grid grid-cols-[110px_1fr] items-center gap-3">
-            <label class="text-[13px] text-slate-600">Decision exp.</label>
-            <input type="date" autocomplete="off" data-lpignore="true"
-                   class="!w-[150px] border border-slate-300 rounded h-8 px-2 text-[13px]"/>
-          </div>
-
-          <!-- Grant / Sponsorship: application URL -->
-          <div id="newUrlRow" class="grid grid-cols-[110px_1fr] items-center gap-3">
-            <label class="text-[13px] text-slate-600">Application URL</label>
-            <input type="url" placeholder="https://…" autocomplete="off" data-lpignore="true" data-form-type="other"
-                   class="border border-slate-300 rounded h-8 px-2 text-[13px]"/>
-          </div>
-
-          <!-- Sponsorship: term start / end -->
-          <div id="newTermRow" class="grid grid-cols-[110px_1fr] items-center gap-3 hidden">
-            <label class="text-[13px] text-slate-600">Term</label>
-            <div class="flex items-center gap-2">
-              <input type="date" autocomplete="off" data-lpignore="true"
-                     class="!w-[150px] border border-slate-300 rounded h-8 px-2 text-[13px]"/>
-              <span class="text-slate-400">→</span>
-              <input type="date" autocomplete="off" data-lpignore="true"
-                     class="!w-[150px] border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+            <div>
+              <label class="block text-[13px] text-slate-600 mb-1">Description</label>
+              <div class="border border-slate-300 border-b-0 rounded-t-md bg-slate-50 px-2 py-1 flex items-center gap-1">
+                <button type="button" data-cmd="bold" class="editor-btn h-7 w-7 rounded hover:bg-white inline-flex items-center justify-center" title="Bold" aria-label="Bold">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 0 8H6z"/><path d="M6 12h9a4 4 0 0 1 0 8H6z"/></svg>
+                </button>
+                <button type="button" data-cmd="italic" class="editor-btn h-7 w-7 rounded hover:bg-white inline-flex items-center justify-center" title="Italic" aria-label="Italic">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg>
+                </button>
+                <button type="button" data-cmd="insertUnorderedList" class="editor-btn h-7 w-7 rounded hover:bg-white inline-flex items-center justify-center" title="Bulleted list" aria-label="Bulleted list">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+                </button>
+                <button type="button" data-cmd="insertOrderedList" class="editor-btn h-7 w-7 rounded hover:bg-white inline-flex items-center justify-center" title="Numbered list" aria-label="Numbered list">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="21" y1="6" y2="6"/><line x1="10" x2="21" y1="12" y2="12"/><line x1="10" x2="21" y1="18" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+                </button>
+                <button type="button" data-cmd="createLink" class="editor-btn h-7 w-7 rounded hover:bg-white text-blue-700 inline-flex items-center justify-center" title="Link" aria-label="Link">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                </button>
+              </div>
+              <div id="oppDescriptionEditor" class="wizard-editor" contenteditable="true"></div>
             </div>
           </div>
 
-          <!-- Grant: restricted -->
-          <div id="newRestrictedRow" class="grid grid-cols-[110px_1fr] items-center gap-3">
-            <label class="text-[13px] text-slate-600">Restricted</label>
-            <div class="flex items-center gap-2 flex-1">
-              <input type="checkbox" class="rounded"/>
-              <input type="text" placeholder="Restriction notes (program code, allowed uses…)" autocomplete="off" data-lpignore="true" data-form-type="other"
-                     class="flex-1 border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+          <aside class="space-y-3">
+            <div id="newDeadlineRow">
+              <label class="text-[13px] text-slate-600">Application due</label>
+              <input type="date" class="wizard-input mt-1" autocomplete="off" data-lpignore="true" />
             </div>
-          </div>
-
-          <!-- Grant: reporting -->
-          <div id="newReportingRow" class="grid grid-cols-[110px_1fr] items-center gap-3">
-            <label class="text-[13px] text-slate-600">Reporting</label>
-            <div class="flex items-center gap-2 flex-1">
-              <input type="checkbox" class="rounded"/>
-              <span class="text-[13px] text-slate-600">Required by</span>
-              <input type="date" autocomplete="off" data-lpignore="true"
-                     class="!w-[150px] border border-slate-300 rounded h-8 px-2 text-[13px]"/>
+            <div id="newDecisionRow">
+              <label class="text-[13px] text-slate-600">Decision expected</label>
+              <input type="date" class="wizard-input mt-1" autocomplete="off" data-lpignore="true" />
             </div>
-          </div>
 
-          <!-- Renewal of -->
-          <div class="grid grid-cols-[110px_1fr] items-center gap-3">
-            <label class="text-[13px] text-slate-600">Renewal of</label>
-            <input type="text" placeholder="Prior opportunity (autocomplete)…" autocomplete="off" data-lpignore="true" data-form-type="other"
-                   class="border border-slate-300 rounded h-8 px-2 text-[13px]"/>
-          </div>
+            <div>
+              <label class="text-[13px] text-slate-600">Website</label>
+              <input type="url" placeholder="https://..." autocomplete="off" data-lpignore="true" data-form-type="other" class="wizard-input mt-1"/>
+            </div>
 
+            <div id="newTermRow" class="hidden">
+              <label class="text-[13px] text-slate-600">Sponsorship term</label>
+              <div class="mt-1 flex items-center gap-2 flex-wrap">
+                <input type="date" class="wizard-input !w-[128px]" autocomplete="off" data-lpignore="true" />
+                <span class="text-slate-400">to</span>
+                <input type="date" class="wizard-input !w-[128px]" autocomplete="off" data-lpignore="true" />
+              </div>
+            </div>
+
+            <div id="newGrantRows" class="space-y-3 border-t border-slate-100 pt-3">
+              <label class="flex items-center gap-2 text-[13px]">
+                <input id="restrictedGrantCheck" type="checkbox" class="rounded"/>
+                <span class="font-medium">Restricted grant</span>
+              </label>
+              <input id="restrictionNotesField" type="text" class="wizard-input hidden" placeholder="Restriction notes" autocomplete="off" data-lpignore="true" data-form-type="other" />
+
+              <label class="flex items-center gap-2 text-[13px]">
+                <input id="reportingRequiredCheck" type="checkbox" class="rounded"/>
+                <span class="font-medium">Reporting required</span>
+              </label>
+              <input id="reportingDueField" type="date" class="wizard-input hidden" autocomplete="off" data-lpignore="true" />
+            </div>
+          </aside>
         </div>
-      </details>
+      </section>
+
+      <section class="wizard-step" data-step="4">
+        <div class="grid gap-4">
+          <div class="rounded-md border border-slate-200 p-4">
+            <div class="text-[12px] uppercase tracking-wide text-slate-500 font-semibold">Ready to create</div>
+            <div class="mt-2 text-lg font-semibold">Walton Fellowship Grant 2026</div>
+            <div class="mt-1 text-[13px] text-slate-600">Walton Family Foundation - Grant - E8 Impact (501(c)(3))</div>
+            <div class="mt-4 grid grid-cols-2 gap-3 text-[13px]">
+              <div><div class="text-slate-500">Ask</div><div class="font-semibold">$100,000 cash + in-kind support</div></div>
+              <div><div class="text-slate-500">Initial stage</div><div class="font-semibold">Prospect</div></div>
+              <div><div class="text-slate-500">Owner</div><div class="font-semibold">Karin Kidder</div></div>
+              <div><div class="text-slate-500">Contact</div><div class="font-semibold">Taylor Brugh</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
-    <div class="px-4 py-3 border-t border-slate-200 flex items-center justify-end gap-2">
+    <div class="px-5 py-3 border-t border-slate-200 flex items-center gap-2">
       <button onclick="closeNewOpp()" class="h-8 px-3 text-[13px] border border-slate-300 rounded">Cancel</button>
-      <button class="h-8 px-3 text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Create &amp; open</button>
+      <button id="wizardBackBtn" type="button" class="ml-auto h-8 px-3 text-[13px] border border-slate-300 rounded bg-white hover:bg-slate-50">Back</button>
+      <button id="wizardNextBtn" type="button" class="h-8 px-3 text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- Relationship/opportunity drawer -->
+<div id="detailOverlay" class="fixed inset-0 z-50 hidden items-stretch justify-end bg-slate-950/25">
+  <section class="detail-drawer relative h-full bg-slate-50 shadow-2xl border-l border-slate-200">
+    <button id="closeDetailPanelBtn" type="button" class="absolute right-3 top-3 z-10 h-8 w-8 rounded-md bg-white border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 inline-flex items-center justify-center" aria-label="Close detail panel">
+      <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+    </button>
+    <iframe id="detailFrame" title="Opportunity detail" class="h-full w-full border-0 bg-slate-50"></iframe>
+  </section>
+</div>
+
+<!-- Add contact modal -->
+<div id="contactModal" class="fixed inset-0 bg-slate-900/40 z-[60] hidden items-center justify-center p-4">
+  <div class="bg-white rounded-md shadow-xl w-full max-w-md">
+    <div class="px-4 py-3 border-b border-slate-200 flex items-center">
+      <div class="font-semibold">Add contact</div>
+      <button onclick="closeContactModal()" class="ml-auto text-slate-400 hover:text-slate-700" aria-label="Close">
+        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+      </button>
+    </div>
+    <div class="p-4 space-y-3">
+      <div class="wizard-field"><label class="wizard-label">Name <span class="text-red-600">*</span></label><input id="contactName" class="wizard-input" value="Taylor Brugh" /></div>
+      <div class="wizard-field"><label class="wizard-label">Email</label><input id="contactEmail" type="email" class="wizard-input" value="taylor.brugh@waltonfamilyfoundation.org" /></div>
+      <div class="wizard-field"><label class="wizard-label">Title</label><input id="contactTitle" class="wizard-input" value="Program Officer" /></div>
+      <div class="wizard-field"><label class="wizard-label">Phone</label><input id="contactPhone" class="wizard-input" placeholder="(206) 555-0144" /></div>
+      <div class="wizard-field"><label class="wizard-label">LinkedIn</label><input id="contactLinkedIn" class="wizard-input" placeholder="https://linkedin.com/in/..." /></div>
+    </div>
+    <div class="px-4 py-3 border-t border-slate-200 flex justify-end gap-2">
+      <button onclick="closeContactModal()" class="h-8 px-3 text-[13px] border border-slate-300 rounded">Cancel</button>
+      <button id="saveContactBtn" class="h-8 px-3 text-[13px] bg-blue-600 hover:bg-blue-700 text-white rounded font-medium">Add contact</button>
     </div>
   </div>
 </div>
@@ -648,6 +783,13 @@ function legalEntityChip(e) {
   if (e === '501c3') return c3;
   return c6 + ' ' + c3;
 }
+function legalEntityFullChip(e) {
+  const c6 = `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c6">501(c)6</span>`;
+  const c3 = `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c3">501(c)3</span>`;
+  if (e === '501c6') return c6;
+  if (e === '501c3') return c3;
+  return c6 + ' ' + c3;
+}
 function typeChip(o) {
   const t = typeOf(o);
   return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${t.cls}">${t.label}</span>`;
@@ -768,7 +910,7 @@ function renderKanban() {
       <div class="flex-1 overflow-y-auto scroll-thin p-2 space-y-2 bg-slate-50">
         ${stageItems.map(o => {
           const ent = entityById(o.entity_id) || {name:'?', type:'?'};
-          return `<a href="opportunity-detail.html" class="card-drag block bg-white border border-slate-200 rounded hover:border-blue-400 hover:shadow-sm transition no-underline text-inherit overflow-hidden" draggable="true">
+          return `<a href="entity-detail.html" class="card-drag block bg-white border border-slate-200 rounded hover:border-blue-400 hover:shadow-sm transition no-underline text-inherit overflow-hidden" draggable="true">
             <!-- Header band: type chip + legal-entity tags -->
             <div class="px-2.5 py-1.5 bg-slate-100 border-b border-slate-200 flex items-center gap-1.5 flex-wrap">
               ${typeChip(o)}
@@ -800,11 +942,11 @@ function renderList() {
   const tbody = document.getElementById('listBody');
   tbody.innerHTML = items.map(o => {
     const ent = entityById(o.entity_id) || {name:'?', type:'?'};
-    return `<tr class="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="window.location='opportunity-detail.html'">
+    return `<tr class="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)">
       <td class="px-3 py-2 font-medium">${o.name}</td>
       <td class="px-3 py-2"><a href="entity-detail.html" class="hover:underline text-slate-700">${ent.name}</a></td>
       <td class="px-3 py-2">${typeChip(o)}</td>
-      <td class="px-3 py-2">${legalEntityChip(o.legal_entity)}</td>
+      <td class="px-3 py-2">${legalEntityFullChip(o.legal_entity)}</td>
       <td class="px-3 py-2"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${stageById(o.stage).cls}">${stageById(o.stage).label}</span></td>
       <td class="px-3 py-2 text-right tabular-nums">${fmtMoney(o.ask,{compact:true})}</td>
       <td class="px-3 py-2 text-right tabular-nums">${o.received ? fmtMoney(o.received,{compact:true}) : '<span class="text-slate-400">—</span>'}</td>
@@ -819,9 +961,10 @@ function renderList() {
 function renderGrants() {
   const items = filteredOpps().filter(o => o.deadline && o.type === 'grant').sort((a,b) => a.deadline.localeCompare(b.deadline));
   const list = document.getElementById('grantList');
+  if (!list) return;
   list.innerHTML = items.map(o => {
     const ent = entityById(o.entity_id) || {name:'?'};
-    return `<a href="opportunity-detail.html" class="block bg-white border border-slate-200 rounded p-3 hover:border-blue-400 hover:shadow-sm">
+    return `<a href="entity-detail.html" class="block bg-white border border-slate-200 rounded p-3 hover:border-blue-400 hover:shadow-sm">
       <div class="flex items-start gap-3">
         <div class="text-center w-12 shrink-0">
           <div class="text-[11px] uppercase text-slate-500">${new Date(o.deadline+'T12:00:00').toLocaleDateString('en-US',{month:'short'})}</div>
@@ -839,34 +982,40 @@ function renderGrants() {
   }).join('') || '<div class="text-[13px] text-slate-500">No upcoming deadlines.</div>';
 }
 
-function renderEntities() {
-  const tbody = document.getElementById('entitiesBody');
-  // Roll up: opp count + lifetime received + last activity (proxied by max followup date) per entity.
-  tbody.innerHTML = ENTITIES.map(e => {
-    const opps = OPPS.filter(o => o.entity_id === e.id);
-    const oppCount = opps.length;
-    const lifetimeReceived = opps.reduce((a,o)=>a+(o.received||0), 0);
-    const lastFollowup = opps.map(o=>o.followup).filter(Boolean).sort().pop();
-    return `<tr class="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="window.location='entity-detail.html'">
-      <td class="px-3 py-2 font-medium">${e.name}</td>
-      <td class="px-3 py-2"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium type-chip">${entityTypeById(e.type).label}</span></td>
-      <td class="px-3 py-2 text-[13px] text-slate-600">${e.primaryContact || '<span class="text-slate-400 italic">none</span>'}</td>
-      <td class="px-3 py-2 text-right tabular-nums">${oppCount}</td>
-      <td class="px-3 py-2 text-right tabular-nums">${lifetimeReceived ? fmtMoney(lifetimeReceived,{compact:true}) : '<span class="text-slate-400">—</span>'}</td>
-      <td class="px-3 py-2 text-[13px] text-slate-500">${lastFollowup ? fmtDate(lastFollowup) : '—'}</td>
-    </tr>`;
-  }).join('');
-}
-
 function renderAll() {
   renderKPIs();
   renderSidebar();
   renderKanban();
   renderList();
   renderGrants();
-  renderEntities();
   document.getElementById('resultCount').textContent = filteredOpps().length + ' opportunities';
 }
+
+// Relationship/opportunity drawer
+const detailOverlay = document.getElementById('detailOverlay');
+const detailFrame = document.getElementById('detailFrame');
+function openDetailPanel(event) {
+  if (event) event.preventDefault();
+  if (!detailFrame.src || !detailFrame.src.endsWith('/entity-detail.html')) {
+    detailFrame.src = 'entity-detail.html';
+  }
+  detailOverlay.classList.remove('hidden');
+  detailOverlay.classList.add('flex');
+  document.body.style.overflow = 'hidden';
+}
+function closeDetailPanel() {
+  detailOverlay.classList.add('hidden');
+  detailOverlay.classList.remove('flex');
+  document.body.style.overflow = '';
+}
+document.addEventListener('click', (event) => {
+  const link = event.target.closest('a[href="entity-detail.html"]');
+  if (link) openDetailPanel(event);
+});
+document.getElementById('closeDetailPanelBtn').addEventListener('click', closeDetailPanel);
+detailOverlay.addEventListener('click', (event) => {
+  if (event.target === detailOverlay) closeDetailPanel();
+});
 
 // Legal-entity toggle
 document.querySelectorAll('.entity-btn').forEach(btn => {
@@ -895,7 +1044,6 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
     document.getElementById('kanbanView').classList.toggle('hidden',   viewMode !== 'kanban');
     document.getElementById('listView').classList.toggle('hidden',     viewMode !== 'list');
     document.getElementById('grantsView').classList.toggle('hidden',   viewMode !== 'grants');
-    document.getElementById('entitiesView').classList.toggle('hidden', viewMode !== 'entities');
   });
 });
 
@@ -906,30 +1054,83 @@ renderAll();
 
 // ============== NEW OPPORTUNITY DIALOG ==============
 const newOppModal = document.getElementById('newOppModal');
-function openNewOpp()  { newOppModal.classList.remove('hidden'); newOppModal.classList.add('flex'); document.getElementById('newOppName').focus(); }
+let wizardStep = 1;
+let entityMode = 'existing';
+let opportunityType = 'grant';
+
+function setWizardStep(step) {
+  wizardStep = Math.max(1, Math.min(4, step));
+  document.querySelectorAll('.wizard-step').forEach(el => el.classList.toggle('active', Number(el.dataset.step) === wizardStep));
+  document.querySelectorAll('.wizard-dot').forEach(el => el.classList.toggle('active', Number(el.dataset.progress) <= wizardStep));
+  document.getElementById('wizardBackBtn').classList.toggle('invisible', wizardStep === 1);
+  document.getElementById('wizardNextBtn').textContent = wizardStep === 4 ? 'Create & open' : 'Continue';
+  const focusTarget = wizardStep === 1 ? (entityMode === 'existing' ? 'entitySearch' : 'newEntityName') : wizardStep === 2 ? 'newOppName' : null;
+  if (focusTarget) setTimeout(() => document.getElementById(focusTarget)?.focus(), 30);
+}
+
+function openNewOpp(options = {})  {
+  newOppModal.classList.remove('hidden');
+  newOppModal.classList.add('flex');
+  const skipEntity = options.entityName;
+  document.getElementById('wizardContext').textContent = skipEntity
+    ? `${skipEntity} selected`
+    : '';
+  if (skipEntity) {
+    document.getElementById('entitySearch').value = skipEntity;
+    setWizardStep(2);
+  } else {
+    setWizardStep(1);
+  }
+}
 function closeNewOpp() { newOppModal.classList.add('hidden'); newOppModal.classList.remove('flex'); }
 document.getElementById('newOppBtn').addEventListener('click', openNewOpp);
 newOppModal.addEventListener('click', (e) => { if (e.target === newOppModal) closeNewOpp(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !newOppModal.classList.contains('hidden')) closeNewOpp(); });
+window.addEventListener('message', (event) => {
+  if (event.data?.type === 'openNewOpportunity') {
+    openNewOpp({ entityName: event.data.entityName || 'Walton Family Foundation' });
+  } else if (event.data?.type === 'detailEscape') {
+    if (!newOppModal.classList.contains('hidden')) closeNewOpp();
+    else if (!detailOverlay.classList.contains('hidden')) closeDetailPanel();
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (!newOppModal.classList.contains('hidden')) closeNewOpp();
+  else if (!detailOverlay.classList.contains('hidden')) closeDetailPanel();
+});
+if (new URLSearchParams(window.location.search).has('newOpportunity')) {
+  openNewOpp({ entityName: 'Walton Family Foundation' });
+}
 
-// Type-conditional rows in the New Opportunity dialog
+document.getElementById('wizardBackBtn').addEventListener('click', () => setWizardStep(wizardStep - 1));
+document.getElementById('wizardNextBtn').addEventListener('click', () => {
+  if (wizardStep === 4) { closeNewOpp(); return; }
+  setWizardStep(wizardStep + 1);
+});
+
+document.querySelectorAll('[data-entity-mode]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    entityMode = btn.dataset.entityMode;
+    document.querySelectorAll('[data-entity-mode]').forEach(b => b.classList.toggle('active', b === btn));
+    document.getElementById('existingEntityPane').classList.toggle('hidden', entityMode !== 'existing');
+    document.getElementById('newEntityPane').classList.toggle('hidden', entityMode !== 'new');
+  });
+});
+
+// Type-conditional rows in the New Opportunity wizard
 function applyNewType(t) {
+  opportunityType = t;
   document.querySelectorAll('.newtype-btn').forEach(b => {
     const active = b.dataset.newtype === t;
-    b.classList.toggle('bg-white', active);
-    b.classList.toggle('shadow-sm', active);
-    b.classList.toggle('text-slate-600', !active);
-    b.classList.toggle('hover:bg-white', !active);
+    b.classList.toggle('active', active);
   });
   const isGrant       = t === 'grant';
   const isSponsorship = t === 'sponsorship';
   document.getElementById('newSubtypeRow').classList.toggle('hidden',    !isSponsorship);
   document.getElementById('newDeadlineRow').classList.toggle('hidden',   !(isGrant || isSponsorship));
-  document.getElementById('newDecisionRow').classList.toggle('hidden',   !isGrant);
-  document.getElementById('newUrlRow').classList.toggle('hidden',        !(isGrant || isSponsorship));
+  document.getElementById('newDecisionRow').classList.toggle('hidden',   false);
   document.getElementById('newTermRow').classList.toggle('hidden',       !isSponsorship);
-  document.getElementById('newRestrictedRow').classList.toggle('hidden', !isGrant);
-  document.getElementById('newReportingRow').classList.toggle('hidden',  !isGrant);
+  document.getElementById('newGrantRows').classList.toggle('hidden',     !isGrant);
 }
 document.querySelectorAll('.newtype-btn').forEach(btn => btn.addEventListener('click', () => applyNewType(btn.dataset.newtype)));
 applyNewType('grant');
@@ -947,8 +1148,51 @@ document.querySelectorAll('.newsubtype-btn').forEach(btn => {
   });
 });
 
-// ============== ASK AMOUNTS EDITOR (multi-line, cash + in-kind) ==============
-// Each line is one development_amounts row at submit time (kind='ask', nature + amount + optional in_kind_description).
+document.querySelectorAll('.newentity-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.newentity-btn').forEach(b => b.classList.toggle('active', b === btn));
+  });
+});
+
+document.getElementById('restrictedGrantCheck')?.addEventListener('change', (e) => {
+  document.getElementById('restrictionNotesField')?.classList.toggle('hidden', !e.target.checked);
+});
+document.getElementById('reportingRequiredCheck')?.addEventListener('change', (e) => {
+  document.getElementById('reportingDueField')?.classList.toggle('hidden', !e.target.checked);
+});
+
+// Contact modal
+const contactModal = document.getElementById('contactModal');
+function openContactModal() { contactModal.classList.remove('hidden'); contactModal.classList.add('flex'); setTimeout(() => document.getElementById('contactName')?.focus(), 30); }
+function closeContactModal() { contactModal.classList.add('hidden'); contactModal.classList.remove('flex'); }
+document.getElementById('addContactBtn').addEventListener('click', openContactModal);
+contactModal.addEventListener('click', (e) => { if (e.target === contactModal) closeContactModal(); });
+document.getElementById('saveContactBtn').addEventListener('click', () => {
+  const name = document.getElementById('contactName').value || 'New contact';
+  const title = document.getElementById('contactTitle').value;
+  const email = document.getElementById('contactEmail').value;
+  const row = document.createElement('div');
+  row.className = 'rounded-md border border-slate-200 px-3 py-2 flex items-center gap-3';
+  row.innerHTML = `<div class="min-w-0"><div class="font-medium">${name}</div><div class="text-[12px] text-slate-500">${[title, email].filter(Boolean).join(' - ') || 'Contact details can be added later'}</div></div>`;
+  document.getElementById('contactList').appendChild(row);
+  closeContactModal();
+});
+
+// Lightweight rich-text editor controls
+document.querySelectorAll('.editor-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const cmd = btn.dataset.cmd;
+    if (cmd === 'createLink') {
+      const url = prompt('Link URL');
+      if (url) document.execCommand(cmd, false, url);
+    } else {
+      document.execCommand(cmd, false, null);
+    }
+    document.getElementById('oppDescriptionEditor')?.focus();
+  });
+});
+
+// ============== ASK AMOUNTS EDITOR ==============
 (function () {
   const linesEl = document.getElementById('askLines');
   const addBtn  = document.getElementById('addAskLineBtn');
@@ -963,9 +1207,8 @@ document.querySelectorAll('.newsubtype-btn').forEach(btn => {
   function fmt(dollars) { return '$' + dollars.toLocaleString(); }
 
   function recomputeSubtotal() {
-    const rows = [...linesEl.querySelectorAll('.ask-line')];
-    if (rows.length < 2) { subtotalEl.classList.add('hidden'); return; }
     let cashTotal = 0, inkindTotal = 0;
+    const rows = [...linesEl.querySelectorAll('.ask-line')];
     rows.forEach(r => {
       const amt = parseDollars(r.querySelector('input[data-role="amount"]').value);
       const nature = r.dataset.nature || 'cash';
@@ -1019,7 +1262,7 @@ document.querySelectorAll('.newsubtype-btn').forEach(btn => {
         <input type="text" data-role="amount" placeholder="0" inputmode="numeric" autocomplete="off" data-lpignore="true" data-form-type="other"
                class="block w-full border border-slate-300 rounded h-8 pl-5 pr-2 text-[13px] text-right tabular-nums"/>
       </div>
-      <input type="text" data-role="desc" placeholder="Description (e.g. Case of wine, 12 bottles)" autocomplete="off" data-lpignore="true" data-form-type="other"
+      <input type="text" data-role="desc" placeholder="Description (required for in-kind)" autocomplete="off" data-lpignore="true" data-form-type="other"
              class="flex-1 min-w-0 border border-slate-300 rounded h-8 px-2 text-[13px] hidden"/>
       <button type="button" data-role="remove" title="Remove this line" class="w-6 h-6 text-slate-400 hover:text-red-700 shrink-0 inline-flex items-center justify-center">
         <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
@@ -1043,19 +1286,8 @@ document.querySelectorAll('.newsubtype-btn').forEach(btn => {
 
   addBtn.addEventListener('click', () => addLine('cash'));
   addLine('cash'); // start with one cash line
+  addLine('in_kind');
 })();
-
-document.querySelectorAll('.newentity-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.newentity-btn').forEach(b => {
-      const active = b === btn;
-      b.classList.toggle('bg-white', active);
-      b.classList.toggle('shadow-sm', active);
-      b.classList.toggle('text-slate-600', !active);
-      b.classList.toggle('hover:bg-white', !active);
-    });
-  });
-});
 
 // ============== RESIZABLE + COLLAPSIBLE LEFT RAIL ==============
 const RAIL_MIN_PX = 200;

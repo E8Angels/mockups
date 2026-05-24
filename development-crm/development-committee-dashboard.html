@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Development CRM - Development Committee</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; }
+  .card { background:#fff; border:1px solid #e2e8f0; border-radius:8px; }
+  .section-head { min-height:48px; display:flex; align-items:center; gap:10px; padding:0 16px; border-bottom:1px solid #e2e8f0; }
+  .label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#64748b; }
+  .quiet-link { color:#1d4ed8; text-underline-offset:2px; }
+  .quiet-link:hover { text-decoration:underline; }
+  .metric { background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:12px; }
+  .stage-prospect { background:#f1f5f9; color:#475569; }
+  .stage-outreach { background:#e2e8f0; color:#334155; }
+  .stage-conversation { background:#dbeafe; color:#1e3a8a; }
+  .stage-proposal { background:#bfdbfe; color:#1d4ed8; }
+  .stage-committed { background:#1d4ed8; color:#fff; }
+  .stage-received { background:#059669; color:#fff; }
+  .opp-grant { background:#ccfbf1; color:#115e59; border:1px solid #99f6e4; }
+  .opp-sponsorship { background:#dbeafe; color:#1e40af; border:1px solid #bfdbfe; }
+  .entity-c3 { background:#faf5ff; color:#6b21a8; border:1px solid #e9d5ff; }
+  .entity-c6 { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; }
+  .pill { display:inline-flex; align-items:center; height:22px; border-radius:999px; padding:0 8px; font-size:12px; font-weight:600; white-space:nowrap; }
+  .avatar { width:32px; height:32px; border-radius:999px; object-fit:cover; background:#e2e8f0; }
+  .member-pill { display:flex; align-items:center; gap:10px; border:1px solid #e2e8f0; border-radius:999px; padding:6px 10px 6px 6px; min-width:0; }
+  .kanban { display:grid; grid-template-columns:repeat(4,minmax(180px,1fr)); gap:10px; }
+  .kanban-col { border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc; min-height:220px; }
+  .kanban-card { display:block; border:1px solid #e2e8f0; border-radius:6px; background:#fff; padding:8px; margin:8px; color:inherit; text-decoration:none; }
+  .kanban-card:hover { border-color:#93c5fd; box-shadow:0 1px 4px rgba(15,23,42,.08); }
+  .doc-icon { width:24px; height:24px; border-radius:5px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff; background:#2563eb; flex-shrink:0; }
+  .folder-icon { width:24px; height:18px; border-radius:4px; background:#fbbf24; position:relative; flex-shrink:0; }
+  .folder-icon::before { content:''; position:absolute; left:2px; top:-4px; width:10px; height:5px; border-radius:3px 3px 0 0; background:#f59e0b; }
+  .activity-dot { width:8px; height:8px; border-radius:999px; background:#2563eb; margin-top:7px; flex-shrink:0; }
+  .activity-dot.win { background:#059669; }
+  .activity-dot.task { background:#f59e0b; }
+  .activity-dot.overdue { background:#dc2626; }
+  .date-card { width:48px; text-align:center; flex-shrink:0; }
+  .modal { display:none; }
+  .modal.flex { display:flex; }
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns:1fr; }
+    .kanban { grid-template-columns:repeat(2,minmax(180px,1fr)); }
+  }
+  @media (max-width: 700px) {
+    .kanban { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 text-sm">
+
+<main class="max-w-[1320px] mx-auto px-4 py-5">
+  <div class="flex items-start gap-4 flex-wrap mb-4">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight">Development Committee</h1>
+    </div>
+    <div class="ml-auto flex items-center gap-2">
+      <button id="logInteractionBtn" class="h-9 px-3 rounded bg-blue-600 hover:bg-blue-700 text-white font-medium inline-flex items-center gap-2">
+        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v8a2 2 0 002 2h2.586l2.707 2.707A1 1 0 0011 17v-2h5a2 2 0 002-2V5a2 2 0 00-2-2H4z"/></svg>
+        Log interaction
+      </button>
+      <button class="h-9 px-3 rounded border border-slate-300 bg-white hover:bg-slate-50 font-medium">Export board report</button>
+    </div>
+  </div>
+
+  <section class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
+    <div class="metric">
+      <div class="label">Raised vs goal</div>
+      <div class="text-2xl font-semibold mt-1 text-emerald-700">$1.0M</div>
+      <div class="h-1.5 bg-slate-200 rounded-full mt-2 overflow-hidden"><div class="h-full bg-emerald-500" style="width:71%"></div></div>
+      <div class="text-[12px] text-slate-500 mt-1">71% of $1.4M</div>
+    </div>
+    <div class="metric">
+      <div class="label">Pipeline</div>
+      <div class="text-2xl font-semibold mt-1 text-blue-700">$570k</div>
+      <div class="text-[12px] text-slate-500 mt-1">Outreach through committed</div>
+    </div>
+    <div class="metric">
+      <div class="label">Active opportunities</div>
+      <div class="text-2xl font-semibold mt-1">9</div>
+      <div class="text-[12px] text-slate-500 mt-1">5 with advocates</div>
+    </div>
+    <div class="metric">
+      <div class="label">Overdue tasks</div>
+      <div class="text-2xl font-semibold mt-1 text-red-700">2</div>
+      <div class="text-[12px] text-slate-500 mt-1">Need follow-up help</div>
+    </div>
+    <div class="metric col-span-2 lg:col-span-1">
+      <div class="label">Avg gift received</div>
+      <div class="text-2xl font-semibold mt-1">$333k</div>
+      <div class="text-[12px] text-slate-500 mt-1">3 received FY26</div>
+    </div>
+  </section>
+
+  <div class="layout grid grid-cols-[minmax(0,1fr)_360px] gap-4 items-start">
+    <div class="space-y-4 min-w-0">
+      <section class="card">
+        <div class="section-head">
+          <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+          <h2 class="font-semibold">Meeting notes</h2>
+          <a href="#" class="quiet-link ml-auto text-[13px]">View all</a>
+          <button class="h-8 px-3 rounded bg-blue-600 hover:bg-blue-700 text-white text-[13px] font-medium">New note</button>
+        </div>
+        <div class="p-4">
+          <div class="flex gap-4">
+            <div class="date-card">
+              <div class="text-[11px] font-semibold text-blue-700 uppercase">May</div>
+              <div class="text-3xl font-semibold leading-none">6</div>
+              <div class="text-[12px] text-slate-500">2026</div>
+            </div>
+            <div class="min-w-0">
+              <a href="#" class="font-semibold quiet-link">Development Committee Meeting - May 2026</a>
+              <p class="text-[13px] text-slate-600 mt-1 leading-5">Discussed Walton and Bezos grant timing, board advocate coverage for top prospects, and document packet ownership for upcoming foundation submissions.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 16V9"/><path d="M12 16V5"/><path d="M17 16v-3"/></svg>
+          <h2 class="font-semibold">Pipeline</h2>
+          <span class="ml-auto text-[12px] text-slate-500">Read-only</span>
+        </div>
+        <div class="p-4">
+          <div class="kanban">
+            <div class="kanban-col">
+              <div class="px-3 py-2 border-b border-slate-200 flex items-center"><span class="pill stage-outreach">Outreach</span><span class="ml-auto text-[12px] text-slate-500">$270k</span></div>
+              <a href="entity-detail.html" class="kanban-card">
+                <div class="font-semibold">Bezos Climate Justice Grant</div>
+                <div class="mt-1 flex gap-1 flex-wrap"><span class="pill opp-grant">Grant</span><span class="pill entity-c3">501(c)3</span></div>
+                <div class="mt-2 text-[12px] text-slate-600">Bezos Earth Fund · $250k requested</div>
+                <div class="mt-1 text-[12px] text-slate-500">Advocate: Lisa Rasmussen</div>
+              </a>
+            </div>
+            <div class="kanban-col">
+              <div class="px-3 py-2 border-b border-slate-200 flex items-center"><span class="pill stage-conversation">Conversation</span><span class="ml-auto text-[12px] text-slate-500">$130k</span></div>
+              <a href="entity-detail.html" class="kanban-card">
+                <div class="font-semibold">Walton Fellowship Grant 2026</div>
+                <div class="mt-1 flex gap-1 flex-wrap"><span class="pill opp-grant">Grant</span><span class="pill entity-c3">501(c)3</span></div>
+                <div class="mt-2 text-[12px] text-slate-600">Walton Family Foundation · $100k requested</div>
+                <div class="mt-1 text-[12px] text-red-700">1 overdue task</div>
+              </a>
+            </div>
+            <div class="kanban-col">
+              <div class="px-3 py-2 border-b border-slate-200 flex items-center"><span class="pill stage-proposal">Proposal</span><span class="ml-auto text-[12px] text-slate-500">$120k</span></div>
+              <a href="entity-detail.html" class="kanban-card">
+                <div class="font-semibold">Microsoft FY27 Sponsorship</div>
+                <div class="mt-1 flex gap-1 flex-wrap"><span class="pill opp-sponsorship">Sponsorship</span><span class="pill entity-c3">501(c)3</span></div>
+                <div class="mt-2 text-[12px] text-slate-600">Microsoft AI for Good · $85k requested</div>
+                <div class="mt-1 text-[12px] text-slate-500">Owner: Karin Kidder</div>
+              </a>
+            </div>
+            <div class="kanban-col">
+              <div class="px-3 py-2 border-b border-slate-200 flex items-center"><span class="pill stage-committed">Committed</span><span class="ml-auto text-[12px] text-slate-500">$50k</span></div>
+              <a href="entity-detail.html" class="kanban-card">
+                <div class="font-semibold">Bullitt Climate Justice Grant</div>
+                <div class="mt-1 flex gap-1 flex-wrap"><span class="pill opp-grant">Grant</span><span class="pill entity-c3">501(c)3</span></div>
+                <div class="mt-2 text-[12px] text-slate-600">Bullitt Foundation · $50k committed</div>
+                <div class="mt-1 text-[12px] text-amber-700">Report due Jun 30</div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid md:grid-cols-2 gap-4">
+        <div class="card">
+          <div class="section-head">
+            <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            <h2 class="font-semibold">Recent activity</h2>
+          </div>
+          <div class="p-4 space-y-4">
+            <div class="flex gap-3"><span class="activity-dot win" aria-hidden="true">&nbsp;</span><div><div class="font-medium">Microsoft FY26 sponsorship received</div><div class="text-[12px] text-slate-500">$75,000 · May 20</div></div></div>
+            <div class="flex gap-3"><span class="activity-dot" aria-hidden="true">&nbsp;</span><div><div class="font-medium">Walton moved to Conversation</div><div class="text-[12px] text-slate-500">Jordan Schwartz · May 3</div></div></div>
+            <div class="flex gap-3"><span class="activity-dot task" aria-hidden="true">&nbsp;</span><div><div class="font-medium">Task added for Walton outcomes packet</div><div class="text-[12px] text-slate-500">Assigned to Jordan · due May 12</div></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-head">
+            <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+            <h2 class="font-semibold">Upcoming dates</h2>
+          </div>
+          <div class="p-4 space-y-3">
+            <a href="entity-detail.html" class="flex gap-3 no-underline text-inherit hover:bg-slate-50 -mx-2 px-2 py-1 rounded">
+              <div class="date-card"><div class="text-[11px] text-slate-500 uppercase">May</div><div class="text-xl font-semibold">20</div></div>
+              <div><div class="font-medium">Sea Mar application due</div><div class="text-[12px] text-slate-500">Grant · Karin Kidder</div></div>
+            </a>
+            <a href="entity-detail.html" class="flex gap-3 no-underline text-inherit hover:bg-slate-50 -mx-2 px-2 py-1 rounded">
+              <div class="date-card"><div class="text-[11px] text-slate-500 uppercase">May</div><div class="text-xl font-semibold">29</div></div>
+              <div><div class="font-medium">Walton call prep</div><div class="text-[12px] text-slate-500">Task · Lisa Rasmussen</div></div>
+            </a>
+            <a href="entity-detail.html" class="flex gap-3 no-underline text-inherit hover:bg-slate-50 -mx-2 px-2 py-1 rounded">
+              <div class="date-card"><div class="text-[11px] text-slate-500 uppercase">Jun</div><div class="text-xl font-semibold">30</div></div>
+              <div><div class="font-medium">Bullitt report due</div><div class="text-[12px] text-slate-500">Reporting · Karin Kidder</div></div>
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="space-y-4">
+      <section class="card">
+        <div class="section-head">
+          <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <h2 class="font-semibold">Members (8)</h2>
+          <button class="ml-auto h-8 px-3 rounded border border-blue-300 text-blue-700 bg-white hover:bg-blue-50 text-[13px]">Contact</button>
+        </div>
+        <div class="p-4 grid grid-cols-2 gap-2">
+          <div class="member-pill"><img class="avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&amp;h=80&amp;fit=crop&amp;crop=face" alt=""><div class="min-w-0"><div class="font-medium truncate">Amanda White</div><div class="text-[11px] text-slate-500">Chair</div></div></div>
+          <div class="member-pill"><div class="avatar bg-rose-600 text-white flex items-center justify-center font-semibold">KK</div><div class="min-w-0"><div class="font-medium truncate">Karin Kidder</div><div class="text-[11px] text-slate-500">Staff</div></div></div>
+          <div class="member-pill"><div class="avatar bg-blue-600 text-white flex items-center justify-center font-semibold">LR</div><div class="min-w-0"><div class="font-medium truncate">Lisa Rasmussen</div><div class="text-[11px] text-slate-500">Advocate</div></div></div>
+          <div class="member-pill"><div class="avatar bg-slate-700 text-white flex items-center justify-center font-semibold">DA</div><div class="min-w-0"><div class="font-medium truncate">Dean Allen</div><div class="text-[11px] text-slate-500">Member</div></div></div>
+          <div class="member-pill"><div class="avatar bg-emerald-600 text-white flex items-center justify-center font-semibold">EB</div><div class="min-w-0"><div class="font-medium truncate">Eric Berman</div><div class="text-[11px] text-slate-500">Member</div></div></div>
+          <div class="member-pill"><div class="avatar bg-purple-600 text-white flex items-center justify-center font-semibold">RW</div><div class="min-w-0"><div class="font-medium truncate">Ramalee Wulf</div><div class="text-[11px] text-slate-500">Member</div></div></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+          <h2 class="font-semibold">Upcoming meetings</h2>
+          <a href="#" class="quiet-link ml-auto text-[13px]">View all</a>
+        </div>
+        <div class="p-4 space-y-3">
+          <div class="flex gap-3"><div class="date-card"><div class="text-[11px] text-blue-700 uppercase font-semibold">Jun</div><div class="text-2xl font-semibold leading-none">3</div></div><div><div class="font-medium">Development Committee</div><div class="text-[12px] text-slate-500">3:00 PM · Zoom</div></div></div>
+          <div class="pt-3 border-t border-slate-100"><a href="#" class="quiet-link text-[13px]">Past recordings</a></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <h2 class="font-semibold">My connections</h2>
+        </div>
+        <div class="p-4 space-y-2">
+          <a href="entity-detail.html" class="block border border-red-200 bg-red-50 rounded-md p-3 no-underline text-inherit">
+            <div class="flex items-center gap-2"><span class="font-semibold">Walton Family Foundation</span><span class="pill stage-conversation ml-auto">Conversation</span></div>
+            <div class="text-[12px] text-red-700 mt-1">Overdue task · $100k requested</div>
+          </a>
+          <a href="entity-detail.html" class="block border border-slate-200 rounded-md p-3 no-underline text-inherit hover:bg-slate-50">
+            <div class="flex items-center gap-2"><span class="font-semibold">Bezos Earth Fund</span><span class="pill stage-outreach ml-auto">Outreach</span></div>
+            <div class="text-[12px] text-slate-500 mt-1">Advocate · last activity 4d ago</div>
+          </a>
+          <a href="entity-detail.html" class="block border border-slate-200 rounded-md p-3 no-underline text-inherit hover:bg-slate-50">
+            <div class="flex items-center gap-2"><span class="font-semibold">Microsoft AI for Good</span><span class="pill stage-proposal ml-auto">Proposal</span></div>
+            <div class="text-[12px] text-slate-500 mt-1">Warm intro · $85k requested</div>
+          </a>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+          <h2 class="font-semibold">Documents</h2>
+          <span class="ml-auto text-[12px] text-slate-500">Drive</span>
+          <a href="#" class="quiet-link text-[13px]">Manage</a>
+        </div>
+        <div class="p-4">
+          <input class="w-full h-9 border border-slate-300 rounded px-3 mb-3" placeholder="Search documents...">
+          <div class="space-y-2">
+            <a href="#" class="flex items-center gap-3 py-2 no-underline text-inherit hover:bg-slate-50 rounded px-1"><span class="doc-icon">DOC</span><span class="min-w-0 flex-1"><span class="font-medium block truncate">Development Committee Charter.docx</span><span class="text-[12px] text-slate-500">Committee docs · Jun 25, 2025</span></span></a>
+            <a href="entity-detail.html" class="flex items-center gap-3 py-2 no-underline text-inherit hover:bg-slate-50 rounded px-1"><span class="doc-icon">DOC</span><span class="min-w-0 flex-1"><span class="font-medium block truncate">Walton Fellowship Grant Application</span><span class="text-[12px] text-slate-500">Walton 2026 opportunity · Mar 12, 2026</span></span></a>
+            <a href="entity-detail.html" class="flex items-center gap-3 py-2 no-underline text-inherit hover:bg-slate-50 rounded px-1"><span class="doc-icon bg-slate-500">PDF</span><span class="min-w-0 flex-1"><span class="font-medium block truncate">E8 Fellowship Program Overview.pdf</span><span class="text-[12px] text-slate-500">Walton 2026 opportunity · Mar 10, 2026</span></span></a>
+            <a href="#" class="flex items-center gap-3 py-2 no-underline text-inherit hover:bg-slate-50 rounded px-1"><span class="folder-icon" aria-hidden="true">&nbsp;</span><span class="min-w-0 flex-1"><span class="font-medium block truncate">Meeting Notes</span><span class="text-[12px] text-slate-500">35 files</span></span></a>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<div id="interactionModal" class="modal fixed inset-0 bg-slate-900/40 z-50 items-center justify-center p-4">
+  <div class="bg-white rounded-md shadow-xl w-full max-w-lg">
+    <div class="px-4 py-3 border-b border-slate-200 flex items-center">
+      <div class="font-semibold">Log interaction</div>
+      <button id="closeInteraction" class="ml-auto text-slate-400 hover:text-slate-700" aria-label="Close">×</button>
+    </div>
+    <div class="p-4 space-y-3">
+      <div class="grid grid-cols-[110px_1fr] gap-3 items-center"><label class="label">Relationship</label><select class="h-9 border border-slate-300 rounded px-2"><option>Walton Family Foundation</option><option>Bezos Earth Fund</option><option>Microsoft AI for Good</option></select></div>
+      <div class="grid grid-cols-[110px_1fr] gap-3 items-center"><label class="label">Date</label><input type="date" value="2026-05-23" class="h-9 border border-slate-300 rounded px-2"></div>
+      <div class="grid grid-cols-[110px_1fr] gap-3 items-center"><label class="label">Channel</label><select class="h-9 border border-slate-300 rounded px-2"><option>Email</option><option>Call</option><option>In person</option><option>Event</option><option>Text</option></select></div>
+      <div class="grid grid-cols-[110px_1fr] gap-3 items-start"><label class="label pt-2">Summary</label><textarea rows="4" maxlength="500" class="border border-slate-300 rounded p-2" placeholder="Brief summary"></textarea></div>
+      <div class="grid grid-cols-[110px_1fr] gap-3 items-start"><label class="label pt-2">Next step</label><textarea rows="2" class="border border-slate-300 rounded p-2" placeholder="Optional"></textarea></div>
+    </div>
+    <div class="px-4 py-3 border-t border-slate-200 flex justify-end gap-2">
+      <button id="cancelInteraction" class="h-8 px-3 rounded border border-slate-300">Cancel</button>
+      <button id="saveInteraction" class="h-8 px-3 rounded bg-blue-600 text-white">Save interaction</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const modal = document.getElementById('interactionModal');
+function openInteraction() { modal.classList.add('flex'); }
+function closeInteraction() { modal.classList.remove('flex'); }
+document.getElementById('logInteractionBtn').addEventListener('click', openInteraction);
+document.getElementById('closeInteraction').addEventListener('click', closeInteraction);
+document.getElementById('cancelInteraction').addEventListener('click', closeInteraction);
+document.getElementById('saveInteraction').addEventListener('click', closeInteraction);
+modal.addEventListener('click', event => { if (event.target === modal) closeInteraction(); });
+</script>
+</body>
+</html>

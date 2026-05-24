@@ -4,51 +4,78 @@
 <meta charset="utf-8" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Development CRM - Entity detail</title>
+<title>Development CRM - Relationship detail</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-
-  .stage-prospect    { background:#f1f5f9; color:#475569; }
-  .stage-outreach    { background:#e2e8f0; color:#334155; }
-  .stage-conversation{ background:#dbeafe; color:#1e3a8a; }
-  .stage-proposal    { background:#bfdbfe; color:#1d4ed8; }
-  .stage-committed   { background:#1d4ed8; color:#ffffff; }
-  .stage-received    { background:#059669; color:#ffffff; }
-  .stage-declined    { background:#f3f4f6; color:#6b7280; }
-
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; }
+  .panel { background:#fff; border:1px solid #e2e8f0; border-radius:8px; }
+  .field-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#64748b; font-weight:700; }
+  .quiet-link { color:#1d4ed8; text-underline-offset:2px; }
+  .quiet-link:hover { text-decoration:underline; }
   .type-chip { background:#f8fafc; color:#475569; border:1px solid #e2e8f0; }
   .opp-grant { background:#ccfbf1; color:#115e59; border:1px solid #99f6e4; }
-
-  .timeline-dot::before {
-    content:''; position:absolute; left:-24px; top:9px; width:10px; height:10px;
-    border-radius:50%; background:#cbd5e1; border:2px solid white; box-shadow:0 0 0 1px #cbd5e1;
+  .entity-c3 { background:#faf5ff; color:#6b21a8; border:1px solid #e9d5ff; }
+  .mini-pill { display:inline-flex; align-items:center; height:24px; border-radius:999px; padding:0 8px; font-size:12px; font-weight:600; }
+  .stage-prospect { background:#f1f5f9; color:#475569; }
+  .stage-conversation { background:#dbeafe; color:#1e3a8a; }
+  .stage-proposal { background:#bfdbfe; color:#1d4ed8; }
+  .stage-declined { background:#f3f4f6; color:#6b7280; }
+  .person-pill {
+    display:inline-flex; align-items:center; gap:6px; height:24px; max-width:100%;
+    border:1px solid #bfdbfe; background:#eff6ff; color:#0f4bc2; border-radius:999px;
+    padding:0 8px; font-size:13px; line-height:1; white-space:nowrap;
   }
-  .timeline-dot.timeline-note::before   { background:#94a3b8; box-shadow:0 0 0 1px #94a3b8; }
-  .timeline-dot.timeline-email::before  { background:#0ea5e9; box-shadow:0 0 0 1px #0ea5e9; }
-  .timeline-dot.timeline-stage::before  { background:#1d4ed8; box-shadow:0 0 0 1px #1d4ed8; }
-  .timeline-dot.timeline-money::before  { background:#059669; box-shadow:0 0 0 1px #059669; }
-  .timeline-dot.timeline-file::before   { background:#a16207; box-shadow:0 0 0 1px #a16207; }
-  .timeline-dot.timeline-owner::before  { background:#6b7280; box-shadow:0 0 0 1px #6b7280; }
+  .person-pill:hover { background:#dbeafe; }
+  .person-pill svg { width:13px; height:13px; color:#2563eb; }
+  .add-person {
+    width:28px; height:28px; border-radius:999px; border:1px dashed #cbd5e1; color:#64748b;
+    display:inline-flex; align-items:center; justify-content:center; background:#fff;
+  }
+  .add-person:hover { border-color:#94a3b8; color:#0f172a; background:#f8fafc; }
+  .tab-btn { height:38px; padding:0 12px; border-bottom:2px solid transparent; color:#64748b; font-weight:600; font-size:13px; }
+  .tab-btn.active { color:#0f172a; border-color:#2563eb; }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+  .opp-panel .edit-pencil { opacity:0; transition:opacity .12s ease; }
+  .opp-panel:hover .edit-pencil { opacity:1; }
+  .editable-panel .edit-pencil { opacity:0; transition:opacity .12s ease; }
+  .editable-panel:hover .edit-pencil { opacity:1; }
+  .prop-row { display:grid; grid-template-columns:86px minmax(0,1fr); gap:10px; align-items:center; font-size:13px; }
+  .note-editor { border:1px solid #cbd5e1; border-radius:8px; background:#fff; overflow:hidden; }
+  .note-toolbar { display:flex; align-items:center; gap:2px; padding:4px 6px; border-bottom:1px solid #e2e8f0; background:#f8fafc; }
+  .note-toolbar button { width:28px; height:28px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; color:#475569; }
+  .note-toolbar button:hover { background:#fff; color:#0f172a; }
+  .note-toolbar .save-note-btn { width:auto; padding:0 12px; background:#2563eb; color:#fff; }
+  .note-toolbar .save-note-btn:hover { background:#1d4ed8; color:#fff; }
+  .note-body-input { min-height:76px; padding:9px 10px; outline:none; font-size:14px; line-height:1.5; }
+  .doc-row { display:flex; align-items:center; gap:8px; min-height:34px; padding:6px 0; font-size:13px; }
+  .doc-icon { width:18px; height:18px; color:#2563eb; flex-shrink:0; }
   .timeline-line { border-left:1px solid #e2e8f0; }
-
-  .note-body { line-height:1.5; }
-  .note-body p { margin:0 0 .5em; }
-  .note-body p:last-child { margin-bottom:0; }
-    .activity-meta { color:#64748b; font-size:12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-  .activity-note-card { margin-top:6px; padding:10px 36px 10px 12px; border:1px solid #cbd5e1; border-radius:8px; background:#fff; position:relative; }
+  .timeline-dot::before {
+    content:''; position:absolute; left:-24px; top:9px; width:10px; height:10px; border-radius:50%;
+    background:#cbd5e1; border:2px solid white; box-shadow:0 0 0 1px #cbd5e1;
+  }
+  .timeline-note::before { background:#94a3b8; box-shadow:0 0 0 1px #94a3b8; }
+  .timeline-email::before { background:#0ea5e9; box-shadow:0 0 0 1px #0ea5e9; }
+  .timeline-stage::before { background:#1d4ed8; box-shadow:0 0 0 1px #1d4ed8; }
+  .timeline-money::before { background:#059669; box-shadow:0 0 0 1px #059669; }
+  .timeline-task::before { background:#f59e0b; box-shadow:0 0 0 1px #f59e0b; }
+  .timeline-overdue::before { background:#dc2626; box-shadow:0 0 0 1px #dc2626; }
+  .activity-meta { color:#64748b; font-size:12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .opp-tag { display:inline-flex; padding:0 4px; border-radius:3px; background:#f1f5f9; color:#475569; font-size:11px; font-weight:500; }
+  .activity-note-card { margin-top:6px; padding:10px 36px 10px 12px; border:1px solid #cbd5e1; border-radius:8px; background:#fff; position:relative; line-height:1.5; }
   .activity-note-card::after {
     content:''; position:absolute; top:10px; right:12px; width:16px; height:16px;
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20h9'/%3E%3Cpath d='M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z'/%3E%3C/svg%3E") center/16px 16px no-repeat;
   }
   .activity-change-card { margin-top:6px; padding:9px 11px; border:1px solid #bfdbfe; border-radius:8px; background:#f8fbff; }
   .activity-money-card { margin-top:6px; padding:9px 11px; border:1px solid #bbf7d0; border-radius:8px; background:#f8fffb; }
-  .activity-file-card { margin-top:6px; padding:9px 11px; border:1px solid #fde68a; border-radius:8px; background:#fffdf5; }
-
-  .email-card { border:1px solid #bfdbfe; border-radius:10px; overflow:hidden; background:#fff; margin-top:6px; max-width:92%; }
-  .email-card.inbound { margin-right:auto; background:#f8fbff; }
+  .activity-task-card { margin-top:6px; padding:9px 11px; border:1px solid #fed7aa; border-radius:8px; background:#fff7ed; }
+  .activity-task-card.overdue { border-color:#fecaca; background:#fef2f2; }
+  .future-divider { display:flex; align-items:center; gap:8px; color:#64748b; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+  .future-divider::before, .future-divider::after { content:''; height:1px; background:#e2e8f0; flex:1; }
+  .email-card { border:1px solid #bfdbfe; border-radius:10px; overflow:hidden; background:#f8fbff; margin-top:6px; max-width:92%; }
   .email-card.outbound { margin-left:auto; border-color:#bbf7d0; background:#f8fffb; }
-  .email-headers { background:rgba(248,250,252,.86); border-bottom:1px solid #e2e8f0; }
   .email-summary { padding:9px 36px 8px 11px; position:relative; }
   .email-summary::after {
     content:''; position:absolute; top:10px; right:12px; width:16px; height:16px;
@@ -60,397 +87,513 @@
   .email-route { color:#64748b; font-size:12px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
   .email-subject { margin-top:3px; color:#0f172a; font-size:14px; font-weight:600; }
   .email-preview { margin-top:4px; color:#475569; font-size:13px; line-height:1.45; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-.email-headers .hk { display:inline-block; width:60px; color:#64748b; }
+  .email-headers { background:rgba(248,250,252,.86); border-bottom:1px solid #e2e8f0; }
+  .email-headers .hk { display:inline-block; width:60px; color:#64748b; }
   .email-body { white-space:pre-line; }
-  .email-body.collapsed {
-    display:none;
-  }
-  .opp-tag {
-    display:inline-flex; align-items:center; gap:2px;
-    padding:0 4px; border-radius:3px;
-    background:#f1f5f9; color:#475569; font-size:11px; font-weight:500;
-    text-decoration:none;
-  }
-  .opp-tag:hover { background:#e2e8f0; color:#0f172a; }
-
-  .section-title { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#64748b; font-weight:700; }
-  .fact-label { font-size:11px; text-transform:uppercase; letter-spacing:.055em; color:#64748b; }
-  .panel { background:#fff; border:1px solid #e2e8f0; border-radius:8px; }
-  .quiet-link { color:#1d4ed8; text-underline-offset:2px; }
-  .quiet-link:hover { text-decoration:underline; }
+  .email-body.collapsed { display:none; }
 </style>
 </head>
 <body class="bg-slate-50 text-slate-900 text-sm">
 
-<header class="bg-white border-b border-slate-200 px-4 py-2 flex items-center gap-3 sticky top-0 z-30">
-  <a href="staff-dashboard.html" class="text-slate-500 hover:text-slate-900 flex items-center gap-1 text-[13px]">
-    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
-    <span class="hidden sm:inline">All entities</span>
-  </a>
-  <div class="ml-auto flex items-center gap-2">
-    <a href="mailto:taylor.brugh@waltonfamilyfoundation.org" class="h-7 px-2.5 text-[13px] border border-slate-300 bg-white hover:bg-slate-50 rounded inline-flex items-center hidden sm:inline-flex">Send email</a>
-    <button id="editEntityBtn" class="h-7 px-2.5 text-[13px] border border-slate-300 bg-white hover:bg-slate-50 rounded inline-flex items-center gap-1">
-      <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
-      Edit details
+<main class="max-w-none mx-0 px-2 md:px-3 pb-6">
+  <section class="panel mt-3 editable-panel relative">
+    <button class="edit-pencil absolute top-3 right-3 w-7 h-7 rounded hover:bg-slate-100 inline-flex items-center justify-center text-slate-500" title="Edit relationship">
+      <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
     </button>
-    <button class="h-7 px-2.5 text-[13px] bg-slate-100 hover:bg-slate-200 rounded text-slate-600">Archive</button>
-    <div class="w-7 h-7 rounded-full bg-slate-200 text-slate-600 text-[13px] flex items-center justify-center font-semibold">KK</div>
-  </div>
-</header>
-
-<main class="max-w-6xl mx-auto px-3 md:px-5 pb-6">
-
-  <section class="panel mt-4 overflow-hidden">
     <div class="px-5 py-4 md:px-6 md:py-5">
-      <div class="flex items-start gap-4 flex-wrap">
-        <div class="flex-1 min-w-[260px]">
-          <div class="flex items-center gap-2 flex-wrap">
+      <div class="grid lg:grid-cols-[minmax(0,1fr)_260px] gap-5">
+        <div class="min-w-0">
+          <div class="mt-1 flex items-center gap-2 flex-wrap">
             <h1 class="text-2xl md:text-[28px] leading-tight font-semibold tracking-tight">Walton Family Foundation</h1>
             <span class="inline-flex items-center px-2 py-0.5 rounded text-[12px] font-medium type-chip">Foundation</span>
           </div>
           <p class="mt-2 max-w-3xl text-[14px] leading-6 text-slate-700">
-            Family foundation focused on climate justice, K-12 education, and watershed protection. Bentonville HQ; West Coast program team based in Seattle. Prefers 1-3 year grants over single-year awards.
+            Family foundation focused on climate justice, K-12 education, and watershed protection. West Coast program team based in Seattle; prefers multi-year grant relationships and outcomes broken out by cohort year.
           </p>
-        </div>
-      </div>
 
-      <div class="mt-5 grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
-          <div class="fact-label">Lifetime asks</div>
-          <div class="mt-1 text-xl font-semibold tabular-nums">$175,000</div>
-        </div>
-        <div class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
-          <div class="fact-label">Lifetime received</div>
-          <div class="mt-1 text-xl font-semibold tabular-nums">$0</div>
-        </div>
-        <div class="rounded-md border border-blue-200 bg-blue-50 px-3 py-2">
-          <div class="fact-label text-blue-700">Active opportunity</div>
-          <div class="mt-1 text-[15px] font-semibold">Conversation</div>
-          <div class="text-[12px] text-slate-600">$100,000</div>
-        </div>
-        <div class="rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
-          <div class="fact-label text-amber-700">Next action</div>
-          <div class="mt-1 text-[15px] font-semibold">Jun 1, 2026</div>
-          <div class="text-[12px] text-slate-700">Send cohort outcomes to Taylor</div>
+          <div class="mt-4 grid md:grid-cols-[90px_minmax(0,1fr)] gap-y-2 gap-x-3 items-center">
+            <div class="field-label">Contacts</div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button class="person-pill" data-contact="Taylor Brugh">
+                <span>Taylor Brugh, Program Officer</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <span class="text-slate-400">×</span>
+              </button>
+              <button class="person-pill" data-contact="Caroline Avila">
+                <span>Caroline Avila, Strategic Grants</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <span class="text-slate-400">×</span>
+              </button>
+              <button id="addContactBtn" class="add-person" title="Add contact">
+                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
+              </button>
+            </div>
+            <div class="field-label">Owner</div>
+            <button class="person-pill justify-self-start" data-contact="Jordan Schwartz"><span>Jordan Schwartz</span><span class="text-slate-400">×</span></button>
+          </div>
         </div>
       </div>
     </div>
-
   </section>
 
-  <div class="mt-4 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-4 items-start">
-    <div class="space-y-4 min-w-0">
-
-      <section class="panel overflow-hidden">
-        <div class="px-4 py-3 border-b border-slate-200 flex items-center gap-3">
-          <div>
-            <div class="section-title">Opportunities</div>
-          </div>
-          <a href="opportunity-detail.html" class="ml-auto h-7 px-2.5 text-[13px] border border-slate-300 bg-white hover:bg-slate-50 rounded inline-flex items-center gap-1 no-underline">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
-            New
-          </a>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-[14px]">
-            <thead class="bg-slate-50">
-              <tr class="text-left text-[11px] uppercase tracking-wider text-slate-500">
-                <th class="px-4 py-2 font-semibold">Opportunity</th>
-                <th class="px-3 py-2 font-semibold">Stage</th>
-                <th class="px-3 py-2 font-semibold">Legal entity</th>
-                <th class="px-3 py-2 font-semibold text-right">Ask</th>
-                <th class="px-3 py-2 font-semibold">Key date</th>
-                <th class="px-3 py-2 font-semibold">Owner</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-t border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="window.location='opportunity-detail.html'">
-                <td class="px-4 py-3 min-w-[240px]">
-                  <a href="opportunity-detail.html" class="quiet-link font-semibold">Walton Fellowship Grant 2026</a>
-                  <div class="mt-1 flex items-center gap-1.5">
-                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium opp-grant">Grant</span>
-                    <span class="text-[12px] text-slate-500">Fellowship Program</span>
-                  </div>
-                </td>
-                <td class="px-3 py-3"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-conversation">Conversation</span></td>
-                <td class="px-3 py-3 text-[13px] text-slate-700">E8 Impact</td>
-                <td class="px-3 py-3 text-right font-semibold tabular-nums">$100,000</td>
-                <td class="px-3 py-3 text-[13px] text-slate-700">App due Jul 10</td>
-                <td class="px-3 py-3 text-[13px] text-slate-700">Jordan Schwartz</td>
-              </tr>
-              <tr class="border-t border-slate-100 hover:bg-slate-50">
-                <td class="px-4 py-3 min-w-[240px]">
-                  <a href="#" class="quiet-link font-semibold text-slate-700">Walton Fellowship Grant 2025</a>
-                  <div class="mt-1 flex items-center gap-1.5">
-                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium opp-grant">Grant</span>
-                    <span class="text-[12px] text-slate-500">Renewed into FY26 cycle</span>
-                  </div>
-                </td>
-                <td class="px-3 py-3"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-declined">Declined</span></td>
-                <td class="px-3 py-3 text-[13px] text-slate-700">E8 Impact</td>
-                <td class="px-3 py-3 text-right font-semibold tabular-nums">$75,000</td>
-                <td class="px-3 py-3 text-[13px] text-slate-500">Declined Mar 15</td>
-                <td class="px-3 py-3 text-[13px] text-slate-700">Jordan Schwartz</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="px-4 py-2 border-b border-slate-200 flex items-center gap-2 flex-wrap">
-          <div class="section-title">Activity <span class="text-slate-400 font-normal">10</span></div>
-          <div class="ml-auto flex items-center gap-1 text-[12px]">
-            <button class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">All</button>
-            <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Notes</button>
-            <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Email</button>
-            <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Stage</button>
-            <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Money</button>
-            <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Files</button>
-          </div>
-        </div>
-        <ol class="timeline-line ml-6 pl-5 my-4 mr-4 space-y-4">
-          <li class="timeline-dot timeline-note relative">
-            <div class="activity-meta">
-              <span>May 12, 2026 - 3:42 PM</span>
-              <span>Jordan Schwartz</span>
-              <a href="opportunity-detail.html" class="opp-tag">Walton Fellowship Grant 2026</a>
-            </div>
-            <div class="activity-note-card note-body text-[14px] text-slate-800">
-              <p>Call with Taylor. They've narrowed to 3 climate-justice orgs; we're on the short list.</p>
-              <p>Next ask from them: outcomes broken out by <em>cohort year</em>, not aggregate. They want retention from Year 1 to Year 3.</p>
-            </div>
-          </li>
-
-          <li class="timeline-dot timeline-stage relative">
-            <div class="activity-meta">
-              <span>May 12, 2026 - 3:38 PM</span>
-              <span>Jordan Schwartz</span>
-              <a href="opportunity-detail.html" class="opp-tag">Walton Fellowship Grant 2026</a>
-            </div>
-            <div class="activity-change-card text-[14px] flex items-center gap-1.5 flex-wrap">
-              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-outreach">Outreach</span>
-              <span class="text-slate-400">to</span>
-              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-conversation">Conversation</span>
-              <span class="text-slate-500 text-[13px]">qualified after first real call</span>
-            </div>
-          </li>
-
-          <li class="timeline-dot timeline-email relative">
-            <div class="activity-meta">
-              <span>May 9, 2026 - 9:12 AM</span>
-              <a href="opportunity-detail.html" class="opp-tag">Walton Fellowship Grant 2026</a>
-            </div>
-            <div class="email-card inbound mt-1">
-              <div class="email-summary">
-                <div class="email-route"><span>Taylor Brugh</span><span>→</span><span>Jordan Schwartz</span></div>
-                <div class="email-subject">Re: E8 fellowship - quick call this week?</div>
-                <div class="email-preview">Yes, let's do Thursday 11am PT. Would love to hear how you measure cohort outcomes year-over-year.</div>
-              </div>
-              <div class="email-headers px-3 py-2 text-[13px] leading-relaxed hidden">
-                <div><span class="hk">To:</span><span class="text-slate-800">Jordan Schwartz</span></div>
-                <div><span class="hk">From:</span><span class="text-slate-800">Taylor Brugh</span></div>
-                <div><span class="hk">Subject:</span><span class="text-slate-800 font-semibold">Re: E8 fellowship - quick call this week?</span></div>
-              </div>
-              <div class="email-body collapsed px-3 py-2 text-[14px] text-slate-800">Yes, let's do Thursday 11am PT. I'll send a calendar invite.
-
-Would love to hear how you measure cohort outcomes year-over-year. That's the piece our climate-justice committee will push on hardest.
-
-A few specific things I'd like to cover:
-1. Retention from Year 1 to Year 3
-2. How you screen for founder-fit on the climate side specifically
-3. Where Walton dollars would have the most marginal impact
-
-Best,
-Taylor</div>
-              <button type="button" class="email-toggle text-[12px] text-blue-700 hover:text-blue-900 px-3 py-1.5 border-t border-slate-100 w-full text-left">View more</button>
-            </div>
-          </li>
-
-          <li class="timeline-dot timeline-note relative">
-            <div class="activity-meta">
-              <span>May 8, 2026</span>
-              <span>Lisa Rasmussen</span>
-            </div>
-            <div class="activity-note-card note-body text-[14px] text-slate-800">
-              <p>Sat next to Taylor at the GreenBiz dinner. They've already evaluated three orgs in our space; we made the short list. Pat from Bullitt vouched for us.</p>
-            </div>
-          </li>
-
-          <li class="timeline-dot timeline-email relative">
-            <div class="activity-meta">
-              <span>May 5, 2026 - 4:02 PM</span>
-              <a href="opportunity-detail.html" class="opp-tag">Walton Fellowship Grant 2026</a>
-            </div>
-            <div class="email-card outbound mt-1">
-              <div class="email-summary">
-                <div class="email-route"><span>Jordan Schwartz</span><span>→</span><span>Taylor Brugh</span></div>
-                <div class="email-subject">E8 fellowship - intro &amp; deck</div>
-                <div class="email-preview">Karin suggested I reach out after your conversation at GreenBiz. Attaching our 1-pager on the fellowship program.</div>
-              </div>
-              <div class="email-headers px-3 py-2 text-[13px] leading-relaxed hidden">
-                <div><span class="hk">To:</span><span class="text-slate-800">Taylor Brugh</span></div>
-                <div><span class="hk">From:</span><span class="text-slate-800">Jordan Schwartz</span></div>
-                <div><span class="hk">Subject:</span><span class="text-slate-800 font-semibold">E8 fellowship - intro &amp; deck</span></div>
-              </div>
-              <div class="email-body collapsed px-3 py-2 text-[14px] text-slate-800">Hi Taylor -
-
-Karin suggested I reach out after your conversation at GreenBiz. Attaching our 1-pager on the fellowship program.
-
-The short version: we're a 12-month founder fellowship for climate-tech entrepreneurs, currently in our 4th cohort. Walton's portfolio in climate justice would be a strong fit.
-
-Best,
-Jordan</div>
-              <button type="button" class="email-toggle text-[12px] text-blue-700 hover:text-blue-900 px-3 py-1.5 border-t border-slate-100 w-full text-left">View more</button>
-            </div>
-          </li>
-
-          <li class="timeline-dot timeline-stage relative">
-            <div class="activity-meta">
-              <span>May 3, 2026</span>
-              <span>Karin Kidder</span>
-              <a href="opportunity-detail.html" class="opp-tag">Walton Fellowship Grant 2026</a>
-            </div>
-            <div class="activity-change-card text-[14px] flex items-center gap-1.5 flex-wrap">
-              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-prospect">Prospect</span>
-              <span class="text-slate-400">to</span>
-              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-outreach">Outreach</span>
-            </div>
-          </li>
-
-          <li class="timeline-dot timeline-money relative">
-            <div class="activity-meta">
-              <span>Apr 28, 2026</span>
-              <span>Karin Kidder</span>
-              <a href="opportunity-detail.html" class="opp-tag">Walton Fellowship Grant 2026</a>
-            </div>
-            <div class="activity-money-card text-[14px] text-slate-800">
-              <span class="font-semibold">$100,000</span>
-              <span class="text-slate-500">ask</span>
-              <span class="text-slate-300">-</span>
-              <span class="text-slate-600">Fellowship Program</span>
-            </div>
-          </li>
-
-          <li class="timeline-dot timeline-file relative">
-            <div class="activity-meta">
-              <span>Apr 28, 2026</span>
-              <span>Karin Kidder</span>
-              <a href="opportunity-detail.html" class="opp-tag">Walton Fellowship Grant 2026</a>
-            </div>
-            <div class="activity-file-card text-[14px] text-slate-800">Attached <a href="#" class="quiet-link">E8 Fellowship Program Overview.pdf</a> <span class="text-slate-400">- 2.4 MB</span></div>
-          </li>
-
-          <li class="timeline-dot timeline-stage relative">
-            <div class="activity-meta">
-              <span>Mar 15, 2025</span>
-              <span>Jordan Schwartz</span>
-              <a href="#" class="opp-tag">Walton Fellowship Grant 2025</a>
-            </div>
-            <div class="activity-change-card text-[14px] flex items-center gap-1.5 flex-wrap">
-              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-proposal">Proposal</span>
-              <span class="text-slate-400">to</span>
-              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium stage-declined">Declined</span>
-              <span class="text-slate-500 text-[13px]">focus area mismatch; encouraged to reapply in 2026</span>
-            </div>
-          </li>
-
-          <li class="timeline-dot timeline-owner relative">
-            <div class="activity-meta">
-              <span>Dec 5, 2024</span>
-              <span>Karin Kidder</span>
-            </div>
-            <div class="activity-change-card text-[14px] text-slate-800">Primary contact <strong>Taylor Brugh</strong></div>
-          </li>
-        </ol>
-      </section>
-
+  <section class="panel mt-3 overflow-hidden">
+    <div class="border-b border-slate-200 flex items-center gap-1 px-4 overflow-x-auto">
+      <button class="tab-btn" data-tab="summary">Summary</button>
+      <button class="tab-btn active inline-flex items-center gap-2" data-tab="active">Walton Fellowship Grant 2026 <span class="mini-pill stage-conversation">Conversation</span></button>
+      <a href="staff-dashboard.html?newOpportunity=walton-family-foundation" onclick="if (window.parent && window.parent !== window) { window.parent.postMessage({ type: 'openNewOpportunity', entityName: 'Walton Family Foundation' }, '*'); return false; }" class="tab-btn inline-flex items-center justify-center gap-1 no-underline" title="New opportunity">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
+      </a>
+      <button class="tab-btn inline-flex items-center gap-2" data-tab="historical">Walton Fellowship Grant 2025 <span class="mini-pill stage-declined">Declined</span></button>
+      <button class="tab-btn" data-tab="activity">Activity</button>
     </div>
 
-    <aside class="space-y-4">
-      <section class="panel">
-        <div class="px-4 py-3 border-b border-slate-200 flex items-center">
-          <div>
-            <div class="section-title">Contacts</div>
-          </div>
-          <button class="ml-auto h-7 px-2.5 text-[13px] border border-slate-300 bg-white hover:bg-slate-50 rounded">+ New</button>
-        </div>
-        <div class="divide-y divide-slate-100">
-          <div class="px-4 py-3">
-            <div class="min-w-0">
-                <div class="flex items-center gap-1.5 flex-wrap">
-                  <a href="#" class="quiet-link font-semibold text-slate-900">Taylor Brugh</a>
-                  <span class="text-[11px] bg-blue-100 text-blue-800 px-1 rounded">Primary</span>
-                </div>
-                <div class="text-[13px] text-slate-600 mt-0.5">Program Officer, Climate Justice</div>
-                <a href="mailto:taylor.brugh@waltonfamilyfoundation.org" class="quiet-link text-[13px] break-all">taylor.brugh@waltonfamilyfoundation.org</a>
-	            </div>
-	          </div>
-	          <div class="px-4 py-3">
-	            <div class="min-w-0">
-                <a href="#" class="quiet-link font-semibold text-slate-900">Caroline Avila</a>
-                <div class="text-[13px] text-slate-600 mt-0.5">Director, Strategic Grants</div>
-                <a href="mailto:caroline.avila@waltonfamilyfoundation.org" class="quiet-link text-[13px] break-all">caroline.avila@waltonfamilyfoundation.org</a>
-	            </div>
-	          </div>
-	        </div>
-	      </section>
+    <div id="summary" class="tab-panel p-4">
+      <div class="overflow-x-auto">
+        <table class="w-full text-[14px]">
+          <thead class="bg-slate-50 text-left text-[11px] uppercase tracking-wider text-slate-500">
+            <tr><th class="px-3 py-2">Opportunity</th><th class="px-3 py-2">Stage</th><th class="px-3 py-2">E8 organization</th><th class="px-3 py-2 text-right">Amount</th><th class="px-3 py-2">Key date</th><th class="px-3 py-2">Owner</th></tr>
+          </thead>
+          <tbody>
+            <tr class="border-t border-slate-100"><td class="px-3 py-3 font-semibold">Walton Fellowship Grant 2026</td><td class="px-3 py-3"><span class="px-1.5 py-0.5 rounded text-[11px] font-medium stage-conversation">Conversation</span></td><td class="px-3 py-3">E8 Impact</td><td class="px-3 py-3 text-right font-semibold">$100,000</td><td class="px-3 py-3">App due Jul 10</td><td class="px-3 py-3">Jordan Schwartz</td></tr>
+            <tr class="border-t border-slate-100 text-slate-600"><td class="px-3 py-3 font-semibold">Walton Fellowship Grant 2025</td><td class="px-3 py-3"><span class="px-1.5 py-0.5 rounded text-[11px] font-medium stage-declined">Declined</span></td><td class="px-3 py-3">E8 Impact</td><td class="px-3 py-3 text-right font-semibold">$75,000</td><td class="px-3 py-3">Declined Mar 15</td><td class="px-3 py-3">Jordan Schwartz</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-      <section class="panel">
-        <div class="px-4 py-3 border-b border-slate-200">
-          <div class="section-title">Relationship details</div>
+    <div id="active" class="tab-panel active">
+      <div class="grid lg:grid-cols-[320px_minmax(0,1fr)] gap-0">
+        <aside class="opp-panel border-b lg:border-b-0 lg:border-r border-slate-200 p-4 relative">
+          <button class="edit-pencil absolute top-3 right-3 w-7 h-7 rounded hover:bg-slate-100 inline-flex items-center justify-center text-slate-500" title="Edit opportunity">
+            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+          </button>
+          <div class="pr-7">
+            <div class="flex items-start gap-2">
+              <h2 class="text-lg font-semibold">Walton Fellowship Grant 2026</h2>
+            </div>
+            <div class="flex items-center gap-1.5 flex-wrap mt-2">
+              <span class="mini-pill opp-grant">Grant</span>
+              <span class="mini-pill entity-c3">501(c)3</span>
+            </div>
+            <a href="#" class="quiet-link mt-2 inline-block text-[13px]">waltonfamilyfoundation.org/grants</a>
+            <p class="mt-2 text-[13px] leading-5 text-slate-700">Fellowship program support for climate-justice founders, with outcomes reported by cohort year.</p>
+            <div class="mt-3 space-y-2">
+              <div class="prop-row">
+                <div class="field-label">Owner</div>
+                <button class="person-pill justify-self-start" data-contact="Jordan Schwartz"><span>Jordan Schwartz</span><span class="text-slate-400">×</span></button>
+              </div>
+              <div class="prop-row">
+                <div class="field-label">Advocate</div>
+                <button class="person-pill justify-self-start" data-contact="Lisa Rasmussen"><span>Lisa Rasmussen</span><span class="text-slate-400">×</span></button>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 space-y-2">
+            <div class="prop-row"><div class="field-label">Stage</div><select class="h-8 border border-slate-300 rounded px-2 text-[13px] stage-conversation font-medium"><option>Conversation</option><option>Proposal</option><option>Committed</option><option>Received</option><option>Declined</option></select></div>
+            <div class="prop-row"><div class="field-label">Requested</div><input class="h-8 border border-slate-300 rounded px-2 text-[13px] text-right tabular-nums" value="$100,000"></div>
+            <div class="prop-row"><div class="field-label">Committed</div><input class="h-8 border border-slate-300 rounded px-2 text-[13px] text-right tabular-nums" value="$100,000"></div>
+            <div class="prop-row"><div class="field-label">Due date</div><input class="h-8 border border-slate-300 rounded px-2 text-[13px]" value="Jul 10, 2026"></div>
+            <div class="prop-row"><div class="field-label">Decision</div><input class="h-8 border border-slate-300 rounded px-2 text-[13px]" value="Aug 12, 2026"></div>
+          </div>
+          <div class="mt-4 rounded border border-slate-200 overflow-hidden text-[12px] bg-white">
+            <table class="w-full">
+              <thead class="bg-slate-50 text-left text-slate-500">
+                <tr><th class="px-2 py-1.5 font-medium">Received</th><th class="px-2 py-1.5 font-medium">Date</th><th class="px-2 py-1.5 font-medium text-right">Amount</th><th class="w-7"></th></tr>
+              </thead>
+              <tbody>
+                <tr class="border-t border-slate-100"><td class="px-2 py-1.5">Cash payment</td><td class="px-2 py-1.5 text-slate-600">May 15, 2026</td><td class="px-2 py-1.5 text-right font-medium">$25,000</td><td class="px-1"><button type="button" class="record-receipt-btn text-slate-400 hover:text-slate-900" title="Edit receipt">✎</button></td></tr>
+                <tr class="border-t border-slate-100"><td class="px-2 py-1.5">Meeting space and catering</td><td class="px-2 py-1.5 text-slate-600">May 20, 2026</td><td class="px-2 py-1.5 text-right font-medium">$7,500</td><td class="px-1"><button type="button" class="record-receipt-btn text-slate-400 hover:text-slate-900" title="Edit receipt">✎</button></td></tr>
+              </tbody>
+              <tfoot class="border-t border-slate-200 bg-slate-50">
+                <tr><td class="px-2 py-1.5 font-medium" colspan="2">Total received</td><td class="px-2 py-1.5 text-right font-semibold">$32,500</td><td></td></tr>
+                <tr><td class="px-2 pb-1.5 text-slate-500" colspan="2">Remaining</td><td class="px-2 pb-1.5 text-right font-medium text-amber-700">$67,500</td><td></td></tr>
+              </tfoot>
+            </table>
+          </div>
+          <button type="button" class="record-receipt-btn mt-2 h-7 px-2.5 text-[13px] border border-slate-300 rounded bg-white hover:bg-slate-50">Record receipt</button>
+        </aside>
+        <div class="p-4">
+          <section class="border border-slate-200 rounded-md mb-4 overflow-hidden">
+            <div class="px-3 py-2 border-b border-slate-100 flex items-center gap-2">
+              <div class="field-label">Documents</div>
+              <div class="ml-auto flex items-center gap-2">
+                <button class="h-7 px-2.5 text-[13px] border border-slate-300 rounded bg-white hover:bg-slate-50">Upload file</button>
+                <button class="h-7 px-2.5 text-[13px] bg-blue-600 text-white rounded hover:bg-blue-700">Create new document</button>
+              </div>
+            </div>
+            <div class="px-3 py-2 divide-y divide-slate-100">
+              <div class="doc-row">
+                <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                <a href="#" class="quiet-link font-medium">Walton Fellowship Grant Application</a>
+                <span class="ml-auto text-[12px] text-slate-500">Last edited: Mar 12, 2026 3:15 pm</span>
+              </div>
+              <div class="doc-row">
+                <svg class="doc-icon text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                <a href="#" class="quiet-link font-medium">E8 Fellowship Program Overview.pdf</a>
+                <span class="ml-auto text-[12px] text-slate-500">Uploaded: Mar 10, 2026 11:42 am</span>
+              </div>
+            </div>
+          </section>
+          <div class="note-editor mb-4">
+            <div class="note-toolbar">
+              <button type="button" title="Bold" aria-label="Bold"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 0 8H6z"/><path d="M6 12h9a4 4 0 0 1 0 8H6z"/></svg></button>
+              <button type="button" title="Italic" aria-label="Italic"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg></button>
+              <button type="button" title="Bulleted list" aria-label="Bulleted list"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg></button>
+              <button type="button" title="Numbered list" aria-label="Numbered list"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="21" y1="6" y2="6"/><line x1="10" x2="21" y1="12" y2="12"/><line x1="10" x2="21" y1="18" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></button>
+              <button type="button" title="Link" aria-label="Link"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+              <button type="button" class="task-btn h-7 px-2.5 text-[13px] border border-slate-300 rounded bg-white hover:bg-slate-50 !w-auto">Task</button>
+              <button type="button" id="saveNoteBtn" class="save-note-btn ml-auto h-7 rounded text-[13px]">Save</button>
+            </div>
+            <div id="noteBodyInput" class="note-body-input text-slate-400" contenteditable="true">Add a note...</div>
+          </div>
+          <div class="flex items-center gap-2 mb-3">
+            <div class="field-label">Activity</div>
+            <div class="ml-auto flex items-center gap-1 text-[12px]">
+              <button class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">This opportunity</button>
+              <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">All</button>
+              <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Unassociated</button>
+            </div>
+          </div>
+          <div class="activity-stream"></div>
         </div>
-        <div class="px-4 py-3 grid grid-cols-1 gap-3 text-[13px]">
-          <div>
-            <div class="fact-label">Relationship owner</div>
-            <div class="mt-1 font-medium">Jordan Schwartz</div>
-          </div>
-          <div>
-            <div class="fact-label">Current advocate</div>
-            <div class="mt-1 font-medium">Lisa Rasmussen</div>
-            <div class="text-[12px] text-slate-500 mt-1">Advocate on Walton Fellowship Grant 2026</div>
-          </div>
-          <div>
-            <div class="fact-label">Typical grant range</div>
-            <div class="mt-1 font-medium">$50k-$500k</div>
-          </div>
-          <div>
-            <div class="fact-label">Known preferences</div>
-            <div class="mt-1 text-slate-700 leading-5">Regional impact, climate justice, and BIPOC founder pipeline. Annual reporting is expected after award.</div>
-          </div>
-        </div>
-      </section>
+      </div>
+    </div>
 
-      <section class="panel">
-        <div class="px-4 py-3 border-b border-slate-200 flex items-center">
-          <div class="section-title">Files</div>
-          <button class="ml-auto h-7 px-2.5 text-[13px] border border-slate-300 bg-white hover:bg-slate-50 rounded">Upload</button>
-        </div>
-        <div class="px-4 py-3 flex items-center gap-2 text-[13px]">
-          <svg class="w-4 h-4 text-red-500 shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h6l4 4v10a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
-          <div class="min-w-0 flex-1">
-            <a href="#" class="quiet-link font-medium truncate block">Walton Funder Profile.pdf</a>
+    <div id="historical" class="tab-panel">
+      <div class="grid lg:grid-cols-[320px_minmax(0,1fr)] gap-0">
+        <aside class="opp-panel border-b lg:border-b-0 lg:border-r border-slate-200 p-4 relative">
+          <button class="edit-pencil absolute top-3 right-3 w-7 h-7 rounded hover:bg-slate-100 inline-flex items-center justify-center text-slate-500" title="Edit opportunity">
+            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+          </button>
+          <div class="pr-7">
+            <h2 class="text-lg font-semibold">Walton Fellowship Grant 2025</h2>
+            <div class="flex items-center gap-1.5 flex-wrap mt-2">
+              <span class="mini-pill opp-grant">Grant</span>
+              <span class="mini-pill entity-c3">501(c)3</span>
+            </div>
+            <a href="#" class="quiet-link mt-2 inline-block text-[13px]">waltonfamilyfoundation.org/grants</a>
+            <p class="mt-2 text-[13px] leading-5 text-slate-700">Prior fellowship proposal for climate-justice founder support. Declined after the foundation narrowed its 2025 funding slate.</p>
+            <div class="mt-3 space-y-2">
+              <div class="prop-row">
+                <div class="field-label">Owner</div>
+                <button class="person-pill justify-self-start" data-contact="Jordan Schwartz"><span>Jordan Schwartz</span><span class="text-slate-400">×</span></button>
+              </div>
+              <div class="prop-row">
+                <div class="field-label">Advocate</div>
+                <button class="add-person justify-self-start" title="Add advocate">
+                  <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
+                </button>
+              </div>
+            </div>
           </div>
-          <span class="text-[11px] text-slate-400">412 KB</span>
+          <div class="mt-4 space-y-2">
+            <div class="prop-row"><div class="field-label">Stage</div><select class="h-8 border border-slate-300 rounded px-2 text-[13px] stage-declined font-medium"><option>Declined</option><option>Conversation</option><option>Proposal</option><option>Committed</option><option>Received</option></select></div>
+            <div class="prop-row"><div class="field-label">Requested</div><input class="h-8 border border-slate-300 rounded px-2 text-[13px] text-right tabular-nums" value="$75,000"></div>
+            <div class="prop-row"><div class="field-label">Committed</div><input class="h-8 border border-slate-300 rounded px-2 text-[13px] text-right tabular-nums" value="$0"></div>
+            <div class="prop-row"><div class="field-label">Due date</div><input class="h-8 border border-slate-300 rounded px-2 text-[13px]" value="Apr 1, 2025"></div>
+            <div class="prop-row"><div class="field-label">Decision</div><input class="h-8 border border-slate-300 rounded px-2 text-[13px]" value="Mar 15, 2025"></div>
+          </div>
+          <div class="mt-4 rounded border border-slate-200 overflow-hidden text-[12px] bg-white">
+            <table class="w-full">
+              <thead class="bg-slate-50 text-left text-slate-500">
+                <tr><th class="px-2 py-1.5 font-medium">Received</th><th class="px-2 py-1.5 font-medium">Date</th><th class="px-2 py-1.5 font-medium text-right">Amount</th><th class="w-7"></th></tr>
+              </thead>
+              <tbody><tr class="border-t border-slate-100"><td class="px-2 py-2 text-slate-500" colspan="4">No receipts recorded.</td></tr></tbody>
+              <tfoot class="border-t border-slate-200 bg-slate-50">
+                <tr><td class="px-2 py-1.5 font-medium" colspan="2">Total received</td><td class="px-2 py-1.5 text-right font-semibold">$0</td><td></td></tr>
+                <tr><td class="px-2 pb-1.5 text-slate-500" colspan="2">Remaining</td><td class="px-2 pb-1.5 text-right font-medium">$0</td><td></td></tr>
+              </tfoot>
+            </table>
+          </div>
+          <button type="button" class="record-receipt-btn mt-2 h-7 px-2.5 text-[13px] border border-slate-300 rounded bg-white hover:bg-slate-50">Record receipt</button>
+        </aside>
+        <div class="p-4">
+          <section class="border border-slate-200 rounded-md mb-4 overflow-hidden">
+            <div class="px-3 py-2 border-b border-slate-100 flex items-center gap-2">
+              <div class="field-label">Documents</div>
+              <div class="ml-auto flex items-center gap-2">
+                <button class="h-7 px-2.5 text-[13px] border border-slate-300 rounded bg-white hover:bg-slate-50">Upload file</button>
+                <button class="h-7 px-2.5 text-[13px] bg-blue-600 text-white rounded hover:bg-blue-700">Create new document</button>
+              </div>
+            </div>
+            <div class="px-3 py-2 divide-y divide-slate-100">
+              <div class="doc-row">
+                <svg class="doc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                <a href="#" class="quiet-link font-medium">Walton Fellowship Grant 2025 Draft</a>
+                <span class="ml-auto text-[12px] text-slate-500">Last edited: Mar 7, 2025 4:28 pm</span>
+              </div>
+              <div class="doc-row">
+                <svg class="doc-icon text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                <a href="#" class="quiet-link font-medium">2025 Outcomes Attachment.pdf</a>
+                <span class="ml-auto text-[12px] text-slate-500">Uploaded: Mar 5, 2025 10:16 am</span>
+              </div>
+            </div>
+          </section>
+          <div class="note-editor mb-4">
+            <div class="note-toolbar">
+              <button type="button" title="Bold" aria-label="Bold"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 0 8H6z"/><path d="M6 12h9a4 4 0 0 1 0 8H6z"/></svg></button>
+              <button type="button" title="Italic" aria-label="Italic"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg></button>
+              <button type="button" title="Bulleted list" aria-label="Bulleted list"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg></button>
+              <button type="button" title="Numbered list" aria-label="Numbered list"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="21" y1="6" y2="6"/><line x1="10" x2="21" y1="12" y2="12"/><line x1="10" x2="21" y1="18" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></button>
+              <button type="button" title="Link" aria-label="Link"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+              <button type="button" class="task-btn h-7 px-2.5 text-[13px] border border-slate-300 rounded bg-white hover:bg-slate-50 !w-auto">Task</button>
+              <button type="button" class="save-note-btn ml-auto h-7 rounded text-[13px]">Save</button>
+            </div>
+            <div class="note-body-input text-slate-400" contenteditable="true">Add a note...</div>
+          </div>
+          <div class="flex items-center gap-2 mb-3">
+            <div class="field-label">Activity</div>
+            <div class="ml-auto flex items-center gap-1 text-[12px]">
+              <button class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">This opportunity</button>
+              <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">All</button>
+              <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Unassociated</button>
+            </div>
+          </div>
+          <div class="activity-stream"></div>
         </div>
-      </section>
-    </aside>
-  </div>
+      </div>
+    </div>
 
+    <div id="activity" class="tab-panel p-4">
+      <div class="flex items-center gap-2 mb-3 flex-wrap">
+        <div class="field-label">Activity</div>
+        <div class="ml-auto flex items-center gap-1 text-[12px]">
+          <button class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">All</button>
+          <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Walton 2026</button>
+          <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Walton 2025</button>
+          <button class="px-1.5 py-0.5 rounded text-slate-500 hover:bg-slate-100">Unassociated</button>
+        </div>
+      </div>
+      <div class="activity-stream"></div>
+    </div>
+  </section>
 </main>
 
+<template id="activityTemplate">
+  <ol class="timeline-line ml-6 pl-5 space-y-4">
+    <li class="timeline-dot timeline-overdue relative">
+      <div class="activity-meta"><span>Due May 6, 2026</span><span class="text-red-700 font-medium">Overdue</span><span class="opp-tag">Walton Fellowship Grant 2026</span></div>
+      <div class="activity-task-card overdue">
+        <div class="flex items-start gap-2">
+          <input type="checkbox" class="mt-0.5 rounded">
+          <div class="min-w-0"><div class="font-semibold text-red-900">Send revised cohort outcomes</div><div class="text-[12px] text-red-700 mt-0.5">Assigned to Jordan Schwartz</div></div>
+        </div>
+      </div>
+    </li>
+    <li class="timeline-dot timeline-note relative">
+      <div class="activity-meta"><span>May 12, 2026 - 3:42 PM</span><span>Jordan Schwartz</span><span class="opp-tag">Walton Fellowship Grant 2026</span></div>
+      <div class="activity-note-card"><p>Call with Taylor. They narrowed to three climate-justice orgs; we're on the short list.</p><p>They want outcomes broken out by cohort year.</p></div>
+    </li>
+    <li class="timeline-dot timeline-email relative">
+      <div class="activity-meta"><span>May 9, 2026 - 9:12 AM</span><span class="opp-tag">Unassociated email</span></div>
+      <div class="email-card">
+        <div class="email-summary"><div class="email-route"><span>Taylor Brugh</span><span>→</span><span>Jordan Schwartz</span></div><div class="email-subject">Re: E8 fellowship - quick call this week?</div><div class="email-preview">Yes, let's do Thursday 11am PT. Would love to hear how you measure cohort outcomes year-over-year.</div></div>
+        <div class="email-headers px-3 py-2 text-[13px] leading-relaxed hidden"><div><span class="hk">To:</span><span>Jordan Schwartz</span></div><div><span class="hk">From:</span><span>Taylor Brugh</span></div><div><span class="hk">Subject:</span><span class="font-semibold">Re: E8 fellowship - quick call this week?</span></div></div>
+        <div class="email-body collapsed px-3 py-2 text-[14px] text-slate-800">Yes, let's do Thursday 11am PT. Would love to hear how you measure cohort outcomes year-over-year.</div>
+        <button type="button" class="email-toggle text-[12px] text-blue-700 hover:text-blue-900 px-3 py-1.5 border-t border-slate-100 w-full text-left">View more</button>
+      </div>
+    </li>
+    <li class="timeline-dot timeline-stage relative">
+      <div class="activity-meta"><span>May 3, 2026</span><span>Karin Kidder</span><span class="opp-tag">Walton Fellowship Grant 2026</span></div>
+      <div class="activity-change-card flex items-center gap-1.5 flex-wrap"><span class="px-1.5 py-0.5 rounded text-[11px] font-medium stage-prospect">Prospect</span><span class="text-slate-400">to</span><span class="px-1.5 py-0.5 rounded text-[11px] font-medium stage-conversation">Conversation</span></div>
+    </li>
+    <li class="timeline-dot timeline-money relative">
+      <div class="activity-meta"><span>Apr 28, 2026</span><span>Karin Kidder</span><span class="opp-tag">Walton Fellowship Grant 2026</span></div>
+      <div class="activity-money-card"><span class="font-semibold">$100,000</span><span class="text-slate-500"> ask</span><span class="text-slate-300"> - </span><span class="text-slate-600">Fellowship Program</span></div>
+    </li>
+    <li class="relative -ml-5 pl-0"><div class="future-divider">Upcoming</div></li>
+    <li class="timeline-dot timeline-task relative">
+      <div class="activity-meta"><span>Due May 29, 2026</span><span>Open task</span><span class="opp-tag">Walton Fellowship Grant 2026</span></div>
+      <div class="activity-task-card">
+        <div class="flex items-start gap-2">
+          <input type="checkbox" class="mt-0.5 rounded">
+          <div class="min-w-0"><div class="font-semibold">Prep questions for Taylor call</div><div class="text-[12px] text-slate-600 mt-0.5">Assigned to Lisa Rasmussen</div></div>
+        </div>
+      </div>
+    </li>
+  </ol>
+</template>
+
+<div id="receiptModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-md shadow-xl w-full max-w-md">
+    <div class="px-4 py-3 border-b border-slate-200 flex items-center">
+      <div class="font-semibold">Record receipt</div>
+      <button id="closeReceipt" class="ml-auto text-slate-400 hover:text-slate-700" aria-label="Close">×</button>
+    </div>
+    <div class="p-4 space-y-3">
+      <div class="grid grid-cols-[100px_1fr] gap-3 items-center">
+        <label class="field-label">Amount</label>
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+          <input class="h-8 w-full border border-slate-300 rounded pl-5 pr-2 text-right tabular-nums" value="25,000">
+        </div>
+      </div>
+      <div class="grid grid-cols-[100px_1fr] gap-3 items-center">
+        <label class="field-label">Date</label>
+        <input type="date" class="h-8 border border-slate-300 rounded px-2" value="2026-05-15">
+      </div>
+      <div class="grid grid-cols-[100px_1fr] gap-3 items-start">
+        <label class="field-label pt-1">In-kind</label>
+        <label class="flex items-center gap-2 text-[13px] pt-0.5">
+          <input type="checkbox" class="rounded">
+          <span>In-kind item received</span>
+        </label>
+      </div>
+    </div>
+    <div class="px-4 py-3 border-t border-slate-200 flex justify-end gap-2">
+      <button id="cancelReceipt" class="h-8 px-3 border border-slate-300 rounded">Cancel</button>
+      <button id="saveReceipt" class="h-8 px-3 bg-slate-950 text-white rounded">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="taskModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-md shadow-xl w-full max-w-md">
+    <div class="px-4 py-3 border-b border-slate-200 flex items-center">
+      <div class="font-semibold">New task</div>
+      <button id="closeTask" class="ml-auto text-slate-400 hover:text-slate-700" aria-label="Close">×</button>
+    </div>
+    <div class="p-4 space-y-3">
+      <div class="grid grid-cols-[90px_1fr] gap-3 items-center"><label class="field-label">Task</label><input class="h-8 border border-slate-300 rounded px-2" value="Prep questions for Taylor call"></div>
+      <div class="grid grid-cols-[90px_1fr] gap-3 items-center"><label class="field-label">Due date</label><input type="date" class="h-8 border border-slate-300 rounded px-2" value="2026-05-29"></div>
+      <div class="grid grid-cols-[90px_1fr] gap-3 items-center"><label class="field-label">Assigned to</label><select class="h-8 border border-slate-300 rounded px-2"><option>Jordan Schwartz</option><option selected>Lisa Rasmussen</option><option>Karin Kidder</option><option>Kathleen Olson</option></select></div>
+    </div>
+    <div class="px-4 py-3 border-t border-slate-200 flex justify-end gap-2">
+      <button id="cancelTask" class="h-8 px-3 border border-slate-300 rounded">Cancel</button>
+      <button id="saveTask" class="h-8 px-3 bg-slate-950 text-white rounded">Save task</button>
+    </div>
+  </div>
+</div>
+
+<div id="contactModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-md shadow-xl w-full max-w-md">
+    <div class="px-4 py-3 border-b border-slate-200 flex items-center">
+      <div class="font-semibold">Edit contact</div>
+      <button id="closeContact" class="ml-auto text-slate-400 hover:text-slate-700" aria-label="Close">×</button>
+    </div>
+    <div class="p-4 space-y-3">
+      <div class="grid grid-cols-[90px_1fr] gap-3 items-center"><label class="field-label">Name</label><div class="grid grid-cols-2 gap-2"><input class="h-8 border border-slate-300 rounded px-2" value="Taylor"><input class="h-8 border border-slate-300 rounded px-2" value="Brugh"></div></div>
+      <div class="grid grid-cols-[90px_1fr] gap-3 items-center"><label class="field-label">Title</label><input class="h-8 border border-slate-300 rounded px-2" value="Program Officer"></div>
+      <div class="grid grid-cols-[90px_1fr] gap-3 items-center"><label class="field-label">Email</label><input class="h-8 border border-slate-300 rounded px-2" value="taylor.brugh@waltonfamilyfoundation.org"></div>
+      <div class="grid grid-cols-[90px_1fr] gap-3 items-center"><label class="field-label">Phone</label><input class="h-8 border border-slate-300 rounded px-2" value="(206) 555-0144"></div>
+      <div class="grid grid-cols-[90px_1fr] gap-3 items-center"><label class="field-label">LinkedIn</label><input class="h-8 border border-slate-300 rounded px-2" value="https://linkedin.com/in/taylor-brugh"></div>
+    </div>
+    <div class="px-4 py-3 border-t border-slate-200 flex justify-end gap-2"><button id="cancelContact" class="h-8 px-3 border border-slate-300 rounded">Cancel</button><button id="saveContact" class="h-8 px-3 bg-slate-950 text-white rounded">Save</button></div>
+  </div>
+</div>
+
+<div id="unsavedNoteModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-md shadow-xl w-full max-w-sm">
+    <div class="px-4 py-3 border-b border-slate-200 font-semibold">Unsaved note</div>
+    <div class="p-4 text-[14px] text-slate-700">Save this note before leaving?</div>
+    <div class="px-4 py-3 border-t border-slate-200 flex justify-end gap-2">
+      <button id="discardNoteBtn" class="h-8 px-3 border border-slate-300 rounded">Discard</button>
+      <button id="cancelLeaveBtn" class="h-8 px-3 border border-slate-300 rounded">Cancel</button>
+      <button id="modalSaveNoteBtn" class="h-8 px-3 bg-blue-600 text-white rounded">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
+let noteDirty = false;
+let pendingTab = null;
+let pendingHref = null;
+document.querySelectorAll('.activity-stream').forEach(target => {
+  target.appendChild(document.getElementById('activityTemplate').content.cloneNode(true));
+});
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (!btn.dataset.tab) return;
+    if (noteDirty) {
+      pendingTab = btn;
+      document.getElementById('unsavedNoteModal').classList.remove('hidden');
+      document.getElementById('unsavedNoteModal').classList.add('flex');
+      return;
+    }
+    activateTab(btn);
+  });
+});
+function activateTab(btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === btn.dataset.tab));
+}
 document.querySelectorAll('.email-toggle').forEach(btn => {
   const body = btn.parentElement.querySelector('.email-body');
-  if (!body) return;
   btn.addEventListener('click', () => {
     const collapsed = body.classList.toggle('collapsed');
-    const headers = btn.parentElement.querySelector('.email-headers');
-    const summary = btn.parentElement.querySelector('.email-summary');
-    if (headers) headers.classList.toggle('hidden', collapsed);
-    if (summary) summary.classList.toggle('hidden', !collapsed);
+    btn.parentElement.querySelector('.email-headers')?.classList.toggle('hidden', collapsed);
+    btn.parentElement.querySelector('.email-summary')?.classList.toggle('hidden', !collapsed);
     btn.textContent = collapsed ? 'View more' : 'View less';
   });
+});
+const modal = document.getElementById('contactModal');
+function openContactModal() { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+function closeContactModal() { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+document.querySelectorAll('.person-pill, #addContactBtn').forEach(el => el.addEventListener('click', openContactModal));
+document.getElementById('closeContact').addEventListener('click', closeContactModal);
+document.getElementById('cancelContact').addEventListener('click', closeContactModal);
+document.getElementById('saveContact').addEventListener('click', closeContactModal);
+const receiptModal = document.getElementById('receiptModal');
+function openReceiptModal() { receiptModal.classList.remove('hidden'); receiptModal.classList.add('flex'); }
+function closeReceiptModal() { receiptModal.classList.add('hidden'); receiptModal.classList.remove('flex'); }
+document.querySelectorAll('.record-receipt-btn').forEach(el => el.addEventListener('click', openReceiptModal));
+document.getElementById('closeReceipt').addEventListener('click', closeReceiptModal);
+document.getElementById('cancelReceipt').addEventListener('click', closeReceiptModal);
+document.getElementById('saveReceipt').addEventListener('click', closeReceiptModal);
+receiptModal.addEventListener('click', (event) => { if (event.target === receiptModal) closeReceiptModal(); });
+const taskModal = document.getElementById('taskModal');
+function openTaskModal() { taskModal.classList.remove('hidden'); taskModal.classList.add('flex'); }
+function closeTaskModal() { taskModal.classList.add('hidden'); taskModal.classList.remove('flex'); }
+document.querySelectorAll('.task-btn').forEach(el => el.addEventListener('click', openTaskModal));
+document.getElementById('closeTask').addEventListener('click', closeTaskModal);
+document.getElementById('cancelTask').addEventListener('click', closeTaskModal);
+document.getElementById('saveTask').addEventListener('click', closeTaskModal);
+taskModal.addEventListener('click', (event) => { if (event.target === taskModal) closeTaskModal(); });
+const noteInput = document.getElementById('noteBodyInput');
+noteInput.addEventListener('focus', () => {
+  if (noteInput.textContent.trim() === 'Add a note...') {
+    noteInput.textContent = '';
+    noteInput.classList.remove('text-slate-400');
+  }
+});
+noteInput.addEventListener('input', () => { noteDirty = noteInput.textContent.trim().length > 0; });
+function saveNote() {
+  noteDirty = false;
+  noteInput.textContent = 'Add a note...';
+  noteInput.classList.add('text-slate-400');
+  document.getElementById('unsavedNoteModal').classList.add('hidden');
+  document.getElementById('unsavedNoteModal').classList.remove('flex');
+  if (pendingHref) { window.location.href = pendingHref; return; }
+  if (pendingTab) { activateTab(pendingTab); pendingTab = null; }
+}
+document.getElementById('saveNoteBtn').addEventListener('click', saveNote);
+document.getElementById('modalSaveNoteBtn').addEventListener('click', saveNote);
+document.getElementById('cancelLeaveBtn').addEventListener('click', () => {
+  pendingTab = null;
+  pendingHref = null;
+  document.getElementById('unsavedNoteModal').classList.add('hidden');
+  document.getElementById('unsavedNoteModal').classList.remove('flex');
+});
+document.getElementById('discardNoteBtn').addEventListener('click', () => {
+  noteDirty = false;
+  document.getElementById('unsavedNoteModal').classList.add('hidden');
+  document.getElementById('unsavedNoteModal').classList.remove('flex');
+  if (pendingHref) { window.location.href = pendingHref; return; }
+  if (pendingTab) { activateTab(pendingTab); pendingTab = null; }
+});
+document.querySelectorAll('a[href]').forEach(link => {
+  link.addEventListener('click', (e) => {
+    if (!noteDirty || link.getAttribute('href')?.startsWith('mailto:') || link.getAttribute('href') === '#') return;
+    e.preventDefault();
+    pendingHref = link.href;
+    document.getElementById('unsavedNoteModal').classList.remove('hidden');
+    document.getElementById('unsavedNoteModal').classList.add('flex');
+  });
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && window.parent && window.parent !== window) {
+    window.parent.postMessage({ type: 'detailEscape' }, '*');
+  }
 });
 </script>
 </body>
