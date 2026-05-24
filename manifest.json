@@ -1,15 +1,15 @@
 {
-  "generated": "2026-05-24T02:09:27+00:00",
+  "generated": "2026-05-24T02:09:52+00:00",
   "plans": [
     {
       "slug": "companies-admin-redesign",
       "title": "Companies Admin Redesign",
-      "status": "unknown",
+      "status": "draft",
       "owner": "jordan",
       "created": "",
-      "last_updated": "",
+      "last_updated": "2026-05-23",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-21T22:38:04-07:00",
+      "last_changed_at": "2026-05-23T19:09:30-07:00",
       "has_plan": true,
       "has_changelog": false,
       "mockups": [
