@@ -887,13 +887,15 @@ Migration is scripted as `scripts/import-development-history.js` with `--env=pro
 
 ## 9. Phased rollout
 
-### Phase 1 — Foundation (week 1)
+Work is executed sequentially. The Development CRM is released to the team only after Phase 6 is complete.
+
+### Phase 1 — Foundation
 - Migration SQL + `createTables()` updates for all `development_*` tables
 - Role + permission additions (incl. `DevelopmentManager`, role-tag rules)
 - Glossary updates
 - Empty `/admin/development` and `/board/development` shells gated on the new resources
 
-### Phase 2 — Core CRUD (weeks 1-2)
+### Phase 2 — Core CRUD
 - Relationship + opportunity list/detail surfaces
 - Stage Kanban on opportunities with drag-to-advance and stage-change prompts
 - Conversation log (polymorphic) + attachments (relationship + opportunity scopes)
@@ -901,25 +903,25 @@ Migration is scripted as `scripts/import-development-history.js` with `--env=pro
 - Inline editing of all required fields
 - Mobile responsive pass
 
-### Phase 3 — Money + goals (week 2)
+### Phase 3 — Money + goals
 - `development_amounts` UI on opportunity detail (ask / commit / receive with due/received dates)
 - Campaigns + per-legal-entity goals admin
 - KPI strip on staff dashboard, including legal-entity toggle
 
-### Phase 4 — Follow-ups + reminders (week 3)
+### Phase 4 — Follow-ups + reminders
 - `development_followups` CRUD (polymorphic)
 - Mailgun reminders (per-follow-up + Monday digest + reporting-due reminders)
 - Overdue widget + auto-suggested follow-up dates on stage change
 - Auto role-tag recompute helper + nightly cron
 
-### Phase 5 — Board dashboard (week 3)
+### Phase 5 — Board dashboard
 - `/board/development` read-only view
 - "My Connections" panel (entity-level)
 - Recent activity feed (opportunity-aware)
 - "Log my interaction" form + owner notification
 - Calendar month/week/table views for deadlines, reports, and tasks
 
-### Phase 6 — Import + cleanup (week 4)
+### Phase 6 — Import + cleanup
 - `scripts/import-development-history.js` dry run
 - Dry-run review pass on dedup decisions
 - Real import
