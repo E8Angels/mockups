@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-26T18:43:31+00:00",
+  "generated": "2026-05-26T21:58:05+00:00",
   "plans": [
     {
       "slug": "companies-admin-redesign",
@@ -163,6 +163,25 @@
         {
           "name": "mockup",
           "path": "prospects/mockup.html",
+          "is_home": true
+        }
+      ]
+    },
+    {
+      "slug": "sourcing-committee",
+      "title": "Sourcing Committee Metrics",
+      "status": "draft",
+      "owner": "sarah",
+      "created": "2026-05-26",
+      "last_updated": "2026-05-26",
+      "last_changed_by": "sarah",
+      "last_changed_at": "2026-05-26T21:57:55Z",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": [
+        {
+          "name": "mockup",
+          "path": "sourcing-committee/mockup.html",
           "is_home": true
         }
       ]
