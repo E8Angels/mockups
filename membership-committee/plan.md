@@ -3,7 +3,7 @@ title: "Membership Committee Page"
 status: draft
 owner: amanda
 created: 2026-05-21
-last_updated: 2026-05-22
+last_updated: 2026-05-26
 home: mockup
 ---
 
