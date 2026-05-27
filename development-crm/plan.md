@@ -31,7 +31,7 @@ The model separates durable funder records from individual fundraising cycles. A
 - **E8 organization reporting** — track E8 Angels and E8 Impact separately and together. E8 organization (501c6 / 501c3 / both) lives on the **opportunity**, not the funder, because a single funder can give to either side year over year. Dashboards have an E8 organization toggle (E8 Angels / E8 Impact / All).
 - **Board notifications** — the portal is the canonical surface; the dev committee has a board view (§6d).
 - **Board onboarding** — already handled. Board members are in the portal; we use the existing `BoardMember` role.
-- **Spreadsheet import** — import the master sponsor spreadsheet (see §8). This is in scope for v1.
+- **Spreadsheet import** — no separate importer in v1. Test/import data flows through governed data-query write support.
 
 ## 3. Data model overview
 
@@ -110,7 +110,7 @@ Triggers (each must call `recomputeDevelopmentRoleTags` with the affected person
 - Update to `development_funders.is_archived`
 - A nightly cron pass that re-evaluates every person whose funders have an opportunity with `term_end_on` between yesterday and today (so `Sponsor` → `Past Sponsor` transitions happen the morning after a term ends without requiring a write to anything)
 
-Implementation lives in `src/lib/development/role-tags.js`. Backfill once on deploy via `scripts/backfill-development-role-tags.js` (dry-run by default per AGENTS.md). Glossary entry in §4.5 must flag these as system-managed and document the rules.
+Implementation lives in the Development CacheManager domain module. Backfill once on deploy via `scripts/backfill-development-role-tags.js` (dry-run by default per AGENTS.md). Glossary entry in §4.5 must flag these as system-managed and document the rules.
 
 ### 4.2 New canonical permission role
 
@@ -542,7 +542,7 @@ Layout, top to bottom:
 - **Toolbar row**: `<result count>` left-aligned; right-aligned cluster of `Kanban / List / Calendar` view-mode toggle, then a divider, then **`+ New opportunity`** (primary blue), `Export CSV`.
 - **Overdue banner** — appears below the toolbar when overdue count > 0.
 - **View body**: Kanban / List / Calendar.
-  - **Kanban** columns = 7 pipeline stages. Each Kanban card is an **opportunity** rendered as the four-band tile (§6a.i). **The entire card opens the relationship/opportunity drawer** over the dashboard. Drag a card to advance stage; a modal prompts for a note.
+  - **Kanban** columns = 7 pipeline stages. Each Kanban card is an **opportunity** rendered as the four-band tile (§6a.i). **The entire card opens the relationship/opportunity drawer** over the dashboard. Dragging a card to another stage updates the card in place and persists the stage in the background; no note modal appears on drag.
   - **List** view: a RecordGrid-powered workspace with grouped saved views for **Opportunities** and **Funders**. Selecting an Opportunity view mounts the Opportunities grid in the content area. Selecting a Funder view mounts the Funders grid in that same content area. The two grids share the visible List surface but use separate base tables, field catalogs, saved views, AI Assist context, row actions, permissions, and write paths. Do not mix funder rows and opportunity rows in one grid instance.
   - **Calendar**: calendar workspace for application deadlines, reporting due dates, decision expected dates, sponsorship term dates, and follow-up tasks. It supports Month, Week, and Table views, with previous/next controls for moving between months or weeks. Month view uses weekday columns plus a compact shared Sat/Sun column. Calendar items are visually distinguished by type: deadline, report, task, and overdue task. Calendar entries link to the related opportunity when an opportunity association exists; clicking an entry opens the relationship/opportunity drawer with that opportunity selected.
 
@@ -620,9 +620,9 @@ Layout, top to bottom:
 
 ### 6c. Stage control on opportunity tabs
 
-   **Stage dropdown.** The stage control in the opportunity property list is a single styled `<select>` rather than a chip + Advance button pair. The select is the stage chip — it carries the same per-stage color treatment, and its width fits the longest stage label. Changing the value opens the stage-change modal (same modal the Kanban drag uses) so the prompted note + auto-suggested follow-up still flow through every transition. Reasons for the dropdown over the chip+button: most stage changes don't go forward one step at a time (a grant can jump from Conversation straight to Declined; a sponsorship often moves Conversation → Committed without a Proposal); the `Advance` button implies a single-step forward flow that doesn't match reality. The dropdown also makes "go backwards" or "correct a mis-click" first-class instead of buried in a kebab. Moving to `declined` still requires `decline_reason` in the modal.
+  **Stage dropdown.** The stage control in the opportunity property list is a single styled `<select>` rather than a chip + Advance button pair. The select is the stage chip — it carries the same per-stage color treatment, and its width fits the longest stage label. Changing the value updates the opportunity in place and persists the stage in the background, matching the later no-popup Kanban direction. Reasons for the dropdown over the chip+button: most stage changes don't go forward one step at a time (a grant can jump from Conversation straight to Declined; a sponsorship often moves Conversation → Committed without a Proposal); the `Advance` button implies a single-step forward flow that doesn't match reality. The dropdown also makes "go backwards" or "correct a mis-click" first-class instead of buried in a kebab.
 
-Stage changes prompt a note; the prompt is the same modal used on the staff Kanban. The opportunity property-list stage dropdown is the only stage-change affordance on this page — there is no separate `Advance` button. Moving to `declined` still requires `decline_reason`.
+Stage changes write `development_stage_events` for timeline/history. Staff can add a note separately in the Activity composer when context is needed.
 
 #### 6c.i. Documents
 
@@ -666,7 +666,7 @@ Each item corresponds to a real event in one of the underlying tables. Event kin
 |---|---|---|
 | **Note** | Staff "Add a note" form scoped to an opportunity (`source='manual'`, `parent_kind='opportunity'`) or to the relationship (`parent_kind='funder'`), or a board member "Log my interaction" (`source='manual_board'`). | Date, author, and rich-text body. A bare "Edit" link is shown to the author for 10 minutes after creation. Board-logged submissions trigger a Mailgun alert to the primary opportunity lead. |
 | **Email** | Auto-ingested via Google Pub/Sub. Pub/Sub pushes each new Gmail message to the portal webhook; the webhook resolves sender/recipient addresses against `people.email` and, on a match against any contact in `development_contacts`, writes a `development_email_events` row plus one `development_email_attachments` row per file. Always relationship-scoped. An email surfaces on an opportunity timeline if it has a row in `development_opportunity_email_links` for that opp. Staff can tag/untag inline (`Attach to this opportunity`). | Collapsed: direction-aware left/right email card with route/from-to metadata, subject, and two-line teaser. Expanded: summary is replaced by full headers, full body, and attachments. Attachments render one-per-row as filetype icon + filename + size. |
-| **Stage** | Generated by the Kanban drag or the stage dropdown in the opportunity drawer. Writes a `development_stage_events` row. An optional note attached at change-time creates a paired `development_notes` row with `source='stage_change'`. | One line: `from-chip → to-chip · author`. If a note was attached, its body renders inline beneath the chips. |
+| **Stage** | Generated by the Kanban drag or the stage dropdown in the opportunity drawer. Writes a `development_stage_events` row. | One line: `from-chip → to-chip · author`. Staff can add a separate note when stage context is needed. |
 | **Money** | One row per `development_amounts` insert/update. | One line: `$amount · ask / commit / receive · campaign · author`. For realized receipts, include `received May 15, 2026`. For `receive` rows with `due_on` but no `received_on`, show `expected $amount · due Jun 30`. In-kind receipts can render as `In-kind received · <description>` with optional estimated value. |
 | **File** | One row per `development_opportunity_attachments` insert (cycle-specific files). Relationship-level files appear on the relationship timeline. | One line: filetype icon · `Attached <filename> · size`. |
 | **Reporting** | One row when `reporting_completed_on` is set on the opportunity. Generates a `development_notes` row with `source='report_completed'`. | One line: `Report submitted · author`. Optional body if the user added one. |
@@ -690,7 +690,7 @@ Fields:
 A follow-up is a discrete actionable item:
 
 - Stored in `development_followups` with `parent_kind` + `parent_id`, title, due date, completion fields, and reminder metadata. Owners live in `development_followup_owners`, so a task can have zero, one, or many owners.
-- Created from the activity composer `Task` button, an explicit task/follow-up affordance in the opportunity drawer, or auto-suggested by the stage-change modal (per-stage default offset configurable in admin).
+- Created from the activity composer `Task` button or an explicit task/follow-up affordance in the opportunity drawer.
 - The New task modal collects title, due date, and owners using the shared PeoplePicker/MultiPeoplePicker pattern. The picker can choose the opportunity lead, named supporters, or another person from `people`; it may also be empty when the task is intentionally unassigned.
 - Surfaced in four places: (a) the opportunity activity stream, (b) the dashboard Calendar, (c) the staff dashboard KPI strip + Overdue banner, (d) Monday morning Mailgun digest to each task owner.
 - In the activity stream, tasks appear in the same date-ordered timeline as every other activity item. Future tasks are not broken into a separate `Upcoming` list; they sort by due date alongside past/current items. Open overdue tasks appear with red overdue treatment. Completed tasks render as completed activity with checkbox checked, completion date, and optional completion note.
@@ -823,7 +823,7 @@ Collect the structural fields that determine the rest of the wizard.
 | E8 organization | Compact choice: E8 Angels / E8 Impact / Both | Required. Asked here because it belongs with the opportunity's structure, not the durable relationship. Defaults to the most recent E8 organization used for this funder, falling back to 501c6. |
 | Opportunity lead | Person picker, staff only | Defaults to current user. Exactly one lead per opportunity. |
 
-Every opportunity created through the wizard starts in `Prospect`. Stage changes happen after creation through the Kanban drag or opportunity detail stage dropdown so every non-initial stage transition can collect a note and follow-up.
+Every opportunity created through the wizard starts in `Prospect`. Stage changes happen after creation through the Kanban drag or opportunity detail stage dropdown.
 
 Do not ask for relationship Source in the visible wizard flow. Source remains available in the edit-details modal and import tooling.
 
@@ -880,7 +880,7 @@ Editing happens directly on the relevant detail page — no separate "edit mode"
 - Inline-editable facts: Campaign, Amount components, Committed, Received, Application deadline, Decision expected, Term start/end, Application URL, Source, Fiscal year. Hover reveals pencil; click activates the matching control; Save on blur or Return.
 - Per-row affordances on Money / Attachments.
 - The opportunity panel pencil reveals inline controls for Name, Type, Subtype (when Type=Sponsorship), E8 organization, Campaign, Restricted + notes, Reporting required + due, and Renewal of. Routine edits do not use a full edit dialog.
-- The stage dropdown in the opportunity tab is the only in-page stage-change affordance and opens the stage-change modal (the only path that writes `development_stage_events`).
+- The stage dropdown in the opportunity tab is the only in-page stage-change affordance and writes `development_stage_events` without a modal.
 
 **Renewal:**
 - `Clone for next cycle` button on opportunity detail (visible when stage is Received or Declined). Opens the New Opportunity wizard pre-populated from this opportunity, with `renewal_of_opportunity_id` set and stage defaulting to Prospect. Term dates shift by one period (default 1 year) and the user adjusts before submitting.
@@ -896,18 +896,18 @@ Editing happens directly on the relevant detail page — no separate "edit mode"
 - **Outbound staff-sent email** — Gmail OAuth via `lib/email-sender.js`, identical wiring to entrepreneur messaging. The contact email affordance opens the same compose flow used elsewhere.
 - **Email auto-ingest into the Activity timeline** — Google Pub/Sub pushes each new Gmail message to the portal webhook (the existing webhook used elsewhere; extend it with a development matcher if not already present). On each delivery the webhook resolves all sender/recipient addresses against `people.email` and checks for membership in `development_contacts`. On a match it writes a `development_email_events` row (idempotent on `gmail_message_id`) plus one `development_email_attachments` row per attachment, all scoped to the matched funder. Opportunity tagging is manual (an `Attach to opportunity` action on the email card) for v1; subject-line heuristics can be added later. SWR invalidation: tag `development`.
 
-## 8. Spreadsheet import
+## 8. Data-query data loading reference
 
 Source: `uploads/E8 Master Sponsor List.xlsx`.
 
-Each spreadsheet row becomes one funder + one or more opportunities. The columns map roughly:
+There is no separate spreadsheet importer in v1. When test or migrated data is loaded through governed data-query write support, use this mapping so spreadsheet rows become one funder + one or more opportunities:
 
 1. **Funder row** — Sponsor / Org Name + Sponsor Type + Source → `development_funders`. Matching gift eligibility lands on the funder.
 2. **Annual giving columns** (`2023 Actual`, `2024 Actual`, `2025 Actual`, `2026 Goal`, `2026 Actual`) — each nonzero amount becomes an **opportunity** for that fiscal year. `type` inferred from funder type (Foundation → `grant`; Corporate → `sponsorship`/`annual`; Individual → `gift`). `stage` derived: realized actuals → `received`; 2026 Goal (no actual yet) → stage from the Stage column. `development_amounts` rows: a `commit` row and a `receive` row per realized year (default `nature='cash'`); an `ask` row for 2026.
 3. **Ask Range** — parsed midpoint (or floor for "$X+"), stored as a `development_amounts` row with `kind='ask'`, `nature='cash'` on the 2026 (current FY) opportunity; original string in `note`.
 4. **Stage** column — applied to the current-FY opportunity, not the funder.
 5. **Foundation Prospects sheet** — one funder per foundation (`funder_type='foundation'`) + one opportunity per active pursuit (`type='grant'`, stage from Outreach Status). Focus area tags into `notes_freeform` on the funder. Grant deadlines into the opportunity's `application_deadline`.
-6. **Email Activity Log sheet** — one `development_notes` row per entry. Default `parent_kind='funder'` since spreadsheet entries don't reliably map to a specific cycle; importer can attempt opp matching when the entry text contains a year that matches an FY opportunity. `occurred_at` from Date, `body_markdown` from Subject/Summary, author resolved by matching staff name to `people.email` (default to `legacy-import@e8angels` placeholder if not resolvable).
+6. **Email Activity Log sheet** — one `development_notes` row per entry. Default `parent_kind='funder'` since spreadsheet entries don't reliably map to a specific cycle; the data-loading prompt can attempt opp matching when the entry text contains a year that matches an FY opportunity. `occurred_at` from Date, `body_markdown` from Subject/Summary, author resolved by matching staff name to `people.email` (default to `legacy-import@e8angels` placeholder if not resolvable).
 7. **Multi-value contact / email cells** — split into separate `people` rows and link via `development_contacts`. First listed becomes `is_primary=1`.
 8. **Multi-assignee cells** — collapse to a single lead: the first listed name becomes `development_funders.lead_person_record_id` (and is inherited as the current-FY opportunity's `lead_person_record_id`). Any additional names from the same cell are imported into `development_opportunity_supporters` on the current-FY opportunity so the relationship isn't lost — Karin reviews via the dry-run CSV and can promote one to lead if the import picked the wrong primary.
 9. **Mixed-format dates** — `Last Communication` and `Email Activity Log` columns mix `"2026-05-01"`, `"2024"`, `"Jan 2026"`. Parse to YMD where possible; store original string in the note body where not.
@@ -928,7 +928,7 @@ Work is executed sequentially. The Development CRM is released to the team only 
 
 ### Phase 2 — Core CRUD
 - Relationship + opportunity list/detail surfaces
-- Stage Kanban on opportunities with drag-to-advance and stage-change prompts
+- Stage Kanban on opportunities with drag-to-advance, optimistic DOM updates, and no stage-change prompt
 - Conversation log (polymorphic) + attachments (relationship + opportunity scopes)
 - Lead + primary contact assignment
 - Inline editing of all required fields
@@ -942,7 +942,7 @@ Work is executed sequentially. The Development CRM is released to the team only 
 ### Phase 4 — Follow-ups + reminders
 - `development_followups` CRUD (polymorphic)
 - Mailgun reminders (per-follow-up + Monday digest + reporting-due reminders)
-- Overdue widget + auto-suggested follow-up dates on stage change
+- Overdue widget + explicit follow-up/task creation
 - Auto role-tag recompute helper + nightly cron
 
 ### Phase 5 — Board dashboard
