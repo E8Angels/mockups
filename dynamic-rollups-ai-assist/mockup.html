@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dynamic Rollups and AI View Assist</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  html { font-size: 18px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .mode-option { display:flex; align-items:center; height:32px; padding:0 10px; border:1px solid #cbd5e1; background:#fff; color:#334155; font-size:12px; cursor:pointer; }
+  .mode-option:first-child { border-radius:6px 0 0 6px; }
+  .mode-option:last-child { border-radius:0 6px 6px 0; border-left:0; }
+  .mode-option.on { background:#0f172a; border-color:#0f172a; color:#fff; }
+  .msg { max-width:86%; border:1px solid #e2e8f0; border-radius:8px; padding:8px 10px; font-size:13px; line-height:1.35; }
+  .msg.user { margin-left:auto; background:#eff6ff; border-color:#bfdbfe; color:#1e3a8a; }
+  .msg.ai { background:#fff; color:#0f172a; }
+  .view-pill { display:inline-flex; align-items:center; gap:4px; height:22px; padding:0 7px; border-radius:999px; background:#f1f5f9; color:#334155; font-size:11px; border:1px solid #e2e8f0; }
+  .proposal-box { border:1px solid #cbd5e1; background:#fff; border-radius:8px; }
+  .proposal-row { display:grid; grid-template-columns:96px minmax(0,1fr); gap:8px; padding:6px 10px; border-top:1px solid #f1f5f9; }
+  .proposal-row:first-child { border-top:0; }
+</style>
+</head>
+<body class="bg-slate-100 text-slate-900 text-sm">
+  <main class="mx-auto max-w-[980px] px-4 py-5">
+    <section class="overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
+      <div class="flex items-center gap-3 border-b border-slate-200 px-4 py-3">
+        <div class="font-semibold text-sm">AI view assist</div>
+        <div class="ml-auto flex items-center gap-2">
+          <span class="view-pill">Companies</span>
+          <span class="view-pill">Current view: Active portfolio</span>
+        </div>
+      </div>
+
+      <div class="border-b border-slate-100 p-4">
+        <div class="flex items-center">
+          <div class="w-24 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">Mode</div>
+          <div class="flex min-w-0">
+            <button class="mode-option on">New view</button>
+            <button class="mode-option">New from current</button>
+            <button class="mode-option">Edit current</button>
+          </div>
+        </div>
+        <div class="mt-2 flex items-center">
+          <label for="saveScope" class="w-24 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">Save as</label>
+          <select id="saveScope" autocomplete="off" data-lpignore="true" data-form-type="other" class="h-8 w-[150px] rounded-md border border-slate-300 bg-white px-2 text-xs">
+            <option>Personal</option>
+            <option>Shared</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="min-h-[360px] max-h-[54vh] space-y-3 overflow-auto bg-slate-50 p-4">
+        <div class="msg ai">Tell me what view you need.</div>
+        <div class="msg user">Give me a view that shows portfolio companies that have some interest in the built environment and have pitched to us in the last 10 years.</div>
+        <div class="msg ai">I can do that. Should built environment mean the primary sector only, or should I search application text too?</div>
+        <div class="msg user">Search the application text too.</div>
+        <div class="msg ai">
+          <div class="mb-2 font-semibold">Proposed view: Built environment portfolio pitches</div>
+          <div class="proposal-box">
+            <div class="proposal-row"><div class="text-slate-500">Filters</div><div>Have we invested? = Yes<br>Application content contains built environment OR construction OR buildings<br>Latest pitch date is in the last 10 years</div></div>
+            <div class="proposal-row"><div class="text-slate-500">Columns</div><div>Company, Sector, Furthest stage, Latest pitch date, Total invested, Status, Last touch</div></div>
+            <div class="proposal-row"><div class="text-slate-500">Sort</div><div>Latest pitch date descending</div></div>
+            <div class="proposal-row"><div class="text-slate-500">Save</div><div>New personal Companies view</div></div>
+          </div>
+        </div>
+        <div class="msg user">Add whether they offered warrants.</div>
+        <div class="msg ai">
+          <div class="mb-2 font-semibold">New derived field needed: Has offered warrants</div>
+          <div class="proposal-box">
+            <div class="proposal-row"><div class="text-slate-500">Row base</div><div>Companies</div></div>
+            <div class="proposal-row"><div class="text-slate-500">Path</div><div>Companies -> Applications -> Deal terms metadata</div></div>
+            <div class="proposal-row"><div class="text-slate-500">Result</div><div>Yes when any related application includes warrant terms</div></div>
+            <div class="proposal-row"><div class="text-slate-500">Next</div><div>Create the derived field, then add it as a column and filter.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-100 p-3">
+        <textarea autocomplete="off" data-lpignore="true" data-form-type="other" class="min-h-[72px] w-full resize-y rounded-md border border-slate-300 px-3 py-2 text-sm" placeholder="Ask for a view or a refinement..."></textarea>
+        <div class="mt-2 flex items-center gap-2">
+          <button class="h-8 rounded-md bg-slate-900 px-3 text-xs font-medium text-white hover:bg-slate-800">Send</button>
+          <button class="h-8 rounded-md border border-slate-300 px-3 text-xs hover:bg-slate-50">Create view</button>
+          <button class="h-8 rounded-md border border-slate-300 px-3 text-xs hover:bg-slate-50">Create derived field</button>
+          <button class="h-8 rounded-md border border-slate-300 px-3 text-xs hover:bg-slate-50">Preview only</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -2,6 +2,7 @@
 title: Development CRM
 status: draft
 owner: jordan
+last_updated: 2026-05-27
 home: staff-dashboard.html
 ---
 
@@ -10,24 +11,24 @@ home: staff-dashboard.html
 ## Mockup files in this folder
 
 - **`staff-dashboard.html`** (home) — the development team's working surface (Opportunity Kanban + List + Calendar).
-- **`entity-detail.html`** — the combined relationship and opportunity workspace for one organization or individual.
+- **`entity-detail.html`** — the combined funder and opportunity workspace for one organization or individual.
 - **`development-committee-dashboard.html`** — committee-style Development dashboard for board / development committee members.
-- **`impact-report.html`** — the impact report (§6e).
+- **`implementation-checklist.md`** — durable implementation ledger for the orchestrator agent.
 
 ## 1. Purpose
 
 The Development CRM is the portal-native workspace for tracking supporter and prospect relationships, logging conversations, managing follow-ups, and visualizing pipeline progress against fundraising goals. It reuses the portal's people table, role/permission system, notification stack, and notes/attachments patterns rather than creating parallel infrastructure.
 
-The model separates durable relationships from individual fundraising cycles. An **Entity** is the organization or individual relationship. An **Opportunity** is a specific grant cycle, sponsorship term, or one-off gift. This lets the system preserve cross-cycle context while keeping pipeline work, legal-entity reporting, deadlines, and money tied to the specific opportunity where they belong.
+The model separates durable funder records from individual fundraising cycles. A **Funder** is the organization or individual relationship. An **Opportunity** is a specific grant cycle, sponsorship term, or one-off gift. This lets the system preserve cross-cycle context while keeping pipeline work, E8 organization reporting, deadlines, and money tied to the specific opportunity where they belong.
 
 ## 2. System Decisions
 
 - **Data storage** — same Turso database as the rest of the portal. New tables, no separate schema. All SQL goes through `CacheManager` per AGENTS.md §"Database Query Centralization".
 - **Auth / SSO** — same portal login. Admins managed exactly like other staff (`auth_admins`).
 - **Mobile** — mobile-responsive from v1. Cheaper than retrofitting later.
-- **Notifications** — system alerts, follow-up reminders, and reporting-deadline reminders via Mailgun (`lib/mailgun.js`). Outbound emails Karin or another staff member sends *as themselves* to an entity contact use Google OAuth (`lib/email-sender.js`), same path entrepreneur messages use today.
-- **Goal tracking** — track by campaign/program. Annual rollup is a derived view. Goals are per-campaign per-legal-entity; money rolls up through opportunities.
-- **Legal-entity reporting** — track separately per legal entity AND together. Legal entity (501c6 / 501c3 / both) lives on the **opportunity**, not the entity, because a single funder can give to either side year over year. Dashboards have a legal-entity toggle (E8 Angels / E8 Impact / All).
+- **Notifications** — system alerts, follow-up reminders, and reporting-deadline reminders via Mailgun (`lib/mailgun.js`). Outbound emails Karin or another staff member sends *as themselves* to a funder contact use Google OAuth (`lib/email-sender.js`), same path entrepreneur messages use today.
+- **Goal tracking** — track by campaign/program. Annual rollup is a derived view. Goals are per campaign and E8 organization; money rolls up through opportunities.
+- **E8 organization reporting** — track E8 Angels and E8 Impact separately and together. E8 organization (501c6 / 501c3 / both) lives on the **opportunity**, not the funder, because a single funder can give to either side year over year. Dashboards have an E8 organization toggle (E8 Angels / E8 Impact / All).
 - **Board notifications** — the portal is the canonical surface; the dev committee has a board view (§6d).
 - **Board onboarding** — already handled. Board members are in the portal; we use the existing `BoardMember` role.
 - **Spreadsheet import** — import the master sponsor spreadsheet (see §8). This is in scope for v1.
@@ -36,15 +37,15 @@ The model separates durable relationships from individual fundraising cycles. An
 
 The portal models fundraising as a two-level relationship:
 
-- **Entity** (`development_entities`) — the durable record for an organization or individual on the giving side. Long-lived. Carries the relationship's contacts, single relationship owner, durable attachments (master MSAs, signed multi-year agreements), email correspondence, and free-text "about" notes.
-- **Opportunity** (`development_opportunities`) — a specific grant cycle, sponsorship term, or one-off gift. One entity has zero or more opportunities; each opportunity belongs to exactly one entity. The pipeline (Prospect → Received) lives on the opportunity, not the entity. Every gift, even a one-time $500 individual donation, is modeled as an opportunity ("Smith Family Gift 2026"). An entity with no opportunities is a cold prospect — visible in the directory but not on the Kanban.
+- **Funder** (`development_funders`) — the durable record for an organization or individual on the giving side. Long-lived. Carries the relationship's contacts, single relationship lead, durable attachments (master MSAs, signed multi-year agreements), email correspondence, and free-text "about" notes.
+- **Opportunity** (`development_opportunities`) — a specific grant cycle, sponsorship term, or one-off gift. One funder has zero or more opportunities; each opportunity belongs to exactly one funder. The pipeline (Prospect → Received) lives on the opportunity, not the funder. Every gift, even a one-time $500 individual donation, is modeled as an opportunity ("Smith Family Gift 2026"). A funder with no opportunities is a cold prospect — visible in the directory but not on the Kanban.
 
 What lives where:
 
-| Concept | Entity-level | Opportunity-level |
+| Concept | Funder-level | Opportunity-level |
 |---|---|---|
 | Pipeline stage | — | yes |
-| Legal entity (501c6/501c3) | — | yes |
+| E8 organization (501c6/501c3) | — | yes |
 | Campaign | — | yes |
 | Money (ask/commit/receive) | — | yes |
 | Application deadlines, decision dates | — | yes |
@@ -55,8 +56,8 @@ What lives where:
 | Conversation notes | polymorphic (default to current page's scope) | polymorphic |
 | Follow-ups | polymorphic | polymorphic |
 | Attachments | yes (durable: MSAs, brand kits) | yes (cycle-specific: LOIs, signed grants) |
-| Owner | yes (single relationship owner) | yes (single per-opp staff member for that cycle's write-up) |
-| Advocates | — (computed from in-flight opps' advocates) | yes (0..n internal E8 helpers, typically board members) |
+| Lead | yes (single relationship lead) | yes (single per-opp staff member for that cycle's write-up) |
+| Support | — (computed from in-flight opps' supporters) | yes (0..n internal E8 helpers, typically board members) |
 | Source of relationship | yes | yes (this specific opp's source can differ) |
 
 The Kanban, the dashboard KPIs, and most day-to-day work are opportunity-oriented. The combined relationship/opportunity drawer is where the development team reviews the relationship, works the active opportunity, and can inspect historical opportunities without leaving the dashboard.
@@ -73,10 +74,10 @@ All new tables. SQL ships in `scripts/migrate-add-development-crm.sql`; `createT
 
 System-managed person tags (never edited by hand; see §4.1.a):
 
-- `Sponsor` — contact at an entity with at least one currently-active sponsorship opportunity (stage Committed or Received; `term_end_on` null or in the future)
-- `Sponsor Prospect` — contact at an entity with at least one in-pipeline sponsorship opportunity (stage Prospect, Outreach, Conversation, or Proposal) and no currently-active sponsorship at that entity
-- `Past Sponsor` — contact at an entity that previously had an active sponsorship (stage Committed or Received with `term_end_on` now in the past) and no currently-active sponsorship; may co-exist with `Sponsor Prospect` if the relationship is being re-courted
-- `Funder` — contact at an entity with at least one grant opportunity, at any stage, at any time (no temporal distinction; "prospective" and "past" funders are all `Funder`)
+- `Sponsor` — contact at a funder with at least one currently-active sponsorship opportunity (stage Committed or Received; `term_end_on` null or in the future)
+- `Sponsor Prospect` — contact at a funder with at least one in-pipeline sponsorship opportunity (stage Prospect, Outreach, Conversation, or Proposal) and no currently-active sponsorship at that funder
+- `Past Sponsor` — contact at a funder that previously had an active sponsorship (stage Committed or Received with `term_end_on` now in the past) and no currently-active sponsorship; may co-exist with `Sponsor Prospect` if the relationship is being re-courted
+- `Funder` — contact at a funder with at least one grant opportunity, at any stage, at any time (no temporal distinction; "prospective" and "past" funders are all `Funder`)
 
 Manually-set tag:
 
@@ -90,7 +91,7 @@ The four system-managed role strings above are computed by the portal, not edite
 
 Per-person evaluation (across all of a person's `development_contacts` links):
 
-1. Collect every non-archived opportunity at every entity the person is a contact on. Skip entities with `is_archived = 1`.
+1. Collect every non-archived opportunity at every funder the person is a contact on. Skip funders with `is_archived = 1`.
 2. Partition by `opportunity.type`:
    - Sponsorship-type = `type = 'sponsorship'` (any subtype: `annual`, `event`, `other`)
    - Grant-type = `type = 'grant'`
@@ -98,16 +99,16 @@ Per-person evaluation (across all of a person's `development_contacts` links):
 3. Sponsor tags (mutually exclusive within the sponsor family, with `Past Sponsor` and `Sponsor Prospect` allowed to co-exist when there is no current sponsorship):
    - If any sponsorship-type opp is in stage Committed or Received AND (`term_end_on IS NULL` OR `term_end_on >= today`) → `Sponsor`. Skip the other sponsor tags.
    - Else: add `Past Sponsor` if any sponsorship-type opp is in stage Committed or Received with `term_end_on < today`; add `Sponsor Prospect` if any sponsorship-type opp is in stage Prospect/Outreach/Conversation/Proposal. Both can apply.
-4. Funder tag: if any grant-type opp exists at any of the person's entities, at any stage, at any time → `Funder`.
+4. Funder tag: if any grant-type opp exists at any of the person's funders, at any stage, at any time → `Funder`.
 5. Remove any of the four tags from `people.roles` that do not apply.
 
 Triggers (each must call `recomputeDevelopmentRoleTags` with the affected person_record_id set):
 
 - Insert / delete on `development_contacts`
-- Insert on `development_stage_events` (recompute for every contact of the affected opportunity's entity)
+- Insert on `development_stage_events` (recompute for every contact of the affected opportunity's funder)
 - Update to `development_opportunities.term_end_on`, `development_opportunities.type`, or `development_opportunities.is_archived`
-- Update to `development_entities.is_archived`
-- A nightly cron pass that re-evaluates every person whose entities have an opportunity with `term_end_on` between yesterday and today (so `Sponsor` → `Past Sponsor` transitions happen the morning after a term ends without requiring a write to anything)
+- Update to `development_funders.is_archived`
+- A nightly cron pass that re-evaluates every person whose funders have an opportunity with `term_end_on` between yesterday and today (so `Sponsor` → `Past Sponsor` transitions happen the morning after a term ends without requiring a write to anything)
 
 Implementation lives in `src/lib/development/role-tags.js`. Backfill once on deploy via `scripts/backfill-development-role-tags.js` (dry-run by default per AGENTS.md). Glossary entry in §4.5 must flag these as system-managed and document the rules.
 
@@ -120,27 +121,27 @@ The `Team Member` role from Karin's §7 resolves to any logged-in staff (`SiteAd
 ### 4.3 Tables
 
 ```sql
--- Entity (org-level OR individual). One row per long-lived relationship.
-CREATE TABLE development_entities (
+-- Funder (org-level OR individual). One row per long-lived relationship.
+CREATE TABLE development_funders (
   id TEXT PRIMARY KEY,                                  -- dent_<hex>
   display_name TEXT NOT NULL,                           -- "Walton Family Foundation" or "Jane Smith"
-  entity_type TEXT NOT NULL CHECK (entity_type IN
+  funder_type TEXT NOT NULL CHECK (funder_type IN
     ('corporate','individual','foundation','government')),
   source TEXT,                                          -- how this relationship started; opps have their own
   matching_gift_eligible INTEGER,                       -- corporate only; nullable
-  notes_freeform TEXT,                                  -- the entity-level "about" / Tags-Notes field
+  notes_freeform TEXT,                                  -- the funder-level "about" / Tags-Notes field
   primary_contact_person_record_id TEXT,                -- denorm; FK -> people.record_id
-  owner_person_record_id TEXT,                          -- single relationship owner; FK -> people.record_id
+  lead_person_record_id TEXT,                          -- single relationship lead; FK -> people.record_id
   is_archived INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX idx_development_entities_type ON development_entities(entity_type);
+CREATE INDEX idx_development_funders_type ON development_funders(funder_type);
 
 -- Opportunity. One row per grant cycle, sponsorship term, or one-off gift.
 CREATE TABLE development_opportunities (
   id TEXT PRIMARY KEY,                                  -- dopp_<hex>
-  entity_id TEXT NOT NULL,                              -- FK -> development_entities.id
+  funder_id TEXT NOT NULL,                              -- FK -> development_funders.id
   name TEXT NOT NULL,                                   -- "Wilmington Scholarship 2026"
   type TEXT NOT NULL CHECK (type IN ('grant','sponsorship','gift')),
   subtype TEXT CHECK (
@@ -150,7 +151,7 @@ CREATE TABLE development_opportunities (
   stage TEXT NOT NULL CHECK (stage IN
     ('prospect','outreach','conversation','proposal',
      'committed','received','declined')),               -- denorm of latest stage event
-  legal_entity TEXT NOT NULL CHECK (legal_entity IN
+  e8_organization TEXT NOT NULL CHECK (e8_organization IN
     ('501c6','501c3','both')),                          -- E8 Angels / E8 Impact / Both
   campaign_id TEXT,                                     -- FK -> development_campaigns.id
   fiscal_year INTEGER,                                  -- derived/denorm for filtering
@@ -172,6 +173,7 @@ CREATE TABLE development_opportunities (
   -- Sponsorship / grant period:
   term_start_on TEXT,                                   -- when the sponsorship or grant period begins
   term_end_on TEXT,                                     -- when it ends (drives Sponsor → Past Sponsor)
+  event_name TEXT,                                      -- free-text event name when type='sponsorship' and subtype='event'
 
   -- Application link:
   application_url TEXT,                                 -- portal URL for the grant or sponsorship application
@@ -191,8 +193,8 @@ CREATE TABLE development_opportunities (
   -- Decline metadata (set when stage moves to 'declined'):
   decline_reason TEXT,
 
-  -- Single owner per opportunity (staff member accountable for the cycle).
-  owner_person_record_id TEXT,                          -- FK -> people.record_id
+  -- Single lead per opportunity (staff member accountable for the cycle).
+  lead_person_record_id TEXT,                          -- FK -> people.record_id
 
   source TEXT,                                          -- this opp's source ("repeat funder", "warm intro at GreenBiz")
   notes_freeform TEXT,                                  -- opp-level "about"
@@ -200,10 +202,10 @@ CREATE TABLE development_opportunities (
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX idx_development_opportunities_entity ON development_opportunities(entity_id);
+CREATE INDEX idx_development_opportunities_funder ON development_opportunities(funder_id);
 CREATE INDEX idx_development_opportunities_stage ON development_opportunities(stage);
 CREATE INDEX idx_development_opportunities_type ON development_opportunities(type, subtype);
-CREATE INDEX idx_development_opportunities_legal_entity ON development_opportunities(legal_entity);
+CREATE INDEX idx_development_opportunities_e8_organization ON development_opportunities(e8_organization);
 CREATE INDEX idx_development_opportunities_campaign ON development_opportunities(campaign_id);
 CREATE INDEX idx_development_opportunities_fy ON development_opportunities(fiscal_year);
 CREATE INDEX idx_development_opportunities_deadline ON development_opportunities(application_deadline)
@@ -211,35 +213,35 @@ CREATE INDEX idx_development_opportunities_deadline ON development_opportunities
 CREATE INDEX idx_development_opportunities_reporting_due ON development_opportunities(reporting_due_on)
   WHERE reporting_due_on IS NOT NULL AND reporting_completed_on IS NULL;
 
--- Contacts at an entity. Reuses people table. Contacts persist across opportunities.
+-- Contacts at a funder. Reuses people table. Contacts persist across opportunities.
 CREATE TABLE development_contacts (
-  entity_id TEXT NOT NULL,
+  funder_id TEXT NOT NULL,
   person_record_id TEXT NOT NULL,
   role_at_org TEXT,                                     -- "VP Partnerships" / "Program Officer" (override of people.title)
   is_primary INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (entity_id, person_record_id)
+  PRIMARY KEY (funder_id, person_record_id)
 );
 
--- Owners are stored as a single `owner_person_record_id` column on `development_entities`
--- (relationship owner) and on `development_opportunities` (opportunity owner). There is
--- exactly one of each — no co-owners, no primary/secondary. Switching owner is a single
--- UPDATE; we keep the change history in `development_notes` (source='owner_changed') so
--- a separate ownership-events table is not needed for v1.
+-- Leads are stored as a single `lead_person_record_id` column on `development_funders`
+-- (relationship lead) and on `development_opportunities` (opportunity lead). There is
+-- exactly one of each — no co-leads, no primary/secondary. Switching lead is a single
+-- UPDATE; we keep the change history in `development_notes` (source='lead_changed') so
+-- a separate lead assignment-events table is not needed for v1.
 
--- Opportunity advocates. An advocate is an internal E8 person (board member, exec, staff)
--- *helping* move a specific opportunity forward without being the accountable owner.
+-- Opportunity supporters. A supporter is an internal E8 person (board member, exec, staff)
+-- *helping* move a specific opportunity forward without being the accountable lead.
 -- Cardinality is 0..n per opportunity, skewed toward 0 and 1. See §6c.iv.
-CREATE TABLE development_opportunity_advocates (
+CREATE TABLE development_opportunity_supporters (
   opportunity_id TEXT NOT NULL,                         -- FK -> development_opportunities.id
   person_record_id TEXT NOT NULL,                       -- FK -> people.record_id; must resolve to a board member or staff member
   notes TEXT,                                           -- "knows program officer directly"; "made the intro at GreenBiz"
-  notification_suppressed INTEGER NOT NULL DEFAULT 0,   -- per-advocate opt-out from the good-news pings on stage advances
+  notification_suppressed INTEGER NOT NULL DEFAULT 0,   -- per-supporter opt-out from the good-news pings on stage advances
   added_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   added_by_person_record_id TEXT,
   PRIMARY KEY (opportunity_id, person_record_id)
 );
-CREATE INDEX idx_development_opportunity_advocates_person ON development_opportunity_advocates(person_record_id);
+CREATE INDEX idx_development_opportunity_supporters_person ON development_opportunity_supporters(person_record_id);
 
 -- Money. Always tied to an opportunity. ask vs commit vs receive, cash vs in-kind.
 -- Multi-installment pledges: one 'commit' row + multiple 'receive' rows, each with due_on/received_on.
@@ -279,12 +281,12 @@ CREATE TABLE development_stage_events (
 );
 CREATE INDEX idx_development_stage_events_opp ON development_stage_events(opportunity_id, changed_at);
 
--- Conversation log. Polymorphic: a note attaches to either an entity or an opportunity.
+-- Conversation log. Polymorphic: a note attaches to either a funder or an opportunity.
 -- Append-only; 10-minute edit window enforced in route.
 CREATE TABLE development_notes (
   id TEXT PRIMARY KEY,                                  -- dnote_<hex>
-  parent_kind TEXT NOT NULL CHECK (parent_kind IN ('entity','opportunity')),
-  parent_id TEXT NOT NULL,                              -- FK to dev_entities.id or dev_opportunities.id
+  parent_kind TEXT NOT NULL CHECK (parent_kind IN ('funder','opportunity')),
+  parent_id TEXT NOT NULL,                              -- FK to dev_funders.id or dev_opportunities.id
   author_person_record_id TEXT NOT NULL,
   source TEXT NOT NULL CHECK (source IN
     ('manual',                  -- staff entered via Add-a-note
@@ -303,11 +305,11 @@ CREATE TABLE development_notes (
 );
 CREATE INDEX idx_development_notes_parent ON development_notes(parent_kind, parent_id, occurred_at);
 
--- Email events ingested via Google Pub/Sub. Always entity-scoped (people are on entities, not opportunities).
+-- Email events ingested via Google Pub/Sub. Always funder-scoped (people are on funders, not opportunities).
 -- An email can optionally be tagged to one or more opportunities via development_opportunity_email_links.
 CREATE TABLE development_email_events (
   id TEXT PRIMARY KEY,                                  -- demail_<hex>
-  entity_id TEXT NOT NULL,
+  funder_id TEXT NOT NULL,
   gmail_message_id TEXT NOT NULL UNIQUE,                -- Gmail Message-ID header
   thread_id TEXT,
   direction TEXT NOT NULL CHECK (direction IN ('inbound','outbound')),
@@ -321,7 +323,7 @@ CREATE TABLE development_email_events (
   has_attachments INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX idx_development_email_events_entity ON development_email_events(entity_id, occurred_at);
+CREATE INDEX idx_development_email_events_funder ON development_email_events(funder_id, occurred_at);
 
 -- Junction: tag an email to one or more opportunities so it surfaces on those opps' timelines.
 -- Set manually by staff ("attach this thread to this grant cycle") or by simple matching rules
@@ -360,10 +362,10 @@ CREATE TABLE development_note_attachments (
   uploaded_by_person_record_id TEXT
 );
 
--- Entity-level durable attachments (master MSAs, brand kits, signed multi-year agreements).
-CREATE TABLE development_entity_attachments (
+-- Funder-level durable attachments (master MSAs, brand kits, signed multi-year agreements).
+CREATE TABLE development_funder_attachments (
   id TEXT PRIMARY KEY,
-  entity_id TEXT NOT NULL,
+  funder_id TEXT NOT NULL,
   google_drive_file_id TEXT NOT NULL,
   google_drive_folder_id TEXT NOT NULL,
   filename TEXT NOT NULL,
@@ -390,14 +392,13 @@ CREATE TABLE development_opportunity_attachments (
   uploaded_by_person_record_id TEXT
 );
 
--- Follow-ups. Polymorphic: attach to entity OR opportunity.
+-- Follow-ups / tasks. Polymorphic: attach to funder OR opportunity.
 CREATE TABLE development_followups (
   id TEXT PRIMARY KEY,
-  parent_kind TEXT NOT NULL CHECK (parent_kind IN ('entity','opportunity')),
+  parent_kind TEXT NOT NULL CHECK (parent_kind IN ('funder','opportunity')),
   parent_id TEXT NOT NULL,
   title TEXT NOT NULL,
   due_on TEXT NOT NULL,                                 -- YYYY-MM-DD, Pacific business calendar
-  assignee_person_record_id TEXT NOT NULL,              -- owner, advocate, or another person in people
   reminder_note TEXT,
   completed_at TEXT,
   completed_by_person_record_id TEXT,
@@ -410,7 +411,17 @@ CREATE INDEX idx_development_followups_due ON development_followups(due_on)
   WHERE completed_at IS NULL;
 CREATE INDEX idx_development_followups_parent ON development_followups(parent_kind, parent_id);
 
--- Campaigns / programs. Goal tracking is per-campaign per-legal-entity.
+-- Task owners. A task can have zero or more owners; the UI uses the shared people picker.
+CREATE TABLE development_followup_owners (
+  followup_id TEXT NOT NULL,                            -- FK -> development_followups.id
+  person_record_id TEXT NOT NULL,                       -- FK -> people.record_id
+  added_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  added_by_person_record_id TEXT,
+  PRIMARY KEY (followup_id, person_record_id)
+);
+CREATE INDEX idx_development_followup_owners_person ON development_followup_owners(person_record_id);
+
+-- Campaigns / programs. Goal tracking is per-campaign per-E8-organization.
 CREATE TABLE development_campaigns (
   id TEXT PRIMARY KEY,                                  -- dcamp_<hex>
   name TEXT NOT NULL,                                   -- "FY26 Annual Fund"
@@ -421,17 +432,17 @@ CREATE TABLE development_campaigns (
 
 CREATE TABLE development_campaign_goals (
   campaign_id TEXT NOT NULL,
-  legal_entity TEXT NOT NULL CHECK (legal_entity IN ('501c6','501c3','both')),
+  e8_organization TEXT NOT NULL CHECK (e8_organization IN ('501c6','501c3','both')),
   goal_cents INTEGER NOT NULL,
-  PRIMARY KEY (campaign_id, legal_entity)
+  PRIMARY KEY (campaign_id, e8_organization)
 );
 
 -- Recent-activity feed (board dashboard, §6d). Pre-materialized for cheap reads.
 -- Built by an SWR getter; stores recent items (30 days, hard-cap 500).
 CREATE TABLE development_activity_feed (
   id TEXT PRIMARY KEY,
-  entity_id TEXT NOT NULL,
-  opportunity_id TEXT,                                  -- nullable when event is entity-level
+  funder_id TEXT NOT NULL,
+  opportunity_id TEXT,                                  -- nullable when event is funder-level
   kind TEXT NOT NULL CHECK (kind IN
     ('new_opportunity','stage_advanced','commitment',
      'gift_received','note_added','report_submitted')),
@@ -450,25 +461,36 @@ ID prefixes follow the established convention (`dent_`, `dopp_`, `damt_`, `dnote
 
 Heavy composed reads land in SWR (AGENTS.md §"SWR Cache"):
 
-- `development.dashboard.staff` — staff Opportunity Kanban + KPIs (per-legal-entity-filtered variants built per request, not cached)
+- `development.dashboard.staff` — staff Opportunity Kanban + KPIs (per-E8-organization-filtered variants built per request, not cached)
 - `development.dashboard.board` — board read-only dashboard
 - `development.activity-feed.30d` — feed materialization
-- `development.entity-directory` — full entities directory (small dataset; full refresh on writes)
+- `development.funder-directory` — full funders directory (small dataset; full refresh on writes)
 - Tags: `development`, `development-goals`, `development-followups`
 
-Invalidate `development` on any write to `development_entities`, `development_opportunities`, `development_amounts`, `development_stage_events`. Invalidate `development-followups` separately because that view's TTL can be much shorter.
+Invalidate `development` on any write to `development_funders`, `development_opportunities`, `development_amounts`, `development_stage_events`. Invalidate `development-followups` separately because that view's TTL can be much shorter.
 
 ### 4.5 Glossary updates (mandatory per AGENTS.md)
 
 `docs/data-query-glossary.md`:
-- Add new section "Development (fundraising)" covering `development_entities`, `development_opportunities`, `development_amounts`, `development_notes`, `development_followups`, `development_campaigns`, `development_email_events`.
+- Add new section "Development (fundraising)" covering `development_funders`, `development_opportunities`, `development_amounts`, `development_notes`, `development_followups`, `development_campaigns`, `development_email_events`.
 - Add the new role strings to the role taxonomy and flag the four system-managed ones (`Sponsor`, `Sponsor Prospect`, `Past Sponsor`, `Funder`) as derived per §4.1.a.
 - Add a "Common gotcha" entry: "Development giving is not the same as `deployments`. `deployments` are E8's outbound investments into portfolio companies; `development_amounts` are gifts coming INTO E8."
-- Add a "Common gotcha" entry: "Pipeline stage lives on `development_opportunities`, not `development_entities`. An entity with two opportunities can have one in Received and another in Prospect at the same time. Asking 'what stage is Walton Family Foundation in?' is the wrong shape of question; ask about a specific opportunity."
+- Add a "Common gotcha" entry: "Pipeline stage lives on `development_opportunities`, not `development_funders`. A funder with two opportunities can have one in Received and another in Prospect at the same time. Asking 'what stage is Walton Family Foundation in?' is the wrong shape of question; ask about a specific opportunity."
 - Add a "Common gotcha" entry: "`development_amounts.kind = 'receive'` rows can be either expected (has `due_on`, null `received_on`) or realized (non-null `received_on`). KPIs that count 'Received' should filter on `received_on IS NOT NULL`."
 - Add a "Common gotcha" entry: "`development_amounts.nature` distinguishes cash from in-kind. In-kind rows still carry an `amount_cents` (the estimated cash value); the opportunity's `amount_*_cents` denorms sum across both. A single opportunity can mix cash and in-kind (e.g. a sponsor commits $10,000 + a case of wine). When reporting on 'cash raised' specifically, filter `nature = 'cash'`."
 - Add a "Common gotcha" entry: "Opportunity `type` is one of (`grant`, `sponsorship`, `gift`). `subtype` is non-null only when `type='sponsorship'` and is one of (`annual`, `event`, `other`). The dashboard and Kanban only surface the top-level `type`; `subtype` is a detail-page-only field. Don't write queries that filter by 'Annual Sponsorship' as if it were a top-level type — group by `type` and join `subtype` only when needed. 'In-kind' is not an opportunity type — it's a row-level `nature` on `development_amounts`, so a single opportunity can carry both cash and in-kind amount rows."
-- Add a "Common gotcha" entry: "Each opportunity has exactly one owner (`development_opportunities.owner_person_record_id`) and zero or more advocates (`development_opportunity_advocates`). An advocate is an *internal* E8 person (board member, exec, staff) *helping* — not the accountable owner. Tasks and follow-ups should never be assigned to an advocate by default. Conversely, contacts (`development_contacts`) live on the *entity* and are *external* — they're the funder/sponsor-side person. Advocate ≠ contact ≠ owner; the three roles never overlap on the same record."
+- Add a "Common gotcha" entry: "Each opportunity has exactly one lead (`development_opportunities.lead_person_record_id`) and zero or more supporters (`development_opportunity_supporters`). A supporter is an *internal* E8 person (board member, exec, staff) *helping* — not the accountable lead. Tasks and follow-ups should never be assigned to a supporter by default. Conversely, contacts (`development_contacts`) live on the *funder* and are *external* — they're the funder/sponsor-side person. Support ≠ contact ≠ lead; the three roles never overlap on the same record."
+
+### 4.6 Data-query skill write support
+
+The existing data-query skill is read-only today. For Development CRM, it becomes a governed read/write assistant for this domain:
+
+- It can create and edit Funders, Opportunities, Contacts, Tasks, Notes, Amounts, Receipts, stage changes, Support assignments, and task owners.
+- It uses the same glossary/schema/AI relationship registry metadata as read queries, plus a write-capability manifest that maps business actions to portal API endpoints and required resource permissions.
+- It never writes SQL directly. Mutations call portal routes that already validate permissions, normalize dates, write through `CacheManager`, invalidate SWR, recompute role tags, and append activity/audit rows.
+- Mutating actions require a structured confirmation preview before execution, including the exact Funder/Opportunity, fields changing, old values when known, and side effects such as notifications.
+- Creation flows support natural-language commands such as "create a Funder for Portland General Electric", "add an event sponsorship opportunity for Portland Sip and Share", "add Lisa and Karin as task owners", or "move Walton to Proposal and create a follow-up for Jordan and Lisa".
+- The skill can propose but not silently send outbound emails or board notifications. Any action that sends external communication remains an explicit portal flow.
 
 ## 5. Permissions
 
@@ -477,11 +499,11 @@ New resource keys (registered in `_seedResourceRegistry`, `lib/auth.js:274-348`)
 | Resource key | Bound roles | Purpose |
 |---|---|---|
 | `admin.development.read` | DevelopmentManager, ExecutiveDirector, SiteAdmin, BoardMember, DevelopmentCommittee | Open the module |
-| `admin.development.write` | DevelopmentManager, ExecutiveDirector, SiteAdmin | Create/edit entity + opportunity rows, stages, amounts |
+| `admin.development.write` | DevelopmentManager, ExecutiveDirector, SiteAdmin | Create/edit funder + opportunity rows, stages, amounts |
 | `admin.development.notes.write` | DevelopmentManager, ExecutiveDirector, SiteAdmin, *plus* logged-in staff | Log a conversation |
 | `admin.development.notes.write.board` | BoardMember, DevelopmentCommittee | "Log my interaction" (creates note with `source='manual_board'`) |
-| `admin.development.followups.write` | DevelopmentManager, ExecutiveDirector, SiteAdmin, plus assignee of any followup | Set / complete a follow-up |
-| `admin.development.export` | DevelopmentManager, ExecutiveDirector, SiteAdmin | CSV + impact report export |
+| `admin.development.followups.write` | DevelopmentManager, ExecutiveDirector, SiteAdmin, plus any task owner | Set / complete a follow-up |
+| `admin.development.export` | DevelopmentManager, ExecutiveDirector, SiteAdmin | CSV export |
 | `admin.development.goals.write` | DevelopmentManager, ExecutiveDirector, SiteAdmin | Edit campaign goals |
 | `admin.development.admin` | SiteAdmin, DevelopmentManager | Delete duplicates, archive |
 
@@ -498,58 +520,71 @@ All views mobile-responsive from day one (single-column collapse at narrow width
 
 Layout, top to bottom:
 
-1. **KPI strip** (6 cards): Received YTD vs. campaign goal (progress bar), Pipeline value (sum of asks across opps in stages Outreach → Proposal), Active opportunities (count in stages Outreach → Proposal), Overdue follow-ups (red if > 0), Avg gift size (received `development_amounts` rows only), Reporting due 30d (count of opps with `reporting_due_on` within 30 days). KPIs respond to the legal-entity filter.
+1. **KPI strip** (6 cards): Received YTD vs. campaign goal (progress bar), Pipeline value (sum of asks across opps in stages Outreach → Proposal), Active opportunities (count in stages Outreach → Proposal), Overdue follow-ups (red if > 0), Avg gift size (received `development_amounts` rows only), Reporting due 30d (count of opps with `reporting_due_on` within 30 days). KPIs respond to the E8 organization filter.
 2. **Workspace** — a two-column flex layout: left rail + main pane, separated by a draggable resize handle. The pattern mirrors `docs/mockups/companies-admin-redesign/variant-a-list.html`: width is persisted in `localStorage` under `e8.development.filterRailWidth`; min 200px, max 560px; default 280px. Drag the handle past 160px to collapse; collapsed state persists under `e8.development.filterRailOpen`. Collapsed, the rail becomes a thin vertical "Filters" button against the left edge that re-expands on click.
 
 #### Left rail contents (top to bottom):
 
 - **Collapse caret** at the top-right of the rail (`‹`) — also collapses to the thin button.
-- **Search** — single text input that matches organization name, opportunity name, contact name, and free-text notes. Live filter. Placeholder: `Search opportunities, organizations, contacts...`.
-- **E8 organization** — segmented control: `All / 501c6 / 501c3`. Selection drives KPIs and the listing. Filters opportunities by `development_opportunities.legal_entity`.
+- **Search** — single text input that matches funder name, opportunity name, contact name, and free-text notes. Live filter. Placeholder: `Search opportunities, funders, contacts...`.
+- **Quick filters** — `My Opportunities` filters by opportunity lead = current user. `My Funders` filters by funder lead = current user. These sit above the full filter groups so staff do not have to hunt inside Lead filters for the common case.
+- **E8 organization** — segmented control: `All / 501c6 / 501c3`. Selection drives KPIs and the listing. Filters opportunities by `development_opportunities.e8_organization`.
 - **Opportunity type** — checkbox group with counts. Three top-level options: `Grant / Sponsorship / Gift`. Sponsorship subtype (Annual / Event / Other) is a detail-level field that surfaces only in the opportunity drawer — it is not exposed as a top-level tag, chip, or filter on the dashboard.
-- **Relationship type** — checkbox group with counts: `Corporate / Foundation / Individual / Government`. (Filters opportunities through the relationship join.)
+- **Funder type** — checkbox group with counts: `Corporate / Foundation / Individual / Government`. (Filters opportunities through the funder join.)
 - **Pipeline stage** — checkbox group with stage chips and counts.
-- **Assigned to** — checkbox group with staff avatars and counts (opportunity owner).
+- **Lead** — checkbox group with staff avatars and counts (opportunity lead).
 - **Follow-up** — checkbox group: Overdue / Due in 7 days / None scheduled.
 - **Fiscal year** — select: `Current FY / Prior FY / Two FYs back / All`.
 - **Reporting** — checkbox group: `Reporting due 30d / Reporting overdue`.
 
 #### Main pane:
 
-- **Toolbar row**: `<result count>` left-aligned; right-aligned cluster of `Kanban / List / Calendar` view-mode toggle, then a divider, then **`+ New opportunity`** (primary blue), `Export CSV`, `Snapshot PDF` (desktop only).
+- **Toolbar row**: `<result count>` left-aligned; right-aligned cluster of `Kanban / List / Calendar` view-mode toggle, then a divider, then **`+ New opportunity`** (primary blue), `Export CSV`.
 - **Overdue banner** — appears below the toolbar when overdue count > 0.
 - **View body**: Kanban / List / Calendar.
   - **Kanban** columns = 7 pipeline stages. Each Kanban card is an **opportunity** rendered as the four-band tile (§6a.i). **The entire card opens the relationship/opportunity drawer** over the dashboard. Drag a card to advance stage; a modal prompts for a note.
-  - **List** view: tabular rows of opportunities; **entire row** opens the relationship/opportunity drawer. Columns: opportunity name, organization name, type (with subtype suffix when present), E8 organization, stage, amount, committed, received, owner, follow-up, fiscal year. The E8 organization column uses full chip labels (`501(c)6`, `501(c)3`) rather than the compact card labels.
+  - **List** view: a RecordGrid-powered workspace with grouped saved views for **Opportunities** and **Funders**. Selecting an Opportunity view mounts the Opportunities grid in the content area. Selecting a Funder view mounts the Funders grid in that same content area. The two grids share the visible List surface but use separate base tables, field catalogs, saved views, AI Assist context, row actions, permissions, and write paths. Do not mix funder rows and opportunity rows in one grid instance.
   - **Calendar**: calendar workspace for application deadlines, reporting due dates, decision expected dates, sponsorship term dates, and follow-up tasks. It supports Month, Week, and Table views, with previous/next controls for moving between months or weeks. Month view uses weekday columns plus a compact shared Sat/Sun column. Calendar items are visually distinguished by type: deadline, report, task, and overdue task. Calendar entries link to the related opportunity when an opportunity association exists; clicking an entry opens the relationship/opportunity drawer with that opportunity selected.
 
 #### 6a.i. Kanban tile layout (opportunity card)
 
 Each card has three horizontal bands, top to bottom:
 
-1. **Header band** (slate-100 fill, hairline below) — opportunity-type chip and E8 organization tag(s). Only three top-level type labels appear: `Grant`, `Sponsorship`, `Gift`. (Sponsorship subtype lives in the opportunity drawer; it is not surfaced on the tile.) When `legal_entity = 'both'` the band renders both `(c)6` and `(c)3` tags side by side rather than a single "both" label. The tile does **not** show the owner's avatar — owner is a structural facet best inspected in the drawer; cluttering every tile with an avatar competes with the type/legal/advocate signal.
+1. **Header band** (slate-100 fill, hairline below) — opportunity-type chip and E8 organization tag(s) on the left; the opportunity Lead's profile photo on the top-right, falling back to initials when no photo is available. Only three top-level type labels appear: `Grant`, `Sponsorship`, `Gift`. (Sponsorship subtype lives in the opportunity drawer; it is not surfaced on the tile.) When `e8_organization = 'both'` the band renders both `(c)6` and `(c)3` tags side by side rather than a single "both" label.
 2. **Opportunity name** — 14px semibold, the strongest text on the card. ("Wilmington Scholarship 2026", "FY27 Sponsorship", "Smith Family Annual Gift")
-3. **Organization name + relationship-type chip** — 12px slate, shown so the card scans correctly out of context. Comma-separated when multiple contacts; rendered as muted italic `No contact yet` when the relationship has no contact.
+3. **Funder name + funder-type chip** — 12px slate, shown so the card scans correctly out of context. Comma-separated when multiple contacts; rendered as muted italic `No contact yet` when the funder has no contact.
 4. **Ask amount** — 16px semibold tabular numerals, full-dollar format (`$75,000`).
-5. **Advocate** *(conditional)* — when the opportunity has at least one advocate, a 12px line below the ask amount reads `Advocate: Kathleen Hebert`. Multiple advocates render comma-separated; an opp with no advocate omits the line entirely (the band only appears when there is an advocate, so most tiles will not show it). See §6c.v for the data model and full semantics.
+5. **Support** *(conditional)* — when the opportunity has at least one supporter, a 12px line below the ask amount reads `Support: Kathleen Hebert`. Multiple supporters render comma-separated; an opp with no supporter omits the line entirely (the band only appears when there is a supporter, so most tiles will not show it). See §6c.v for the data model and full semantics.
 
 Below the body, a hairline separator and a **footer row**: `Follow-up: May 26`, color-coded by urgency (amber within 7 days, red+`· overdue` when past due, muted `none scheduled` when absent). When `reporting_due_on` is within 30 days, a second footer row shows `Report due Jun 30` in amber/red as appropriate.
 
-The `+ New opportunity` button opens the dialog described in §6g.
+The `+ New opportunity` button opens the dialog described in §6f.
+
+### 6a.ii. List RecordGrid base tables
+
+The staff dashboard List view uses the same RecordGrid component and view-builder/AI-assist patterns used by `/admin/companies`, `/admin/people`, and `/admin/partners`, but it supports two explicit base tables:
+
+- **Opportunity views** mount `RecordGrid` with `tableKey="development_opportunities"`. Default saved views include `Pipeline opportunities`, `My Opportunities`, `Reporting due`, `Received this FY`, and `Declined / archived`. Row clicks open the relationship/opportunity drawer with that opportunity tab selected.
+- **Funder views** mount `RecordGrid` with `tableKey="development_funders"`. Default saved views include `All Funders`, `My Funders`, `Cold prospects`, `Active funders`, and `No primary contact`. Row clicks open a right-side slide-out Funder panel rather than navigating away. The panel is modeled on `entity-detail.html`: funder summary, contacts, lead, active/historical opportunities, documents, and the unified activity stream.
+- The List toolbar contains a compact saved-view selector grouped by `Opportunities` and `Funders`. Changing between groups unmounts the current grid and mounts the other base table in the same content area; it is not a polymorphic mixed-row grid.
+- Each base table has its own column catalog, filter options, row selection semantics, CSV export, AI Assist prompt context, and view-builder rail state. Persist selected view separately, e.g. `e8-record-grid-view:development_opportunities` and `e8-record-grid-view:development_funders`.
+- The shared left filter rail remains visible. When an Opportunity view is active, filters apply directly to opportunity fields. When a Funder view is active, opportunity-specific filters apply through related opportunities (`has at least one opportunity matching...`) and funder-specific filters apply directly to `development_funders`.
+- The grid and panel share the same write APIs as the Kanban/drawer, so edits made from any surface update the same records and invalidate the same `development` SWR tags.
+- `My Funders` is a first-class saved view and quick filter: current user is `development_funders.lead_person_record_id`.
 
 ### 6b. Relationship/opportunity drawer
 
-The canonical detail surface for development CRM work. It opens as a right-side drawer over the staff dashboard, occupying roughly 95% of the viewport width with the dashboard still visible behind it. The drawer content uses tight left/right gutters so the panel reads as a workspace, not a centered page. Users close it with Escape, backdrop click, or the `X` in the drawer chrome. It combines durable relationship information, contacts, relationship ownership, opportunity work, historical opportunities, and relationship-level activity in one workspace. Opportunity-specific dashboard clicks open the drawer with the relevant opportunity tab selected.
+The canonical detail surface for development CRM work. It opens as a right-side drawer over the staff dashboard, occupying roughly 95% of the viewport width with the dashboard still visible behind it. The drawer content uses tight left/right gutters so the panel reads as a workspace, not a centered page. Users close it with Escape, backdrop click, or the `X` in the drawer chrome. It combines durable relationship information, contacts, relationship lead assignment, opportunity work, historical opportunities, and relationship-level activity in one workspace. Opportunity-specific dashboard clicks open the drawer with the relevant opportunity tab selected.
 
 Layout, top to bottom:
 
 1. **Relationship summary card**:
-   - Header: organization/person name, relationship-type chip, and optional short description from `development_entities.notes_freeform`. Do not render an "Entity information" label.
+   - Header: funder/person name, funder-type chip, and optional short description from `development_funders.notes_freeform`. Do not render an "Funder information" label.
    - Contacts render as the existing reusable people-pill component used elsewhere in the portal. The pill shows name/title and may include the email icon. Clicking a person opens the existing Add/Edit Contact dialog. The circular `+` affordance beside the pills adds a contact.
    - The Add/Edit Contact dialog includes name, email, title, phone, and LinkedIn. Name is the only required field.
    - Outbound email starts from the contact pill/email icon, not from a page-level button.
-   - Relationship owner appears in this summary area.
-   - Advocate is opportunity-scoped and does not appear as a relationship field.
+   - Relationship lead appears in this summary area.
+   - Support is opportunity-scoped and does not appear as a relationship field.
    - Hovering the relationship summary reveals a pencil icon in the upper-right for inline relationship edits.
    - Do not render typical grant range or known preferences as separate structured fields. Put that information in the relationship description when it matters.
 2. **Opportunity tabs**:
@@ -564,7 +599,7 @@ Layout, top to bottom:
    - Left panel header: opportunity name flush to the top of the pane, with compact type chip (`Grant` / `Sponsorship` / `Gift`) and E8 organization chip (`501(c)3`, `501(c)6`, or both) directly beneath it.
    - Website appears just above the description without a separate label.
    - Description appears directly below the website/opportunity name without a separate label.
-   - Owner and Advocate appear below the description as people-pill controls. Changing owner or advocate uses the same inline people-picker pattern as Contacts, not a page edit mode.
+   - Lead and Support appear below the description as people-pill controls. Changing lead or supporter uses the same inline people-picker pattern as Contacts, not a page edit mode.
    - Properties use left-aligned labels: Stage, Amount, Due date, Decision, sponsorship term when relevant, and reporting/restriction fields when relevant. Use date strings such as `Aug 12, 2026`.
    - Amount fields are ordinary property rows in the left-label layout: `Requested` with editable amount, then `Committed` with editable amount. Do not render these as summary tiles.
    - The receipt table appears below the normal property rows, after Due date and Decision. It spans the full left panel width and does not have a left-side field label.
@@ -577,7 +612,7 @@ Layout, top to bottom:
    - Documents panel appears above the activity stream. It lists Google Drive files in the opportunity folder and includes `Upload file` and `Create new document`.
    - Activity stream appears beside the opportunity details. A TipTap note editor sits above the stream. Notes are created from the activity pane, not from an Add Note button in the opportunity details panel. The editor has a clear `Save` button.
    - If a user starts a note and navigates to another tab before saving, show a modal prompt with Save / Discard / Cancel. Implement this with the existing React modal pattern, not `window.confirm`.
-5. **Entity-level Activity tab**:
+5. **Funder-level Activity tab**:
    - Shows all relationship activity by default: emails, notes, stage changes, money, files, contact changes, and opportunity lifecycle events.
    - Email ingestion is relationship-scoped because emails can often be matched to the relationship/contact but not confidently matched to a specific opportunity.
    - Activity can be filtered to `All`, a specific opportunity, or `Unassociated`.
@@ -594,7 +629,7 @@ Stage changes prompt a note; the prompt is the same modal used on the staff Kanb
 Development documents and attachments are backed by Google Drive, not database BLOB storage.
 
 - On first use, the app creates a `Development` folder under `PORTAL_STORAGE_DRIVE_FOLDER_ID` using the portal Google Service Account.
-- Each relationship gets a folder inside `Development`, named from the display name plus entity id for uniqueness.
+- Each relationship gets a folder inside `Development`, named from the display name plus funder id for uniqueness.
 - Each opportunity gets a subfolder inside its relationship folder, named from the opportunity name plus opportunity id.
 - Relationship-level files are stored in the relationship folder. Opportunity-level files are stored in the opportunity subfolder.
 - The UI lists the current Drive folder contents directly, following the pattern used on the Diligence page's supporting documents panel.
@@ -629,7 +664,7 @@ Each item corresponds to a real event in one of the underlying tables. Event kin
 
 | Kind | Source / how it's created | What's shown in the timeline |
 |---|---|---|
-| **Note** | Staff "Add a note" form scoped to an opportunity (`source='manual'`, `parent_kind='opportunity'`) or to the relationship (`parent_kind='entity'`), or a board member "Log my interaction" (`source='manual_board'`). | Date, author, and rich-text body. A bare "Edit" link is shown to the author for 10 minutes after creation. Board-logged submissions trigger a Mailgun alert to the primary opportunity owner. |
+| **Note** | Staff "Add a note" form scoped to an opportunity (`source='manual'`, `parent_kind='opportunity'`) or to the relationship (`parent_kind='funder'`), or a board member "Log my interaction" (`source='manual_board'`). | Date, author, and rich-text body. A bare "Edit" link is shown to the author for 10 minutes after creation. Board-logged submissions trigger a Mailgun alert to the primary opportunity lead. |
 | **Email** | Auto-ingested via Google Pub/Sub. Pub/Sub pushes each new Gmail message to the portal webhook; the webhook resolves sender/recipient addresses against `people.email` and, on a match against any contact in `development_contacts`, writes a `development_email_events` row plus one `development_email_attachments` row per file. Always relationship-scoped. An email surfaces on an opportunity timeline if it has a row in `development_opportunity_email_links` for that opp. Staff can tag/untag inline (`Attach to this opportunity`). | Collapsed: direction-aware left/right email card with route/from-to metadata, subject, and two-line teaser. Expanded: summary is replaced by full headers, full body, and attachments. Attachments render one-per-row as filetype icon + filename + size. |
 | **Stage** | Generated by the Kanban drag or the stage dropdown in the opportunity drawer. Writes a `development_stage_events` row. An optional note attached at change-time creates a paired `development_notes` row with `source='stage_change'`. | One line: `from-chip → to-chip · author`. If a note was attached, its body renders inline beneath the chips. |
 | **Money** | One row per `development_amounts` insert/update. | One line: `$amount · ask / commit / receive · campaign · author`. For realized receipts, include `received May 15, 2026`. For `receive` rows with `due_on` but no `received_on`, show `expected $amount · due Jun 30`. In-kind receipts can render as `In-kind received · <description>` with optional estimated value. |
@@ -641,7 +676,7 @@ Filter bar at top of Activity: `All · Notes · Email · Stage · Money · Files
 
 #### 6c.iii. "Add a note" form
 
-Scope toggle at the top of the form: `This opportunity (default) | The relationship`. Choosing "The relationship" writes a `development_notes` row with `parent_kind='entity'`; the note appears in the entity activity stream and can be included by opportunity filters as unassociated relationship activity.
+Scope toggle at the top of the form: `This opportunity (default) | The relationship`. Choosing "The relationship" writes a `development_notes` row with `parent_kind='funder'`; the note appears in the funder activity stream and can be included by opportunity filters as unassociated relationship activity.
 
 Fields:
 
@@ -654,47 +689,47 @@ Fields:
 
 A follow-up is a discrete actionable item:
 
-- Stored in `development_followups` with `parent_kind` + `parent_id`, title, due date, assignee, completion fields, and reminder metadata.
+- Stored in `development_followups` with `parent_kind` + `parent_id`, title, due date, completion fields, and reminder metadata. Owners live in `development_followup_owners`, so a task can have zero, one, or many owners.
 - Created from the activity composer `Task` button, an explicit task/follow-up affordance in the opportunity drawer, or auto-suggested by the stage-change modal (per-stage default offset configurable in admin).
-- The New task modal collects title, due date, and assignee. The assignee picker can choose the opportunity owner, named advocates, or another person from `people`.
-- Surfaced in four places: (a) the opportunity activity stream, (b) the dashboard Calendar, (c) the staff dashboard KPI strip + Overdue banner, (d) Monday morning Mailgun digest to each assignee.
-- In the activity stream, tasks are not rendered as completed history by default. Open future tasks appear below an `Upcoming` divider so it is visually clear they have not happened yet. Open overdue tasks appear in the past/current section with red overdue treatment. Completed tasks render as completed activity with checkbox checked, completion date, and optional completion note.
+- The New task modal collects title, due date, and owners using the shared PeoplePicker/MultiPeoplePicker pattern. The picker can choose the opportunity lead, named supporters, or another person from `people`; it may also be empty when the task is intentionally unassigned.
+- Surfaced in four places: (a) the opportunity activity stream, (b) the dashboard Calendar, (c) the staff dashboard KPI strip + Overdue banner, (d) Monday morning Mailgun digest to each task owner.
+- In the activity stream, tasks appear in the same date-ordered timeline as every other activity item. Future tasks are not broken into a separate `Upcoming` list; they sort by due date alongside past/current items. Open overdue tasks appear with red overdue treatment. Completed tasks render as completed activity with checkbox checked, completion date, and optional completion note.
 - Marking a follow-up done prompts for an optional completion note; that completion note creates a `development_notes` row tagged with `related_followup_id`.
 
 Multiple open follow-ups per opportunity are allowed but uncommon. The band shows the soonest-due; a count chip ("3 open") expands the rest.
 
-#### 6c.v. Advocates — what they are and where they show up
+#### 6c.v. Support — what they are and where they show up
 
-An **advocate** is an internal E8 person — typically a board member, but also occasionally a staff member or executive director — who is helping move a specific opportunity forward. Examples: a board member who personally knows the program officer at a foundation; an exec who's championing a sponsorship with their network; a member who agreed to make an intro at a specific event.
+A **supporter** is an internal E8 person — typically a board member, but also occasionally a staff member or executive director — who is helping move a specific opportunity forward. Examples: a board member who personally knows the program officer at a foundation; an exec who's championing a sponsorship with their network; a member who agreed to make an intro at a specific event.
 
 Cardinality is `0..n`, skewed heavily toward 0 and 1:
 
-- Most opportunities have **zero** advocates. The owner is doing the work themselves.
-- A common case is **one** advocate — a single board member who's actively in the loop.
-- **More than one** advocate exists but is rare. The UI should accommodate up to three on a tile without wrapping; beyond that, additional advocates collapse to `+N more` on the tile and are listed in full in the opportunity drawer.
+- Most opportunities have **zero** supporters. The lead is doing the work themselves.
+- A common case is **one** supporter — a single board member who's actively in the loop.
+- **More than one** supporter exists but is rare. The UI should accommodate up to three on a tile without wrapping; beyond that, additional supporters collapse to `+N more` on the tile and are listed in full in the opportunity drawer.
 
-Where advocates surface:
+Where supporters surface:
 
-- **Kanban tile** (§6a.i): `Advocate: Kathleen Hebert` line below the ask amount, only when present.
-- **List view** (staff dashboard): a dedicated `Advocate` column shows the first advocate's name, with `+N more` for additional.
-- **Relationship/opportunity drawer** (§6b): the relationship summary does not show advocates; each opportunity tab shows its own advocates when present. No role tag — the data model doesn't carry one.
-- **Board / Dev-Committee dashboard "My Connections" panel** (§6d): when the signed-in board member is the advocate (not just the source of the relationship), the entity appears in their connections list with an `Advocate` tag.
+- **Kanban tile** (§6a.i): `Support: Kathleen Hebert` line below the ask amount, only when present.
+- **Opportunity RecordGrid views** (staff dashboard List): a dedicated `Support` column shows the first supporter's name, with `+N more` for additional.
+- **Relationship/opportunity drawer** (§6b): the relationship summary does not show supporters; each opportunity tab shows its own supporters when present. No role tag — the data model doesn't carry one.
+- **Board / Dev-Committee dashboard "My Connections" panel** (§6d): when the signed-in board member is the supporter (not just the source of the relationship), the funder appears in their connections list with a `Support` tag.
 
-Distinguishing **advocate** from **owner**:
+Distinguishing **supporter** from **lead**:
 
-- The **owner** is the staff member accountable for the opportunity — writes the proposal, sends the follow-up emails, logs notes, pushes the stage forward. There is exactly one per opportunity.
-- An **advocate** is a *helper*, not the accountable party. They aren't on the hook for sending emails or hitting deadlines; they're providing access, vouching, or making intros. Tasks and follow-ups are never assigned to advocates by default.
+- The **lead** is the staff member accountable for the opportunity — writes the proposal, sends the follow-up emails, logs notes, pushes the stage forward. There is exactly one per opportunity.
+- A **supporter** is a *helper*, not the accountable party. They aren't on the hook for sending emails or hitting deadlines; they're providing access, vouching, or making intros. Tasks and follow-ups are never assigned to supporters by default.
 
-Distinguishing **advocate** from **contact**:
+Distinguishing **supporter** from **contact**:
 
-- A **contact** lives on the **entity** (the funder/sponsor side). They are the *external* person at Walton or Microsoft or Patagonia.
-- An **advocate** lives on the **opportunity** and is an *internal* E8 person. The two never overlap; the person picker for advocate is restricted to people with a staff or board role.
+- A **contact** lives on the **funder** (the funder/sponsor side). They are the *external* person at Walton or Microsoft or Patagonia.
+- A **supporter** lives on the **opportunity** and is an *internal* E8 person. The two never overlap; the person picker for supporter is restricted to people with a staff or board role.
 
 Notifications:
 
-- Advocates do **not** receive the standard follow-up or reporting reminders the owner gets.
-- When stage advances to Proposal, Committed, or Received, all advocates on that opp receive a "good news" Mailgun ping ("Walton Fellowship Grant moved to Committed — thanks for your help") so they feel the impact of their advocacy. Suppressible per-advocate.
-- When stage advances to Declined, no advocate notification is sent (the owner decides what to share).
+- Supporters do **not** receive the standard follow-up or reporting reminders the lead gets.
+- When stage advances to Proposal, Committed, or Received, all supporters on that opp receive a "good news" Mailgun ping ("Walton Fellowship Grant moved to Committed — thanks for your help") so they feel the impact of their advocacy. Suppressible per-supporter.
+- When stage advances to Declined, no supporter notification is sent (the lead decides what to share).
 
 #### 6c.vi. Visual style
 
@@ -706,7 +741,6 @@ Default landing for board and development-committee members. The page follows th
 
 Top actions:
 - `Log interaction` opens the simplified board-member note form.
-- `Export board report` downloads the current development board report.
 
 KPI strip:
 - Raised vs goal.
@@ -724,7 +758,7 @@ Main column:
 Right column:
 - `Members` uses the existing committee member tile pattern and contact action.
 - `Upcoming meetings` uses the existing committee meetings tile pattern with links to meeting detail and past recordings.
-- `My connections` shows relationships and opportunities where the signed-in committee member is an advocate, source / warm intro, or has logged a development note. Each row shows relationship name, active opportunity stage, amount context, and urgent state such as overdue follow-up.
+- `My connections` shows relationships and opportunities where the signed-in committee member is a supporter, source / warm intro, or has logged a development note. Each row shows relationship name, active opportunity stage, amount context, and urgent state such as overdue follow-up.
 - `Documents` lists committee-level documents and selected relationship / opportunity documents. Search covers all documents visible to this committee role.
 
 Documents:
@@ -737,25 +771,21 @@ Log interaction modal:
 - Fields: relationship/opportunity, date, channel, summary, next step.
 - Summary is capped at 500 characters.
 - Notes are stored with `source='manual_board'`.
-- The owner receives a Mailgun notification. If the interaction is scoped to an opportunity, notify the opportunity owner; otherwise notify the relationship owner.
+- The lead receives a Mailgun notification. If the interaction is scoped to an opportunity, notify the opportunity lead; otherwise notify the relationship lead.
 
 Permissions:
 - Board and development-committee roles hold `admin.development.read` plus permission to create board interaction notes.
 - Opportunity fields, stages, amounts, receipts, documents created by staff, and task completion state are read-only unless the user also has staff/admin development permissions.
 
-### 6e. Impact report (`/admin/development/impact`)
-
-A standalone shareable document. Single page suitable for sending to existing and prospective supporters. Sections: who we are, who's already supporting us (lists **supporting organizations and individuals**, not individual opportunities — sponsors don't want to see their gift parsed by cycle), anonymized impact stats from the broader portal (cohort outcomes, deployments), this year's goal vs progress (totals roll up from opportunities). Renders as HTML; exported to PDF via the existing PDF skill / a print stylesheet. The "Snapshot PDF" button on the staff dashboard is a print-stylesheet export of the dashboard itself.
-
-### 6f. Mobile layout
+### 6e. Mobile layout
 
 Kanban collapses to a "swipe between stages" carousel with one stage visible at a time and a stage-picker chip row. KPI strip becomes a 2×3 grid. The collapsible filter rail moves above the main pane as a collapsible accordion. The relationship/opportunity drawer stacks the relationship summary, opportunity tabs, opportunity details, and activity vertically. Editing affordances on mobile match desktop.
 
-### 6f.i. Product copy standard
+### 6e.i. Product copy standard
 
 UI copy should be terse and functional. Use labels, values, section titles, and action names rather than explanatory helper text. Do not add microcopy that explains obvious controls or repeats the purpose of a field or section. Helper text belongs only where the user needs a constraint, format, consequence, or non-obvious distinction to make the right choice.
 
-### 6g. New Opportunity wizard
+### 6f. New Opportunity wizard
 
 Triggered by the **`+ New opportunity`** button on the staff dashboard or opportunity Kanban, and by the compact **`+`** opportunity tab in the relationship/opportunity drawer. The dashboard entry starts at Step 1. The drawer entry opens the same wizard with that relationship already selected and starts at Step 2. Modal, centered, max-w-3xl, labels-left layout per AGENTS.md §"Form Layout". Escape and click-on-overlay close.
 
@@ -764,21 +794,21 @@ Triggered by the **`+ New opportunity`** button on the staff dashboard or opport
 Ask whether the opportunity belongs to an existing relationship or requires a new relationship first.
 
 **Existing relationship path:**
-- Search input over `development_entities`.
-- Typing opens a dropdown of matching entities with name and entity type.
-- Selecting an entity pins it for the remainder of the wizard.
+- Search input over `development_funders`.
+- Typing opens a dropdown of matching funders with name and funder type.
+- Selecting a funder pins it for the remainder of the wizard.
 
-**New entity path:**
-- Entity name, required.
-- Entity type, required: Foundation / Corporate / Individual / Government.
-- Entity description, optional multi-line plain text. Stores into `development_entities.notes_freeform`.
+**New funder path:**
+- Funder name, required.
+- Funder type, required: Foundation / Corporate / Individual / Government.
+- Funder description, optional multi-line plain text. Stores into `development_funders.notes_freeform`.
 
 **Contacts:**
 - Step 1 includes a compact Contacts area and a `+ Add contact` action.
 - `+ Add contact` opens a small modal with: name, email, title, phone, LinkedIn URL.
 - Contact modal labels are left of the inputs on desktop.
 - Only name is required. Email is encouraged but not blocking.
-- The user can add one or more contacts before continuing. New contacts create `people` rows and `development_contacts` links in the same transaction as the entity/opportunity creation when needed.
+- The user can add one or more contacts before continuing. New contacts create `people` rows and `development_contacts` links in the same transaction as the funder/opportunity creation when needed.
 
 #### Step 2 — Opportunity shape
 
@@ -789,8 +819,9 @@ Collect the structural fields that determine the rest of the wizard.
 | Opportunity name | Text | Required. Suggested format should include funder/program/year when useful. |
 | Type | Compact choice: Grant / Sponsorship / Gift | Required. Drives type-specific fields in Step 3. |
 | Sponsorship subtype | Segmented control: Annual / Event / Other | Optional. Visible only when Type = Sponsorship. |
-| E8 legal entity | Compact choice: E8 Angels / E8 Impact / Both | Required. Asked here because it belongs with the opportunity's structure, not the durable relationship. Defaults to the most recent legal entity used for this entity, falling back to 501c6. |
-| Opportunity owner | Person picker, staff only | Defaults to current user. Exactly one owner per opportunity. |
+| Event | Free text | Optional. Visible only when Type = Sponsorship and subtype = Event. Examples: `Portland Sip and Share`, `E8 Summit`, `Cleantech Open reception`. Stores in `development_opportunities.event_name`. |
+| E8 organization | Compact choice: E8 Angels / E8 Impact / Both | Required. Asked here because it belongs with the opportunity's structure, not the durable relationship. Defaults to the most recent E8 organization used for this funder, falling back to 501c6. |
+| Opportunity lead | Person picker, staff only | Defaults to current user. Exactly one lead per opportunity. |
 
 Every opportunity created through the wizard starts in `Prospect`. Stage changes happen after creation through the Kanban drag or opportunity detail stage dropdown so every non-initial stage transition can collect a note and follow-up.
 
@@ -823,9 +854,9 @@ Collect the working details the development team needs before opening the opport
 #### Step 4 — Review and create
 
 Show a compact review before creation:
-- Entity name and type.
+- Funder name and type.
 - Primary contact, if any.
-- Opportunity name, type/subtype, E8 legal entity, initial stage, owner.
+- Opportunity name, type/subtype, E8 organization, initial stage, lead.
 - Ask summary, including cash and in-kind components.
 - Key dates and URL when present.
 
@@ -834,12 +865,12 @@ Actions:
 - **Cancel** — closes without saving.
 - **Create & open** — writes the relationship, contacts, opportunity, ask components, and initial activity events in one transaction; then opens the relationship/opportunity drawer with the new opportunity tab selected. On failure, show an inline error and leave the wizard open. Use the single-flight save pattern per AGENTS.md §"Async Save / Toast Single-Flight".
 
-### 6h. Editing an existing entity or opportunity
+### 6g. Editing an existing funder or opportunity
 
 Editing happens directly on the relevant detail page — no separate "edit mode" route. Patterns:
 
 **Relationship drawer (§6b):**
-- Inline edit on the About row (`development_entities.notes_freeform`).
+- Inline edit on the About row (`development_funders.notes_freeform`).
 - Contacts are managed from the Contacts panel header (`+ New`) and contact rows remain clean: name, optional primary chip, title, and email address link.
 - Source is stored when available but is not shown as a prominent visible fact on the detail surface.
 - Durable attachments are managed from the Files panel.
@@ -848,7 +879,7 @@ Editing happens directly on the relevant detail page — no separate "edit mode"
 - Inline edit on the About row (`development_opportunities.notes_freeform`).
 - Inline-editable facts: Campaign, Amount components, Committed, Received, Application deadline, Decision expected, Term start/end, Application URL, Source, Fiscal year. Hover reveals pencil; click activates the matching control; Save on blur or Return.
 - Per-row affordances on Money / Attachments.
-- The opportunity panel pencil reveals inline controls for Name, Type, Subtype (when Type=Sponsorship), Legal entity, Campaign, Restricted + notes, Reporting required + due, and Renewal of. Routine edits do not use a full edit dialog.
+- The opportunity panel pencil reveals inline controls for Name, Type, Subtype (when Type=Sponsorship), E8 organization, Campaign, Restricted + notes, Reporting required + due, and Renewal of. Routine edits do not use a full edit dialog.
 - The stage dropdown in the opportunity tab is the only in-page stage-change affordance and opens the stage-change modal (the only path that writes `development_stage_events`).
 
 **Renewal:**
@@ -859,29 +890,29 @@ Editing happens directly on the relevant detail page — no separate "edit mode"
 ## 7. Notifications, reminders, and email ingest
 
 - **Follow-up reminders** — Mailgun, sent on the morning a follow-up is due (Pacific). Idempotency via `development_followups.reminder_sent_at`. Templated through `email_template_versions` so Karin can edit copy without a deploy. Cron: a new entry in the existing dispatcher (`lib/recurring-emails/dispatcher.js`).
-- **Reporting-due reminders** — Mailgun, sent to the primary opportunity owner at T-30 and T-7 days before `reporting_due_on`, and on the due date itself if `reporting_completed_on` is still null. Idempotency via per-opp `reporting_reminder_sent_at` tracker (separate table or denorm column; defer choice).
-- **Board-logged-note alert** — Mailgun, sent immediately when a board member submits "Log my interaction". Recipient is the owner (opp owner if scoped to opp; entity owner if scoped to entity). Subject: "[Board] {Board Member} logged a note on {Entity}".
-- **Overdue summary** — Mailgun digest to each staff owner Monday morning listing their overdue follow-ups (across opps + entities they own).
+- **Reporting-due reminders** — Mailgun, sent to the primary opportunity lead at T-30 and T-7 days before `reporting_due_on`, and on the due date itself if `reporting_completed_on` is still null. Idempotency via per-opp `reporting_reminder_sent_at` tracker (separate table or denorm column; defer choice).
+- **Board-logged-note alert** — Mailgun, sent immediately when a board member submits "Log my interaction". Recipient is the lead (opp lead if scoped to opp; funder lead if scoped to funder). Subject: "[Board] {Board Member} logged a note on {Funder}".
+- **Overdue summary** — Mailgun digest to each staff lead Monday morning listing their overdue follow-ups (across opps + funders they own).
 - **Outbound staff-sent email** — Gmail OAuth via `lib/email-sender.js`, identical wiring to entrepreneur messaging. The contact email affordance opens the same compose flow used elsewhere.
-- **Email auto-ingest into the Activity timeline** — Google Pub/Sub pushes each new Gmail message to the portal webhook (the existing webhook used elsewhere; extend it with a development matcher if not already present). On each delivery the webhook resolves all sender/recipient addresses against `people.email` and checks for membership in `development_contacts`. On a match it writes a `development_email_events` row (idempotent on `gmail_message_id`) plus one `development_email_attachments` row per attachment, all scoped to the matched entity. Opportunity tagging is manual (an `Attach to opportunity` action on the email card) for v1; subject-line heuristics can be added later. SWR invalidation: tag `development`.
+- **Email auto-ingest into the Activity timeline** — Google Pub/Sub pushes each new Gmail message to the portal webhook (the existing webhook used elsewhere; extend it with a development matcher if not already present). On each delivery the webhook resolves all sender/recipient addresses against `people.email` and checks for membership in `development_contacts`. On a match it writes a `development_email_events` row (idempotent on `gmail_message_id`) plus one `development_email_attachments` row per attachment, all scoped to the matched funder. Opportunity tagging is manual (an `Attach to opportunity` action on the email card) for v1; subject-line heuristics can be added later. SWR invalidation: tag `development`.
 
 ## 8. Spreadsheet import
 
 Source: `uploads/E8 Master Sponsor List.xlsx`.
 
-Each spreadsheet row becomes one entity + one or more opportunities. The columns map roughly:
+Each spreadsheet row becomes one funder + one or more opportunities. The columns map roughly:
 
-1. **Entity row** — Sponsor / Org Name + Sponsor Type + Source → `development_entities`. Matching gift eligibility lands on the entity.
-2. **Annual giving columns** (`2023 Actual`, `2024 Actual`, `2025 Actual`, `2026 Goal`, `2026 Actual`) — each nonzero amount becomes an **opportunity** for that fiscal year. `type` inferred from entity type (Foundation → `grant`; Corporate → `sponsorship`/`annual`; Individual → `gift`). `stage` derived: realized actuals → `received`; 2026 Goal (no actual yet) → stage from the Stage column. `development_amounts` rows: a `commit` row and a `receive` row per realized year (default `nature='cash'`); an `ask` row for 2026.
+1. **Funder row** — Sponsor / Org Name + Sponsor Type + Source → `development_funders`. Matching gift eligibility lands on the funder.
+2. **Annual giving columns** (`2023 Actual`, `2024 Actual`, `2025 Actual`, `2026 Goal`, `2026 Actual`) — each nonzero amount becomes an **opportunity** for that fiscal year. `type` inferred from funder type (Foundation → `grant`; Corporate → `sponsorship`/`annual`; Individual → `gift`). `stage` derived: realized actuals → `received`; 2026 Goal (no actual yet) → stage from the Stage column. `development_amounts` rows: a `commit` row and a `receive` row per realized year (default `nature='cash'`); an `ask` row for 2026.
 3. **Ask Range** — parsed midpoint (or floor for "$X+"), stored as a `development_amounts` row with `kind='ask'`, `nature='cash'` on the 2026 (current FY) opportunity; original string in `note`.
-4. **Stage** column — applied to the current-FY opportunity, not the entity.
-5. **Foundation Prospects sheet** — one entity per foundation (`entity_type='foundation'`) + one opportunity per active pursuit (`type='grant'`, stage from Outreach Status). Focus area tags into `notes_freeform` on the entity. Grant deadlines into the opportunity's `application_deadline`.
-6. **Email Activity Log sheet** — one `development_notes` row per entry. Default `parent_kind='entity'` since spreadsheet entries don't reliably map to a specific cycle; importer can attempt opp matching when the entry text contains a year that matches an FY opportunity. `occurred_at` from Date, `body_markdown` from Subject/Summary, author resolved by matching staff name to `people.email` (default to `legacy-import@e8angels` placeholder if not resolvable).
+4. **Stage** column — applied to the current-FY opportunity, not the funder.
+5. **Foundation Prospects sheet** — one funder per foundation (`funder_type='foundation'`) + one opportunity per active pursuit (`type='grant'`, stage from Outreach Status). Focus area tags into `notes_freeform` on the funder. Grant deadlines into the opportunity's `application_deadline`.
+6. **Email Activity Log sheet** — one `development_notes` row per entry. Default `parent_kind='funder'` since spreadsheet entries don't reliably map to a specific cycle; importer can attempt opp matching when the entry text contains a year that matches an FY opportunity. `occurred_at` from Date, `body_markdown` from Subject/Summary, author resolved by matching staff name to `people.email` (default to `legacy-import@e8angels` placeholder if not resolvable).
 7. **Multi-value contact / email cells** — split into separate `people` rows and link via `development_contacts`. First listed becomes `is_primary=1`.
-8. **Multi-assignee cells** — collapse to a single owner: the first listed name becomes `development_entities.owner_person_record_id` (and is inherited as the current-FY opportunity's `owner_person_record_id`). Any additional names from the same cell are imported into `development_opportunity_advocates` on the current-FY opportunity so the relationship isn't lost — Karin reviews via the dry-run CSV and can promote one to owner if the import picked the wrong primary.
+8. **Multi-assignee cells** — collapse to a single lead: the first listed name becomes `development_funders.lead_person_record_id` (and is inherited as the current-FY opportunity's `lead_person_record_id`). Any additional names from the same cell are imported into `development_opportunity_supporters` on the current-FY opportunity so the relationship isn't lost — Karin reviews via the dry-run CSV and can promote one to lead if the import picked the wrong primary.
 9. **Mixed-format dates** — `Last Communication` and `Email Activity Log` columns mix `"2026-05-01"`, `"2024"`, `"Jan 2026"`. Parse to YMD where possible; store original string in the note body where not.
 10. **Section headers** — sheets use merged-cell section dividers ("CONFIRMED 2026 SPONSORS", "HOT/WARM/COLD PROSPECTS"). Use the Stage column as truth; section text breaks ties only when Stage is blank.
-11. **Dedup** — entities appearing on multiple sheets (e.g. Starbucks in Prospects + Email Log) collapse to one entity. Match on normalized name; ask before merging anything ambiguous.
+11. **Dedup** — funders appearing on multiple sheets (e.g. Starbucks in Prospects + Email Log) collapse to one funder. Match on normalized name; ask before merging anything ambiguous.
 
 Migration is scripted as `scripts/import-development-history.js` with `--env=prod` support per AGENTS.md, and dry-run by default. Output a CSV of decisions for Karin to review before the real run.
 
@@ -899,14 +930,14 @@ Work is executed sequentially. The Development CRM is released to the team only 
 - Relationship + opportunity list/detail surfaces
 - Stage Kanban on opportunities with drag-to-advance and stage-change prompts
 - Conversation log (polymorphic) + attachments (relationship + opportunity scopes)
-- Owner + primary contact assignment
+- Lead + primary contact assignment
 - Inline editing of all required fields
 - Mobile responsive pass
 
 ### Phase 3 — Money + goals
 - `development_amounts` UI on opportunity detail (ask / commit / receive with due/received dates)
-- Campaigns + per-legal-entity goals admin
-- KPI strip on staff dashboard, including legal-entity toggle
+- Campaigns + per-E8-organization goals admin
+- KPI strip on staff dashboard, including E8 organization toggle
 
 ### Phase 4 — Follow-ups + reminders
 - `development_followups` CRUD (polymorphic)
@@ -916,9 +947,9 @@ Work is executed sequentially. The Development CRM is released to the team only 
 
 ### Phase 5 — Board dashboard
 - `/board/development` read-only view
-- "My Connections" panel (entity-level)
+- "My Connections" panel (funder-level)
 - Recent activity feed (opportunity-aware)
-- "Log my interaction" form + owner notification
+- "Log my interaction" form + lead notification
 - Calendar month/week/table views for deadlines, reports, and tasks
 
 ### Phase 6 — Import + cleanup
@@ -928,18 +959,13 @@ Work is executed sequentially. The Development CRM is released to the team only 
 - `scripts/backfill-development-role-tags.js`
 - CSV export from filtered list
 
-### Phase 7 (post-v1) — Impact report
-- Standalone shareable document at `/admin/development/impact`
-- HTML print stylesheet + PDF export through existing PDF skill
-- Anonymized cohort + deployment stats pulled from the rest of the portal
-
 ## 10. V1 Boundaries
 
-- **Owner-change audit trail.** v1 records owner changes as auto-generated `development_notes` rows (`source='owner_changed'`) rather than a dedicated `development_ownership_events` table.
-- **Spreadsheet dedup.** Some entities may genuinely be different relationships under the same brand (Starbucks Corporate vs Starbucks Foundation). The import script flags ambiguous matches rather than auto-merging them.
-- **Legal-entity assignment for imported opportunities.** Rows without legal-entity data default to `501c6` (E8 Angels) unless the dry-run review changes them before import.
+- **Lead-change audit trail.** v1 records lead changes as auto-generated `development_notes` rows (`source='lead_changed'`) rather than a dedicated `development_lead assignment_events` table.
+- **Spreadsheet dedup.** Some funders may genuinely be different relationships under the same brand (Starbucks Corporate vs Starbucks Foundation). The import script flags ambiguous matches rather than auto-merging them.
+- **E8 organization assignment for imported opportunities.** Rows without E8 organization data default to `501c6` (E8 Angels) unless the dry-run review changes them before import.
 - **Glossary load lag.** The data-query skill caches the glossary per session; staff who already have a session open at deploy time need to restart the skill before the new tables appear in data-query answers.
 - **Multi-installment pledge UX.** v1 stores a pledge as one commit row plus multiple receive rows, each with `due_on`. It does not include a dedicated pledge-schedule table.
 - **Sponsorship benefits package.** Corporate sponsorship benefits such as logo placement, event tickets, naming rights, and recognition details are stored as free text in `development_opportunities.notes_freeform`.
-- **Email-to-opportunity matching.** v1 ingests emails entity-scoped only. Staff tag specific emails to opportunities manually.
+- **Email-to-opportunity matching.** v1 ingests emails funder-scoped only. Staff tag specific emails to opportunities manually.
 - **Grant vs sponsorship terminology.** The system distinguishes grants, sponsorships, and gifts through the `type` enum, sponsorship `subtype`, and the conditional fields those values control: deadlines/reporting for grants; term dates and subtype for sponsorships.

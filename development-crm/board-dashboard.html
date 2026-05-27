@@ -27,6 +27,8 @@
   .opp-grant       { background:#ccfbf1; color:#115e59; border:1px solid #99f6e4; }
   .opp-sponsorship { background:#dbeafe; color:#1e40af; border:1px solid #bfdbfe; }
   .opp-gift        { background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; }
+  .lead-avatar { width:24px; height:24px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid #cbd5e1; background:#fff; color:#334155; font-size:10px; font-weight:700; flex-shrink:0; }
+  .lead-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
 
   .activity-gift             { background:#d1fae5; color:#065f46; }
   .activity-commitment       { background:#dbeafe; color:#1d4ed8; }
@@ -126,14 +128,14 @@
 
         <div class="relative">
           <svg class="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"/></svg>
-          <input id="searchInput" type="text" placeholder="Search opportunities, entities, contacts…"
+          <input id="searchInput" type="text" placeholder="Search opportunities, funders, contacts…"
                  autocomplete="off" data-lpignore="true" data-form-type="other"
                  class="w-full h-8 pl-8 pr-2 border border-slate-300 rounded text-[13px] focus:outline-none focus:ring-2 focus:ring-blue-500"/>
         </div>
 
         <!-- LEGAL ENTITY -->
         <div>
-          <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1">Legal entity</div>
+          <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1">E8 organization</div>
           <div class="flex items-center bg-slate-100 rounded-md p-0.5">
             <button data-entity="all"   class="entity-btn flex-1 px-2 py-1 rounded font-medium bg-white shadow-sm text-[12px]">All</button>
             <button data-entity="501c6" class="entity-btn flex-1 px-2 py-1 rounded font-medium text-slate-600 hover:bg-white text-[12px]">501c6</button>
@@ -152,7 +154,7 @@
         <!-- ENTITY TYPE -->
         <details>
           <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
-            <span>Entity type</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+            <span>Funder type</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
           </summary>
           <ul class="text-[13px] space-y-0.5 mt-1" id="entityTypeFilter"></ul>
         </details>
@@ -168,9 +170,9 @@
         <!-- OWNER -->
         <details>
           <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
-            <span>Owner</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+            <span>Lead</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
           </summary>
-          <ul class="text-[13px] space-y-0.5 mt-1" id="ownerFilter"></ul>
+          <ul class="text-[13px] space-y-0.5 mt-1" id="leadFilter"></ul>
         </details>
 
       </div>
@@ -189,7 +191,6 @@
           <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
           Log my interaction
         </button>
-        <button class="h-7 px-2.5 text-[13px] font-medium border border-slate-300 bg-white hover:bg-slate-50 rounded whitespace-nowrap">Export board report</button>
       </div>
     </div>
 
@@ -230,7 +231,7 @@
             <div class="text-[12px] uppercase tracking-wider text-slate-500 font-semibold">My connections</div>
             <div class="ml-auto text-[12px] text-slate-400" id="myConnectionsCount">—</div>
           </div>
-          <div class="px-3 py-1.5 border-b border-slate-100 text-[11px] text-slate-400">Entities you introduced or have logged a note on.</div>
+          <div class="px-3 py-1.5 border-b border-slate-100 text-[11px] text-slate-400">Funders you introduced or have logged a note on.</div>
           <ul class="divide-y divide-slate-100" id="myConnections"></ul>
         </section>
       </aside>
@@ -253,7 +254,7 @@
         <label class="text-[12px] text-slate-500 block mb-1">Attach to</label>
         <div class="flex items-center bg-slate-100 rounded p-0.5 w-fit">
           <button type="button" id="logScopeOpp" class="px-2.5 py-1 rounded text-[13px] font-medium bg-white shadow-sm">An opportunity</button>
-          <button type="button" id="logScopeEnt" class="px-2.5 py-1 rounded text-[13px] font-medium text-slate-600 hover:bg-white">The relationship</button>
+          <button type="button" id="logScopeEnt" class="px-2.5 py-1 rounded text-[13px] font-medium text-slate-600 hover:bg-white">The Funder</button>
         </div>
       </div>
       <div>
@@ -273,7 +274,7 @@
         <input type="text" autocomplete="off" data-lpignore="true" data-form-type="other" class="w-full border border-slate-300 rounded px-2 h-8 text-sm" placeholder="e.g. Karin to send follow-up deck" />
       </div>
       <div class="bg-slate-50 border border-slate-200 rounded p-2 text-[12px] text-slate-600">
-        Submitting will tag this note as logged by you. The owner will be notified.
+        Submitting will tag this note as logged by you. The lead will be notified.
       </div>
     </div>
     <div class="px-4 py-3 border-t border-slate-200 flex justify-end gap-2">
@@ -307,10 +308,10 @@ const TYPES = [
 ];
 const matchType = (o, t) => o.type === t.type;
 const STAFF = [
-  { id:'KK', name:'Karin Kidder' },
-  { id:'KO', name:'Kathleen Olson' },
-  { id:'LO', name:"Lee O'Connor" },
-  { id:'JS', name:'Jordan Schwartz' },
+  { id:'KK', initials:'KK', name:'Karin Kidder', photo:'https://i.pravatar.cc/96?img=47' },
+  { id:'KO', initials:'KO', name:'Kathleen Olson', photo:null },
+  { id:'LO', initials:'LO', name:"Lee O'Connor", photo:null },
+  { id:'JS', initials:'JS', name:'Jordan Schwartz', photo:null },
 ];
 
 const ENTITIES = [
@@ -331,24 +332,24 @@ const ENTITIES = [
 ];
 const entityById = (id) => ENTITIES.find(e => e.id === id);
 
-// `advocate` is an internal E8 person (typically a board member) helping move the opp forward.
+// `supporter` is an internal E8 person (typically a board member) helping move the opp forward.
 // Zero, one, or — rarely — more per opp. Surfaced on the Kanban tile and the opp detail page.
 const OPPS = [
-  { id:'dopp_1',  name:'Microsoft FY26 Sponsorship',         entity_id:'dent_1',  type:'sponsorship', subtype:'annual', stage:'received',     legal_entity:'501c3', amount:'$75k',  owner:'KK', advocate:'Kathleen Hebert', overdue:false, lastActivity:'1w' },
-  { id:'dopp_2',  name:'Microsoft FY27 Sponsorship',         entity_id:'dent_1',  type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c3', amount:'$85k',  owner:'KK', advocate:'Kathleen Hebert', overdue:false, lastActivity:'3d' },
-  { id:'dopp_3',  name:'Bullitt Climate Justice Grant 2026', entity_id:'dent_2',  type:'grant',       subtype:null,     stage:'committed',    legal_entity:'501c3', amount:'$50k',  owner:'KK', advocate:null,              overdue:true,  lastActivity:'4d', lisa:true },
-  { id:'dopp_4',  name:'Stoel Rives Summit Sponsorship 2026', entity_id:'dent_3', type:'sponsorship', subtype:'event',  stage:'committed',    legal_entity:'501c6', amount:'$15k',  owner:'KO', advocate:'Mark Schwabe',    overdue:false, lastActivity:'5d' },
-  { id:'dopp_5',  name:'Schwabe FY26 Sponsorship',           entity_id:'dent_4',  type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c6', amount:'$25k',  owner:'KO', advocate:null,              overdue:false, lastActivity:'3d' },
-  { id:'dopp_6',  name:'Wilson Sonsini FY26 Sponsorship',    entity_id:'dent_5',  type:'sponsorship', subtype:'annual', stage:'conversation', legal_entity:'both',  amount:'$10k',  owner:'KK', advocate:null,              overdue:false, lastActivity:'4d' },
-  { id:'dopp_7',  name:'McKinstry Fellowship FY26',          entity_id:'dent_6',  type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c3', amount:'$30k',  owner:'LO', advocate:'Dean Allen',      overdue:true,  lastActivity:'2d' },
-  { id:'dopp_9',  name:'Walton Fellowship Grant 2026',       entity_id:'dent_7',  type:'grant',       subtype:null,     stage:'conversation', legal_entity:'501c3', amount:'$100k', owner:'JS', advocate:'Lisa Rasmussen',  overdue:false, lastActivity:'2d', lisa:true },
-  { id:'dopp_10', name:'Bezos Climate Justice Grant 2026',   entity_id:'dent_8',  type:'grant',       subtype:null,     stage:'outreach',     legal_entity:'501c3', amount:'$250k', owner:'JS', advocate:'Lisa Rasmussen',  overdue:false, lastActivity:'8d', lisa:true },
-  { id:'dopp_11', name:'Sea Mar Health Equity Grant 2026',   entity_id:'dent_9',  type:'grant',       subtype:null,     stage:'prospect',     legal_entity:'501c3', amount:'$5k',   owner:'KK', advocate:null,              overdue:false, lastActivity:null },
-  { id:'dopp_12', name:'Starbucks Coffee Sponsorship FY26',  entity_id:'dent_10', type:'sponsorship', subtype:'annual', stage:'conversation', legal_entity:'both',  amount:'$20k',  owner:'KO', advocate:null,              overdue:false, lastActivity:'1w' },
-  { id:'dopp_14', name:'Anonymous Major Gift 2026',          entity_id:'dent_12', type:'gift',        subtype:null,     stage:'received',     legal_entity:'501c3', amount:'$25k',  owner:'KK', advocate:'Kathleen Hebert', overdue:false, lastActivity:'2w' },
-  { id:'dopp_15', name:'Convene Summit Venue 2026',          entity_id:'dent_13', type:'sponsorship', subtype:'event',  stage:'committed',    legal_entity:'501c6', amount:'$8k',   owner:'KO', advocate:null,              overdue:false, lastActivity:'1w' },
-  { id:'dopp_16', name:'Russell Fellowship Grant 2026',      entity_id:'dent_14', type:'grant',       subtype:null,     stage:'proposal',     legal_entity:'501c3', amount:'$35k',  owner:'LO', advocate:null,              overdue:false, lastActivity:'6d' },
-  { id:'dopp_17', name:'Patagonia FY26 Sponsorship',         entity_id:'dent_15', type:'sponsorship', subtype:'annual', stage:'outreach',     legal_entity:'501c3', amount:'$15k',  owner:'JS', advocate:null,              overdue:false, lastActivity:'5d' },
+  { id:'dopp_1',  name:'Microsoft FY26 Sponsorship',         entity_id:'dent_1',  type:'sponsorship', subtype:'annual', stage:'received',     legal_entity:'501c3', amount:'$75k',  lead:'KK', supporter:'Kathleen Hebert', overdue:false, lastActivity:'1w' },
+  { id:'dopp_2',  name:'Microsoft FY27 Sponsorship',         entity_id:'dent_1',  type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c3', amount:'$85k',  lead:'KK', supporter:'Kathleen Hebert', overdue:false, lastActivity:'3d' },
+  { id:'dopp_3',  name:'Bullitt Climate Justice Grant 2026', entity_id:'dent_2',  type:'grant',       subtype:null,     stage:'committed',    legal_entity:'501c3', amount:'$50k',  lead:'KK', supporter:null,              overdue:true,  lastActivity:'4d', lisa:true },
+  { id:'dopp_4',  name:'Stoel Rives Summit Sponsorship 2026', entity_id:'dent_3', type:'sponsorship', subtype:'event',  stage:'committed',    legal_entity:'501c6', amount:'$15k',  lead:'KO', supporter:'Mark Schwabe',    overdue:false, lastActivity:'5d' },
+  { id:'dopp_5',  name:'Schwabe FY26 Sponsorship',           entity_id:'dent_4',  type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c6', amount:'$25k',  lead:'KO', supporter:null,              overdue:false, lastActivity:'3d' },
+  { id:'dopp_6',  name:'Wilson Sonsini FY26 Sponsorship',    entity_id:'dent_5',  type:'sponsorship', subtype:'annual', stage:'conversation', legal_entity:'both',  amount:'$10k',  lead:'KK', supporter:null,              overdue:false, lastActivity:'4d' },
+  { id:'dopp_7',  name:'McKinstry Fellowship FY26',          entity_id:'dent_6',  type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c3', amount:'$30k',  lead:'LO', supporter:'Dean Allen',      overdue:true,  lastActivity:'2d' },
+  { id:'dopp_9',  name:'Walton Fellowship Grant 2026',       entity_id:'dent_7',  type:'grant',       subtype:null,     stage:'conversation', legal_entity:'501c3', amount:'$100k', lead:'JS', supporter:'Lisa Rasmussen',  overdue:false, lastActivity:'2d', lisa:true },
+  { id:'dopp_10', name:'Bezos Climate Justice Grant 2026',   entity_id:'dent_8',  type:'grant',       subtype:null,     stage:'outreach',     legal_entity:'501c3', amount:'$250k', lead:'JS', supporter:'Lisa Rasmussen',  overdue:false, lastActivity:'8d', lisa:true },
+  { id:'dopp_11', name:'Sea Mar Health Equity Grant 2026',   entity_id:'dent_9',  type:'grant',       subtype:null,     stage:'prospect',     legal_entity:'501c3', amount:'$5k',   lead:'KK', supporter:null,              overdue:false, lastActivity:null },
+  { id:'dopp_12', name:'Starbucks Coffee Sponsorship FY26',  entity_id:'dent_10', type:'sponsorship', subtype:'annual', stage:'conversation', legal_entity:'both',  amount:'$20k',  lead:'KO', supporter:null,              overdue:false, lastActivity:'1w' },
+  { id:'dopp_14', name:'Anonymous Major Gift 2026',          entity_id:'dent_12', type:'gift',        subtype:null,     stage:'received',     legal_entity:'501c3', amount:'$25k',  lead:'KK', supporter:'Kathleen Hebert', overdue:false, lastActivity:'2w' },
+  { id:'dopp_15', name:'Convene Summit Venue 2026',          entity_id:'dent_13', type:'sponsorship', subtype:'event',  stage:'committed',    legal_entity:'501c6', amount:'$8k',   lead:'KO', supporter:null,              overdue:false, lastActivity:'1w' },
+  { id:'dopp_16', name:'Russell Fellowship Grant 2026',      entity_id:'dent_14', type:'grant',       subtype:null,     stage:'proposal',     legal_entity:'501c3', amount:'$35k',  lead:'LO', supporter:null,              overdue:false, lastActivity:'6d' },
+  { id:'dopp_17', name:'Patagonia FY26 Sponsorship',         entity_id:'dent_15', type:'sponsorship', subtype:'annual', stage:'outreach',     legal_entity:'501c3', amount:'$15k',  lead:'JS', supporter:null,              overdue:false, lastActivity:'5d' },
 ];
 
 // Activity feed — opportunity-level events for the board to skim.
@@ -363,10 +364,10 @@ const ACTIVITY = [
 ];
 
 const GRANT_DEADLINES = [
-  { opp:'Russell Fellowship Grant 2026',     entity:'Russell Family Foundation', stage:'Proposal',     amount:'$35k',  owner:'LO', due:'May 28', daysLeft:6 },
-  { opp:'Sea Mar Health Equity Grant 2026',  entity:'Sea Mar Foundation',        stage:'Prospect',     amount:'$5k',   owner:'KK', due:'Jun 11', daysLeft:20 },
-  { opp:'Bezos Climate Justice Grant 2026',  entity:'Bezos Earth Fund',          stage:'Outreach',     amount:'$250k', owner:'JS', due:'Jul 1',  daysLeft:40 },
-  { opp:'Walton Fellowship Grant 2026',      entity:'Walton Family Foundation',  stage:'Conversation', amount:'$100k', owner:'JS', due:'Jul 16', daysLeft:55 },
+  { opp:'Russell Fellowship Grant 2026',     entity:'Russell Family Foundation', stage:'Proposal',     amount:'$35k',  lead:'LO', due:'May 28', daysLeft:6 },
+  { opp:'Sea Mar Health Equity Grant 2026',  entity:'Sea Mar Foundation',        stage:'Prospect',     amount:'$5k',   lead:'KK', due:'Jun 11', daysLeft:20 },
+  { opp:'Bezos Climate Justice Grant 2026',  entity:'Bezos Earth Fund',          stage:'Outreach',     amount:'$250k', lead:'JS', due:'Jul 1',  daysLeft:40 },
+  { opp:'Walton Fellowship Grant 2026',      entity:'Walton Family Foundation',  stage:'Conversation', amount:'$100k', lead:'JS', due:'Jul 16', daysLeft:55 },
 ];
 
 let legalEntityFilter = 'all';
@@ -388,6 +389,12 @@ function typeOf(o) {
 function typeChip(o) {
   const t = typeOf(o);
   return `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${t.cls}">${t.label}</span>`;
+}
+function staffById(id) { return STAFF.find(s => s.id === id) || { initials:id || '?', name:id || '?' }; }
+function leadAvatar(id) {
+  const person = staffById(id);
+  const photo = person.photo ? `<img src="${person.photo}" alt="">` : (person.initials || id);
+  return `<span class="lead-avatar" title="${person.name}" aria-label="${person.name}">${photo}</span>`;
 }
 
 function filteredOpps() {
@@ -429,8 +436,8 @@ function renderSidebar() {
       <span class="ml-auto text-[12px] text-slate-400">${n}</span>
     </label></li>`;
   }).join('');
-  document.getElementById('ownerFilter').innerHTML = STAFF.map(o => {
-    const n = items.filter(x => x.owner === o.id).length;
+  document.getElementById('leadFilter').innerHTML = STAFF.map(o => {
+    const n = items.filter(x => x.lead === o.id).length;
     return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
       <input type="checkbox" class="rounded" />
       <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] flex items-center justify-center font-semibold">${o.id}</span>
@@ -469,15 +476,15 @@ function renderKanban() {
         ${stageItems.map(o => {
           const ent = entityById(o.entity_id) || {name:'?'};
           return `<a href="entity-detail.html" class="block bg-white border border-slate-200 rounded hover:border-blue-400 transition no-underline text-inherit overflow-hidden">
-            <div class="px-2.5 py-1.5 bg-slate-100 border-b border-slate-200 flex items-center gap-1.5 flex-wrap">
-              ${typeChip(o)}
-              ${legalEntityChip(o.legal_entity)}
+            <div class="px-2.5 py-1.5 bg-slate-100 border-b border-slate-200 flex items-center gap-1.5">
+              <div class="flex items-center gap-1.5 flex-wrap min-w-0">${typeChip(o)} ${legalEntityChip(o.legal_entity)}</div>
+              <div class="ml-auto">${leadAvatar(o.lead)}</div>
             </div>
             <div class="px-2.5 pt-2 pb-2.5">
               <div class="text-[13px] font-semibold leading-tight text-slate-900 truncate">${o.name}</div>
               <div class="text-[12px] text-slate-500 mt-0.5 truncate">${ent.name}</div>
               <div class="text-[15px] font-semibold tabular-nums text-slate-900 mt-2">${o.amount}</div>
-              ${o.advocate ? `<div class="text-[12px] text-slate-500 mt-1 truncate"><span class="text-slate-400">Advocate:</span> <span class="text-slate-700">${o.advocate}</span></div>` : ''}
+              ${o.supporter ? `<div class="text-[12px] text-slate-500 mt-1 truncate"><span class="text-slate-400">Support:</span> <span class="text-slate-700">${o.supporter}</span></div>` : ''}
             </div>
             ${tileFooter(o)}
           </a>`;
@@ -519,7 +526,7 @@ function renderGrants() {
         <div class="text-[14px] font-medium truncate">${g.opp}</div>
         <div class="text-[12px] text-slate-500 truncate">${g.entity} · ${g.stage} · Ask ${g.amount} · ${g.daysLeft} days left</div>
       </div>
-      <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] inline-flex items-center justify-center font-semibold">${g.owner}</span>
+      <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] inline-flex items-center justify-center font-semibold">${g.lead}</span>
     </a>`).join('');
 }
 
@@ -594,7 +601,7 @@ function setLogScope(scope) {
   logEntBtn.classList.toggle('bg-white', !oppActive);
   logEntBtn.classList.toggle('shadow-sm', !oppActive);
   logEntBtn.classList.toggle('text-slate-600', oppActive);
-  logLabel.textContent = oppActive ? 'Opportunity' : 'Entity';
+  logLabel.textContent = oppActive ? 'Opportunity' : 'Funder';
 }
 logOppBtn.addEventListener('click', () => setLogScope('opp'));
 logEntBtn.addEventListener('click', () => setLogScope('ent'));

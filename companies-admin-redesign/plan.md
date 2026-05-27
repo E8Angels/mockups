@@ -315,6 +315,10 @@ For each available filter:
 
 The list mockups (`variant-a-list.html` and `variant-a-groupby.html`) show the view builder rail in context. `view-builder.html` isolates the chooser interaction so implementation details that are difficult to see in the list surface remain explicit.
 
+### 9.2.1 AI view assist
+
+AI-assisted view creation and the dynamic rollup engine are now tracked as a separate feature plan: `../dynamic-rollups-ai-assist/plan.md`. The Companies redesign should treat that work as an adjacent capability: this page remains the first company/application-centered surface that will eventually host AI Assist, but the architecture, relationship registry, rollup migration, query-backed reports, and cross-grid expansion live in the standalone plan.
+
 ### 9.3 Custom column builder
 
 For the rare case where the user wants something the pre-rolled set doesn't cover: a guided form that asks for a name, what to count/sum/find-latest-of, and which records to include. Hidden behind an "Advanced" disclosure.

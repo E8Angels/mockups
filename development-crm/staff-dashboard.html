@@ -32,6 +32,8 @@
   .opp-grant       { background:#ccfbf1; color:#115e59; border:1px solid #99f6e4; }  /* teal */
   .opp-sponsorship { background:#dbeafe; color:#1e40af; border:1px solid #bfdbfe; }  /* blue */
   .opp-gift        { background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; }  /* slate */
+  .lead-avatar { width:28px; height:28px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid #cbd5e1; background:#fff; color:#334155; font-size:11px; font-weight:700; flex-shrink:0; }
+  .lead-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
 
   details > summary { list-style: none; cursor: pointer; }
   details > summary::-webkit-details-marker { display: none; }
@@ -123,7 +125,7 @@
   <div class="bg-white border border-slate-200 rounded-md p-3">
     <div class="text-[12px] uppercase tracking-wide text-slate-500">Overdue follow-ups</div>
     <div class="text-xl md:text-2xl font-semibold mt-0.5 text-red-700" id="kpiOverdue">—</div>
-    <div class="text-[12px] text-slate-500 mt-1">Across all owners</div>
+    <div class="text-[12px] text-slate-500 mt-1">Across all leads</div>
   </div>
   <div class="bg-white border border-slate-200 rounded-md p-3">
     <div class="text-[12px] uppercase tracking-wide text-slate-500">Avg gift (received)</div>
@@ -168,9 +170,18 @@
         <!-- SEARCH -->
         <div class="relative">
           <svg class="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"/></svg>
-          <input id="searchInput" type="text" placeholder="Search opportunities, organizations, contacts..."
+          <input id="searchInput" type="text" placeholder="Search opportunities, funders, contacts..."
                  autocomplete="off" data-lpignore="true" data-form-type="other"
                  class="w-full h-8 pl-8 pr-2 border border-slate-300 rounded text-[13px] focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+        </div>
+
+        <!-- QUICK FILTERS -->
+        <div>
+          <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1">Quick filters</div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <button type="button" data-quick-filter="my-opportunities" class="quick-filter-btn h-8 px-2 text-[12px] border border-slate-300 rounded bg-white hover:bg-slate-50">My Opportunities</button>
+            <button type="button" data-quick-filter="my-funders" class="quick-filter-btn h-8 px-2 text-[12px] border border-slate-300 rounded bg-white hover:bg-slate-50">My Funders</button>
+          </div>
         </div>
 
         <!-- LEGAL ENTITY -->
@@ -191,10 +202,10 @@
           <ul class="text-[13px] space-y-0.5 mt-1" id="kindFilter"></ul>
         </details>
 
-        <!-- ENTITY TYPE -->
+        <!-- FUNDER TYPE -->
         <details>
           <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
-            <span>Relationship type</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+            <span>Funder type</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
           </summary>
           <ul class="text-[13px] space-y-0.5 mt-1" id="typeFilter"></ul>
         </details>
@@ -207,12 +218,12 @@
           <ul class="text-[13px] space-y-0.5 mt-1" id="stageFilter"></ul>
         </details>
 
-        <!-- ASSIGNED TO -->
+        <!-- LEAD -->
         <details>
           <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
-            <span>Assigned to</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
+            <span>Lead</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
           </summary>
-          <ul class="text-[13px] space-y-0.5 mt-1" id="ownerFilter"></ul>
+          <ul class="text-[13px] space-y-0.5 mt-1" id="leadFilter"></ul>
         </details>
 
         <!-- FOLLOW-UP -->
@@ -277,7 +288,6 @@
           New opportunity
         </button>
         <button class="h-7 px-2.5 text-[13px] font-medium border border-slate-300 bg-white hover:bg-slate-50 rounded whitespace-nowrap">Export CSV</button>
-        <button class="h-7 px-2.5 text-[13px] font-medium border border-slate-300 bg-white hover:bg-slate-50 rounded whitespace-nowrap hidden md:inline-block">Snapshot PDF</button>
       </div>
     </div>
 
@@ -293,22 +303,28 @@
         <div id="kanbanBoard" class="flex gap-3 h-full"></div>
       </div>
       <div id="listView" class="flex-1 overflow-auto bg-white hidden">
+        <div class="sticky top-0 z-20 border-b border-slate-200 bg-white px-3 py-2 flex items-center gap-2 flex-wrap">
+          <label for="recordGridViewSelect" class="text-[12px] font-medium text-slate-500">View</label>
+          <select id="recordGridViewSelect" class="h-8 min-w-[230px] border border-slate-300 rounded px-2 text-[13px] bg-white" autocomplete="off" data-lpignore="true" data-form-type="other">
+            <optgroup label="Opportunities">
+              <option value="opportunities:pipeline">Pipeline opportunities</option>
+              <option value="opportunities:my">My Opportunities</option>
+              <option value="opportunities:reporting">Reporting due</option>
+            </optgroup>
+            <optgroup label="Funders">
+              <option value="funders:all">All Funders</option>
+              <option value="funders:my">My Funders</option>
+              <option value="funders:cold">Cold prospects</option>
+            </optgroup>
+          </select>
+          <div class="ml-auto flex items-center gap-2">
+            <button class="h-7 px-2.5 text-[13px] font-medium border border-slate-300 bg-white hover:bg-slate-50 rounded whitespace-nowrap">Columns</button>
+            <button class="h-7 px-2.5 text-[13px] font-medium border border-slate-300 bg-white hover:bg-slate-50 rounded whitespace-nowrap">AI Assist</button>
+            <button class="h-7 px-2.5 text-[13px] font-medium border border-slate-300 bg-white hover:bg-slate-50 rounded whitespace-nowrap">View builder</button>
+          </div>
+        </div>
         <table class="w-full text-[14px] border-collapse">
-          <thead class="bg-slate-50 sticky top-0 z-10">
-            <tr class="text-left text-[12px] uppercase tracking-wider text-slate-500">
-              <th class="px-3 py-2 font-semibold">Opportunity</th>
-              <th class="px-3 py-2 font-semibold">Organization</th>
-              <th class="px-3 py-2 font-semibold">Kind</th>
-              <th class="px-3 py-2 font-semibold">E8 organization</th>
-              <th class="px-3 py-2 font-semibold">Stage</th>
-              <th class="px-3 py-2 font-semibold text-right">Ask</th>
-              <th class="px-3 py-2 font-semibold text-right">Received</th>
-              <th class="px-3 py-2 font-semibold">FY</th>
-              <th class="px-3 py-2 font-semibold">Owner</th>
-              <th class="px-3 py-2 font-semibold">Advocate</th>
-              <th class="px-3 py-2 font-semibold">Next follow-up</th>
-            </tr>
-          </thead>
+          <thead id="listHead" class="bg-slate-50 sticky top-[49px] z-10"></thead>
           <tbody id="listBody"></tbody>
         </table>
       </div>
@@ -336,7 +352,7 @@
         </div>
         <div class="mt-3 bg-white border border-slate-200 rounded-md overflow-hidden">
           <table class="w-full text-[13px]">
-            <thead class="bg-slate-50 text-left text-[11px] uppercase tracking-wider text-slate-500"><tr><th class="px-3 py-2">Date</th><th class="px-3 py-2">Item</th><th class="px-3 py-2">Type</th><th class="px-3 py-2">Owner</th></tr></thead>
+            <thead class="bg-slate-50 text-left text-[11px] uppercase tracking-wider text-slate-500"><tr><th class="px-3 py-2">Date</th><th class="px-3 py-2">Item</th><th class="px-3 py-2">Type</th><th class="px-3 py-2">Lead</th></tr></thead>
             <tbody>
               <tr class="border-t border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-3 py-2">May 12</td><td class="px-3 py-2"><a href="entity-detail.html" class="quiet-link">Walton outcomes packet</a></td><td class="px-3 py-2">Follow-up</td><td class="px-3 py-2">Jordan</td></tr>
               <tr class="border-t border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)"><td class="px-3 py-2">May 15</td><td class="px-3 py-2"><a href="entity-detail.html" class="quiet-link">Bullitt report due</a></td><td class="px-3 py-2">Reporting</td><td class="px-3 py-2">Karin</td></tr>
@@ -391,16 +407,16 @@
       <section class="wizard-step active" data-step="1">
         <div class="grid md:grid-cols-2 gap-3">
           <div role="button" tabindex="0" class="wizard-choice active cursor-pointer" data-entity-mode="existing">
-            <div class="font-semibold">Use an existing relationship</div>
+            <div class="font-semibold">Use an existing Funder</div>
           </div>
           <div role="button" tabindex="0" class="wizard-choice cursor-pointer" data-entity-mode="new">
-            <div class="font-semibold">Create a new relationship</div>
+            <div class="font-semibold">Create a new Funder</div>
           </div>
         </div>
 
         <div id="existingEntityPane" class="mt-4 space-y-3">
           <div class="wizard-field">
-            <label class="wizard-label" for="entitySearch">Organization</label>
+            <label class="wizard-label" for="entitySearch">Funder</label>
             <div>
               <input id="entitySearch" type="text" value="Walton" autocomplete="off" data-lpignore="true" data-form-type="other"
                      class="wizard-input" placeholder="Type to search..." />
@@ -492,6 +508,13 @@
             </div>
           </div>
 
+          <div id="newEventRow" class="wizard-field hidden">
+            <label class="wizard-label" for="newEventName">Event</label>
+            <input id="newEventName" type="text" autocomplete="off" data-lpignore="true" data-form-type="other"
+                   placeholder="e.g. Portland Sip and Share"
+                   class="wizard-input max-w-[320px]"/>
+          </div>
+
           <div class="wizard-field">
             <label class="wizard-label">E8 organization</label>
             <div class="flex flex-wrap gap-2">
@@ -508,7 +531,7 @@
           </div>
 
           <div class="wizard-field">
-            <label class="wizard-label">Owner</label>
+            <label class="wizard-label">Lead</label>
             <select class="wizard-input max-w-[260px]">
               <option>Karin Kidder (me)</option>
               <option>Kathleen Olson</option>
@@ -605,7 +628,7 @@
             <div class="mt-4 grid grid-cols-2 gap-3 text-[13px]">
               <div><div class="text-slate-500">Ask</div><div class="font-semibold">$100,000 cash + in-kind support</div></div>
               <div><div class="text-slate-500">Initial stage</div><div class="font-semibold">Prospect</div></div>
-              <div><div class="text-slate-500">Owner</div><div class="font-semibold">Karin Kidder</div></div>
+              <div><div class="text-slate-500">Lead</div><div class="font-semibold">Karin Kidder</div></div>
               <div><div class="text-slate-500">Contact</div><div class="font-semibold">Taylor Brugh</div></div>
             </div>
           </div>
@@ -680,11 +703,12 @@ const TYPES = [
   { type:'gift',        label:'Gift',        cls:'opp-gift' },
 ];
 const matchType = (o, t) => o.type === t.type;
+const CURRENT_USER_ID = 'p_jordan';
 const STAFF = [
-  { id:'p_karin',    initials:'KK', name:'Karin Kidder' },
-  { id:'p_kathleen', initials:'KO', name:'Kathleen Olson' },
-  { id:'p_lee',      initials:'LO', name:"Lee O'Connor" },
-  { id:'p_jordan',   initials:'JS', name:'Jordan Schwartz' },
+  { id:'p_karin',    initials:'KK', name:'Karin Kidder', photo:'https://i.pravatar.cc/96?img=47' },
+  { id:'p_kathleen', initials:'KO', name:'Kathleen Olson', photo:null },
+  { id:'p_lee',      initials:'LO', name:"Lee O'Connor", photo:null },
+  { id:'p_jordan',   initials:'JS', name:'Jordan Schwartz', photo:null },
 ];
 const TODAY = new Date('2026-05-22');
 const isoDate = d => d.toISOString().slice(0,10);
@@ -700,23 +724,23 @@ const fmtMoneyFull = (cents) => {
   return '$' + Math.round(cents/100).toLocaleString();
 };
 
-// Entities. The durable relationship records.
+// Funders. The durable relationship records.
 const ENTITIES = [
-  { id:'dent_1',  name:'Microsoft AI for Good',     type:'corporate',  primaryContact:'Brandon Middaugh' },
-  { id:'dent_2',  name:'Bullitt Foundation',         type:'foundation', primaryContact:'Pat Forster' },
-  { id:'dent_3',  name:'Stoel Rives LLP',            type:'corporate',  primaryContact:'Greg Jacobson' },
-  { id:'dent_4',  name:'Schwabe Williamson',         type:'corporate',  primaryContact:'Connie Sun' },
-  { id:'dent_5',  name:'Wilson Sonsini',             type:'corporate',  primaryContact:'Mark Talley' },
-  { id:'dent_6',  name:'McKinstry',                  type:'corporate',  primaryContact:'Ash Aiyar' },
-  { id:'dent_7',  name:'Walton Family Foundation',   type:'foundation', primaryContact:'Taylor Brugh' },
-  { id:'dent_8',  name:'Bezos Earth Fund',           type:'foundation', primaryContact:'Andy Karsner' },
-  { id:'dent_9',  name:'Sea Mar Foundation',         type:'foundation', primaryContact:null },
-  { id:'dent_10', name:'Starbucks',                  type:'corporate',  primaryContact:'Maria Lopez' },
-  { id:'dent_11', name:'JP Morgan Climate',          type:'corporate',  primaryContact:'Reed Phillips' },
-  { id:'dent_12', name:'Anonymous Major Donor',      type:'individual', primaryContact:null },
-  { id:'dent_13', name:'Convene Seattle',            type:'corporate',  primaryContact:'Jen Reyes' },
-  { id:'dent_14', name:'Russell Family Foundation',  type:'foundation', primaryContact:'Erika Russell' },
-  { id:'dent_15', name:'Patagonia',                  type:'corporate',  primaryContact:'Cara Dolan' },
+  { id:'dent_1',  name:'Microsoft AI for Good',     type:'corporate',  primaryContact:'Brandon Middaugh', lead:'p_karin' },
+  { id:'dent_2',  name:'Bullitt Foundation',         type:'foundation', primaryContact:'Pat Forster', lead:'p_karin' },
+  { id:'dent_3',  name:'Stoel Rives LLP',            type:'corporate',  primaryContact:'Greg Jacobson', lead:'p_kathleen' },
+  { id:'dent_4',  name:'Schwabe Williamson',         type:'corporate',  primaryContact:'Connie Sun', lead:'p_kathleen' },
+  { id:'dent_5',  name:'Wilson Sonsini',             type:'corporate',  primaryContact:'Mark Talley', lead:'p_karin' },
+  { id:'dent_6',  name:'McKinstry',                  type:'corporate',  primaryContact:'Ash Aiyar', lead:'p_lee' },
+  { id:'dent_7',  name:'Walton Family Foundation',   type:'foundation', primaryContact:'Taylor Brugh', lead:'p_jordan' },
+  { id:'dent_8',  name:'Bezos Earth Fund',           type:'foundation', primaryContact:'Andy Karsner', lead:'p_jordan' },
+  { id:'dent_9',  name:'Sea Mar Foundation',         type:'foundation', primaryContact:null, lead:'p_karin' },
+  { id:'dent_10', name:'Starbucks',                  type:'corporate',  primaryContact:'Maria Lopez', lead:'p_kathleen' },
+  { id:'dent_11', name:'JP Morgan Climate',          type:'corporate',  primaryContact:'Reed Phillips', lead:'p_karin' },
+  { id:'dent_12', name:'Anonymous Major Donor',      type:'individual', primaryContact:null, lead:'p_karin' },
+  { id:'dent_13', name:'Convene Seattle',            type:'corporate',  primaryContact:'Jen Reyes', lead:'p_kathleen' },
+  { id:'dent_14', name:'Russell Family Foundation',  type:'foundation', primaryContact:'Erika Russell', lead:'p_lee' },
+  { id:'dent_15', name:'Patagonia',                  type:'corporate', primaryContact:'Cara Dolan', lead:'p_jordan' },
 ];
 const entityById = (id) => ENTITIES.find(e => e.id === id);
 
@@ -726,56 +750,97 @@ const entityById = (id) => ENTITIES.find(e => e.id === id);
 //   2. Microsoft has FY26 (received) AND FY27 (proposal) — same entity, renewal cycle.
 //   3. Some sponsorships pay in cash (Microsoft, Stoel Rives); others pay in-kind (Starbucks coffee,
 //      Convene venue). In-kind is a nature on the underlying amount rows, not an opportunity type.
-//   4. `advocate` is an internal E8 person (typically a board member) helping move the opp forward.
+//   4. `supporter` is an internal E8 person (typically a board member) helping move the opp forward.
 //      Zero, one, or — rarely — more per opp. Surfaced on the Kanban tile and the opp detail page.
 const OPPS = [
   // Microsoft: two consecutive sponsorship cycles, both annual cash
-  { id:'dopp_1',  name:'Microsoft FY26 Sponsorship',         entity_id:'dent_1',  type:'sponsorship', subtype:'annual', stage:'received',     legal_entity:'501c3', ask:7500000,  commit:7500000, received:7500000, fy:2026, term_start:'2025-08-01', term_end:'2026-07-31', deadline:null, reporting_due:null, owner:'p_karin',    advocate:'Kathleen Hebert', campaign:'FY26 Annual Fund', followup:daysFromToday(45) },
-  { id:'dopp_2',  name:'Microsoft FY27 Sponsorship',         entity_id:'dent_1',  type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c3', ask:8500000,  commit:0,        received:0,       fy:2027, term_start:'2026-08-01', term_end:'2027-07-31', deadline:null, reporting_due:null, owner:'p_karin',    advocate:'Kathleen Hebert', campaign:'FY27 Annual Fund', followup:daysFromToday(7) },
+  { id:'dopp_1',  name:'Microsoft FY26 Sponsorship',         entity_id:'dent_1',  type:'sponsorship', subtype:'annual', stage:'received',     legal_entity:'501c3', ask:7500000,  commit:7500000, received:7500000, fy:2026, term_start:'2025-08-01', term_end:'2026-07-31', deadline:null, reporting_due:null, lead:'p_karin',    supporter:'Kathleen Hebert', campaign:'FY26 Annual Fund', followup:daysFromToday(45) },
+  { id:'dopp_2',  name:'Microsoft FY27 Sponsorship',         entity_id:'dent_1',  type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c3', ask:8500000,  commit:0,        received:0,       fy:2027, term_start:'2026-08-01', term_end:'2027-07-31', deadline:null, reporting_due:null, lead:'p_karin',    supporter:'Kathleen Hebert', campaign:'FY27 Annual Fund', followup:daysFromToday(7) },
 
-  { id:'dopp_3',  name:'Bullitt Climate Justice Grant 2026', entity_id:'dent_2', type:'grant',       subtype:null,     stage:'committed',    legal_entity:'501c3', ask:5000000,  commit:5000000, received:0,       fy:2026, term_start:'2026-07-01', term_end:'2027-06-30', deadline:daysFromToday(-30), reporting_due:daysFromToday(45), owner:'p_karin',    advocate:null,              campaign:'Fellowship Program', followup:daysFromToday(-3) },
-  { id:'dopp_4',  name:'Stoel Rives Summit Sponsorship 2026', entity_id:'dent_3', type:'sponsorship', subtype:'event',  stage:'committed',    legal_entity:'501c6', ask:1500000,  commit:1500000, received:0,       fy:2026, term_start:'2026-06-01', term_end:'2026-06-30', deadline:null, reporting_due:null, owner:'p_kathleen', advocate:'Mark Schwabe',    campaign:'Member Events', followup:daysFromToday(5) },
-  { id:'dopp_5',  name:'Schwabe FY26 Sponsorship',           entity_id:'dent_4', type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c6', ask:2500000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, owner:'p_kathleen', advocate:null,              campaign:'Member Events', followup:daysFromToday(2) },
-  { id:'dopp_6',  name:'Wilson Sonsini FY26 Sponsorship',    entity_id:'dent_5', type:'sponsorship', subtype:'annual', stage:'conversation', legal_entity:'both',  ask:1000000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, owner:'p_karin',    advocate:null,              campaign:'Member Events', followup:daysFromToday(7) },
-  { id:'dopp_7',  name:'McKinstry Fellowship FY26',          entity_id:'dent_6', type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c3', ask:3000000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, owner:'p_lee',      advocate:'Dean Allen',      campaign:'Fellowship Program', followup:daysFromToday(-1) },
+  { id:'dopp_3',  name:'Bullitt Climate Justice Grant 2026', entity_id:'dent_2', type:'grant',       subtype:null,     stage:'committed',    legal_entity:'501c3', ask:5000000,  commit:5000000, received:0,       fy:2026, term_start:'2026-07-01', term_end:'2027-06-30', deadline:daysFromToday(-30), reporting_due:daysFromToday(45), lead:'p_karin',    supporter:null,              campaign:'Fellowship Program', followup:daysFromToday(-3) },
+  { id:'dopp_4',  name:'Stoel Rives Summit Sponsorship 2026', entity_id:'dent_3', type:'sponsorship', subtype:'event',  stage:'committed',    legal_entity:'501c6', ask:1500000,  commit:1500000, received:0,       fy:2026, term_start:'2026-06-01', term_end:'2026-06-30', deadline:null, reporting_due:null, lead:'p_kathleen', supporter:'Mark Schwabe',    campaign:'Member Events', followup:daysFromToday(5) },
+  { id:'dopp_5',  name:'Schwabe FY26 Sponsorship',           entity_id:'dent_4', type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c6', ask:2500000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, lead:'p_kathleen', supporter:null,              campaign:'Member Events', followup:daysFromToday(2) },
+  { id:'dopp_6',  name:'Wilson Sonsini FY26 Sponsorship',    entity_id:'dent_5', type:'sponsorship', subtype:'annual', stage:'conversation', legal_entity:'both',  ask:1000000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, lead:'p_karin',    supporter:null,              campaign:'Member Events', followup:daysFromToday(7) },
+  { id:'dopp_7',  name:'McKinstry Fellowship FY26',          entity_id:'dent_6', type:'sponsorship', subtype:'annual', stage:'proposal',     legal_entity:'501c3', ask:3000000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, lead:'p_lee',      supporter:'Dean Allen',      campaign:'Fellowship Program', followup:daysFromToday(-1) },
 
   // Walton: prior cycle (declined) + current cycle (in conversation)
-  { id:'dopp_8',  name:'Walton Fellowship Grant 2025',       entity_id:'dent_7', type:'grant',       subtype:null,     stage:'declined',     legal_entity:'501c3', ask:7500000,  commit:0,        received:0,      fy:2025, term_start:null, term_end:null, deadline:'2025-04-01', reporting_due:null, owner:'p_jordan',   advocate:null,              campaign:'Fellowship Program', followup:null },
-  { id:'dopp_9',  name:'Walton Fellowship Grant 2026',       entity_id:'dent_7', type:'grant',       subtype:null,     stage:'conversation', legal_entity:'501c3', ask:10000000, commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:daysFromToday(55), reporting_due:null, owner:'p_jordan',   advocate:'Lisa Rasmussen',  campaign:'Fellowship Program', followup:daysFromToday(10) },
+  { id:'dopp_8',  name:'Walton Fellowship Grant 2025',       entity_id:'dent_7', type:'grant',       subtype:null,     stage:'declined',     legal_entity:'501c3', ask:7500000,  commit:0,        received:0,      fy:2025, term_start:null, term_end:null, deadline:'2025-04-01', reporting_due:null, lead:'p_jordan',   supporter:null,              campaign:'Fellowship Program', followup:null },
+  { id:'dopp_9',  name:'Walton Fellowship Grant 2026',       entity_id:'dent_7', type:'grant',       subtype:null,     stage:'conversation', legal_entity:'501c3', ask:10000000, commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:daysFromToday(55), reporting_due:null, lead:'p_jordan',   supporter:'Lisa Rasmussen',  campaign:'Fellowship Program', followup:daysFromToday(10) },
 
-  { id:'dopp_10', name:'Bezos Climate Justice Grant 2026',   entity_id:'dent_8', type:'grant',       subtype:null,     stage:'outreach',     legal_entity:'501c3', ask:25000000, commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:daysFromToday(40), reporting_due:null, owner:'p_jordan',   advocate:'Lisa Rasmussen',  campaign:'Fellowship Program', followup:daysFromToday(4) },
-  { id:'dopp_11', name:'Sea Mar Health Equity Grant 2026',   entity_id:'dent_9', type:'grant',       subtype:null,     stage:'prospect',     legal_entity:'501c3', ask:500000,   commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:daysFromToday(20), reporting_due:null, owner:'p_karin',    advocate:null,              campaign:'Fellowship Program', followup:null },
+  { id:'dopp_10', name:'Bezos Climate Justice Grant 2026',   entity_id:'dent_8', type:'grant',       subtype:null,     stage:'outreach',     legal_entity:'501c3', ask:25000000, commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:daysFromToday(40), reporting_due:null, lead:'p_jordan',   supporter:'Lisa Rasmussen',  campaign:'Fellowship Program', followup:daysFromToday(4) },
+  { id:'dopp_11', name:'Sea Mar Health Equity Grant 2026',   entity_id:'dent_9', type:'grant',       subtype:null,     stage:'prospect',     legal_entity:'501c3', ask:500000,   commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:daysFromToday(20), reporting_due:null, lead:'p_karin',    supporter:null,              campaign:'Fellowship Program', followup:null },
   // Starbucks: annual sponsorship paid in coffee (in-kind nature on amounts)
-  { id:'dopp_12', name:'Starbucks Coffee Sponsorship FY26',  entity_id:'dent_10',type:'sponsorship', subtype:'annual', stage:'conversation', legal_entity:'both',  ask:2000000,  commit:0,        received:0,      fy:2026, term_start:'2026-09-01', term_end:'2027-08-31', deadline:null, reporting_due:null, owner:'p_kathleen', advocate:null,              campaign:'Member Events', followup:daysFromToday(3) },
-  { id:'dopp_13', name:'JP Morgan Climate Grant 2026',       entity_id:'dent_11',type:'grant',       subtype:null,     stage:'declined',     legal_entity:'501c3', ask:5000000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, owner:'p_karin',    advocate:null,              campaign:'FY26 Annual Fund', followup:null },
-  { id:'dopp_14', name:'Anonymous Major Gift 2026',          entity_id:'dent_12',type:'gift',        subtype:null,     stage:'received',     legal_entity:'501c3', ask:2500000,  commit:2500000, received:2500000, fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, owner:'p_karin',    advocate:'Kathleen Hebert', campaign:'FY26 Annual Fund', followup:daysFromToday(90) },
+  { id:'dopp_12', name:'Starbucks Coffee Sponsorship FY26',  entity_id:'dent_10',type:'sponsorship', subtype:'annual', stage:'conversation', legal_entity:'both',  ask:2000000,  commit:0,        received:0,      fy:2026, term_start:'2026-09-01', term_end:'2027-08-31', deadline:null, reporting_due:null, lead:'p_kathleen', supporter:null,              campaign:'Member Events', followup:daysFromToday(3) },
+  { id:'dopp_13', name:'JP Morgan Climate Grant 2026',       entity_id:'dent_11',type:'grant',       subtype:null,     stage:'declined',     legal_entity:'501c3', ask:5000000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, lead:'p_karin',    supporter:null,              campaign:'FY26 Annual Fund', followup:null },
+  { id:'dopp_14', name:'Anonymous Major Gift 2026',          entity_id:'dent_12',type:'gift',        subtype:null,     stage:'received',     legal_entity:'501c3', ask:2500000,  commit:2500000, received:2500000, fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, lead:'p_karin',    supporter:'Kathleen Hebert', campaign:'FY26 Annual Fund', followup:daysFromToday(90) },
   // Convene: event sponsorship paid in venue space (in-kind nature on amounts)
-  { id:'dopp_15', name:'Convene Summit Venue 2026',          entity_id:'dent_13',type:'sponsorship', subtype:'event',  stage:'committed',    legal_entity:'501c6', ask:800000,   commit:800000,   received:0,      fy:2026, term_start:'2026-06-15', term_end:'2026-06-15', deadline:null, reporting_due:null, owner:'p_kathleen', advocate:null,              campaign:'Member Events', followup:daysFromToday(14) },
-  { id:'dopp_16', name:'Russell Fellowship Grant 2026',      entity_id:'dent_14',type:'grant',       subtype:null,     stage:'proposal',     legal_entity:'501c3', ask:3500000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:daysFromToday(12), reporting_due:null, owner:'p_lee',      advocate:null,              campaign:'Fellowship Program', followup:daysFromToday(8) },
-  { id:'dopp_17', name:'Patagonia FY26 Sponsorship',         entity_id:'dent_15',type:'sponsorship', subtype:'annual', stage:'outreach',     legal_entity:'501c3', ask:1500000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, owner:'p_jordan',   advocate:null,              campaign:'FY26 Annual Fund', followup:daysFromToday(6) },
+  { id:'dopp_15', name:'Convene Summit Venue 2026',          entity_id:'dent_13',type:'sponsorship', subtype:'event',  stage:'committed',    legal_entity:'501c6', ask:800000,   commit:800000,   received:0,      fy:2026, term_start:'2026-06-15', term_end:'2026-06-15', deadline:null, reporting_due:null, lead:'p_kathleen', supporter:null,              campaign:'Member Events', followup:daysFromToday(14) },
+  { id:'dopp_16', name:'Russell Fellowship Grant 2026',      entity_id:'dent_14',type:'grant',       subtype:null,     stage:'proposal',     legal_entity:'501c3', ask:3500000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:daysFromToday(12), reporting_due:null, lead:'p_lee',      supporter:null,              campaign:'Fellowship Program', followup:daysFromToday(8) },
+  { id:'dopp_17', name:'Patagonia FY26 Sponsorship',         entity_id:'dent_15',type:'sponsorship', subtype:'annual', stage:'outreach',     legal_entity:'501c3', ask:1500000,  commit:0,        received:0,      fy:2026, term_start:null, term_end:null, deadline:null, reporting_due:null, lead:'p_jordan',   supporter:null,              campaign:'FY26 Annual Fund', followup:daysFromToday(6) },
 ];
 
 // ============== STATE ==============
 let legalEntityFilter = 'all';
 let viewMode = 'kanban';
+let quickFilter = null;
+let recordGridView = 'opportunities:pipeline';
 
 // ============== HELPERS ==============
 function filteredOpps() {
   const q = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
   return OPPS.filter(o => {
     if (legalEntityFilter !== 'all' && !(o.legal_entity === legalEntityFilter || o.legal_entity === 'both')) return false;
+    const ent = entityById(o.entity_id);
+    if (quickFilter === 'my-opportunities' && o.lead !== CURRENT_USER_ID) return false;
+    if (quickFilter === 'my-funders' && ent?.lead !== CURRENT_USER_ID) return false;
     if (q) {
-      const ent = entityById(o.entity_id);
       const hay = (o.name + ' ' + (ent ? ent.name : '') + ' ' + (ent && ent.primaryContact ? ent.primaryContact : '')).toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
   });
 }
+function oppsForFunder(funderId) {
+  return OPPS.filter(o => o.entity_id === funderId);
+}
+function filteredFunders() {
+  const q = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+  const [, savedView] = recordGridView.split(':');
+  return ENTITIES.filter(ent => {
+    const opps = oppsForFunder(ent.id);
+    if (quickFilter === 'my-funders' && ent.lead !== CURRENT_USER_ID) return false;
+    if (quickFilter === 'my-opportunities' && !opps.some(o => o.lead === CURRENT_USER_ID)) return false;
+    if (savedView === 'my' && ent.lead !== CURRENT_USER_ID) return false;
+    if (savedView === 'cold' && opps.some(o => !['received','declined'].includes(o.stage))) return false;
+    if (legalEntityFilter !== 'all' && !opps.some(o => o.legal_entity === legalEntityFilter || o.legal_entity === 'both')) return false;
+    if (q) {
+      const hay = [
+        ent.name,
+        ent.primaryContact || '',
+        entityTypeById(ent.type).label,
+        ...opps.map(o => o.name)
+      ].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+function filteredRecordGridOpps() {
+  const [, savedView] = recordGridView.split(':');
+  let items = filteredOpps();
+  if (savedView === 'my') items = items.filter(o => o.lead === CURRENT_USER_ID);
+  if (savedView === 'reporting') items = items.filter(o => o.reporting_due);
+  return items;
+}
 function staffById(id) { return STAFF.find(s => s.id === id) || {initials:'?', name:'?'}; }
 function entityTypeById(id) { return ENTITY_TYPES.find(t => t.id === id) || {label:id}; }
 function typeOf(o) { return TYPES.find(t => t.type === o.type) || {label:o.type, cls:''}; }
 function stageById(id) { return STAGES.find(s => s.id === id) || {label:id, cls:''}; }
+function leadAvatar(id, extraClass = '') {
+  const person = staffById(id);
+  const photo = person.photo ? `<img src="${person.photo}" alt="">` : person.initials;
+  return `<span class="lead-avatar ${extraClass}" title="${person.name}" aria-label="${person.name}">${photo}</span>`;
+}
 function legalEntityChip(e) {
   const c6 = `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c6">(c)6</span>`;
   const c3 = `<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium entity-c3">(c)3</span>`;
@@ -885,8 +950,8 @@ function renderSidebar() {
       <span class="ml-auto text-[12px] text-slate-400">${n}</span>
     </label></li>`;
   }).join('');
-  document.getElementById('ownerFilter').innerHTML = STAFF.map(o => {
-    const n = items.filter(x => x.owner === o.id).length;
+  document.getElementById('leadFilter').innerHTML = STAFF.map(o => {
+    const n = items.filter(x => x.lead === o.id).length;
     return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
       <input type="checkbox" class="rounded" />
       <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] flex items-center justify-center font-semibold">${o.initials}</span>
@@ -911,12 +976,15 @@ function renderKanban() {
         ${stageItems.map(o => {
           const ent = entityById(o.entity_id) || {name:'?', type:'?'};
           return `<a href="entity-detail.html" class="card-drag block bg-white border border-slate-200 rounded hover:border-blue-400 hover:shadow-sm transition no-underline text-inherit overflow-hidden" draggable="true">
-            <!-- Header band: type chip + legal-entity tags -->
-            <div class="px-2.5 py-1.5 bg-slate-100 border-b border-slate-200 flex items-center gap-1.5 flex-wrap">
-              ${typeChip(o)}
-              ${legalEntityChip(o.legal_entity)}
+            <!-- Header band: type chip + E8 organization tags + lead avatar -->
+            <div class="px-2.5 py-1.5 bg-slate-100 border-b border-slate-200 flex items-center gap-1.5">
+              <div class="flex items-center gap-1.5 flex-wrap min-w-0">
+                ${typeChip(o)}
+                ${legalEntityChip(o.legal_entity)}
+              </div>
+              <div class="ml-auto">${leadAvatar(o.lead)}</div>
             </div>
-            <!-- Body: opportunity name (primary), entity name (secondary), ask amount, optional advocate -->
+            <!-- Body: opportunity name (primary), entity name (secondary), ask amount, optional supporter -->
             <div class="px-2.5 pt-2 pb-2.5">
               <div class="text-[14px] font-semibold leading-tight text-slate-900">${o.name}</div>
               <div class="text-[12px] text-slate-500 mt-0.5 truncate flex items-center gap-1">
@@ -924,7 +992,7 @@ function renderKanban() {
                 <span class="truncate">${ent.name}</span>
               </div>
               <div class="text-[16px] font-semibold tabular-nums text-slate-900 mt-2">${fmtMoneyFull(o.ask)}</div>
-              ${o.advocate ? `<div class="text-[12px] text-slate-500 mt-1 truncate"><span class="text-slate-400">Advocate:</span> <span class="text-slate-700">${o.advocate}</span></div>` : ''}
+              ${o.supporter ? `<div class="text-[12px] text-slate-500 mt-1 truncate"><span class="text-slate-400">Support:</span> <span class="text-slate-700">${o.supporter}</span></div>` : ''}
             </div>
             <!-- Footer: follow-up + optional reporting due -->
             ${followupFooter(o.followup)}
@@ -938,8 +1006,27 @@ function renderKanban() {
 }
 
 function renderList() {
-  const items = filteredOpps();
+  const [baseTable] = recordGridView.split(':');
+  if (baseTable === 'funders') {
+    renderFunderList();
+    return;
+  }
+  const items = filteredRecordGridOpps();
+  const head = document.getElementById('listHead');
   const tbody = document.getElementById('listBody');
+  head.innerHTML = `<tr class="text-left text-[12px] uppercase tracking-wider text-slate-500">
+    <th class="px-3 py-2 font-semibold">Opportunity</th>
+    <th class="px-3 py-2 font-semibold">Funder</th>
+    <th class="px-3 py-2 font-semibold">Kind</th>
+    <th class="px-3 py-2 font-semibold">E8 organization</th>
+    <th class="px-3 py-2 font-semibold">Stage</th>
+    <th class="px-3 py-2 font-semibold text-right">Ask</th>
+    <th class="px-3 py-2 font-semibold text-right">Received</th>
+    <th class="px-3 py-2 font-semibold">FY</th>
+    <th class="px-3 py-2 font-semibold">Lead</th>
+    <th class="px-3 py-2 font-semibold">Support</th>
+    <th class="px-3 py-2 font-semibold">Next follow-up</th>
+  </tr>`;
   tbody.innerHTML = items.map(o => {
     const ent = entityById(o.entity_id) || {name:'?', type:'?'};
     return `<tr class="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)">
@@ -951,9 +1038,42 @@ function renderList() {
       <td class="px-3 py-2 text-right tabular-nums">${fmtMoney(o.ask,{compact:true})}</td>
       <td class="px-3 py-2 text-right tabular-nums">${o.received ? fmtMoney(o.received,{compact:true}) : '<span class="text-slate-400">—</span>'}</td>
       <td class="px-3 py-2 text-[12px] text-slate-500">FY${String(o.fy).slice(2)}</td>
-      <td class="px-3 py-2"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] inline-flex items-center justify-center font-semibold" title="${staffById(o.owner).name}">${staffById(o.owner).initials}</span></td>
-      <td class="px-3 py-2 text-[13px] text-slate-700">${o.advocate || '<span class="text-slate-400">—</span>'}</td>
+      <td class="px-3 py-2"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] inline-flex items-center justify-center font-semibold" title="${staffById(o.lead).name}">${staffById(o.lead).initials}</span></td>
+      <td class="px-3 py-2 text-[13px] text-slate-700">${o.supporter || '<span class="text-slate-400">—</span>'}</td>
       <td class="px-3 py-2">${followupBadge(o.followup)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderFunderList() {
+  const items = filteredFunders();
+  const head = document.getElementById('listHead');
+  const tbody = document.getElementById('listBody');
+  head.innerHTML = `<tr class="text-left text-[12px] uppercase tracking-wider text-slate-500">
+    <th class="px-3 py-2 font-semibold">Funder</th>
+    <th class="px-3 py-2 font-semibold">Type</th>
+    <th class="px-3 py-2 font-semibold">Lead</th>
+    <th class="px-3 py-2 font-semibold">Primary contact</th>
+    <th class="px-3 py-2 font-semibold text-right">Active opps</th>
+    <th class="px-3 py-2 font-semibold text-right">Pipeline ask</th>
+    <th class="px-3 py-2 font-semibold text-right">Received</th>
+    <th class="px-3 py-2 font-semibold">Next follow-up</th>
+  </tr>`;
+  tbody.innerHTML = items.map(ent => {
+    const opps = oppsForFunder(ent.id);
+    const activeOpps = opps.filter(o => !['received','declined'].includes(o.stage));
+    const pipelineAsk = activeOpps.reduce((sum, o) => sum + (o.ask || 0), 0);
+    const received = opps.reduce((sum, o) => sum + (o.received || 0), 0);
+    const nextFollowup = opps.map(o => o.followup).filter(Boolean).sort()[0];
+    return `<tr class="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onclick="openDetailPanel(event)">
+      <td class="px-3 py-2 font-medium"><a href="entity-detail.html" class="hover:underline text-slate-800">${ent.name}</a></td>
+      <td class="px-3 py-2"><span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium type-chip">${entityTypeById(ent.type).label}</span></td>
+      <td class="px-3 py-2">${leadAvatar(ent.lead, 'w-6 h-6')}</td>
+      <td class="px-3 py-2 text-slate-700">${ent.primaryContact || '<span class="text-slate-400">No contact yet</span>'}</td>
+      <td class="px-3 py-2 text-right tabular-nums">${activeOpps.length}</td>
+      <td class="px-3 py-2 text-right tabular-nums">${pipelineAsk ? fmtMoney(pipelineAsk,{compact:true}) : '<span class="text-slate-400">—</span>'}</td>
+      <td class="px-3 py-2 text-right tabular-nums">${received ? fmtMoney(received,{compact:true}) : '<span class="text-slate-400">—</span>'}</td>
+      <td class="px-3 py-2">${followupBadge(nextFollowup)}</td>
     </tr>`;
   }).join('');
 }
@@ -975,7 +1095,7 @@ function renderGrants() {
           <div class="text-[12px] text-slate-500 mt-0.5">${ent.name} · Ask ${fmtMoney(o.ask,{compact:true})} · Stage ${stageById(o.stage).label}</div>
         </div>
         <div class="text-right">
-          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] inline-flex items-center justify-center font-semibold">${staffById(o.owner).initials}</span>
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] inline-flex items-center justify-center font-semibold">${staffById(o.lead).initials}</span>
         </div>
       </div>
     </a>`;
@@ -988,7 +1108,13 @@ function renderAll() {
   renderKanban();
   renderList();
   renderGrants();
-  document.getElementById('resultCount').textContent = filteredOpps().length + ' opportunities';
+  if (viewMode === 'list') {
+    const [baseTable] = recordGridView.split(':');
+    const count = baseTable === 'funders' ? filteredFunders().length : filteredRecordGridOpps().length;
+    document.getElementById('resultCount').textContent = count + (baseTable === 'funders' ? ' funders' : ' opportunities');
+  } else {
+    document.getElementById('resultCount').textContent = filteredOpps().length + ' opportunities';
+  }
 }
 
 // Relationship/opportunity drawer
@@ -1044,11 +1170,29 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
     document.getElementById('kanbanView').classList.toggle('hidden',   viewMode !== 'kanban');
     document.getElementById('listView').classList.toggle('hidden',     viewMode !== 'list');
     document.getElementById('grantsView').classList.toggle('hidden',   viewMode !== 'grants');
+    renderAll();
   });
+});
+document.getElementById('recordGridViewSelect').addEventListener('change', (event) => {
+  recordGridView = event.target.value;
+  renderAll();
 });
 
 // Live search
 document.getElementById('searchInput').addEventListener('input', () => { renderAll(); });
+
+document.querySelectorAll('.quick-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    quickFilter = quickFilter === btn.dataset.quickFilter ? null : btn.dataset.quickFilter;
+    document.querySelectorAll('.quick-filter-btn').forEach(b => {
+      const active = quickFilter === b.dataset.quickFilter;
+      b.classList.toggle('bg-blue-50', active);
+      b.classList.toggle('border-blue-300', active);
+      b.classList.toggle('text-blue-800', active);
+    });
+    renderAll();
+  });
+});
 
 renderAll();
 
@@ -1127,6 +1271,7 @@ function applyNewType(t) {
   const isGrant       = t === 'grant';
   const isSponsorship = t === 'sponsorship';
   document.getElementById('newSubtypeRow').classList.toggle('hidden',    !isSponsorship);
+  document.getElementById('newEventRow').classList.add('hidden');
   document.getElementById('newDeadlineRow').classList.toggle('hidden',   !(isGrant || isSponsorship));
   document.getElementById('newDecisionRow').classList.toggle('hidden',   false);
   document.getElementById('newTermRow').classList.toggle('hidden',       !isSponsorship);
@@ -1145,6 +1290,7 @@ document.querySelectorAll('.newsubtype-btn').forEach(btn => {
       b.classList.toggle('text-slate-600', !active);
       b.classList.toggle('hover:bg-white', !active);
     });
+    document.getElementById('newEventRow').classList.toggle('hidden', btn.dataset.newsubtype !== 'event');
   });
 });
 

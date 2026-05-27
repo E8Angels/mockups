@@ -26,6 +26,8 @@
   .entity-c6 { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; }
   .pill { display:inline-flex; align-items:center; height:22px; border-radius:999px; padding:0 8px; font-size:12px; font-weight:600; white-space:nowrap; }
   .avatar { width:32px; height:32px; border-radius:999px; object-fit:cover; background:#e2e8f0; }
+  .lead-avatar { width:24px; height:24px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid #cbd5e1; background:#fff; color:#334155; font-size:10px; font-weight:700; flex-shrink:0; }
+  .lead-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
   .member-pill { display:flex; align-items:center; gap:10px; border:1px solid #e2e8f0; border-radius:999px; padding:6px 10px 6px 6px; min-width:0; }
   .kanban { display:grid; grid-template-columns:repeat(4,minmax(180px,1fr)); gap:10px; }
   .kanban-col { border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc; min-height:220px; }
@@ -62,7 +64,6 @@
         <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v8a2 2 0 002 2h2.586l2.707 2.707A1 1 0 0011 17v-2h5a2 2 0 002-2V5a2 2 0 00-2-2H4z"/></svg>
         Log interaction
       </button>
-      <button class="h-9 px-3 rounded border border-slate-300 bg-white hover:bg-slate-50 font-medium">Export board report</button>
     </div>
   </div>
 
@@ -81,7 +82,7 @@
     <div class="metric">
       <div class="label">Active opportunities</div>
       <div class="text-2xl font-semibold mt-1">9</div>
-      <div class="text-[12px] text-slate-500 mt-1">5 with advocates</div>
+      <div class="text-[12px] text-slate-500 mt-1">5 with supporters</div>
     </div>
     <div class="metric">
       <div class="label">Overdue tasks</div>
@@ -113,7 +114,7 @@
             </div>
             <div class="min-w-0">
               <a href="#" class="font-semibold quiet-link">Development Committee Meeting - May 2026</a>
-              <p class="text-[13px] text-slate-600 mt-1 leading-5">Discussed Walton and Bezos grant timing, board advocate coverage for top prospects, and document packet ownership for upcoming foundation submissions.</p>
+              <p class="text-[13px] text-slate-600 mt-1 leading-5">Discussed Walton and Bezos grant timing, board supporter coverage for top prospects, and document packet ownership for upcoming foundation submissions.</p>
             </div>
           </div>
         </div>
@@ -130,16 +131,16 @@
             <div class="kanban-col">
               <div class="px-3 py-2 border-b border-slate-200 flex items-center"><span class="pill stage-outreach">Outreach</span><span class="ml-auto text-[12px] text-slate-500">$270k</span></div>
               <a href="entity-detail.html" class="kanban-card">
-                <div class="font-semibold">Bezos Climate Justice Grant</div>
+                <div class="flex items-start gap-2"><div class="font-semibold min-w-0 flex-1">Bezos Climate Justice Grant</div><span class="lead-avatar">JS</span></div>
                 <div class="mt-1 flex gap-1 flex-wrap"><span class="pill opp-grant">Grant</span><span class="pill entity-c3">501(c)3</span></div>
                 <div class="mt-2 text-[12px] text-slate-600">Bezos Earth Fund · $250k requested</div>
-                <div class="mt-1 text-[12px] text-slate-500">Advocate: Lisa Rasmussen</div>
+                <div class="mt-1 text-[12px] text-slate-500">Support: Lisa Rasmussen</div>
               </a>
             </div>
             <div class="kanban-col">
               <div class="px-3 py-2 border-b border-slate-200 flex items-center"><span class="pill stage-conversation">Conversation</span><span class="ml-auto text-[12px] text-slate-500">$130k</span></div>
               <a href="entity-detail.html" class="kanban-card">
-                <div class="font-semibold">Walton Fellowship Grant 2026</div>
+                <div class="flex items-start gap-2"><div class="font-semibold min-w-0 flex-1">Walton Fellowship Grant 2026</div><span class="lead-avatar">JS</span></div>
                 <div class="mt-1 flex gap-1 flex-wrap"><span class="pill opp-grant">Grant</span><span class="pill entity-c3">501(c)3</span></div>
                 <div class="mt-2 text-[12px] text-slate-600">Walton Family Foundation · $100k requested</div>
                 <div class="mt-1 text-[12px] text-red-700">1 overdue task</div>
@@ -148,16 +149,16 @@
             <div class="kanban-col">
               <div class="px-3 py-2 border-b border-slate-200 flex items-center"><span class="pill stage-proposal">Proposal</span><span class="ml-auto text-[12px] text-slate-500">$120k</span></div>
               <a href="entity-detail.html" class="kanban-card">
-                <div class="font-semibold">Microsoft FY27 Sponsorship</div>
+                <div class="flex items-start gap-2"><div class="font-semibold min-w-0 flex-1">Microsoft FY27 Sponsorship</div><span class="lead-avatar"><img src="https://i.pravatar.cc/96?img=47" alt=""></span></div>
                 <div class="mt-1 flex gap-1 flex-wrap"><span class="pill opp-sponsorship">Sponsorship</span><span class="pill entity-c3">501(c)3</span></div>
                 <div class="mt-2 text-[12px] text-slate-600">Microsoft AI for Good · $85k requested</div>
-                <div class="mt-1 text-[12px] text-slate-500">Owner: Karin Kidder</div>
+                <div class="mt-1 text-[12px] text-slate-500">Lead: Karin Kidder</div>
               </a>
             </div>
             <div class="kanban-col">
               <div class="px-3 py-2 border-b border-slate-200 flex items-center"><span class="pill stage-committed">Committed</span><span class="ml-auto text-[12px] text-slate-500">$50k</span></div>
               <a href="entity-detail.html" class="kanban-card">
-                <div class="font-semibold">Bullitt Climate Justice Grant</div>
+                <div class="flex items-start gap-2"><div class="font-semibold min-w-0 flex-1">Bullitt Climate Justice Grant</div><span class="lead-avatar"><img src="https://i.pravatar.cc/96?img=47" alt=""></span></div>
                 <div class="mt-1 flex gap-1 flex-wrap"><span class="pill opp-grant">Grant</span><span class="pill entity-c3">501(c)3</span></div>
                 <div class="mt-2 text-[12px] text-slate-600">Bullitt Foundation · $50k committed</div>
                 <div class="mt-1 text-[12px] text-amber-700">Report due Jun 30</div>
@@ -176,7 +177,7 @@
           <div class="p-4 space-y-4">
             <div class="flex gap-3"><span class="activity-dot win" aria-hidden="true">&nbsp;</span><div><div class="font-medium">Microsoft FY26 sponsorship received</div><div class="text-[12px] text-slate-500">$75,000 · May 20</div></div></div>
             <div class="flex gap-3"><span class="activity-dot" aria-hidden="true">&nbsp;</span><div><div class="font-medium">Walton moved to Conversation</div><div class="text-[12px] text-slate-500">Jordan Schwartz · May 3</div></div></div>
-            <div class="flex gap-3"><span class="activity-dot task" aria-hidden="true">&nbsp;</span><div><div class="font-medium">Task added for Walton outcomes packet</div><div class="text-[12px] text-slate-500">Assigned to Jordan · due May 12</div></div></div>
+            <div class="flex gap-3"><span class="activity-dot task" aria-hidden="true">&nbsp;</span><div><div class="font-medium">Task added for Walton outcomes packet</div><div class="text-[12px] text-slate-500">Owners: Jordan · due May 12</div></div></div>
           </div>
         </div>
         <div class="card">
@@ -212,7 +213,7 @@
         <div class="p-4 grid grid-cols-2 gap-2">
           <div class="member-pill"><img class="avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&amp;h=80&amp;fit=crop&amp;crop=face" alt=""><div class="min-w-0"><div class="font-medium truncate">Amanda White</div><div class="text-[11px] text-slate-500">Chair</div></div></div>
           <div class="member-pill"><div class="avatar bg-rose-600 text-white flex items-center justify-center font-semibold">KK</div><div class="min-w-0"><div class="font-medium truncate">Karin Kidder</div><div class="text-[11px] text-slate-500">Staff</div></div></div>
-          <div class="member-pill"><div class="avatar bg-blue-600 text-white flex items-center justify-center font-semibold">LR</div><div class="min-w-0"><div class="font-medium truncate">Lisa Rasmussen</div><div class="text-[11px] text-slate-500">Advocate</div></div></div>
+          <div class="member-pill"><div class="avatar bg-blue-600 text-white flex items-center justify-center font-semibold">LR</div><div class="min-w-0"><div class="font-medium truncate">Lisa Rasmussen</div><div class="text-[11px] text-slate-500">Support</div></div></div>
           <div class="member-pill"><div class="avatar bg-slate-700 text-white flex items-center justify-center font-semibold">DA</div><div class="min-w-0"><div class="font-medium truncate">Dean Allen</div><div class="text-[11px] text-slate-500">Member</div></div></div>
           <div class="member-pill"><div class="avatar bg-emerald-600 text-white flex items-center justify-center font-semibold">EB</div><div class="min-w-0"><div class="font-medium truncate">Eric Berman</div><div class="text-[11px] text-slate-500">Member</div></div></div>
           <div class="member-pill"><div class="avatar bg-purple-600 text-white flex items-center justify-center font-semibold">RW</div><div class="min-w-0"><div class="font-medium truncate">Ramalee Wulf</div><div class="text-[11px] text-slate-500">Member</div></div></div>
@@ -243,7 +244,7 @@
           </a>
           <a href="entity-detail.html" class="block border border-slate-200 rounded-md p-3 no-underline text-inherit hover:bg-slate-50">
             <div class="flex items-center gap-2"><span class="font-semibold">Bezos Earth Fund</span><span class="pill stage-outreach ml-auto">Outreach</span></div>
-            <div class="text-[12px] text-slate-500 mt-1">Advocate · last activity 4d ago</div>
+            <div class="text-[12px] text-slate-500 mt-1">Support · last activity 4d ago</div>
           </a>
           <a href="entity-detail.html" class="block border border-slate-200 rounded-md p-3 no-underline text-inherit hover:bg-slate-50">
             <div class="flex items-center gap-2"><span class="font-semibold">Microsoft AI for Good</span><span class="pill stage-proposal ml-auto">Proposal</span></div>
