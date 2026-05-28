@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-27T16:16:07+00:00",
+  "generated": "2026-05-28T00:44:05+00:00",
   "plans": [
     {
       "slug": "companies-admin-redesign",
@@ -112,9 +112,9 @@
       "status": "draft",
       "owner": "amanda",
       "created": "2026-05-21",
-      "last_updated": "2026-05-27",
+      "last_updated": "2026-05-28",
       "last_changed_by": "Amanda White",
-      "last_changed_at": "2026-05-27T15:17:20Z",
+      "last_changed_at": "2026-05-28T00:43:56Z",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
