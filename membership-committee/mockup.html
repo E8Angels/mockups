@@ -62,9 +62,20 @@
   .stat-tile:hover { border-color: var(--primary); box-shadow: 0 1px 3px rgba(15,23,42,0.06); }
   .stat-tile .t-label { font-size: 11px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
   .stat-tile .t-value { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; color: var(--text); }
+  .stat-tile .t-value-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .stat-tile .t-delta { font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap; }
+  .stat-tile .t-delta.pos { color: #16a34a; }
+  .stat-tile .t-delta.neg { color: #dc2626; }
+  .stat-tile .t-delta.zero { color: var(--text-muted); }
   .stat-tile .t-sub { font-size: 11px; color: var(--text-subtle); }
   .stats-grid.hubs .stat-tile { padding: 10px 12px; }
   .stats-grid.hubs .stat-tile .t-value { font-size: 20px; }
+  .stats-grid.hubs .stat-tile .t-delta { font-size: 11px; }
+
+  .glance-toggles { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 0 0 14px; }
+  .toggle-group { display: inline-flex; gap: 2px; padding: 3px; background: var(--page-bg); border: 1px solid var(--card-border); border-radius: 8px; }
+  .toggle-group .tog { padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; background: transparent; color: var(--text-muted); border: 1px solid transparent; cursor: pointer; font-family: inherit; }
+  .toggle-group .tog.active { background: var(--tab-active-bg); color: var(--tab-active-fg); }
 
   .note-row { display: flex; gap: 18px; padding: 14px 0; border-top: 1px solid var(--card-border); }
   .note-row:first-of-type { border-top: none; padding-top: 4px; }
@@ -240,23 +251,37 @@
           </div>
           <div class="card-actions"><span id="asof" style="font-size:12px;color:var(--text-muted);"></span></div>
         </div>
+        <div class="glance-toggles">
+          <div class="toggle-group" id="delta-mode-toggle" role="group" aria-label="Delta format">
+            <button type="button" class="tog active" data-mode="abs">+/− #</button>
+            <button type="button" class="tog" data-mode="pct">+/− %</button>
+          </div>
+          <div class="toggle-group" id="delta-period-toggle" role="group" aria-label="Delta period">
+            <button type="button" class="tog active" data-period="month">vs last month</button>
+            <button type="button" class="tog" data-period="year">vs last year</button>
+          </div>
+        </div>
         <div class="stats-section">
           <div class="label">Roster</div>
           <div class="stats-grid roster">
             <button class="stat-tile" data-bucket="total">
-              <span class="t-label">Total members</span><span class="t-value" id="v-total"></span>
+              <span class="t-label">Total members</span>
+              <span class="t-value-row"><span class="t-value" id="v-total"></span><span class="t-delta" id="d-v-total"></span></span>
               <span class="t-sub" title="Member + Corporate Member by role. Metrics chart shows 139 via event-cumulative formula.">Member + Corporate Member</span>
             </button>
             <button class="stat-tile" data-bucket="new-ytd">
-              <span class="t-label">New members YTD</span><span class="t-value" id="v-new"></span>
+              <span class="t-label">New members YTD</span>
+              <span class="t-value-row"><span class="t-value" id="v-new"></span><span class="t-delta" id="d-v-new"></span></span>
               <span class="t-sub">Joined since Jan 1, 2026</span>
             </button>
             <button class="stat-tile" data-bucket="past-ytd">
-              <span class="t-label">Past members YTD</span><span class="t-value" id="v-past"></span>
+              <span class="t-label">Past members YTD</span>
+              <span class="t-value-row"><span class="t-value" id="v-past"></span><span class="t-delta" id="d-v-past"></span></span>
               <span class="t-sub">Memberships lapsed this year</span>
             </button>
             <button class="stat-tile" data-bucket="prospects">
-              <span class="t-label">Active prospects</span><span class="t-value" id="v-prospects"></span>
+              <span class="t-label">Active prospects</span>
+              <span class="t-value-row"><span class="t-value" id="v-prospects"></span><span class="t-delta" id="d-v-prospects"></span></span>
               <span class="t-sub">In the recruitment pipeline</span>
             </button>
           </div>
@@ -265,19 +290,23 @@
           <div class="label">Health</div>
           <div class="stats-grid health">
             <button class="stat-tile" data-bucket="at-risk">
-              <span class="t-label">Members at risk</span><span class="t-value" id="v-atrisk"></span>
+              <span class="t-label">Members at risk</span>
+              <span class="t-value-row"><span class="t-value" id="v-atrisk"></span><span class="t-delta" id="d-v-atrisk"></span></span>
               <span class="t-sub">No events in 6+ months</span>
             </button>
             <button class="stat-tile" data-bucket="active">
-              <span class="t-label">Active members</span><span class="t-value" id="v-active"></span>
+              <span class="t-label">Active members</span>
+              <span class="t-value-row"><span class="t-value" id="v-active"></span><span class="t-delta" id="d-v-active"></span></span>
               <span class="t-sub" id="v-active-sub"></span>
             </button>
             <button class="stat-tile" data-bucket="invest-active">
-              <span class="t-label">Invested in last 12 mo</span><span class="t-value" id="v-invest"></span>
+              <span class="t-label">Invested in last 12 mo</span>
+              <span class="t-value-row"><span class="t-value" id="v-invest"></span><span class="t-delta" id="d-v-invest"></span></span>
               <span class="t-sub" id="v-invest-sub"></span>
             </button>
             <a class="stat-tile" href="https://app.e8angels.com/surveys/e8-annual-survey-2026" target="_blank" rel="noopener" style="text-decoration:none;">
-              <span class="t-label">Annual survey completed</span><span class="t-value" id="v-survey"></span>
+              <span class="t-label">Annual survey completed</span>
+              <span class="t-value-row"><span class="t-value" id="v-survey"></span><span class="t-delta" id="d-v-survey"></span></span>
               <span class="t-sub" id="v-survey-sub"></span>
             </a>
           </div>
@@ -285,12 +314,12 @@
         <div class="stats-section">
           <div class="label">Members by hub</div>
           <div class="stats-grid hubs">
-            <button class="stat-tile" data-bucket="hub-Seattle"><span class="t-label">Seattle</span><span class="t-value" id="h-Seattle"></span></button>
-            <button class="stat-tile" data-bucket="hub-Oregon"><span class="t-label">Oregon</span><span class="t-value" id="h-Oregon"></span></button>
-            <button class="stat-tile" data-bucket="hub-Bay Area"><span class="t-label">Bay Area</span><span class="t-value" id="h-Bay Area"></span></button>
-            <button class="stat-tile" data-bucket="hub-SoCal"><span class="t-label">SoCal</span><span class="t-value" id="h-SoCal"></span></button>
-            <button class="stat-tile" data-bucket="hub-New York"><span class="t-label">New York</span><span class="t-value" id="h-New York"></span></button>
-            <button class="stat-tile" data-bucket="hub-Other"><span class="t-label">Other</span><span class="t-value" id="h-Other"></span></button>
+            <button class="stat-tile" data-bucket="hub-Seattle"><span class="t-label">Seattle</span><span class="t-value-row"><span class="t-value" id="h-Seattle"></span><span class="t-delta" id="d-h-Seattle"></span></span></button>
+            <button class="stat-tile" data-bucket="hub-Oregon"><span class="t-label">Oregon</span><span class="t-value-row"><span class="t-value" id="h-Oregon"></span><span class="t-delta" id="d-h-Oregon"></span></span></button>
+            <button class="stat-tile" data-bucket="hub-Bay Area"><span class="t-label">Bay Area</span><span class="t-value-row"><span class="t-value" id="h-Bay Area"></span><span class="t-delta" id="d-h-Bay Area"></span></span></button>
+            <button class="stat-tile" data-bucket="hub-SoCal"><span class="t-label">SoCal</span><span class="t-value-row"><span class="t-value" id="h-SoCal"></span><span class="t-delta" id="d-h-SoCal"></span></span></button>
+            <button class="stat-tile" data-bucket="hub-New York"><span class="t-label">New York</span><span class="t-value-row"><span class="t-value" id="h-New York"></span><span class="t-delta" id="d-h-New York"></span></span></button>
+            <button class="stat-tile" data-bucket="hub-Other"><span class="t-label">Other</span><span class="t-value-row"><span class="t-value" id="h-Other"></span><span class="t-delta" id="d-h-Other"></span></span></button>
           </div>
         </div>
       </div>
@@ -392,6 +421,70 @@ const surveyPct = Math.round((TOTALS.surveyDone / TOTALS.surveyTotal) * 100);
 document.getElementById("v-survey").textContent = surveyPct + "%";
 document.getElementById("v-survey-sub").innerHTML = TOTALS.surveyDone + " of " + TOTALS.surveyTotal + " · view results →";
 ["Seattle","Oregon","Bay Area","SoCal","New York","Other"].forEach(h => { document.getElementById("h-" + h).textContent = TOTALS.hubs[h] || 0; });
+
+// ===== At-a-glance deltas (mock data, illustrative) =====
+// `inverse: true` means an increase is *bad* (red), decrease is *good* (green).
+const GLANCE_DELTAS = {
+  "v-total":     { month: { abs: +3,   pct: +2.2 }, year: { abs: +12,  pct: +9.4 } },
+  "v-new":       { month: { abs: +2,   pct: +18  }, year: { abs: +5,   pct: +62  } },
+  "v-past":      { month: { abs: -1,   pct: -14  }, year: { abs: -3,   pct: -27  }, inverse: true },
+  "v-prospects": { month: { abs: +4,   pct: +9   }, year: { abs: -2,   pct: -4   } },
+  "v-atrisk":    { month: { abs: -2,   pct: -8   }, year: { abs: +4,   pct: +21  }, inverse: true },
+  "v-active":    { month: { abs: +1.2, pct: +1.7 }, year: { abs: +4.8, pct: +7.3 }, unit: "pp" },
+  "v-invest":    { month: { abs: +0.8, pct: +1.5 }, year: { abs: -2.1, pct: -3.8 }, unit: "pp" },
+  "v-survey":    { month: { abs: +3.4, pct: +6.5 }, year: { abs: +12,  pct: +28  }, unit: "pp" },
+  "h-Seattle":   { month: { abs: +1,   pct: +3   }, year: { abs: +4,   pct: +13  } },
+  "h-Oregon":    { month: { abs:  0,   pct:  0   }, year: { abs: +2,   pct: +9   } },
+  "h-Bay Area":  { month: { abs: +1,   pct: +5   }, year: { abs: +3,   pct: +17  } },
+  "h-SoCal":     { month: { abs: -1,   pct: -7   }, year: { abs: -1,   pct: -7   } },
+  "h-New York":  { month: { abs:  0,   pct:  0   }, year: { abs: +1,   pct: +6   } },
+  "h-Other":     { month: { abs: +1,   pct: +6   }, year: { abs: +2,   pct: +14  } },
+};
+let GLANCE_MODE = "abs";     // "abs" | "pct"
+let GLANCE_PERIOD = "month"; // "month" | "year"
+
+function formatDelta(num, mode, unit) {
+  const sign = num > 0 ? "+" : (num < 0 ? "−" : "");
+  const abs = Math.abs(num);
+  const rounded = Number.isInteger(abs) ? abs.toString() : abs.toFixed(1);
+  if (mode === "pct") return sign + rounded + "%";
+  return sign + rounded + (unit === "pp" ? " pp" : "");
+}
+
+function renderGlanceDeltas() {
+  Object.keys(GLANCE_DELTAS).forEach(id => {
+    const el = document.getElementById("d-" + id);
+    if (!el) return;
+    const cfg = GLANCE_DELTAS[id];
+    const period = cfg[GLANCE_PERIOD];
+    const val = GLANCE_MODE === "pct" ? period.pct : period.abs;
+    el.textContent = formatDelta(val, GLANCE_MODE, cfg.unit);
+    let cls = "zero";
+    if (val > 0) cls = cfg.inverse ? "neg" : "pos";
+    else if (val < 0) cls = cfg.inverse ? "pos" : "neg";
+    el.className = "t-delta " + cls;
+  });
+}
+
+document.querySelectorAll("#delta-mode-toggle .tog").forEach(btn => {
+  btn.addEventListener("click", (e) => {
+    e.preventDefault(); e.stopPropagation();
+    document.querySelectorAll("#delta-mode-toggle .tog").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    GLANCE_MODE = btn.dataset.mode;
+    renderGlanceDeltas();
+  });
+});
+document.querySelectorAll("#delta-period-toggle .tog").forEach(btn => {
+  btn.addEventListener("click", (e) => {
+    e.preventDefault(); e.stopPropagation();
+    document.querySelectorAll("#delta-period-toggle .tog").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    GLANCE_PERIOD = btn.dataset.period;
+    renderGlanceDeltas();
+  });
+});
+renderGlanceDeltas();
 
 const notesEl = document.getElementById("notes-list");
 const monthsAbbr = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
