@@ -1,6 +1,54 @@
 {
-  "generated": "2026-05-29T19:44:42+00:00",
+  "generated": "2026-05-31T17:26:57+00:00",
   "plans": [
+    {
+      "slug": "Live-Chat-Codex",
+      "title": "Live Chat Codex",
+      "status": "draft",
+      "owner": "jordan",
+      "created": "2026-05-31",
+      "last_updated": "2026-05-31",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-05-31T10:26:46-07:00",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": [
+        {
+          "name": "mockup",
+          "path": "Live-Chat-Codex/mockup.html",
+          "is_home": true
+        }
+      ]
+    },
+    {
+      "slug": "audience-questions-claude",
+      "title": "Audience Questions (Live Meeting Q&A)",
+      "status": "draft",
+      "owner": "jordan",
+      "created": "2026-05-30",
+      "last_updated": "2026-05-31",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-05-31T10:26:46-07:00",
+      "has_plan": true,
+      "has_changelog": false,
+      "mockups": [
+        {
+          "name": "variant-a-tabs",
+          "path": "audience-questions-claude/variant-a-tabs.html",
+          "is_home": true
+        },
+        {
+          "name": "variant-b-split",
+          "path": "audience-questions-claude/variant-b-split.html",
+          "is_home": false
+        },
+        {
+          "name": "variant-c-console",
+          "path": "audience-questions-claude/variant-c-console.html",
+          "is_home": false
+        }
+      ]
+    },
     {
       "slug": "companies-admin-redesign",
       "title": "Companies Admin Redesign",
@@ -48,7 +96,7 @@
       "created": "",
       "last_updated": "2026-05-27",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-27T09:15:45-07:00",
+      "last_changed_at": "2026-05-31T10:26:46-07:00",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
@@ -107,6 +155,44 @@
       "mockups": []
     },
     {
+      "slug": "meeting-live-chat",
+      "title": "Live Meeting Chat",
+      "status": "draft",
+      "owner": "jordan",
+      "created": "2026-05-30",
+      "last_updated": "2026-05-30",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-05-31T10:26:46-07:00",
+      "has_plan": true,
+      "has_changelog": false,
+      "mockups": [
+        {
+          "name": "mockup",
+          "path": "meeting-live-chat/mockup.html",
+          "is_home": true
+        }
+      ]
+    },
+    {
+      "slug": "meeting-questions-codex",
+      "title": "Meeting Questions Codex",
+      "status": "draft",
+      "owner": "jordan",
+      "created": "2026-05-31",
+      "last_updated": "2026-05-31",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-05-31T10:26:46-07:00",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": [
+        {
+          "name": "rail-queue",
+          "path": "meeting-questions-codex/rail-queue.html",
+          "is_home": true
+        }
+      ]
+    },
+    {
       "slug": "membership-committee",
       "title": "Membership Committee Page",
       "status": "draft",
@@ -153,6 +239,25 @@
         {
           "name": "mockup",
           "path": "per-company-investor-groups/mockup.html",
+          "is_home": true
+        }
+      ]
+    },
+    {
+      "slug": "portfolio-event-recording-wizard",
+      "title": "Portfolio Event Recording Wizard",
+      "status": "draft",
+      "owner": "jordan",
+      "created": "2026-05-27",
+      "last_updated": "2026-05-27",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-05-31T10:26:46-07:00",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": [
+        {
+          "name": "mockup",
+          "path": "portfolio-event-recording-wizard/mockup.html",
           "is_home": true
         }
       ]
