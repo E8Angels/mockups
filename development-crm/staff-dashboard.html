@@ -40,13 +40,8 @@
   .card-drag { cursor: grab; }
   .card-drag:active { cursor: grabbing; }
 
-  /* Resizable rail */
-  .workspace { display:flex; gap:0; align-items:stretch; }
-  .workspace-rail { flex-shrink:0; padding-right:10px; }
-  .workspace-handle { width:6px; cursor:col-resize; flex-shrink:0; position:relative; background:transparent; }
-  .workspace-handle::before { content:''; position:absolute; top:0; bottom:0; left:2px; width:2px; background:#e2e8f0; }
-  .workspace-handle:hover::before, .workspace-handle.dragging::before { background:#3b82f6; left:1px; width:4px; }
-  .workspace-main { flex:1; min-width:0; padding-left:10px; display:flex; flex-direction:column; min-height:0; }
+  .workspace { display:block; }
+  .workspace-main { min-width:0; display:flex; flex-direction:column; min-height:0; }
   .detail-drawer {
     width:min(95vw, 1280px);
     transform:translateX(100%);
@@ -64,16 +59,6 @@
   .cal-report { background:#faf5ff; border-color:#e9d5ff; }
   .cal-task { background:#fff7ed; border-color:#fed7aa; }
   .cal-overdue { background:#fef2f2; border-color:#fecaca; color:#991b1b; }
-
-  /* Collapsed rail */
-  .rail-collapsed-btn { width:36px; flex-shrink:0; border:1px solid #e2e8f0; border-radius:6px; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:14px 0; cursor:pointer; }
-  .rail-collapsed-btn:hover { background:#f8fafc; }
-  .rail-collapsed-btn .rcb-chev { color:#64748b; font-size:14px; line-height:1; }
-  .rail-collapsed-btn:hover .rcb-chev { color:#0f172a; }
-  .rail-collapsed-btn .rcb-label { writing-mode:vertical-rl; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:#475569; }
-  .rail-collapsed-btn:hover .rcb-label { color:#0f172a; }
-  .rail-collapsed-btn .rcb-icon { color:#64748b; }
-  .rail-collapsed-btn:hover .rcb-icon { color:#0f172a; }
 
   /* New opportunity wizard */
   .wizard-step { display:none; }
@@ -142,133 +127,6 @@
 <!-- WORKSPACE -->
 <div class="workspace px-3 md:px-4 pb-3" id="workspace">
 
-  <!-- COLLAPSED RAIL BUTTON -->
-  <button id="workspaceRailCollapsed"
-          type="button"
-          onclick="expandRail()"
-          title="Open filters"
-          class="rail-collapsed-btn"
-          style="display:none;">
-    <span class="rcb-chev">›</span>
-    <span class="rcb-label">Filters</span>
-    <svg class="rcb-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-    </svg>
-  </button>
-
-  <!-- LEFT RAIL -->
-  <aside class="workspace-rail" id="workspaceRail" style="width:280px;">
-    <div class="bg-white border border-slate-200 rounded-md overflow-hidden">
-
-      <div class="flex items-center justify-between px-2 py-1 border-b border-slate-100">
-        <span class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Filters</span>
-        <button type="button" onclick="collapseRail()" title="Collapse filters" class="text-slate-400 hover:text-slate-700 text-[13px] leading-none px-1">‹</button>
-      </div>
-
-      <div class="p-2.5 space-y-3 max-h-[calc(100vh-180px)] overflow-y-auto scroll-thin">
-
-        <!-- SEARCH -->
-        <div class="relative">
-          <svg class="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"/></svg>
-          <input id="searchInput" type="text" placeholder="Search opportunities, funders, contacts..."
-                 autocomplete="off" data-lpignore="true" data-form-type="other"
-                 class="w-full h-8 pl-8 pr-2 border border-slate-300 rounded text-[13px] focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-        </div>
-
-        <!-- QUICK FILTERS -->
-        <div>
-          <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1">Quick filters</div>
-          <div class="grid grid-cols-2 gap-1.5">
-            <button type="button" data-quick-filter="my-opportunities" class="quick-filter-btn h-8 px-2 text-[12px] border border-slate-300 rounded bg-white hover:bg-slate-50">My Opportunities</button>
-            <button type="button" data-quick-filter="my-funders" class="quick-filter-btn h-8 px-2 text-[12px] border border-slate-300 rounded bg-white hover:bg-slate-50">My Funders</button>
-          </div>
-        </div>
-
-        <!-- LEGAL ENTITY -->
-        <div>
-          <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1">E8 organization</div>
-          <div class="flex items-center bg-slate-100 rounded-md p-0.5">
-            <button data-entity="all"   class="entity-btn flex-1 px-2 py-1 rounded font-medium bg-white shadow-sm text-[12px]">All</button>
-            <button data-entity="501c6" class="entity-btn flex-1 px-2 py-1 rounded font-medium text-slate-600 hover:bg-white text-[12px]">501c6</button>
-            <button data-entity="501c3" class="entity-btn flex-1 px-2 py-1 rounded font-medium text-slate-600 hover:bg-white text-[12px]">501c3</button>
-          </div>
-        </div>
-
-        <!-- OPPORTUNITY TYPE (3 top-level options: Grant / Sponsorship / Gift; sponsorship subtype lives on the opportunity detail page) -->
-        <details open>
-          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
-            <span>Opportunity type</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
-          </summary>
-          <ul class="text-[13px] space-y-0.5 mt-1" id="kindFilter"></ul>
-        </details>
-
-        <!-- FUNDER TYPE -->
-        <details>
-          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
-            <span>Funder type</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
-          </summary>
-          <ul class="text-[13px] space-y-0.5 mt-1" id="typeFilter"></ul>
-        </details>
-
-        <!-- PIPELINE STAGE -->
-        <details open>
-          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
-            <span>Pipeline stage</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
-          </summary>
-          <ul class="text-[13px] space-y-0.5 mt-1" id="stageFilter"></ul>
-        </details>
-
-        <!-- LEAD -->
-        <details>
-          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
-            <span>Lead</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
-          </summary>
-          <ul class="text-[13px] space-y-0.5 mt-1" id="leadFilter"></ul>
-        </details>
-
-        <!-- FOLLOW-UP -->
-        <details>
-          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
-            <span>Follow-up</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
-          </summary>
-          <ul class="text-[13px] space-y-0.5 mt-1">
-            <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded"/><span class="text-red-700">Overdue</span></label></li>
-            <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded"/><span>Due in 7 days</span></label></li>
-            <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded"/><span class="text-slate-500">None scheduled</span></label></li>
-          </ul>
-        </details>
-
-        <!-- FISCAL YEAR -->
-        <details>
-          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
-            <span>Fiscal year</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
-          </summary>
-          <select class="w-full h-8 border border-slate-300 rounded px-2 text-[13px] mt-1">
-            <option>Current FY (FY26)</option>
-            <option>Prior FY (FY25)</option>
-            <option>Two FYs back (FY24)</option>
-            <option>All fiscal years</option>
-          </select>
-        </details>
-
-        <!-- REPORTING -->
-        <details>
-          <summary class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-1 flex items-center justify-between">
-            <span>Reporting</span><svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path d="M5 8l5 5 5-5z"/></svg>
-          </summary>
-          <ul class="text-[13px] space-y-0.5 mt-1">
-            <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded"/><span class="text-amber-700">Reporting due 30d</span></label></li>
-            <li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded"><input type="checkbox" class="rounded"/><span class="text-red-700">Reporting overdue</span></label></li>
-          </ul>
-        </details>
-
-      </div>
-    </div>
-  </aside>
-
-  <!-- Drag handle -->
-  <div class="workspace-handle" id="workspaceHandle" title="Drag to resize"></div>
-
   <!-- MAIN PANE -->
   <main class="workspace-main">
 
@@ -277,6 +135,11 @@
       <div class="text-[13px] text-slate-500 whitespace-nowrap" id="resultCount">—</div>
 
       <div class="ml-auto flex items-center gap-2 flex-wrap">
+        <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px]">
+          <button data-entity="all" class="entity-btn px-2.5 py-1 font-medium rounded bg-white shadow-sm">All</button>
+          <button data-entity="501c6" class="entity-btn px-2.5 py-1 font-medium rounded text-slate-600 hover:bg-white">501c6</button>
+          <button data-entity="501c3" class="entity-btn px-2.5 py-1 font-medium rounded text-slate-600 hover:bg-white">501c3</button>
+        </div>
         <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px]">
           <button data-mode="kanban"   class="mode-btn px-2.5 py-1 font-medium rounded bg-white shadow-sm">Kanban</button>
           <button data-mode="list"     class="mode-btn px-2.5 py-1 font-medium rounded text-slate-600 hover:bg-white">List</button>
@@ -782,21 +645,12 @@ const OPPS = [
 // ============== STATE ==============
 let legalEntityFilter = 'all';
 let viewMode = 'kanban';
-let quickFilter = null;
 let recordGridView = 'opportunities:pipeline';
 
 // ============== HELPERS ==============
 function filteredOpps() {
-  const q = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
   return OPPS.filter(o => {
     if (legalEntityFilter !== 'all' && !(o.legal_entity === legalEntityFilter || o.legal_entity === 'both')) return false;
-    const ent = entityById(o.entity_id);
-    if (quickFilter === 'my-opportunities' && o.lead !== CURRENT_USER_ID) return false;
-    if (quickFilter === 'my-funders' && ent?.lead !== CURRENT_USER_ID) return false;
-    if (q) {
-      const hay = (o.name + ' ' + (ent ? ent.name : '') + ' ' + (ent && ent.primaryContact ? ent.primaryContact : '')).toLowerCase();
-      if (!hay.includes(q)) return false;
-    }
     return true;
   });
 }
@@ -804,24 +658,12 @@ function oppsForFunder(funderId) {
   return OPPS.filter(o => o.entity_id === funderId);
 }
 function filteredFunders() {
-  const q = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
   const [, savedView] = recordGridView.split(':');
   return ENTITIES.filter(ent => {
     const opps = oppsForFunder(ent.id);
-    if (quickFilter === 'my-funders' && ent.lead !== CURRENT_USER_ID) return false;
-    if (quickFilter === 'my-opportunities' && !opps.some(o => o.lead === CURRENT_USER_ID)) return false;
     if (savedView === 'my' && ent.lead !== CURRENT_USER_ID) return false;
     if (savedView === 'cold' && opps.some(o => !['received','declined'].includes(o.stage))) return false;
     if (legalEntityFilter !== 'all' && !opps.some(o => o.legal_entity === legalEntityFilter || o.legal_entity === 'both')) return false;
-    if (q) {
-      const hay = [
-        ent.name,
-        ent.primaryContact || '',
-        entityTypeById(ent.type).label,
-        ...opps.map(o => o.name)
-      ].join(' ').toLowerCase();
-      if (!hay.includes(q)) return false;
-    }
     return true;
   });
 }
@@ -922,43 +764,6 @@ function renderKPIs() {
   const banner = document.getElementById('overdueBanner');
   if (overdue > 0) { banner.classList.remove('hidden'); banner.classList.add('flex'); document.getElementById('overdueCount').textContent = overdue; }
   else { banner.classList.add('hidden'); banner.classList.remove('flex'); }
-}
-
-function renderSidebar() {
-  const items = filteredOpps();
-  document.getElementById('kindFilter').innerHTML = TYPES.map(t => {
-    const n = items.filter(o => matchType(o, t)).length;
-    return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
-      <input type="checkbox" class="rounded" />
-      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${t.cls}">${t.label}</span>
-      <span class="ml-auto text-[12px] text-slate-400">${n}</span>
-    </label></li>`;
-  }).join('');
-  document.getElementById('typeFilter').innerHTML = ENTITY_TYPES.map(t => {
-    const n = items.filter(o => (entityById(o.entity_id)||{}).type === t.id).length;
-    return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
-      <input type="checkbox" class="rounded" />
-      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium type-chip">${t.label}</span>
-      <span class="ml-auto text-[12px] text-slate-400">${n}</span>
-    </label></li>`;
-  }).join('');
-  document.getElementById('stageFilter').innerHTML = STAGES.map(st => {
-    const n = items.filter(o => o.stage === st.id).length;
-    return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
-      <input type="checkbox" class="rounded" />
-      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[12px] font-medium ${st.cls}">${st.label}</span>
-      <span class="ml-auto text-[12px] text-slate-400">${n}</span>
-    </label></li>`;
-  }).join('');
-  document.getElementById('leadFilter').innerHTML = STAFF.map(o => {
-    const n = items.filter(x => x.lead === o.id).length;
-    return `<li><label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-1 py-0.5 rounded">
-      <input type="checkbox" class="rounded" />
-      <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[11px] flex items-center justify-center font-semibold">${o.initials}</span>
-      <span>${o.name}</span>
-      <span class="ml-auto text-[12px] text-slate-400">${n}</span>
-    </label></li>`;
-  }).join('');
 }
 
 function renderKanban() {
@@ -1104,7 +909,6 @@ function renderGrants() {
 
 function renderAll() {
   renderKPIs();
-  renderSidebar();
   renderKanban();
   renderList();
   renderGrants();
@@ -1176,22 +980,6 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
 document.getElementById('recordGridViewSelect').addEventListener('change', (event) => {
   recordGridView = event.target.value;
   renderAll();
-});
-
-// Live search
-document.getElementById('searchInput').addEventListener('input', () => { renderAll(); });
-
-document.querySelectorAll('.quick-filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    quickFilter = quickFilter === btn.dataset.quickFilter ? null : btn.dataset.quickFilter;
-    document.querySelectorAll('.quick-filter-btn').forEach(b => {
-      const active = quickFilter === b.dataset.quickFilter;
-      b.classList.toggle('bg-blue-50', active);
-      b.classList.toggle('border-blue-300', active);
-      b.classList.toggle('text-blue-800', active);
-    });
-    renderAll();
-  });
 });
 
 renderAll();
@@ -1435,89 +1223,6 @@ document.querySelectorAll('.editor-btn').forEach(btn => {
   addLine('in_kind');
 })();
 
-// ============== RESIZABLE + COLLAPSIBLE LEFT RAIL ==============
-const RAIL_MIN_PX = 200;
-const RAIL_MAX_PX = 560;
-const COLLAPSE_THRESHOLD_PX = 160;
-const RAIL_WIDTH_KEY = 'e8.development.filterRailWidth';
-const RAIL_OPEN_KEY  = 'e8.development.filterRailOpen';
-
-function collapseRail() {
-  const rail = document.getElementById('workspaceRail');
-  const handle = document.getElementById('workspaceHandle');
-  const btn = document.getElementById('workspaceRailCollapsed');
-  if (rail) rail.style.display = 'none';
-  if (handle) handle.style.display = 'none';
-  if (btn) btn.style.display = '';
-  try { localStorage.setItem(RAIL_OPEN_KEY, '0'); } catch (e) {}
-}
-function expandRail() {
-  const rail = document.getElementById('workspaceRail');
-  const handle = document.getElementById('workspaceHandle');
-  const btn = document.getElementById('workspaceRailCollapsed');
-  if (rail) rail.style.display = '';
-  if (handle) handle.style.display = '';
-  if (btn) btn.style.display = 'none';
-  try { localStorage.setItem(RAIL_OPEN_KEY, '1'); } catch (e) {}
-}
-
-(function initResize() {
-  const handle = document.getElementById('workspaceHandle');
-  const rail   = document.getElementById('workspaceRail');
-  if (!handle || !rail) return;
-
-  try {
-    const savedW = parseInt(localStorage.getItem(RAIL_WIDTH_KEY) || '', 10);
-    if (Number.isFinite(savedW) && savedW >= RAIL_MIN_PX && savedW <= RAIL_MAX_PX) {
-      rail.style.width = savedW + 'px';
-    }
-    const open = localStorage.getItem(RAIL_OPEN_KEY);
-    if (open === '0') collapseRail();
-  } catch (e) {}
-
-  let resizing = false, startX = 0, startW = 0, lastW = 0;
-
-  handle.addEventListener('mousedown', (e) => {
-    resizing = true;
-    startX = e.clientX;
-    startW = rail.offsetWidth;
-    lastW  = startW;
-    handle.classList.add('dragging');
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-    e.preventDefault();
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (!resizing) return;
-    const dx = e.clientX - startX;
-    const candidate = startW + dx;
-    if (candidate < COLLAPSE_THRESHOLD_PX) {
-      rail.style.width = Math.max(60, candidate) + 'px';
-    } else {
-      rail.style.width = Math.min(RAIL_MAX_PX, candidate) + 'px';
-    }
-    lastW = candidate;
-  });
-
-  document.addEventListener('mouseup', () => {
-    if (!resizing) return;
-    resizing = false;
-    handle.classList.remove('dragging');
-    document.body.style.cursor = '';
-    document.body.style.userSelect = '';
-
-    if (lastW < COLLAPSE_THRESHOLD_PX) {
-      rail.style.width = '280px';
-      try { localStorage.setItem(RAIL_WIDTH_KEY, '280'); } catch (e) {}
-      collapseRail();
-    } else {
-      const finalW = Math.max(RAIL_MIN_PX, Math.min(RAIL_MAX_PX, lastW));
-      rail.style.width = finalW + 'px';
-      try { localStorage.setItem(RAIL_WIDTH_KEY, String(finalW)); } catch (e) {}
-    }
-  });
-})();
 </script>
 
 </body>

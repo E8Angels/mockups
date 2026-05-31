@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variant B — Split Dock · Audience Questions Mockup</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #020617;
+  --sidebar: #0f172a;
+  --panel: #1e293b;
+  --panel-2: #334155;
+  --border: #1e293b;
+  --border-2: #334155;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --subtle: #64748b;
+  --primary: #3b82f6;
+  --primary-soft: #1d4ed8;
+  --ok: #34d399;
+  --danger: #f87171;
+  --radius: 12px;
+}
+
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; line-height: 1.5; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--panel-2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--subtle); }
+
+/* NAV */
+.nav { height: 56px; background: #0b1220; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; gap: 28px; flex-shrink: 0; }
+.nav-brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; color: var(--text); text-decoration: none; }
+.nav-dot { width: 10px; height: 10px; background: #2dd4bf; border-radius: 50%; box-shadow: 0 0 6px #2dd4bf88; }
+.nav-links { display: flex; gap: 4px; margin-left: 8px; }
+.nav-link { padding: 6px 12px; border-radius: 8px; color: var(--muted); font-size: 13px; cursor: pointer; }
+.nav-link:hover, .nav-link.active { color: var(--text); background: var(--panel); }
+
+/* LAYOUT */
+.app-body { display: flex; height: calc(100vh - 56px); overflow: hidden; padding-bottom: 48px; }
+
+/* STAGE */
+.stage { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.stage-header { height: 52px; background: var(--sidebar); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 10px; flex-shrink: 0; }
+.back-btn { width: 30px; height: 30px; border-radius: 8px; background: var(--panel); border: 1px solid var(--border-2); color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.back-btn:hover { color: var(--text); background: var(--panel-2); }
+.meeting-title { font-weight: 600; font-size: 14px; color: var(--text); }
+.meeting-date { font-size: 12px; color: var(--muted); }
+.live-pill { display: flex; align-items: center; gap: 5px; background: #7f1d1d; border: 1px solid #dc2626; border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 700; color: #fca5a5; letter-spacing: .05em; }
+.live-dot { width: 6px; height: 6px; background: var(--danger); border-radius: 50%; animation: blink 1.2s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+.stage-spacer { flex: 1; }
+
+.layout-ctl { display: flex; align-items: center; gap: 7px; }
+.layout-ctl .lbl { font-size: 11px; color: var(--subtle); }
+.segmented { display: flex; background: var(--panel); border: 1px solid var(--border-2); border-radius: 8px; overflow: hidden; }
+.seg-btn { padding: 5px 11px; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; border: none; background: transparent; font-family: inherit; white-space: nowrap; }
+.seg-btn:hover { color: var(--text); }
+.seg-btn.active { background: var(--primary); color: #fff; }
+
+.video-area { flex: 1; background: #000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; }
+.video-play-icon { width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,.08); display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--muted); }
+.video-label { font-size: 13px; color: var(--subtle); }
+.video-sub { font-size: 12px; color: var(--subtle); }
+
+/* DOCK (sidebar) */
+.dock { flex-shrink: 0; background: var(--sidebar); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; transition: width .28s ease; }
+.dock.tabs { width: 360px; }
+.dock.split { width: 680px; }
+.dock.qonly { width: 440px; }
+
+/* tab bar (tabs mode only) */
+.sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 12px; gap: 2px; flex-shrink: 0; }
+.sidebar-tab { padding: 12px 10px 11px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; }
+.sidebar-tab:hover { color: var(--text); }
+.sidebar-tab.active { color: var(--text); border-bottom-color: var(--primary); }
+.tab-badge { display: inline-flex; align-items: center; justify-content: center; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; border-radius: 10px; min-width: 16px; height: 16px; padding: 0 4px; margin-left: 5px; vertical-align: middle; }
+.tab-badge.hidden { display: none; }
+
+/* column container */
+.columns { flex: 1; display: flex; min-height: 0; }
+.col { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 0; }
+.col + .col { border-left: 1px solid var(--border); }
+.col-head { height: 40px; padding: 0 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.col-head .ct { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.col-head .cnt { font-size: 11px; color: var(--subtle); }
+.col-head .spacer { flex: 1; }
+
+/* chat column (stub) */
+.chat-messages { flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; min-height: 0; }
+.chat-msg { display: flex; gap: 8px; }
+.chat-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--panel-2); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--muted); flex-shrink: 0; margin-top: 1px; }
+.chat-meta { font-size: 11px; color: var(--subtle); margin-bottom: 2px; }
+.chat-text { font-size: 13px; color: var(--text); line-height: 1.4; }
+.chat-composer { padding: 10px 12px; border-top: 1px solid var(--border); display: flex; gap: 6px; flex-shrink: 0; }
+
+/* questions column */
+.q-col { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 0; }
+.qa-banner { border-bottom: 1px solid var(--border); padding: 12px 14px; flex-shrink: 0; }
+.qa-empty { text-align: center; padding: 26px 16px; }
+.qa-empty-icon { font-size: 22px; opacity: .4; margin-bottom: 8px; }
+.qa-empty-text { font-size: 12px; color: var(--muted); line-height: 1.5; max-width: 260px; margin: 0 auto; }
+.open-company-btn { margin-top: 14px; padding: 8px 14px; border-radius: 9px; background: var(--primary); border: none; color: #fff; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
+.open-company-btn:hover { background: var(--primary-soft); }
+.qa-active { display: flex; align-items: center; gap: 9px; }
+.company-logo { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.qa-active-label { flex: 1; min-width: 0; }
+.qa-active-label .lbl { font-size: 11px; color: var(--subtle); }
+.qa-active-label .nm { font-size: 13px; font-weight: 600; color: var(--text); }
+.mod-controls { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+.toggle-switch { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ok); }
+.switch { width: 34px; height: 19px; border-radius: 20px; background: #166534; position: relative; cursor: pointer; border: 1px solid #22c55e; }
+.switch::after { content: ''; position: absolute; top: 1px; right: 1px; width: 15px; height: 15px; border-radius: 50%; background: #fff; }
+.mini-btn { padding: 4px 9px; border-radius: 7px; background: var(--panel); border: 1px solid var(--border-2); color: var(--muted); font-size: 12px; cursor: pointer; font-family: inherit; }
+.mini-btn:hover { color: var(--text); border-color: var(--primary); }
+.mini-btn.danger { color: var(--danger); border-color: #7f1d1d; }
+.mini-btn.danger:hover { background: #7f1d1d33; }
+
+.sort-row { display: flex; align-items: center; gap: 8px; padding: 10px 14px; flex-shrink: 0; }
+.sort-row .label { font-size: 11px; color: var(--subtle); text-transform: uppercase; letter-spacing: .05em; }
+.q-count { margin-left: auto; font-size: 11px; color: var(--subtle); }
+
+.q-list { flex: 1; overflow-y: auto; padding: 4px 12px 12px; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.q-row { display: flex; gap: 10px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--panel); transition: opacity .2s; }
+.q-row.answered { opacity: .5; }
+.q-vote { display: flex; flex-direction: column; align-items: center; gap: 1px; background: var(--sidebar); border: 1px solid var(--border-2); border-radius: 7px; padding: 5px 0; min-width: 40px; cursor: pointer; user-select: none; flex-shrink: 0; color: var(--muted); font-family: inherit; }
+.q-vote:hover { border-color: var(--primary); color: var(--text); }
+.q-vote.voted { background: #1e3a5f; border-color: var(--primary); color: #93c5fd; }
+.q-vote .chev { font-size: 11px; line-height: 1; }
+.q-vote .cnt { font-size: 14px; font-weight: 700; line-height: 1.1; }
+.q-main { flex: 1; min-width: 0; }
+.q-text { font-size: 13px; color: var(--text); line-height: 1.4; }
+.q-row.answered .q-text { text-decoration: line-through; }
+.q-meta { font-size: 11px; color: var(--subtle); margin-top: 4px; }
+.q-check { width: 28px; height: 28px; border-radius: 7px; border: 1px solid var(--border-2); background: transparent; color: var(--subtle); cursor: pointer; flex-shrink: 0; align-self: center; font-size: 13px; font-family: inherit; }
+.q-check:hover { color: var(--ok); border-color: #166534; }
+.q-check.done { background: #052e16; border-color: #166534; color: var(--ok); }
+
+.q-composer { border-top: 1px solid var(--border); padding: 10px 12px; display: flex; gap: 6px; flex-shrink: 0; }
+.composer-input { flex: 1; background: var(--bg); border: 1px solid var(--border-2); border-radius: 8px; padding: 8px 10px; color: var(--text); font-size: 13px; font-family: inherit; outline: none; }
+.composer-input:focus { border-color: var(--primary); }
+.composer-input:disabled { opacity: .4; cursor: not-allowed; }
+.composer-input::placeholder { color: var(--subtle); }
+.send-btn { width: 34px; height: 34px; border-radius: 8px; background: var(--primary); border: none; color: #fff; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: inherit; }
+.send-btn:hover { background: var(--primary-soft); }
+.send-btn:disabled { background: var(--panel-2); cursor: not-allowed; }
+
+.menu { position: fixed; z-index: 300; background: var(--panel); border: 1px solid var(--border-2); border-radius: 10px; padding: 5px; box-shadow: 0 8px 30px rgba(0,0,0,.5); min-width: 200px; }
+.menu.hidden { display: none; }
+.menu-item { display: flex; align-items: center; gap: 8px; padding: 7px 9px; border-radius: 7px; font-size: 13px; color: var(--text); cursor: pointer; }
+.menu-item:hover { background: var(--panel-2); }
+.menu-item .company-logo { width: 22px; height: 22px; font-size: 9px; }
+
+.toast { position: fixed; bottom: 64px; left: 50%; transform: translateX(-50%) translateY(8px); background: var(--panel-2); border: 1px solid var(--border-2); color: var(--text); font-size: 13px; padding: 9px 16px; border-radius: 10px; z-index: 200; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.demo-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 48px; background: #030b1a; border-top: 1px solid #1e3a5f; display: flex; align-items: center; padding: 0 16px; gap: 20px; z-index: 50; }
+.demo-label { font-size: 11px; font-weight: 700; color: #38bdf8; letter-spacing: .07em; text-transform: uppercase; }
+.demo-group { display: flex; align-items: center; gap: 7px; }
+.demo-group-label { font-size: 11px; color: var(--subtle); }
+.variant-caption { position: fixed; bottom: 54px; right: 12px; font-size: 10px; color: var(--subtle); background: rgba(15,23,42,.9); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; z-index: 60; pointer-events: none; max-width: 380px; text-align: right; line-height: 1.5; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="#"><span class="nav-dot"></span>E8 Portal</a>
+  <div class="nav-links">
+    <span class="nav-link">Home</span>
+    <span class="nav-link active">Recordings</span>
+    <span class="nav-link">Pipeline</span>
+    <span class="nav-link">E8 Fund</span>
+    <span class="nav-link">Explore</span>
+  </div>
+</nav>
+
+<div class="app-body">
+  <div class="stage">
+    <div class="stage-header">
+      <button class="back-btn">←</button>
+      <div>
+        <div class="meeting-title">Member Meeting: May 2026</div>
+        <div class="meeting-date">Thursday, May 21, 2026</div>
+      </div>
+      <div class="live-pill" id="livePill"><span class="live-dot"></span>LIVE</div>
+      <div class="stage-spacer"></div>
+      <div class="layout-ctl">
+        <span class="lbl">⇔ Columns</span>
+        <div class="segmented">
+          <button class="seg-btn" id="lay-tabs" onclick="setLayout('tabs')">Tabs</button>
+          <button class="seg-btn active" id="lay-split" onclick="setLayout('split')">Split</button>
+          <button class="seg-btn" id="lay-qonly" onclick="setLayout('qonly')">Q only</button>
+        </div>
+      </div>
+    </div>
+    <div class="video-area">
+      <div class="video-play-icon">▶</div>
+      <div class="video-label" id="videoLabel">Embedded Zoom — live</div>
+      <div class="video-sub">Member Meeting · May 2026</div>
+    </div>
+  </div>
+
+  <div class="dock split" id="dock">
+    <!-- tab bar: only visible in tabs mode -->
+    <div class="sidebar-tabs" id="tabBar">
+      <div class="sidebar-tab" id="tab-btn-chat" onclick="switchTab('chat')">Chat</div>
+      <div class="sidebar-tab active" id="tab-btn-questions" onclick="switchTab('questions')">
+        Questions<span class="tab-badge hidden" id="qBadge">0</span>
+      </div>
+    </div>
+
+    <div class="columns" id="columns">
+      <!-- CHAT COLUMN -->
+      <div class="col" id="chatCol">
+        <div class="col-head"><span class="ct">Chat</span><span class="spacer"></span><span class="cnt">5 online</span></div>
+        <div class="chat-messages">
+          <div class="chat-msg"><div class="chat-avatar">JR</div><div><div class="chat-meta">James R · 12m</div><div class="chat-text">Excited for the Ocean Build pitch.</div></div></div>
+          <div class="chat-msg"><div class="chat-avatar">SB</div><div><div class="chat-meta">Sarah Bell · 10m</div><div class="chat-text">+1, the coastal sequestration angle is fascinating.</div></div></div>
+          <div class="chat-msg"><div class="chat-avatar">AR</div><div><div class="chat-meta">Adam Robinson · 7m</div><div class="chat-text">@Maya can you add your IP question to the list?</div></div></div>
+          <div class="chat-msg"><div class="chat-avatar">MC</div><div><div class="chat-meta">Maya Chen · 6m</div><div class="chat-text">Done — upvote it if you want it asked.</div></div></div>
+        </div>
+        <div class="chat-composer">
+          <input class="composer-input" type="text" placeholder="Message…" autocomplete="off" data-lpignore="true" data-form-type="other" />
+          <button class="send-btn">➤</button>
+        </div>
+      </div>
+
+      <!-- QUESTIONS COLUMN -->
+      <div class="q-col" id="qCol">
+        <div class="col-head" id="qColHead"><span class="ct">Questions</span><span class="spacer"></span></div>
+        <div class="qa-banner" id="qaBanner"></div>
+        <div class="sort-row" id="sortRow">
+          <span class="label">Sort</span>
+          <div class="segmented">
+            <button class="seg-btn active" id="sort-newest" onclick="setSort('newest')">Newest</button>
+            <button class="seg-btn" id="sort-top" onclick="setSort('top')">Top ▲</button>
+          </div>
+          <span class="q-count" id="qCount">7 questions</span>
+        </div>
+        <div class="q-list" id="qList"></div>
+        <div class="q-composer" id="qComposer">
+          <input class="composer-input" id="qInput" type="text" placeholder="Ask a question…" maxlength="220" autocomplete="off" data-lpignore="true" data-form-type="other" />
+          <button class="send-btn" id="qSend" onclick="submitQuestion()">➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="menu hidden" id="companyMenu"></div>
+<div class="toast" id="toast"></div>
+
+<div class="demo-bar">
+  <span class="demo-label">Demo:</span>
+  <div class="demo-group"><span class="demo-group-label">Mode</span>
+    <div class="segmented">
+      <button class="seg-btn active" id="m-live" onclick="setMode('live')">Live</button>
+      <button class="seg-btn" id="m-rec" onclick="setMode('recording')">Recording</button>
+    </div>
+  </div>
+  <div class="demo-group"><span class="demo-group-label">Role</span>
+    <div class="segmented">
+      <button class="seg-btn" id="r-member" onclick="setRole('member')">Member</button>
+      <button class="seg-btn active" id="r-mod" onclick="setRole('moderator')">Moderator</button>
+    </div>
+  </div>
+  <div class="demo-group"><span class="demo-group-label">Q&amp;A session</span>
+    <div class="segmented">
+      <button class="seg-btn" id="s-off" onclick="setSession(null)">Off</button>
+      <button class="seg-btn active" id="s-ob" onclick="setSession('Ocean Build')">Ocean Build</button>
+    </div>
+  </div>
+</div>
+
+<div class="variant-caption">Variant B — split dock: widen the panel so chat + questions show together; "Q only" hides chat. Falls back to tabs on narrow screens.</div>
+
+<script>
+const COMPANIES = [
+  { name:'Ocean Build', color:'#16a34a', initials:'OB' },
+  { name:'E-Zn', color:'#2563eb', initials:'EZ' },
+  { name:'Furno Materials', color:'#ea580c', initials:'FM' },
+  { name:'Alithic', color:'#7c3aed', initials:'AL' },
+  { name:'Decarbon8', color:'#0d9488', initials:'D8' },
+];
+function companyByName(n){ return COMPANIES.find(c=>c.name===n) || COMPANIES[0]; }
+
+let seqCounter = 100;
+let questions = [
+  { id:'q1', body:"What's your gross margin at current production volume, and where does it land at scale?", author:'Sarah Bell', votes:14, minsAgo:2 },
+  { id:'q2', body:"How defensible is the materials IP vs. incumbents like Holcim?", author:'Adam Robinson', votes:11, minsAgo:4 },
+  { id:'q3', body:"Who are your first three design-partner customers and are any of them paying yet?", author:'Maya Chen', votes:9, minsAgo:5 },
+  { id:'q4', body:"What's the regulatory/permitting path for the coastal installations?", author:'Tom Realini', votes:6, minsAgo:6 },
+  { id:'q5', body:"Cap table — how much runway does this round buy and what's the next milestone?", author:'Priya Nair', votes:4, minsAgo:8 },
+  { id:'q6', body:"Have you validated the carbon-sequestration numbers with a third party?", author:'David Kim', votes:3, minsAgo:9 },
+  { id:'q7', body:"What's the unit-economics sensitivity to cement price?", author:'Lena Ortiz', votes:1, minsAgo:10 },
+].map((q,i,arr)=>({ ...q, seq: arr.length - i }));
+
+const S = { mode:'live', role:'moderator', session:'Ocean Build', layout:'split', tab:'questions', myVotes:new Set(), answered:new Set(), sort:'newest' };
+
+const isLive = () => S.mode==='live';
+const isMod = () => S.role==='moderator';
+const sessionOpen = () => !!S.session;
+const canAsk = () => isLive() && sessionOpen();
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function logoHtml(c){ return `<div class="company-logo" style="background:${c.color}">${c.initials}</div>`; }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2000); }
+
+/* ── layout ── */
+function setLayout(l){
+  S.layout = l;
+  ['tabs','split','qonly'].forEach(x=>document.getElementById('lay-'+x).classList.toggle('active', x===l));
+  applyLayout();
+}
+function switchTab(name){
+  S.tab = name;
+  document.getElementById('tab-btn-chat').classList.toggle('active', name==='chat');
+  document.getElementById('tab-btn-questions').classList.toggle('active', name==='questions');
+  applyLayout();
+}
+function applyLayout(){
+  const dock = document.getElementById('dock');
+  dock.classList.remove('tabs','split','qonly'); dock.classList.add(S.layout);
+  const tabBar = document.getElementById('tabBar');
+  const chatCol = document.getElementById('chatCol');
+  const qCol = document.getElementById('qCol');
+
+  if(S.layout==='tabs'){
+    tabBar.style.display = '';
+    chatCol.style.display = S.tab==='chat' ? '' : 'none';
+    qCol.style.display = S.tab==='questions' ? '' : 'none';
+  } else if(S.layout==='split'){
+    tabBar.style.display = 'none';
+    chatCol.style.display = '';
+    qCol.style.display = '';
+  } else { /* qonly */
+    tabBar.style.display = 'none';
+    chatCol.style.display = 'none';
+    qCol.style.display = '';
+  }
+}
+
+/* ── banner ── */
+function renderBanner(){
+  const b = document.getElementById('qaBanner');
+  if(!sessionOpen()){
+    b.innerHTML = `
+      <div class="qa-empty">
+        <div class="qa-empty-icon">💬</div>
+        <div class="qa-empty-text">No active Q&amp;A. The moderator opens questions when a company is presenting.</div>
+        ${isMod() ? `<button class="open-company-btn" onclick="openCompanyMenu(event,'open')">Open questions for a company ▾</button>` : ''}
+      </div>`;
+    return;
+  }
+  const c = companyByName(S.session);
+  b.innerHTML = `
+    <div class="qa-active">
+      ${logoHtml(c)}
+      <div class="qa-active-label"><div class="lbl">Questions about</div><div class="nm">${esc(c.name)}</div></div>
+      ${isMod() ? `<div class="toggle-switch"><span class="switch" onclick="setSession(null)" title="Turn off"></span>On</div>` : ''}
+    </div>
+    ${isMod() ? `
+      <div class="mod-controls">
+        <button class="mini-btn" onclick="openCompanyMenu(event,'switch')">Switch ▾</button>
+        <button class="mini-btn danger" onclick="setSession(null)">Close</button>
+      </div>` : ''}`;
+}
+function openCompanyMenu(e, mode){
+  e.stopPropagation();
+  const menu = document.getElementById('companyMenu');
+  const list = COMPANIES.filter(c => mode==='open' ? true : c.name!==S.session);
+  menu.innerHTML = list.map(c => `<div class="menu-item" onclick="pickCompany('${c.name}')">${logoHtml(c)}${esc(c.name)}</div>`).join('');
+  const r = e.target.getBoundingClientRect();
+  menu.style.left = Math.min(r.left, window.innerWidth-220) + 'px';
+  menu.style.top = (r.bottom + 4) + 'px';
+  menu.classList.remove('hidden');
+}
+function pickCompany(name){
+  document.getElementById('companyMenu').classList.add('hidden');
+  setSession(name);
+  showToast('Questions opened for ' + name);
+}
+document.addEventListener('click', ()=> document.getElementById('companyMenu').classList.add('hidden'));
+
+/* ── sort ── */
+function setSort(s){
+  S.sort = s;
+  document.getElementById('sort-newest').classList.toggle('active', s==='newest');
+  document.getElementById('sort-top').classList.toggle('active', s==='top');
+  renderList();
+}
+function sortedQuestions(){
+  const arr = [...questions];
+  if(S.sort==='top') arr.sort((a,b)=> b.votes-a.votes || a.seq-b.seq);
+  else arr.sort((a,b)=> b.seq-a.seq);
+  return arr;
+}
+
+/* ── list ── */
+function renderList(){
+  const list = document.getElementById('qList');
+  document.getElementById('qCount').textContent = questions.length + (questions.length===1?' question':' questions');
+  const badge = document.getElementById('qBadge');
+  if(sessionOpen() && questions.length){ badge.textContent = questions.length; badge.classList.remove('hidden'); }
+  else badge.classList.add('hidden');
+
+  if(!sessionOpen()){ list.innerHTML=''; return; }
+
+  list.innerHTML = sortedQuestions().map(q => {
+    const voted = S.myVotes.has(q.id);
+    const done = S.answered.has(q.id);
+    return `
+      <div class="q-row ${done?'answered':''}">
+        <button class="q-vote ${voted?'voted':''}" onclick="toggleVote('${q.id}')">
+          <span class="chev">▲</span><span class="cnt">${q.votes}</span>
+        </button>
+        <div class="q-main">
+          <div class="q-text">${esc(q.body)}</div>
+          <div class="q-meta">${esc(q.author)} · ${q.minsAgo===0?'just now':q.minsAgo+'m ago'}</div>
+        </div>
+        ${isMod() ? `<button class="q-check ${done?'done':''}" title="Mark answered (only you see this)" onclick="toggleAnswered('${q.id}')">✓</button>` : ''}
+      </div>`;
+  }).join('');
+}
+function toggleVote(id){
+  const q = questions.find(x=>x.id===id); if(!q) return;
+  if(S.myVotes.has(id)){ S.myVotes.delete(id); q.votes=Math.max(0,q.votes-1); }
+  else { S.myVotes.add(id); q.votes++; }
+  renderList();
+}
+function toggleAnswered(id){ if(S.answered.has(id)) S.answered.delete(id); else S.answered.add(id); renderList(); }
+function submitQuestion(){
+  if(!canAsk()) return;
+  const input = document.getElementById('qInput');
+  const text = input.value.trim(); if(!text) return;
+  questions.push({ id:'q'+seqCounter, body:text, author:'You', votes:0, minsAgo:0, seq: ++seqCounter });
+  input.value='';
+  renderList();
+  showToast('Question added');
+}
+document.getElementById('qInput').addEventListener('keydown', e=>{ if(e.key==='Enter') submitQuestion(); });
+
+function renderComposer(){
+  const input = document.getElementById('qInput');
+  const send = document.getElementById('qSend');
+  const on = canAsk();
+  input.disabled = !on; send.disabled = !on;
+  input.placeholder = !sessionOpen() ? 'Questions are closed' : (!isLive() ? 'Recording — questions are read-only' : 'Ask a question…');
+  document.getElementById('qComposer').style.display = sessionOpen() ? '' : 'none';
+  document.getElementById('sortRow').style.display = sessionOpen() ? '' : 'none';
+}
+
+/* ── demo bar ── */
+function setMode(m){ S.mode=m; document.getElementById('m-live').classList.toggle('active',m==='live'); document.getElementById('m-rec').classList.toggle('active',m==='recording'); apply(); }
+function setRole(r){ S.role=r; document.getElementById('r-member').classList.toggle('active',r==='member'); document.getElementById('r-mod').classList.toggle('active',r==='moderator'); apply(); }
+function setSession(name){
+  S.session = name;
+  document.getElementById('s-off').classList.toggle('active', !name);
+  document.getElementById('s-ob').classList.toggle('active', name==='Ocean Build');
+  apply();
+}
+
+function apply(){
+  document.getElementById('livePill').style.display = isLive() ? '' : 'none';
+  document.getElementById('videoLabel').textContent = isLive() ? 'Embedded Zoom — live' : 'Recording — Member Meeting, May 21 2026';
+  applyLayout();
+  renderBanner();
+  renderComposer();
+  renderList();
+}
+apply();
+</script>
+</body>
+</html>

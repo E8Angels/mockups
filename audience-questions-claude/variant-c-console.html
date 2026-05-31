@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variant C — Moderator Console · Audience Questions Mockup</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #020617;
+  --sidebar: #0f172a;
+  --panel: #1e293b;
+  --panel-2: #334155;
+  --border: #1e293b;
+  --border-2: #334155;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --subtle: #64748b;
+  --primary: #3b82f6;
+  --primary-soft: #1d4ed8;
+  --ok: #34d399;
+  --danger: #f87171;
+  --radius: 12px;
+}
+
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; line-height: 1.5; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--panel-2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--subtle); }
+
+/* ── NAV ── */
+.nav { height: 56px; background: #0b1220; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; gap: 28px; flex-shrink: 0; position: relative; z-index: 10; }
+.nav-brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; color: var(--text); text-decoration: none; }
+.nav-dot { width: 10px; height: 10px; background: #2dd4bf; border-radius: 50%; box-shadow: 0 0 6px #2dd4bf88; }
+.nav-links { display: flex; gap: 4px; margin-left: 8px; }
+.nav-link { padding: 6px 12px; border-radius: 8px; color: var(--muted); font-size: 13px; cursor: pointer; transition: color .15s, background .15s; }
+.nav-link:hover { color: var(--text); background: var(--panel); }
+.nav-link.active { color: var(--text); background: var(--panel); }
+
+/* ── LAYOUT ── */
+.app-body { display: flex; height: calc(100vh - 56px); overflow: hidden; position: relative; padding-bottom: 48px; }
+
+/* ── STAGE ── */
+.stage { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.stage-header { height: 52px; background: var(--sidebar); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 10px; flex-shrink: 0; }
+.back-btn { width: 30px; height: 30px; border-radius: 8px; background: var(--panel); border: 1px solid var(--border-2); color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: color .15s, background .15s; }
+.back-btn:hover { color: var(--text); background: var(--panel-2); }
+.meeting-title { font-weight: 600; font-size: 14px; color: var(--text); }
+.meeting-date { font-size: 12px; color: var(--muted); }
+.live-pill { display: flex; align-items: center; gap: 5px; background: #7f1d1d; border: 1px solid #dc2626; border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 700; color: #fca5a5; letter-spacing: .05em; }
+.live-dot { width: 6px; height: 6px; background: var(--danger); border-radius: 50%; animation: blink 1.2s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+.stage-spacer { flex: 1; }
+.console-btn { display: flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 8px; border: 1px solid var(--border-2); background: var(--panel); color: var(--text); font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s, border-color .15s, color .15s; font-family: inherit; }
+.console-btn:hover { background: var(--panel-2); border-color: var(--primary); color: var(--primary); }
+.console-btn.archive { border-color: #0ea5e9; color: #38bdf8; }
+.console-btn.archive:hover { background: #0c2233; border-color: #38bdf8; }
+
+.video-area { flex: 1; background: #000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; overflow: hidden; }
+.video-play-icon { width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,.08); display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--muted); }
+.video-label { font-size: 13px; color: var(--subtle); }
+.video-sub { font-size: 12px; color: var(--subtle); }
+
+/* ── SIDEBAR ── */
+.sidebar { width: 360px; flex-shrink: 0; background: var(--sidebar); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+.sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 12px; gap: 2px; flex-shrink: 0; }
+.sidebar-tab { padding: 12px 10px 11px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: color .15s, border-color .15s; white-space: nowrap; }
+.sidebar-tab:hover { color: var(--text); }
+.sidebar-tab.active { color: var(--text); border-bottom-color: var(--primary); }
+.tab-badge { display: inline-flex; align-items: center; justify-content: center; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; border-radius: 10px; min-width: 16px; height: 16px; padding: 0 4px; margin-left: 5px; vertical-align: middle; }
+
+.tab-panel { display: none; flex: 1; overflow-y: auto; flex-direction: column; }
+.tab-panel.active { display: flex; }
+
+/* Info tab */
+.info-section { padding: 14px 14px 6px; font-size: 11px; font-weight: 600; color: var(--subtle); text-transform: uppercase; letter-spacing: .06em; }
+.company-card { margin: 0 10px 6px; border-radius: var(--radius); border: 1px solid var(--border-2); overflow: hidden; }
+.company-card.presenting { border-color: var(--ok); box-shadow: 0 0 0 1px #34d39922; }
+.company-card-header { display: flex; align-items: center; gap: 10px; padding: 10px 12px; }
+.company-logo { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.company-name { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
+.presenting-badge { font-size: 10px; font-weight: 600; color: var(--ok); background: #052e16; border: 1px solid #166534; border-radius: 5px; padding: 2px 6px; }
+
+/* Inline Q&A */
+.inline-qa { border-top: 1px solid var(--border); padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.inline-qa-title { font-size: 11px; font-weight: 600; color: var(--subtle); text-transform: uppercase; letter-spacing: .06em; }
+.composer-row { display: flex; gap: 6px; }
+.composer-input { flex: 1; background: var(--bg); border: 1px solid var(--border-2); border-radius: 8px; padding: 7px 10px; color: var(--text); font-size: 13px; font-family: inherit; outline: none; transition: border-color .15s; }
+.composer-input:focus { border-color: var(--primary); }
+.composer-input:disabled { opacity: .4; cursor: not-allowed; }
+.composer-input::placeholder { color: var(--subtle); }
+.send-btn { width: 32px; height: 32px; border-radius: 8px; background: var(--primary); border: none; color: #fff; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .15s; font-family: inherit; }
+.send-btn:hover { background: var(--primary-soft); }
+.send-btn:disabled { background: var(--panel-2); cursor: not-allowed; }
+.inline-q-list { display: flex; flex-direction: column; gap: 6px; }
+.inline-q-row { display: flex; align-items: flex-start; gap: 8px; }
+.vote-pill { display: flex; align-items: center; gap: 3px; background: var(--panel); border: 1px solid var(--border-2); border-radius: 6px; padding: 3px 7px; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; flex-shrink: 0; transition: background .15s, border-color .15s, color .15s; user-select: none; min-width: 46px; justify-content: center; font-family: inherit; }
+.vote-pill:hover { background: var(--panel-2); color: var(--text); }
+.vote-pill.voted { background: #1e3a5f; border-color: var(--primary); color: var(--primary); }
+.inline-q-text { font-size: 12px; color: var(--text); line-height: 1.4; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.view-all-link { font-size: 12px; color: var(--primary); cursor: pointer; padding: 2px 0; transition: color .15s; }
+.view-all-link:hover { color: #93c5fd; }
+.inline-qa-disabled { font-size: 12px; color: var(--subtle); font-style: italic; padding: 2px 0; }
+
+/* Chat tab */
+.chat-messages { flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
+.chat-msg { display: flex; gap: 8px; }
+.chat-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--panel-2); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--muted); flex-shrink: 0; margin-top: 1px; }
+.chat-bubble { flex: 1; }
+.chat-meta { font-size: 11px; color: var(--subtle); margin-bottom: 2px; }
+.chat-text { font-size: 13px; color: var(--text); line-height: 1.4; }
+.chat-composer { padding: 10px 12px 12px; border-top: 1px solid var(--border); display: flex; gap: 6px; flex-shrink: 0; }
+
+/* Questions redirect tab */
+.questions-redirect { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; }
+.redirect-icon { font-size: 28px; }
+.redirect-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.redirect-sub { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.redirect-btn { padding: 9px 18px; border-radius: 9px; background: var(--primary); border: none; color: #fff; font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s; font-family: inherit; }
+.redirect-btn:hover { background: var(--primary-soft); }
+
+/* ── CONSOLE OVERLAY ── */
+.console-overlay { display: none; position: fixed; inset: 0; z-index: 100; pointer-events: none; }
+.console-overlay.open { display: flex; pointer-events: auto; }
+.console-backdrop { position: absolute; inset: 0; background: rgba(2,6,23,.6); }
+.console-panel { position: absolute; left: 0; top: 56px; bottom: 48px; width: 72%; max-width: 920px; background: #0b1120; border-right: 1px solid var(--border-2); display: flex; flex-direction: column; box-shadow: 8px 0 40px rgba(0,0,0,.5); animation: slideIn .22s ease-out; }
+@keyframes slideIn { from{transform:translateX(-32px);opacity:0} to{transform:translateX(0);opacity:1} }
+
+.console-topbar { height: 52px; border-bottom: 1px solid var(--border-2); display: flex; align-items: center; padding: 0 16px; gap: 14px; flex-shrink: 0; background: var(--sidebar); }
+.console-title-wrap { flex: 1; }
+.console-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.console-meta { font-size: 12px; color: var(--muted); }
+.console-live-stat { font-size: 12px; color: var(--subtle); display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.console-live-dot { width: 6px; height: 6px; background: var(--ok); border-radius: 50%; animation: blink 1.4s ease-in-out infinite; }
+.close-btn { width: 30px; height: 30px; border-radius: 8px; background: var(--panel); border: 1px solid var(--border-2); color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 17px; transition: color .15s, background .15s; font-family: inherit; }
+.close-btn:hover { color: var(--text); background: var(--panel-2); }
+
+/* Session bar */
+.session-bar { border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: var(--bg); flex-wrap: wrap; }
+.session-label { font-size: 11px; font-weight: 600; color: var(--subtle); text-transform: uppercase; letter-spacing: .06em; flex-shrink: 0; }
+.company-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.company-chip { display: flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 20px; border: 1px solid var(--border-2); background: var(--panel); color: var(--muted); font-size: 12px; font-weight: 500; cursor: pointer; transition: all .15s; user-select: none; }
+.company-chip:hover { border-color: var(--primary); color: var(--text); }
+.company-chip.active { border-color: var(--ok); color: var(--ok); background: #052e16; }
+.chip-live-dot { width: 6px; height: 6px; background: var(--ok); border-radius: 50%; animation: blink 1.4s ease-in-out infinite; flex-shrink: 0; }
+.chip-mini-logo { width: 20px; height: 20px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.session-controls { display: flex; gap: 6px; margin-left: auto; }
+.close-qa-btn { padding: 5px 12px; border-radius: 8px; border: 1px solid #7f1d1d; background: transparent; color: var(--danger); font-size: 12px; font-weight: 500; cursor: pointer; transition: all .15s; font-family: inherit; }
+.close-qa-btn:hover { background: #7f1d1d33; }
+
+/* Archive header */
+.archive-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); background: #0c1a2e; flex-shrink: 0; }
+.archive-header-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.archive-header-note { font-size: 11px; color: var(--subtle); display: flex; align-items: center; gap: 5px; }
+.readonly-notice { padding: 8px 14px; background: #0c1a2e; border-bottom: 1px solid #1e3a5f; font-size: 12px; color: #38bdf8; text-align: center; flex-shrink: 0; }
+
+/* Two-pane body */
+.console-body { flex: 1; display: flex; overflow: hidden; }
+.pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.pane + .pane { border-left: 1px solid var(--border); }
+.pane-header { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: var(--sidebar); }
+.pane-title { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.pane-count { font-size: 11px; color: var(--subtle); margin-left: auto; }
+.pane-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+
+/* Incoming rows */
+.incoming-row { display: flex; align-items: flex-start; gap: 8px; padding: 9px 10px; border-radius: 9px; border: 1px solid var(--border); background: var(--panel); transition: border-color .15s; }
+.incoming-row:hover { border-color: var(--border-2); }
+.incoming-votes { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 36px; text-align: center; flex-shrink: 0; padding-top: 1px; }
+.incoming-body { flex: 1; min-width: 0; }
+.incoming-text { font-size: 13px; color: var(--text); line-height: 1.4; margin-bottom: 3px; }
+.incoming-meta { font-size: 11px; color: var(--subtle); }
+
+/* Top-voted rows */
+.tv-list-inner { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.top-voted-row { padding: 14px 14px 12px; border-radius: 11px; border: 1px solid var(--border-2); background: var(--panel); display: flex; flex-direction: column; gap: 10px; transition: border-color .2s, opacity .25s, transform .25s; }
+.tv-top { display: flex; align-items: flex-start; gap: 12px; }
+.tv-vote-badge { display: flex; flex-direction: column; align-items: center; gap: 1px; flex-shrink: 0; min-width: 48px; }
+.tv-vote-count { font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; }
+.tv-vote-label { font-size: 10px; color: var(--subtle); text-transform: uppercase; letter-spacing: .05em; }
+.tv-question-text { font-size: 16px; font-weight: 500; color: var(--text); line-height: 1.45; flex: 1; }
+.tv-meta { font-size: 12px; color: var(--subtle); padding-left: 60px; }
+.tv-actions { padding-left: 60px; }
+.mark-asked-btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; background: #052e16; border: 1px solid #166534; color: var(--ok); font-size: 13px; font-weight: 500; cursor: pointer; transition: all .15s; font-family: inherit; }
+.mark-asked-btn:hover { background: #0a4120; }
+
+/* Asked group */
+.asked-group { border-top: 1px solid var(--border); flex-shrink: 0; }
+.asked-group-header { display: flex; align-items: center; gap: 7px; padding: 9px 12px; background: var(--sidebar); cursor: pointer; user-select: none; font-size: 12px; font-weight: 600; color: var(--muted); transition: color .15s; }
+.asked-group-header:hover { color: var(--text); }
+.asked-chevron { font-size: 10px; transition: transform .2s; display: inline-block; }
+.asked-group.expanded .asked-chevron { transform: rotate(90deg); }
+.asked-items { display: none; flex-direction: column; background: var(--bg); }
+.asked-group.expanded .asked-items { display: flex; }
+.asked-item { padding: 9px 12px; display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--border); }
+.asked-item-text { font-size: 12px; color: var(--subtle); text-decoration: line-through; flex: 1; }
+.asked-item-votes { font-size: 11px; color: var(--subtle); flex-shrink: 0; }
+
+/* Empty */
+.empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; text-align: center; }
+.empty-icon { font-size: 24px; opacity: .4; }
+.empty-text { font-size: 13px; color: var(--muted); }
+.empty-sub { font-size: 12px; color: var(--subtle); }
+
+/* Toast */
+.toast { position: fixed; bottom: 64px; left: 50%; transform: translateX(-50%) translateY(8px); background: var(--panel-2); border: 1px solid var(--border-2); color: var(--text); font-size: 13px; padding: 9px 16px; border-radius: 10px; z-index: 200; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; white-space: nowrap; box-shadow: 0 4px 20px rgba(0,0,0,.4); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Demo bar */
+.demo-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 48px; background: #030b1a; border-top: 1px solid #1e3a5f; display: flex; align-items: center; padding: 0 16px; gap: 20px; z-index: 50; font-size: 12px; }
+.demo-label { font-size: 11px; font-weight: 700; color: #38bdf8; letter-spacing: .07em; text-transform: uppercase; flex-shrink: 0; }
+.demo-group { display: flex; align-items: center; gap: 7px; }
+.demo-group-label { font-size: 11px; color: var(--subtle); flex-shrink: 0; }
+.segmented { display: flex; background: var(--panel); border: 1px solid var(--border-2); border-radius: 8px; overflow: hidden; }
+.seg-btn { padding: 5px 11px; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; border: none; background: transparent; transition: background .12s, color .12s; font-family: inherit; white-space: nowrap; }
+.seg-btn:hover { color: var(--text); }
+.seg-btn.active { background: var(--primary); color: #fff; }
+
+/* Variant caption */
+.variant-caption { position: fixed; bottom: 54px; right: 12px; font-size: 10px; color: var(--subtle); background: rgba(15,23,42,.9); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; z-index: 60; pointer-events: none; max-width: 340px; text-align: right; line-height: 1.5; }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="nav">
+  <a class="nav-brand" href="#">
+    <span class="nav-dot"></span>
+    E8 Portal
+  </a>
+  <div class="nav-links">
+    <span class="nav-link">Dashboard</span>
+    <span class="nav-link">Companies</span>
+    <span class="nav-link active">Meetings</span>
+    <span class="nav-link">Diligence</span>
+    <span class="nav-link">Admin</span>
+  </div>
+</nav>
+
+<!-- APP BODY -->
+<div class="app-body">
+
+  <!-- STAGE -->
+  <div class="stage">
+    <div class="stage-header">
+      <button class="back-btn">←</button>
+      <div>
+        <div class="meeting-title">Member Meeting: May 2026</div>
+        <div class="meeting-date">May 21, 2026 · 6:00 PM PT</div>
+      </div>
+      <div class="live-pill" id="livePill">
+        <span class="live-dot"></span>
+        LIVE
+      </div>
+      <div class="stage-spacer"></div>
+      <button class="console-btn" id="consoleBtn" onclick="openConsole()">
+        <span id="consoleBtnIcon">⛶</span>
+        <span id="consoleBtnLabel">Open Console</span>
+      </button>
+    </div>
+    <div class="video-area">
+      <div class="video-play-icon">▶</div>
+      <div class="video-label" id="videoLabel">Embedded Zoom — live</div>
+      <div class="video-sub">Ocean Build · Member Meeting, May 2026</div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-tabs">
+      <div class="sidebar-tab active" onclick="switchTab('info')">Info</div>
+      <div class="sidebar-tab" onclick="switchTab('chat')">Chat</div>
+      <div class="sidebar-tab" id="qTab" onclick="switchTab('questions')">
+        Questions
+        <span class="tab-badge hidden" id="qBadge">0</span>
+      </div>
+    </div>
+
+    <!-- INFO TAB -->
+    <div class="tab-panel active" id="tab-info">
+      <div class="info-section">Companies Pitching</div>
+
+      <!-- Ocean Build — presenting -->
+      <div class="company-card presenting" id="card-ob">
+        <div class="company-card-header">
+          <div class="company-logo" style="background:#16a34a">OB</div>
+          <span class="company-name">Ocean Build</span>
+          <span class="presenting-badge" id="obPresentingBadge">● Presenting</span>
+        </div>
+        <div class="inline-qa" id="inlineQA">
+          <div class="inline-qa-title">Audience Questions</div>
+          <div class="composer-row" id="inlineComposerRow">
+            <input class="composer-input" id="inlineInput" type="text" placeholder="Ask a question…" maxlength="200" />
+            <button class="send-btn" id="inlineSendBtn" onclick="submitInlineQuestion()">➤</button>
+          </div>
+          <div id="inlineDisabledMsg" class="inline-qa-disabled hidden">Q&amp;A is archived — meeting has ended.</div>
+          <div class="inline-q-list" id="inlineQList"></div>
+          <div class="view-all-link" id="viewAllLink" onclick="openConsole()">
+            View all (<span id="viewAllCount">8</span>) →
+          </div>
+        </div>
+      </div>
+
+      <div class="company-card">
+        <div class="company-card-header">
+          <div class="company-logo" style="background:#2563eb">EZ</div>
+          <span class="company-name">E-Zn</span>
+        </div>
+      </div>
+      <div class="company-card">
+        <div class="company-card-header">
+          <div class="company-logo" style="background:#ea580c">FM</div>
+          <span class="company-name">Furno Materials</span>
+        </div>
+      </div>
+      <div class="company-card">
+        <div class="company-card-header">
+          <div class="company-logo" style="background:#7c3aed">AL</div>
+          <span class="company-name">Alithic</span>
+        </div>
+      </div>
+      <div class="company-card">
+        <div class="company-card-header">
+          <div class="company-logo" style="background:#0d9488">D8</div>
+          <span class="company-name">Decarbon8</span>
+        </div>
+      </div>
+
+      <div class="info-section" style="margin-top:8px">Meeting Info</div>
+      <div style="margin:0 10px 60px;padding:10px 12px;border-radius:var(--radius);border:1px solid var(--border-2);font-size:12px;color:var(--muted);line-height:1.8">
+        <div><strong style="color:var(--text)">Date</strong> · Wed, May 21, 2026 6:00 PM PT</div>
+        <div><strong style="color:var(--text)">Format</strong> · Live Zoom · 90 min</div>
+        <div><strong style="color:var(--text)">Attendees</strong> · 23 members</div>
+      </div>
+    </div>
+
+    <!-- CHAT TAB -->
+    <div class="tab-panel" id="tab-chat">
+      <div class="chat-messages">
+        <div class="chat-msg"><div class="chat-avatar">JR</div><div class="chat-bubble"><div class="chat-meta">James R · 12m</div><div class="chat-text">Really excited for the Ocean Build pitch — saw them at a conference last year.</div></div></div>
+        <div class="chat-msg"><div class="chat-avatar">SB</div><div class="chat-bubble"><div class="chat-meta">Sarah Bell · 10m</div><div class="chat-text">+1, the coastal sequestration angle is fascinating.</div></div></div>
+        <div class="chat-msg"><div class="chat-avatar">MC</div><div class="chat-bubble"><div class="chat-meta">Maya Chen · 8m</div><div class="chat-text">Has anyone reviewed the deck beforehand? The cap table section is sparse.</div></div></div>
+        <div class="chat-msg"><div class="chat-avatar">PR</div><div class="chat-bubble"><div class="chat-meta">Priya Nair · 5m</div><div class="chat-text">Agreed. And I want to hear more about channel strategy — direct vs. distributors.</div></div></div>
+        <div class="chat-msg"><div class="chat-avatar">TR</div><div class="chat-bubble"><div class="chat-meta">Tom Realini · 3m</div><div class="chat-text">Coastal permitting path is the key risk imo — hope someone asks about it.</div></div></div>
+      </div>
+      <div class="chat-composer">
+        <input class="composer-input" style="flex:1" type="text" placeholder="Message…" />
+        <button class="send-btn">➤</button>
+      </div>
+    </div>
+
+    <!-- QUESTIONS REDIRECT TAB -->
+    <div class="tab-panel" id="tab-questions">
+      <div class="questions-redirect">
+        <div class="redirect-icon">⛶</div>
+        <div class="redirect-title">Audience Questions</div>
+        <div class="redirect-sub" id="redirectSub">Questions live in the <strong>Info tab</strong> on each company's card. Ask, upvote, and see the top 3 — or view all in the console.</div>
+        <button class="redirect-btn" onclick="openConsole()">Open Q&amp;A Console</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONSOLE OVERLAY -->
+<div class="console-overlay" id="consoleOverlay">
+  <div class="console-backdrop" onclick="closeConsole()"></div>
+  <div class="console-panel">
+
+    <!-- Top bar -->
+    <div class="console-topbar">
+      <div class="console-title-wrap">
+        <div class="console-title" id="consoleTitle">Q&amp;A Console</div>
+        <div class="console-meta" id="consoleMeta">Member Meeting: May 2026</div>
+      </div>
+      <div class="console-live-stat" id="consoleLiveStat">
+        <span class="console-live-dot"></span>
+        23 members · <span id="questionCount">8</span> questions
+      </div>
+      <button class="close-btn" onclick="closeConsole()">✕</button>
+    </div>
+
+    <!-- Session controls -->
+    <div class="session-bar" id="sessionBar">
+      <span class="session-label">Session</span>
+      <div class="company-chips" id="companyChips">
+        <div class="company-chip active" id="chip-ob" onclick="switchConsoleCompany('ob','Ocean Build')">
+          <span class="chip-live-dot"></span>
+          <span class="chip-mini-logo" style="background:#16a34a">OB</span>
+          Ocean Build
+        </div>
+        <div class="company-chip" id="chip-ez" onclick="switchConsoleCompany('ez','E-Zn')">
+          <span class="chip-mini-logo" style="background:#2563eb">EZ</span>
+          E-Zn
+        </div>
+        <div class="company-chip" id="chip-fm" onclick="switchConsoleCompany('fm','Furno Materials')">
+          <span class="chip-mini-logo" style="background:#ea580c">FM</span>
+          Furno Materials
+        </div>
+        <div class="company-chip" id="chip-al" onclick="switchConsoleCompany('al','Alithic')">
+          <span class="chip-mini-logo" style="background:#7c3aed">AL</span>
+          Alithic
+        </div>
+        <div class="company-chip" id="chip-d8" onclick="switchConsoleCompany('d8','Decarbon8')">
+          <span class="chip-mini-logo" style="background:#0d9488">D8</span>
+          Decarbon8
+        </div>
+      </div>
+      <div class="session-controls">
+        <button class="close-qa-btn" onclick="closeSession()">Close Q&amp;A</button>
+      </div>
+    </div>
+
+    <!-- Archive header (recording) -->
+    <div class="archive-header hidden" id="archiveHeader">
+      <div class="archive-header-title">Audience Questions — Member Meeting, May 21 2026 · Ocean Build</div>
+      <div class="archive-header-note">
+        <span>📁</span>
+        This same view is embedded on the company's Diligence page.
+      </div>
+    </div>
+
+    <!-- Read-only notice -->
+    <div class="readonly-notice hidden" id="readonlyNotice">🔒 Read-only archive — questions and votes are frozen from the live session.</div>
+
+    <!-- Two-pane body -->
+    <div class="console-body" id="consoleBody">
+
+      <!-- Left: Incoming / Newest -->
+      <div class="pane" id="incomingPane">
+        <div class="pane-header">
+          <span class="pane-title">Incoming · Newest</span>
+          <span class="pane-count" id="incomingCount">8 questions</span>
+        </div>
+        <div class="pane-list" id="incomingList"></div>
+      </div>
+
+      <!-- Right: Top Voted -->
+      <div class="pane" id="topPane" style="display:flex;flex-direction:column;">
+        <div class="pane-header">
+          <span class="pane-title">Top Voted</span>
+          <span class="pane-count">sorted by votes</span>
+        </div>
+        <div class="tv-list-inner" id="topVotedList"></div>
+        <div class="asked-group hidden" id="askedGroup">
+          <div class="asked-group-header" onclick="toggleAsked()">
+            <span class="asked-chevron">▶</span>
+            Asked (<span id="askedCount">0</span>)
+          </div>
+          <div class="asked-items" id="askedItems"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state hidden" id="consoleEmpty">
+      <div class="empty-icon">❓</div>
+      <div class="empty-text">No Q&amp;A session open</div>
+      <div class="empty-sub">Select a company chip above and the session will open automatically.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Demo control bar -->
+<div class="demo-bar">
+  <span class="demo-label">Demo:</span>
+  <div class="demo-group">
+    <span class="demo-group-label">Mode</span>
+    <div class="segmented">
+      <button class="seg-btn active" id="seg-live" onclick="setMode('live')">Live</button>
+      <button class="seg-btn" id="seg-recording" onclick="setMode('recording')">Recording</button>
+    </div>
+  </div>
+  <div class="demo-group">
+    <span class="demo-group-label">Role</span>
+    <div class="segmented">
+      <button class="seg-btn" id="seg-member" onclick="setRole('member')">Member</button>
+      <button class="seg-btn active" id="seg-moderator" onclick="setRole('moderator')">Moderator</button>
+    </div>
+  </div>
+  <div class="demo-group">
+    <span class="demo-group-label">Q&amp;A session</span>
+    <div class="segmented">
+      <button class="seg-btn" id="seg-off" onclick="setSession('off')">Off</button>
+      <button class="seg-btn active" id="seg-ocean" onclick="setSession('ocean')">Ocean Build</button>
+    </div>
+  </div>
+</div>
+
+<!-- Variant caption -->
+<div class="variant-caption">
+  Variant C — role-split: members ask inline; moderators get a dedicated console; the console doubles as the post-meeting archive.
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+const S = {
+  mode: 'live',
+  role: 'moderator',
+  session: 'ocean',
+  consoleOpen: false,
+  myVotes: new Set(),
+  askedIds: new Set(),
+};
+
+let questions = [
+  { id:'q1', body:"What's your gross margin at current production volume, and where does it land at scale?", author:'Sarah Bell', votes:14, minsAgo:2 },
+  { id:'q2', body:"How defensible is the materials IP vs. incumbents like Holcim?", author:'Adam Robinson', votes:11, minsAgo:4 },
+  { id:'q3', body:"Who are your first three design-partner customers and are any of them paying yet?", author:'Maya Chen', votes:9, minsAgo:5 },
+  { id:'q4', body:"What's the regulatory/permitting path for the coastal installations?", author:'Tom Realini', votes:6, minsAgo:6 },
+  { id:'q5', body:"Cap table — how much runway does this round buy and what's the next milestone?", author:'Priya Nair', votes:4, minsAgo:8 },
+  { id:'q6', body:"Have you validated the carbon-sequestration numbers with a third party?", author:'David Kim', votes:3, minsAgo:9 },
+  { id:'q7', body:"What's the unit-economics sensitivity to cement price?", author:'Lena Ortiz', votes:1, minsAgo:10 },
+  { id:'q8', body:"How are you thinking about channel — direct to GCs or through distributors?", author:'Sam Patel', votes:0, minsAgo:11 },
+];
+let nextId = 9;
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function isLive(){ return S.mode === 'live'; }
+function isMod(){ return S.role === 'moderator'; }
+function sessionOpen(){ return S.session === 'ocean'; }
+function canAsk(){ return isLive() && sessionOpen(); }
+
+function showToast(msg, ms=2200){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>el.classList.remove('show'), ms);
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+function switchTab(name){
+  ['info','chat','questions'].forEach((n,i)=>{
+    document.querySelectorAll('.sidebar-tab')[i].classList.toggle('active', n===name);
+    document.getElementById('tab-'+n).classList.toggle('active', n===name);
+  });
+}
+
+// ─── INLINE Q&A ───────────────────────────────────────────────────────────────
+function renderInlineQA(){
+  const inlineQA   = document.getElementById('inlineQA');
+  const compRow    = document.getElementById('inlineComposerRow');
+  const disMsg     = document.getElementById('inlineDisabledMsg');
+  const input      = document.getElementById('inlineInput');
+  const sendBtn    = document.getElementById('inlineSendBtn');
+  const qList      = document.getElementById('inlineQList');
+  const valCount   = document.getElementById('viewAllCount');
+  const badge      = document.getElementById('qBadge');
+
+  inlineQA.style.display = sessionOpen() ? '' : 'none';
+  document.getElementById('obPresentingBadge').style.display = sessionOpen() ? '' : 'none';
+
+  if(!sessionOpen()){
+    badge.classList.add('hidden');
+    return;
+  }
+
+  // Composer state
+  if(canAsk()){
+    compRow.classList.remove('hidden');
+    disMsg.classList.add('hidden');
+    input.disabled = false;
+    sendBtn.disabled = false;
+  } else if(!isLive() && sessionOpen()){
+    compRow.classList.add('hidden');
+    disMsg.classList.remove('hidden');
+  } else {
+    compRow.classList.remove('hidden');
+    disMsg.classList.add('hidden');
+    input.disabled = true;
+    sendBtn.disabled = true;
+  }
+
+  // Top 3 by votes (exclude asked)
+  const active = questions.filter(q=>!S.askedIds.has(q.id));
+  const top3 = [...active].sort((a,b)=>b.votes-a.votes).slice(0,3);
+  valCount.textContent = questions.length;
+
+  qList.innerHTML='';
+  top3.forEach(q=>{
+    const row = document.createElement('div');
+    row.className = 'inline-q-row';
+    row.innerHTML = `
+      <button class="vote-pill ${S.myVotes.has(q.id)?'voted':''}" onclick="toggleVote('${q.id}')">▲ ${q.votes}</button>
+      <div class="inline-q-text">${esc(q.body)}</div>
+    `;
+    qList.appendChild(row);
+  });
+
+  badge.textContent = questions.length;
+  badge.classList.toggle('hidden', questions.length===0);
+}
+
+function submitInlineQuestion(){
+  if(!canAsk()) return;
+  const input = document.getElementById('inlineInput');
+  const text = input.value.trim();
+  if(!text) return;
+  questions.unshift({ id:'q'+nextId++, body:text, author:'You', votes:0, minsAgo:0 });
+  input.value = '';
+  renderInlineQA();
+  if(S.consoleOpen) renderConsole();
+  showToast('Question submitted!');
+}
+
+document.getElementById('inlineInput').addEventListener('keydown', e=>{
+  if(e.key==='Enter') submitInlineQuestion();
+});
+
+// ─── VOTE TOGGLE ─────────────────────────────────────────────────────────────
+function toggleVote(qid){
+  const q = questions.find(x=>x.id===qid);
+  if(!q) return;
+  if(S.myVotes.has(qid)){ S.myVotes.delete(qid); q.votes=Math.max(0,q.votes-1); }
+  else { S.myVotes.add(qid); q.votes+=1; }
+  renderInlineQA();
+  if(S.consoleOpen) renderConsole();
+}
+
+// ─── CONSOLE ─────────────────────────────────────────────────────────────────
+function openConsole(){
+  S.consoleOpen = true;
+  document.getElementById('consoleOverlay').classList.add('open');
+  renderConsole();
+}
+function closeConsole(){
+  S.consoleOpen = false;
+  document.getElementById('consoleOverlay').classList.remove('open');
+}
+
+function renderConsole(){
+  const archive    = !isLive();
+  const sessionBar = document.getElementById('sessionBar');
+  const archHdr    = document.getElementById('archiveHeader');
+  const roNotice   = document.getElementById('readonlyNotice');
+  const cTitle     = document.getElementById('consoleTitle');
+  const cMeta      = document.getElementById('consoleMeta');
+  const cStat      = document.getElementById('consoleLiveStat');
+  const cBody      = document.getElementById('consoleBody');
+  const cEmpty     = document.getElementById('consoleEmpty');
+  const incPane    = document.getElementById('incomingPane');
+
+  if(archive){
+    sessionBar.classList.add('hidden');
+    archHdr.classList.remove('hidden');
+    roNotice.classList.remove('hidden');
+    roNotice.textContent = '🔒 Read-only archive — questions and votes are frozen from the live session.';
+    cTitle.textContent   = 'Archived Q&A';
+    cMeta.textContent    = 'May 21, 2026 · Read-only';
+    cStat.style.display  = 'none';
+    incPane.style.display= 'none';
+  } else if(isMod()){
+    sessionBar.classList.remove('hidden');
+    archHdr.classList.add('hidden');
+    roNotice.classList.add('hidden');
+    cTitle.textContent   = 'Q&A Console';
+    cMeta.textContent    = 'Member Meeting: May 2026';
+    cStat.style.display  = '';
+    incPane.style.display= '';
+  } else {
+    // member live view
+    sessionBar.classList.add('hidden');
+    archHdr.classList.add('hidden');
+    roNotice.classList.remove('hidden');
+    roNotice.textContent = '👀 Viewing live audience questions — cast your votes below.';
+    cTitle.textContent   = 'Audience Questions';
+    cMeta.textContent    = 'Ocean Build · Live';
+    cStat.style.display  = '';
+    incPane.style.display= '';
+  }
+
+  if(!sessionOpen()){
+    cBody.classList.add('hidden');
+    cEmpty.classList.remove('hidden');
+  } else {
+    cBody.classList.remove('hidden');
+    cEmpty.classList.add('hidden');
+  }
+
+  document.getElementById('questionCount').textContent = questions.length;
+  document.getElementById('incomingCount').textContent = questions.length+' questions';
+
+  renderIncomingList();
+  renderTopVotedList();
+  renderAskedGroup();
+}
+
+function renderIncomingList(){
+  const list = document.getElementById('incomingList');
+  list.innerHTML = '';
+  questions.forEach(q=>{
+    const asked = S.askedIds.has(q.id);
+    const row = document.createElement('div');
+    row.className = 'incoming-row';
+    if(asked) row.style.opacity='0.38';
+    row.innerHTML = `
+      <div class="incoming-votes">▲${q.votes}</div>
+      <div class="incoming-body">
+        <div class="incoming-text">${esc(q.body)}</div>
+        <div class="incoming-meta">${esc(q.author)} · ${q.minsAgo===0?'just now':q.minsAgo+'m ago'}</div>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function renderTopVotedList(){
+  const list   = document.getElementById('topVotedList');
+  list.innerHTML = '';
+  const active = questions.filter(q=>!S.askedIds.has(q.id));
+  const sorted = [...active].sort((a,b)=>b.votes-a.votes||(a.minsAgo-b.minsAgo));
+  const showMarkBtn = isMod() && isLive();
+
+  if(sorted.length===0){
+    if(S.askedIds.size>0){
+      const note = document.createElement('div');
+      note.className='empty-state';
+      note.style.flex='1';
+      note.innerHTML='<div class="empty-icon" style="opacity:1">🎉</div><div class="empty-text" style="color:var(--ok)">All questions have been asked!</div>';
+      list.appendChild(note);
+    }
+    return;
+  }
+
+  sorted.forEach(q=>{
+    const row = document.createElement('div');
+    row.className = 'top-voted-row';
+    row.id = 'tv-'+q.id;
+    row.innerHTML = `
+      <div class="tv-top">
+        <div class="tv-vote-badge">
+          <div class="tv-vote-count">${q.votes}</div>
+          <div class="tv-vote-label">votes</div>
+        </div>
+        <div class="tv-question-text">${esc(q.body)}</div>
+      </div>
+      <div class="tv-meta">${esc(q.author)} · ${q.minsAgo===0?'just now':q.minsAgo+'m ago'}</div>
+      ${showMarkBtn?`<div class="tv-actions"><button class="mark-asked-btn" onclick="markAsked('${q.id}')">✓ Mark asked</button></div>`:''}
+    `;
+    list.appendChild(row);
+  });
+}
+
+function renderAskedGroup(){
+  const group  = document.getElementById('askedGroup');
+  const items  = document.getElementById('askedItems');
+  const count  = document.getElementById('askedCount');
+  const asked  = questions.filter(q=>S.askedIds.has(q.id));
+  if(asked.length===0){ group.classList.add('hidden'); return; }
+  group.classList.remove('hidden');
+  count.textContent = asked.length;
+  items.innerHTML = '';
+  asked.forEach(q=>{
+    const item = document.createElement('div');
+    item.className = 'asked-item';
+    item.innerHTML = `<div class="asked-item-text">${esc(q.body)}</div><div class="asked-item-votes">▲${q.votes}</div>`;
+    items.appendChild(item);
+  });
+}
+
+function markAsked(qid){
+  const row = document.getElementById('tv-'+qid);
+  if(row){
+    row.style.opacity='0';
+    row.style.transform='translateX(14px)';
+    setTimeout(()=>{
+      S.askedIds.add(qid);
+      renderIncomingList();
+      renderTopVotedList();
+      renderAskedGroup();
+      document.getElementById('questionCount').textContent = questions.length;
+    }, 250);
+  } else {
+    S.askedIds.add(qid);
+    renderIncomingList();
+    renderTopVotedList();
+    renderAskedGroup();
+  }
+  showToast('Marked as asked — moved to Asked group.');
+}
+
+function toggleAsked(){
+  document.getElementById('askedGroup').classList.toggle('expanded');
+}
+
+function switchConsoleCompany(key, name){
+  ['ob','ez','fm','al','d8'].forEach(k=>{
+    const chip = document.getElementById('chip-'+k);
+    chip.classList.remove('active');
+    const dot = chip.querySelector('.chip-live-dot');
+    if(dot) dot.remove();
+  });
+  const chip = document.getElementById('chip-'+key);
+  chip.classList.add('active');
+  const dot = document.createElement('span');
+  dot.className = 'chip-live-dot';
+  chip.prepend(dot);
+  showToast(`Switched to ${name} — Q&A now open for ${name}.`);
+}
+
+function closeSession(){
+  S.session = 'off';
+  document.getElementById('seg-off').classList.add('active');
+  document.getElementById('seg-ocean').classList.remove('active');
+  applyState();
+  showToast('Q&A session closed.');
+}
+
+// ─── DEMO BAR ────────────────────────────────────────────────────────────────
+function setMode(m){
+  S.mode = m;
+  document.getElementById('seg-live').classList.toggle('active', m==='live');
+  document.getElementById('seg-recording').classList.toggle('active', m==='recording');
+  applyState();
+}
+function setRole(r){
+  S.role = r;
+  document.getElementById('seg-member').classList.toggle('active', r==='member');
+  document.getElementById('seg-moderator').classList.toggle('active', r==='moderator');
+  applyState();
+}
+function setSession(s){
+  S.session = s;
+  document.getElementById('seg-off').classList.toggle('active', s==='off');
+  document.getElementById('seg-ocean').classList.toggle('active', s==='ocean');
+  applyState();
+}
+
+function applyState(){
+  // Live pill
+  document.getElementById('livePill').style.display = isLive() ? '' : 'none';
+
+  // Video label
+  document.getElementById('videoLabel').textContent = isLive()
+    ? 'Embedded Zoom — live'
+    : 'Recording — Member Meeting, May 21 2026';
+
+  // Console button
+  const btn      = document.getElementById('consoleBtn');
+  const btnIcon  = document.getElementById('consoleBtnIcon');
+  const btnLabel = document.getElementById('consoleBtnLabel');
+
+  if(isMod()){
+    btn.style.display = '';
+    if(isLive()){
+      btn.className  = 'console-btn';
+      btnIcon.textContent  = '⛶';
+      btnLabel.textContent = 'Open Console';
+    } else {
+      btn.className  = 'console-btn archive';
+      btnIcon.textContent  = '📁';
+      btnLabel.textContent = 'View archived Q&A';
+    }
+  } else {
+    if(sessionOpen()){
+      btn.style.display = '';
+      btn.className = 'console-btn';
+      btnIcon.textContent  = '⛶';
+      btnLabel.textContent = isLive() ? 'View Q&A' : 'View archived Q&A';
+    } else {
+      btn.style.display = 'none';
+    }
+  }
+
+  // Redirect tab copy
+  const sub = document.getElementById('redirectSub');
+  if(isMod()){
+    sub.innerHTML = 'The dedicated console is the moderator\'s stage tool — two reading panes, session controls, and check-off. Open it from the header button above.';
+  } else {
+    sub.innerHTML = 'Questions live in the <strong>Info tab</strong> on each company\'s card. Ask, upvote, and see the top 3 — or view all in the console.';
+  }
+
+  renderInlineQA();
+  if(S.consoleOpen) renderConsole();
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+applyState();
+</script>
+</body>
+</html>

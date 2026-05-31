@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Live Chat Codex — Meeting Chat Mockup</title>
+<style>
+  :root {
+    color-scheme: light;
+    --ink: #0f172a;
+    --muted: #64748b;
+    --line: #dbe3ee;
+    --soft: #f8fafc;
+    --panel: #ffffff;
+    --accent: #0f766e;
+    --accent-soft: #ccfbf1;
+    --link: #0369a1;
+    --danger: #b91c1c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: #eef2f7; font-size: 14px; }
+  .app { min-height: 100vh; display: grid; grid-template-rows: 52px 1fr; }
+  .topbar { display: flex; align-items: center; gap: 18px; padding: 0 18px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  .brand { font-weight: 700; }
+  .nav { display: flex; gap: 14px; color: var(--muted); font-size: 13px; }
+  .nav .active { color: var(--ink); font-weight: 600; }
+  .meeting { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 380px; }
+  .stage { min-width: 0; background: #111827; color: #e5e7eb; display: grid; grid-template-rows: auto 1fr; }
+  .stage-head { min-height: 58px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,.12); }
+  .stage-title { display: flex; align-items: center; gap: 10px; font-weight: 650; }
+  .live { display: inline-flex; align-items: center; gap: 6px; color: #fecaca; border: 1px solid rgba(248,113,113,.55); background: rgba(127,29,29,.35); border-radius: 999px; padding: 2px 9px; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+  .dot { width: 7px; height: 7px; border-radius: 999px; background: #ef4444; }
+  .video { display: grid; place-items: center; background: #020617; min-height: 420px; }
+  .video-box { width: min(720px, 82%); aspect-ratio: 16/9; border: 1px solid #334155; border-radius: 8px; display: grid; place-items: center; color: #94a3b8; }
+  .sidebar { min-height: 0; display: grid; grid-template-rows: auto auto 1fr auto; background: var(--soft); border-left: 1px solid var(--line); }
+  .tabs { display: flex; gap: 2px; padding: 0 8px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  .tab { padding: 12px 10px 10px; color: var(--muted); font-size: 13px; border-bottom: 2px solid transparent; }
+  .tab.active { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+  .avatar { width: 28px; height: 28px; border-radius: 999px; display: inline-grid; place-items: center; color: white; font-size: 11px; font-weight: 700; border: 2px solid var(--soft); }
+  .messages { min-height: 0; overflow: auto; padding: 10px; display: grid; align-content: start; gap: 8px; }
+  .message-wrap { position: relative; }
+  .message { padding: 7px; border-radius: 8px; }
+  .message:hover { background: #eef6f6; }
+  .message-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .message-head .meta { min-width: 0; }
+  .meta { display: flex; align-items: baseline; gap: 8px; }
+  .name, .person-link { border: 0; background: none; padding: 0; color: var(--ink); font: inherit; font-weight: 650; cursor: pointer; }
+  .name:hover, .person-link:hover { color: var(--link); text-decoration: underline; }
+  .time, .edited { color: var(--muted); font-size: 11px; }
+  .text { margin-top: 2px; line-height: 1.4; }
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .pending { opacity: .65; }
+  .mention { color: var(--link); background: #e0f2fe; border: 0; border-radius: 4px; padding: 0 3px; font: inherit; font-weight: 600; cursor: pointer; }
+  .mention:hover { text-decoration: underline; }
+  .reactions { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+  .reaction { border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 1px 8px; font-size: 12px; cursor: pointer; }
+  .reaction.mine { background: var(--accent-soft); border-color: var(--accent); }
+  .actions { position: absolute; top: 4px; right: 8px; display: none; gap: 4px; }
+  .message-wrap:hover > .actions, .reply:hover > .actions { display: flex; }
+  .action { position: relative; min-width: 24px; height: 24px; padding: 0 6px; display: inline-grid; place-items: center; border-radius: 999px; background: rgba(255,255,255,.95); border: 1px solid var(--line); color: var(--muted); font-size: 13px; line-height: 1; box-shadow: 0 4px 12px rgba(15,23,42,.08); }
+  .action.icon { width: 24px; padding: 0; font-size: 14px; }
+  .action[data-tip]::after { content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 7px); transform: translateX(-50%); white-space: nowrap; pointer-events: none; opacity: 0; background: #fff; color: var(--ink); border: 1px solid var(--ink); border-radius: 6px; padding: 4px 7px; font-size: 12px; font-weight: 400; box-shadow: 0 8px 18px rgba(15,23,42,.12); z-index: 5; }
+  .action[data-tip]::before { content: ""; position: absolute; left: 50%; bottom: calc(100% + 2px); transform: translateX(-50%); border: 5px solid transparent; border-top-color: var(--ink); opacity: 0; pointer-events: none; z-index: 6; }
+  .action[data-tip]:hover::after, .action[data-tip]:hover::before { opacity: 1; }
+  .action.danger { color: var(--danger); }
+  .thread { margin-left: 22px; padding-left: 0; }
+  .reply { position: relative; padding: 5px 7px 5px 9px; border-radius: 8px; }
+  .reply:hover { background: #f1f7f7; }
+  .reply-head { display: flex; align-items: center; gap: 7px; min-width: 0; }
+  .reply-head .meta { min-width: 0; }
+  .reply .text { margin-top: 4px; }
+  .reply .avatar { width: 24px; height: 24px; font-size: 10px; }
+  .context-row { display: flex; align-items: center; gap: 6px; margin-bottom: 7px; color: var(--muted); font-size: 12px; }
+  .context-row b { color: var(--ink); }
+  .context-row button { border: 0; padding: 0 3px; color: var(--muted); }
+  .context-row[hidden] { display: none; }
+  .composer { position: relative; background: var(--panel); border-top: 1px solid var(--line); padding: 10px; }
+  .picker { position: absolute; left: 10px; right: 10px; bottom: 128px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 14px 32px rgba(15,23,42,.18); overflow: hidden; }
+  .picker[hidden] { display: none; }
+  .person { display: flex; align-items: center; gap: 8px; padding: 8px 10px; }
+  .person.active { background: var(--accent-soft); }
+  .compose-box { display: flex; flex-direction: column; gap: 7px; border: 1px solid var(--line); border-radius: 8px; padding: 7px; }
+  .compose-tools { display: flex; justify-content: flex-end; gap: 6px; }
+  textarea { width: 100%; border: 0; resize: none; outline: 0; font: inherit; min-height: 62px; max-height: 150px; line-height: 1.35; }
+  button { border: 1px solid var(--line); border-radius: 7px; background: var(--panel); color: var(--ink); padding: 6px 8px; cursor: pointer; font: inherit; }
+  .send { background: var(--accent); border-color: var(--accent); color: white; }
+  .demo { position: fixed; left: 12px; bottom: 12px; display: flex; gap: 8px; align-items: center; background: rgba(15,23,42,.95); color: #e5e7eb; border-radius: 8px; padding: 8px 10px; font-size: 12px; }
+  .demo button { background: #1f2937; color: #e5e7eb; border-color: #475569; padding: 4px 8px; }
+  .readonly .composer { display: none; }
+  .replay { display: none; padding: 8px 12px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12px; text-align: center; }
+  .readonly .replay { display: block; }
+  .profile-backdrop { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(15,23,42,.45); z-index: 20; }
+  .profile-backdrop[hidden] { display: none; }
+  .profile-card { width: min(360px, calc(100vw - 28px)); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; box-shadow: 0 18px 48px rgba(15,23,42,.22); }
+  .profile-card-head { display: flex; align-items: flex-start; gap: 12px; }
+  .profile-card .avatar { width: 72px; height: 72px; font-size: 22px; border-color: var(--line); }
+  .profile-close { float: right; width: 26px; height: 26px; padding: 0; }
+  .profile-name { font-weight: 700; font-size: 15px; }
+  .profile-detail { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .confirm-backdrop { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(15,23,42,.45); z-index: 30; }
+  .confirm-backdrop[hidden] { display: none; }
+  .confirm-card { width: min(320px, calc(100vw - 28px)); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; box-shadow: 0 18px 48px rgba(15,23,42,.22); }
+  .confirm-title { font-weight: 700; font-size: 15px; margin-bottom: 12px; }
+  .confirm-actions { display: flex; justify-content: flex-end; gap: 8px; }
+  .danger-button { background: var(--danger); border-color: var(--danger); color: white; }
+  @media (max-width: 760px) {
+    .meeting { grid-template-columns: 1fr; grid-template-rows: minmax(260px, 40vh) minmax(0, 1fr); }
+    .sidebar { border-left: 0; border-top: 1px solid var(--line); }
+    .stage-head { align-items: flex-start; flex-direction: column; gap: 4px; }
+    .demo { right: 8px; flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="brand">E8 Portal</div>
+    <div class="nav"><span>Home</span><span class="active">Meetings</span><span>Companies</span><span>Members</span></div>
+  </div>
+  <main class="meeting">
+    <section class="stage">
+      <div class="stage-head">
+        <div class="stage-title">Selection Committee — Spring Cohort <span class="live"><span class="dot"></span>Live</span></div>
+        <div style="color:#cbd5e1;font-size:13px;">4:00 PM PT · Embedded Zoom</div>
+      </div>
+      <div class="video"><div class="video-box">Embedded Zoom meeting</div></div>
+    </section>
+    <aside class="sidebar">
+      <div class="tabs"><div class="tab">Background</div><div class="tab active">Chat · <span id="count">4</span></div></div>
+      <div class="replay">Viewing recording — chat is read-only</div>
+      <div class="messages" id="messages"></div>
+      <div class="composer">
+        <div class="context-row" id="composerContext" hidden></div>
+        <div class="picker" id="picker" hidden><div id="people"></div></div>
+        <div class="compose-box">
+          <textarea id="input" rows="3" placeholder="Message — @ to mention someone here" autocomplete="off" data-lpignore="true" data-form-type="other"></textarea>
+          <div class="compose-tools">
+            <button id="emoji" title="Emoji">😊</button>
+            <button class="send" id="send">Send</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+</div>
+<div class="profile-backdrop" id="profile" hidden>
+  <div class="profile-card" role="dialog" aria-modal="true" aria-labelledby="profileName">
+    <button class="profile-close" id="profileClose" type="button" aria-label="Close">×</button>
+    <div class="profile-card-head">
+      <div id="profileAvatar"></div>
+      <div>
+        <div class="profile-name" id="profileName"></div>
+        <div class="profile-detail" id="profileEmail"></div>
+        <div class="profile-detail" id="profileLocation"></div>
+        <div class="profile-detail" id="profileSince"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="confirm-backdrop" id="deleteModal" hidden>
+  <div class="confirm-card" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+    <div class="confirm-title" id="deleteTitle">Delete this message?</div>
+    <div class="confirm-actions">
+      <button id="cancelDelete" type="button">Cancel</button>
+      <button class="danger-button" id="confirmDelete" type="button">Delete</button>
+    </div>
+  </div>
+</div>
+<div class="demo"><span>Demo</span><button id="mode">Mode: Live</button><button id="admin">You: Member</button><button id="addLink">Resolve link title</button><button id="react">React 👍</button></div>
+<script>
+const people = [
+  { recordId: 'p_jordan', fullName: 'Jordan Schwartz', email: 'jordan@e8angels.org', location: 'Seattle, WA', since: 'Member Since: May 2021', color: '#0f766e' },
+  { recordId: 'p_adam', fullName: 'Adam Robinson', email: 'adam@example.com', location: 'Portland, OR', since: 'Member Since: March 2020', color: '#2563eb' },
+  { recordId: 'p_roberta', fullName: 'Roberta Chen', email: 'roberta@example.com', location: 'Vancouver, WA', since: 'Member Since: January 2022', color: '#9333ea' },
+  { recordId: 'p_maria', fullName: 'Maria Gonzalez', email: 'maria@example.com', location: 'Seattle, WA', since: 'Member Since: August 2019', color: '#be123c' },
+  { recordId: 'p_devon', fullName: 'Devon Park', email: 'devon@example.com', location: 'Boise, ID', since: 'Member Since: June 2023', color: '#b45309' }
+];
+let replyTarget = null;
+let editingTarget = null;
+let deleteTarget = null;
+let isAdmin = false;
+let messages = [
+  { id: 1, authorId: 'p_maria', text: 'HelioGrid is up first. Deck is in the folder.', reactions: [{ emoji: '👍', count: 2, mine: false }], replies: [] },
+  { id: 2, authorId: 'p_adam', text: 'Memo: <a class="resolved" target="_blank" rel="noopener" href="https://example.com">HelioGrid — Investment Memo</a>', reactions: [], replies: [
+    { id: 21, authorId: 'p_roberta', text: mention('p_adam') + ' retention curve is the standout.', reactions: [{ emoji: '🔥', count: 1, mine: false }] }
+  ] },
+  { id: 3, authorId: 'p_jordan', text: 'Can we get the unit economics slide back up?', edited: true, reactions: [{ emoji: '👍', count: 3, mine: true }], replies: [] }
+];
+let nextId = 100;
+function person(id){ return people.find(p => p.recordId === id) || people[0]; }
+function personByName(name){ return people.find(p => p.fullName === name); }
+function initials(name){ return name.split(' ').map(part => part[0]).slice(0,2).join('').toUpperCase(); }
+function avatar(personOrId){
+  const p = typeof personOrId === 'string' ? person(personOrId) : personOrId;
+  return `<span class="avatar" style="background:${p.color}">${initials(p.fullName)}</span>`;
+}
+function mention(personId){
+  const p = person(personId);
+  return `<button type="button" class="mention" data-profile="${p.recordId}">@${p.fullName}</button>`;
+}
+function renderPeople(matches = people.slice(1)){
+  document.getElementById('people').innerHTML = matches.map((p, i) => `<button type="button" class="person ${i === 0 ? 'active' : ''}" data-pick="${p.recordId}">${avatar(p)}<span>${p.fullName}</span></button>`).join('');
+}
+function authorButton(authorId){
+  const p = person(authorId);
+  return `<button type="button" class="name" data-profile="${p.recordId}">${p.fullName}</button>`;
+}
+function replyActions(messageId){
+  return `<div class="actions"><button type="button" class="action icon" data-reply="${messageId}" data-tip="Reply" aria-label="Reply">↩</button><button type="button" class="action" aria-label="React">😊</button>${messageActions(messageId)}</div>`;
+}
+function messageActions(messageId){
+  const found = findMessage(messageId);
+  if (!found) return '';
+  const own = found.message.authorId === 'p_jordan';
+  const edit = own ? `<button type="button" class="action icon" data-edit="${messageId}" data-tip="Edit" aria-label="Edit">✎</button>` : '';
+  const del = (own || isAdmin) ? `<button type="button" class="action icon danger" data-delete="${messageId}" data-tip="Delete" aria-label="Delete">⌫</button>` : '';
+  return edit + del;
+}
+function replyHoverActions(messageId){
+  return `<div class="actions">${messageActions(messageId)}</div>`;
+}
+function renderReactions(messageId, reactions){
+  if (!reactions.length) return '';
+  return `<div class="reactions">${reactions.map(r => `<button type="button" class="reaction ${r.mine ? 'mine' : ''}" data-reaction-message="${messageId}" data-reaction-emoji="${r.emoji}" aria-label="React ${r.emoji}">${r.emoji} ${r.count}</button>`).join('')}</div>`;
+}
+function renderMessages(){
+  document.getElementById('messages').innerHTML = messages.map(m => {
+    const reactions = renderReactions(m.id, m.reactions);
+    const replies = m.replies.length ? `<div class="thread">${m.replies.map(r => `<div class="reply"><div class="reply-head">${avatar(r.authorId)}<div class="meta">${authorButton(r.authorId)}<span class="time">4:06 PM</span>${r.edited ? '<span class="edited">(edited)</span>' : ''}</div></div><div class="text">${r.text}</div>${renderReactions(r.id, r.reactions)}${replyHoverActions(r.id)}</div>`).join('')}</div>` : '';
+    const edited = m.edited ? '<span class="edited">(edited)</span>' : '';
+    return `<div class="message-wrap"><div class="message"><div class="message-head">${avatar(m.authorId)}<div class="meta">${authorButton(m.authorId)}<span class="time">4:08 PM</span>${edited}</div></div><div class="text">${m.text}</div>${reactions}</div>${replyActions(m.id)}${replies}</div>`;
+  }).join('');
+  document.getElementById('count').textContent = messages.reduce((n, m) => n + 1 + m.replies.length, 0);
+}
+renderPeople();
+renderMessages();
+function openProfile(personId){
+  const p = person(personId);
+  document.getElementById('profileAvatar').innerHTML = avatar(p);
+  document.getElementById('profileName').textContent = p.fullName;
+  document.getElementById('profileEmail').textContent = p.email;
+  document.getElementById('profileLocation').textContent = p.location;
+  document.getElementById('profileSince').textContent = p.since;
+  document.getElementById('profile').hidden = false;
+}
+document.getElementById('profileClose').addEventListener('click', () => { document.getElementById('profile').hidden = true; });
+document.getElementById('profile').addEventListener('click', (event) => {
+  if (event.target.id === 'profile') document.getElementById('profile').hidden = true;
+});
+document.getElementById('messages').addEventListener('click', (event) => {
+  const reaction = event.target.closest('[data-reaction-message]');
+  if (reaction) {
+    toggleReaction(Number(reaction.dataset.reactionMessage), reaction.dataset.reactionEmoji);
+    return;
+  }
+  const profile = event.target.closest('[data-profile]');
+  if (profile) { openProfile(profile.dataset.profile); return; }
+  const reply = event.target.closest('[data-reply]');
+  if (reply) { startReply(Number(reply.dataset.reply)); }
+  const edit = event.target.closest('[data-edit]');
+  if (edit) { startEdit(Number(edit.dataset.edit)); }
+  const del = event.target.closest('[data-delete]');
+  if (del) { openDelete(Number(del.dataset.delete)); }
+});
+document.getElementById('people').addEventListener('click', (event) => {
+  const picked = event.target.closest('[data-pick]');
+  if (!picked) return;
+  const p = person(picked.dataset.pick);
+  const input = document.getElementById('input');
+  input.value = input.value.replace(/@([^\s@]*)$/, `@${p.fullName} `);
+  document.getElementById('picker').hidden = true;
+  input.focus();
+});
+function startReply(messageId){
+  const parent = messages.find(m => m.id === messageId) || messages.find(m => m.replies.some(r => r.id === messageId));
+  if (!parent) return;
+  editingTarget = null;
+  replyTarget = parent.id;
+  const p = person(parent.authorId);
+  const bar = document.getElementById('composerContext');
+  bar.innerHTML = `Replying to <b>${p.fullName}</b> <button type="button" id="cancelReply">×</button>`;
+  bar.hidden = false;
+  document.getElementById('cancelReply').addEventListener('click', resetComposerMode);
+  document.getElementById('input').focus();
+  document.getElementById('send').textContent = 'Send';
+}
+function startEdit(messageId){
+  const found = findMessage(messageId);
+  if (!found || found.message.authorId !== 'p_jordan') return;
+  replyTarget = null;
+  editingTarget = { id: messageId };
+  const p = person(found.message.authorId);
+  const input = document.getElementById('input');
+  input.value = plainText(found.message.text);
+  autoGrowInput();
+  const bar = document.getElementById('composerContext');
+  bar.innerHTML = `Editing <b>${p.fullName}</b> <button type="button" id="cancelEdit">×</button>`;
+  bar.hidden = false;
+  document.getElementById('cancelEdit').addEventListener('click', resetComposerMode);
+  document.getElementById('send').textContent = 'Save';
+  input.focus();
+}
+function resetComposerMode(){
+  replyTarget = null;
+  editingTarget = null;
+  const input = document.getElementById('input');
+  input.value = '';
+  autoGrowInput();
+  document.getElementById('composerContext').hidden = true;
+  document.getElementById('send').textContent = 'Send';
+}
+document.getElementById('input').addEventListener('input', (event) => {
+  autoGrowInput();
+  const value = event.target.value;
+  const match = value.match(/@([^\s@]*)$/);
+  const picker = document.getElementById('picker');
+  if (!match) { picker.hidden = true; return; }
+  const q = match[1].toLowerCase();
+  const matches = people.slice(1).filter(p => p.fullName.toLowerCase().includes(q));
+  renderPeople(matches);
+  picker.hidden = !matches.length;
+});
+document.getElementById('send').addEventListener('click', () => {
+  const input = document.getElementById('input');
+  if (!input.value.trim()) return;
+  const safe = input.value.replace(/[<>]/g, '');
+  let text = safe;
+  people.forEach(p => { text = text.replaceAll(`@${p.fullName}`, mention(p.recordId)); });
+  if (editingTarget) {
+    const found = findMessage(editingTarget.id);
+    if (found) {
+      found.message.text = text;
+      found.message.edited = true;
+    }
+    resetComposerMode();
+    document.getElementById('picker').hidden = true;
+    renderMessages();
+    return;
+  }
+  const msg = { id: nextId++, authorId: 'p_jordan', text, reactions: [], replies: [] };
+  if (replyTarget) {
+    const parent = messages.find(m => m.id === replyTarget);
+    if (parent) parent.replies.push(msg);
+  } else {
+    messages.push(msg);
+  }
+  resetComposerMode();
+  document.getElementById('picker').hidden = true;
+  renderMessages();
+});
+document.getElementById('addLink').addEventListener('click', () => {
+  messages.push({ id: nextId++, authorId: 'p_jordan', text: 'Worth checking: <a class="pending" target="_blank" rel="noopener" href="https://example.com">example.com</a>', reactions: [], replies: [] });
+  renderMessages();
+  setTimeout(() => {
+    messages[messages.length - 1].text = 'Worth checking: <a target="_blank" rel="noopener" href="https://example.com">Example Domain — Reference</a>';
+    renderMessages();
+  }, 900);
+});
+document.getElementById('react').addEventListener('click', () => {
+  toggleReaction(1, '👍');
+  const found = findMessage(1);
+  if (found && !found.message.reactions.some(r => r.emoji === '😂')) {
+    found.message.reactions.push({ emoji: '😂', count: 1, mine: true });
+  }
+  renderMessages();
+});
+document.getElementById('admin').addEventListener('click', () => {
+  isAdmin = !isAdmin;
+  document.getElementById('admin').textContent = isAdmin ? 'You: Admin' : 'You: Member';
+  renderMessages();
+});
+document.getElementById('mode').addEventListener('click', () => {
+  const app = document.getElementById('app');
+  app.classList.toggle('readonly');
+  document.getElementById('mode').textContent = app.classList.contains('readonly') ? 'Mode: Recording' : 'Mode: Live';
+});
+function findMessage(id){
+  for (const message of messages) {
+    if (message.id === id) return { message, parent: null };
+    for (const reply of message.replies) {
+      if (reply.id === id) return { message: reply, parent: message };
+    }
+  }
+  return null;
+}
+function toggleReaction(messageId, emoji){
+  const found = findMessage(messageId);
+  if (!found) return;
+  const existing = found.message.reactions.find(r => r.emoji === emoji);
+  if (existing) {
+    if (existing.mine) {
+      existing.mine = false;
+      existing.count = Math.max(0, existing.count - 1);
+    } else {
+      existing.mine = true;
+      existing.count += 1;
+    }
+    found.message.reactions = found.message.reactions.filter(r => r.count > 0);
+  } else {
+    found.message.reactions.push({ emoji, count: 1, mine: true });
+  }
+  renderMessages();
+}
+function plainText(html){
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.innerText;
+}
+function autoGrowInput(){
+  const input = document.getElementById('input');
+  input.style.height = 'auto';
+  input.style.height = Math.max(62, Math.min(input.scrollHeight, 150)) + 'px';
+}
+function openDelete(id){
+  const found = findMessage(id);
+  if (!found) return;
+  const own = found.message.authorId === 'p_jordan';
+  if (!own && !isAdmin) return;
+  deleteTarget = id;
+  document.getElementById('deleteModal').hidden = false;
+  document.getElementById('confirmDelete').focus();
+}
+function closeDelete(){
+  deleteTarget = null;
+  document.getElementById('deleteModal').hidden = true;
+}
+function confirmDelete(){
+  const id = deleteTarget;
+  if (!id) return closeDelete();
+  const topIndex = messages.findIndex(m => m.id === id);
+  if (topIndex >= 0) {
+    messages.splice(topIndex, 1);
+  } else {
+    for (const message of messages) {
+      const replyIndex = message.replies.findIndex(r => r.id === id);
+      if (replyIndex >= 0) {
+        message.replies.splice(replyIndex, 1);
+        break;
+      }
+    }
+  }
+  closeDelete();
+  if (editingTarget?.id === id) resetComposerMode();
+  renderMessages();
+}
+document.getElementById('cancelDelete').addEventListener('click', closeDelete);
+document.getElementById('confirmDelete').addEventListener('click', confirmDelete);
+document.getElementById('deleteModal').addEventListener('click', (event) => {
+  if (event.target.id === 'deleteModal') closeDelete();
+});
+autoGrowInput();
+</script>
+</body>
+</html>

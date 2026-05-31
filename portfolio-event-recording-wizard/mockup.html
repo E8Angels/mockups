@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Portfolio Event Recording Wizard — Mockup</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f8fafc;
+    --panel: #ffffff;
+    --line: #d8e0ea;
+    --line-strong: #b9c5d4;
+    --text: #0f172a;
+    --muted: #64748b;
+    --blue: #2563eb;
+    --blue-soft: #eff6ff;
+    --green: #047857;
+    --green-soft: #ecfdf5;
+    --amber: #b45309;
+    --amber-soft: #fffbeb;
+    --red: #b91c1c;
+    --red-soft: #fef2f2;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+  .page { padding: 20px; }
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 650;
+    letter-spacing: 0;
+  }
+  .tabs {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: var(--panel);
+  }
+  .tab, .button, .icon-button {
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    cursor: default;
+  }
+  .tab { height: 28px; padding: 0 10px; font-size: 12px; }
+  .tab.active { background: #0f172a; color: white; }
+  .grid-shell {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+    overflow: hidden;
+  }
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .search {
+    width: 260px;
+    height: 32px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0 10px 0 32px;
+    color: var(--muted);
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #fff;
+  }
+  .search::before {
+    content: "⌕";
+    position: absolute;
+    left: 11px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .button {
+    height: 32px;
+    padding: 0 11px;
+    border-color: var(--line-strong);
+    background: #fff;
+    font-size: 13px;
+  }
+  .button.primary {
+    border-color: #1d4ed8;
+    background: var(--blue);
+    color: white;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  th, td {
+    height: 36px;
+    padding: 0 10px;
+    border-bottom: 1px solid #edf2f7;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  th {
+    height: 32px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  td.num, th.num { text-align: right; }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .status.active { background: var(--green-soft); color: var(--green); }
+  .status.exited { background: var(--blue-soft); color: #1d4ed8; }
+  .status.closed { background: var(--red-soft); color: var(--red); }
+  .kebab {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: 18px;
+    color: #475569;
+  }
+  .overlay {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(15, 23, 42, 0.26);
+    padding: 24px;
+  }
+  .modal {
+    width: min(980px, 100%);
+    max-height: calc(100vh - 48px);
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    background: var(--panel);
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    box-shadow: 0 24px 80px rgba(15, 23, 42, .22);
+    overflow: hidden;
+  }
+  .modal-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .modal-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 650;
+  }
+  .modal-sub {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .modal-body {
+    min-height: 0;
+    overflow: auto;
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+  .steps {
+    border-right: 1px solid var(--line);
+    background: #fbfdff;
+    padding: 10px;
+  }
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 34px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    color: #334155;
+    font-size: 13px;
+  }
+  .step.active {
+    background: var(--blue-soft);
+    color: #1d4ed8;
+    font-weight: 650;
+  }
+  .step.done::before, .step.active::before, .step.pending::before {
+    display: grid;
+    place-items: center;
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    font-size: 11px;
+    flex: 0 0 auto;
+  }
+  .step.done::before { content: "✓"; background: var(--green-soft); color: var(--green); }
+  .step.active::before { content: "2"; background: #dbeafe; color: #1d4ed8; }
+  .step.pending::before { content: "3"; background: #e2e8f0; color: #475569; }
+  .content {
+    padding: 16px 18px 18px;
+  }
+  .section-title {
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 650;
+  }
+  .choice-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .choice {
+    min-height: 70px;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: #fff;
+  }
+  .choice.selected {
+    border-color: #60a5fa;
+    background: var(--blue-soft);
+  }
+  .choice-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 650;
+    margin-bottom: 4px;
+  }
+  .choice-text {
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .form-grid {
+    display: grid;
+    gap: 8px;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+  }
+  .row.top { align-items: start; }
+  label {
+    color: #334155;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .field {
+    height: 32px;
+    width: fit-content;
+    min-width: 150px;
+    max-width: 100%;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    padding: 0 9px;
+    color: #334155;
+  }
+  .field.wide { width: 420px; }
+  .field.money { width: 180px; justify-content: flex-end; }
+  .field.select::after { content: "⌄"; margin-left: auto; color: var(--muted); }
+  .checkline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 32px;
+    color: #334155;
+  }
+  .checkbox {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    display: grid;
+    place-items: center;
+    background: var(--blue);
+    color: white;
+    font-size: 11px;
+  }
+  .impact {
+    margin-top: 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .impact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--line);
+    background: #f8fafc;
+  }
+  .impact-header strong { font-size: 13px; }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--amber-soft);
+    color: var(--amber);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .preview-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .preview-card {
+    padding: 10px;
+    border-right: 1px solid var(--line);
+  }
+  .preview-card:last-child { border-right: 0; }
+  .metric-label {
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 650;
+  }
+  .metric-value {
+    margin-top: 2px;
+    font-size: 17px;
+    font-weight: 700;
+  }
+  .mini-table th, .mini-table td { height: 32px; font-size: 12px; }
+  .modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    border-top: 1px solid var(--line);
+    background: #fff;
+  }
+  .footnote { color: var(--muted); font-size: 12px; }
+  @media (max-width: 800px) {
+    .page { padding: 10px; }
+    .topbar { align-items: flex-start; flex-direction: column; }
+    .tabs { max-width: 100%; overflow: auto; }
+    .modal-body { grid-template-columns: 1fr; }
+    .steps { border-right: 0; border-bottom: 1px solid var(--line); display: flex; overflow-x: auto; }
+    .step { white-space: nowrap; }
+    .choice-grid, .preview-list { grid-template-columns: 1fr; }
+    .preview-card { border-right: 0; border-bottom: 1px solid var(--line); }
+    .row { grid-template-columns: 1fr; gap: 3px; }
+    .field.wide { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="topbar">
+    <h1>Portfolio</h1>
+    <div class="tabs" aria-label="Companies sections">
+      <button class="tab">Companies</button>
+      <button class="tab active">Portfolio</button>
+      <button class="tab">Instruments</button>
+      <button class="tab">Investments</button>
+      <button class="tab">Valuation</button>
+    </div>
+  </div>
+
+  <div class="grid-shell">
+    <div class="toolbar">
+      <div class="search">Search companies...</div>
+      <button class="button primary">Record Portfolio Update</button>
+    </div>
+    <table aria-label="Portfolio companies">
+      <colgroup>
+        <col />
+        <col style="width: 110px" />
+        <col style="width: 120px" />
+        <col style="width: 120px" />
+        <col style="width: 90px" />
+        <col style="width: 44px" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>Status</th>
+          <th class="num">Cost</th>
+          <th class="num">Fair value</th>
+          <th class="num">MOIC</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>HelioForge Materials</td>
+          <td><span class="status active">Active</span></td>
+          <td class="num">$420k</td>
+          <td class="num">$1.1M</td>
+          <td class="num">2.6x</td>
+          <td><button class="kebab" aria-label="Open actions">⋯</button></td>
+        </tr>
+        <tr>
+          <td>GridLoop Storage</td>
+          <td><span class="status active">Active</span></td>
+          <td class="num">$275k</td>
+          <td class="num">$275k</td>
+          <td class="num">1.0x</td>
+          <td><button class="kebab" aria-label="Open actions">⋯</button></td>
+        </tr>
+        <tr>
+          <td>BlueCarbon Systems</td>
+          <td><span class="status exited">Exited</span></td>
+          <td class="num">$190k</td>
+          <td class="num">$760k</td>
+          <td class="num">4.0x</td>
+          <td><button class="kebab" aria-label="Open actions">⋯</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="overlay">
+  <section class="modal" role="dialog" aria-modal="true" aria-label="Record Portfolio Update">
+    <header class="modal-header">
+      <h2 class="modal-title">Record Portfolio Update</h2>
+      <div class="modal-sub">HelioForge Materials</div>
+    </header>
+    <div class="modal-body">
+      <aside class="steps" aria-label="Wizard steps">
+        <div class="step done">What happened</div>
+        <div class="step active">Details</div>
+        <div class="step pending">Preview and save</div>
+      </aside>
+      <main class="content">
+        <h3 class="section-title">What happened?</h3>
+        <div class="choice-grid">
+          <div class="choice">
+            <div class="choice-title">↗ New financing round</div>
+            <div class="choice-text">Use round pricing to update prior investments.</div>
+          </div>
+          <div class="choice selected">
+            <div class="choice-title">✓ Company exited</div>
+            <div class="choice-text">Record return value and mark company as exited.</div>
+          </div>
+          <div class="choice">
+            <div class="choice-title">× Company closed</div>
+            <div class="choice-text">Write active investments to zero.</div>
+          </div>
+          <div class="choice">
+            <div class="choice-title">⇄ Instrument converted</div>
+            <div class="choice-text">SAFE, note, or warrant converted to equity.</div>
+          </div>
+          <div class="choice">
+            <div class="choice-title">≈ Manual valuation update</div>
+            <div class="choice-text">Adjust value from an internal estimate.</div>
+          </div>
+          <div class="choice">
+            <div class="choice-title">⎇ Cram down / restructure</div>
+            <div class="choice-text">Apply participation-based value changes.</div>
+          </div>
+        </div>
+
+        <h3 class="section-title">Exit details</h3>
+        <div class="form-grid">
+          <div class="row">
+            <label>Exit date</label>
+            <div class="field">2026-05-20</div>
+          </div>
+          <div class="row">
+            <label>Exit type</label>
+            <div class="field select" style="width: 190px;">Acquisition</div>
+          </div>
+          <div class="row">
+            <label>Company exit valuation</label>
+            <div class="field money">$86,000,000</div>
+          </div>
+          <div class="row">
+            <label>Return multiple</label>
+            <div class="field" style="width: 96px;">3.4x</div>
+          </div>
+          <div class="row">
+            <label>Total returned to E8</label>
+            <div class="field money">$1,428,000</div>
+          </div>
+          <div class="row">
+            <label>Company status</label>
+            <div class="checkline"><span class="checkbox">✓</span> Mark company as exited after save</div>
+          </div>
+          <div class="row">
+            <label>Source</label>
+            <div class="field wide">Acquirer closing notice</div>
+          </div>
+          <div class="row top">
+            <label>Note</label>
+            <div class="field wide" style="height: 56px; align-items: flex-start; padding-top: 7px;">Cash acquisition; escrow expected Q4.</div>
+          </div>
+        </div>
+
+        <section class="impact">
+          <div class="impact-header">
+            <strong>Impact preview</strong>
+            <span class="pill">Creates one portfolio update</span>
+          </div>
+          <div class="preview-list">
+            <div class="preview-card">
+              <div class="metric-label">Company status</div>
+              <div class="metric-value">Active → Exited</div>
+            </div>
+            <div class="preview-card">
+              <div class="metric-label">Affected investments</div>
+              <div class="metric-value">41</div>
+            </div>
+            <div class="preview-card">
+              <div class="metric-label">Fair value</div>
+              <div class="metric-value">$1.1M → $1.43M</div>
+            </div>
+          </div>
+          <table class="mini-table" aria-label="Affected instruments">
+            <colgroup>
+              <col />
+              <col style="width: 120px" />
+              <col style="width: 120px" />
+              <col style="width: 90px" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Instrument</th>
+                <th class="num">Current value</th>
+                <th class="num">Exit value</th>
+                <th class="num">MOIC</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Seed SAFE</td>
+                <td class="num">$420k</td>
+                <td class="num">$612k</td>
+                <td class="num">3.4x</td>
+              </tr>
+              <tr>
+                <td>Series A Preferred</td>
+                <td class="num">$680k</td>
+                <td class="num">$816k</td>
+                <td class="num">3.4x</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+    <footer class="modal-footer">
+      <div class="footnote">Will update valuation history, company status, and exit event records.</div>
+      <div>
+        <button class="button">Back</button>
+        <button class="button primary">Save Portfolio Update</button>
+      </div>
+    </footer>
+  </section>
+</div>
+</body>
+</html>
