@@ -1,302 +1,550 @@
 ---
-title: Per-Company Investor Google Groups
+title: "Company Discussion Groups"
 status: draft
 owner: jordan
 created: 2026-05-16
-last_updated: 2026-05-16
-mockup: mockup.html
+last_updated: 2026-06-05
+home: member-experience
 ---
 
-# Per-Company Investor Google Groups
-
-**Status:** Draft for team review
-**Mockup:** [docs/mockups/per-company-investor-groups.html](../mockups/per-company-investor-groups.html)
-**Related infrastructure:** `lib/google-groups.js` (already supports add/remove/list members; needs a `createGroup` + settings configurator)
-
----
+# Company Discussion Groups
 
 ## Goal
 
-When a company has **2+ investors**, automatically provision a private Google Group at
-`{company-slug}-investors@e8angels.com` and keep its membership in sync as new
-deployments land. Surface the group as a "mail this list" affordance on the portfolio
-company header and the member-facing investments page, while keeping the membership
-roster private (size visible, identities not).
+Create a per-company mailing list so E8 members can discuss a company with investors, diligence contributors, and other interested members. The group is backed by Google Groups and uses a predictable address:
 
----
-
-## Scope
-
-### In
-- New table `company_investor_groups` to track which companies have a group.
-- Auto-provision on the deployment that brings a company to 2+ unique investors.
-- Auto-add new investors on subsequent deployments.
-- Manual just-in-time provisioning button on company surfaces (incl. the 1-investor case).
-- Read-side affordance on:
-  - Admin company page header (`/admin/company/:companyRecordId`) — chip in the existing right-side icon row alongside the link / cart / checklist / `de` icons.
-  - Member investments page `/forms/investments` — new "List" column at the right end of the table.
-- Anonymized membership for members (count visible; identities hidden).
-- **Admin-only "Manage members" panel** on the company admin page so staff can remove someone who emails asking to be taken off (plus add, re-sync, and delete the whole group).
-
-### Out
-- Retroactive bulk creation across the whole portfolio. (Manual button covers the long tail.)
-- Auto-removal of investors when they exit a position — admins do this on request via the Manage members panel.
-- Posting from within the portal (UI is a `mailto:` link; sending happens in their mail client).
-- Cross-company "all investors" digest groups.
-
----
-
-## Naming and uniqueness
-
-- Slug: lowercase, hyphenated, alphanumerics only, max 50 chars; e.g. `Emerald Battery Labs` → `emerald-battery-labs-investors@e8angels.com`.
-- If a slug collides (rare — e.g. two companies with same name), append `-2`, `-3`, etc.
-- **Slug is locked at creation.** Renaming a company in the portal does NOT rename the group. We display the group address as-is.
-
----
-
-## Data model
-
-New table (migration script + `createTables()` update; DO NOT auto-migrate at boot):
-
-```sql
-CREATE TABLE company_investor_groups (
-    company_record_id      TEXT PRIMARY KEY,
-    group_email            TEXT NOT NULL UNIQUE,
-    member_count           INTEGER NOT NULL DEFAULT 0,
-    last_synced_at         TEXT,                 -- UTC ISO
-    welcome_scheduled_for  TEXT,                 -- UTC ISO; debounce target for the welcome send
-    welcome_sent_at        TEXT,                 -- UTC ISO; NULL until sent
-    created_at             TEXT DEFAULT CURRENT_TIMESTAMP,
-    created_by             TEXT,                 -- admin email, or 'auto'
-    created_reason         TEXT                  -- 'auto-threshold' | 'manual'
-);
-CREATE INDEX idx_cig_group_email ON company_investor_groups(group_email);
-CREATE INDEX idx_cig_welcome_due ON company_investor_groups(welcome_scheduled_for)
-    WHERE welcome_sent_at IS NULL;
+```text
+{company-slug}-chat@e8angels.com
 ```
 
-Glossary: this is admin/infra metadata; **no `data-query-glossary.md` update required** (staff would never query it directly).
+Example: `emerald-battery-labs-chat@e8angels.com`.
 
----
+## Recommendation Summary
 
-## Membership: who counts as an investor
+| Question | Recommendation |
+|---|---|
+| How do people find the address? | Everyone with portal access can see the address anywhere the company discussion group appears: company page, investment table, and the member/profile widget. |
+| How do people join? | Any portal user can add themselves from the company page, investment row, or Company Discussion Groups widget. No admin approval. |
+| Can non-members send mail? | Yes. Configure Google Groups so anyone on the internet can send to the address. Membership controls who receives list mail and who can unsubscribe, not who can send. |
+| Can admins see/manage lists and members? | Yes. Add `Manage -> Company -> Chats`, with the Chats menu item below Leads. Admins can create missing aliases, add/remove members, re-sync, and see the current roster with source badges. |
+| Can admins audit mail sent or membership changes? | No. We do not track adds, removes, syncs, or messages sent to the list. The portal stores current group state only. |
+| How do people unsubscribe? | The Company Discussion Groups widget has a Leave action. Leaving removes the Google Group membership and records an opt-out so auto-sync does not re-add the person unless they self-join or an admin adds them back. |
+| How do people see which lists they're on? | Add a "Company Discussion Groups" tile on the member/profile page modeled on the investments tile: compact stat boxes, a bounded-height scroll table, address/member/status columns, and a split-button action per row. |
+| How are new investors added to existing groups? | Every deployment write calls the shared sync function after commit. If the group already exists, the sync adds the new investor unless they previously opted out. |
+| How are diligence contributors added? | Use the canonical diligence-team list in the system for that company. Whenever someone is added to that diligence team, sync them into the group. |
+| How do we keep local membership state fresh? | Update local membership immediately when portal actions run, and run a nightly reconciliation job that reads all Google Groups and refreshes the local mirror. |
+| How do we backfill existing invested companies? | Run a one-time backfill script after review. Do not include a portal backfill UI. |
+| Can people see member count? | Yes. Show count on member-facing surfaces. |
+| Can people see who is on the list? | No, except admins. Portal users see the address, count, and their own membership state; admins see the roster. |
 
-"Investors in a company" = distinct `person_record_id` resolved from `deployments` rows for that `company_record_id` where `record_type = 'deployment'` AND `amount_cents > 0`.
+## Mockups
 
-For each investor person, resolve their **primary email** from `people`. People without a usable email are skipped (logged, surfaced in the admin UI's "issues" line on the dialog).
+- [Member experience](member-experience.html): company page, investment table, self-join, and the member/profile widget.
+- [Admin console](admin-console.html): `Manage -> Company -> Chats`, current roster, source badges, and repair alias creation.
+- [Overview](mockup.html): compact entry page linking the variants.
 
----
+## Core UX Decisions
 
-## Provisioning flow
+### 1. Address visibility and sending
 
-### Auto (on deployment write)
+Everyone with portal access can see and use the company discussion group address. On company pages, the address lives inside a lightweight `Chat` split button in the right-side action group, just left of `Notes`. The main button opens mail to the group; the dropdown shows `Email {group address} ({member count})` plus `Join` or `Leave` depending on the viewer's membership state. The hover tooltip says `Contact mailing list of people interested in {company name}`.
 
-In the existing deployment write path (post-commit):
+In compact table contexts, the address can be shown as text while the row action remains the compact mail split button.
 
-1. Compute distinct investor count for the company.
-2. If count ≥ 2 AND no row in `company_investor_groups`:
-   - Generate slug, resolve any collisions.
-   - `googleGroups.createGroup({ email, name: '<Company> Investors', description: 'Private list for E8 investors in <Company>.' })`.
-   - Apply privacy settings (see below).
-   - Insert `company_investor_groups` row with `created_reason='auto-threshold'` and `welcome_scheduled_for = now + 5min`.
-3. Whether new or pre-existing: diff current members against expected investor emails, add new ones via the existing `addMembersToGroup`. Never auto-remove.
-4. Update `member_count` and `last_synced_at`. **If the group is still in its pre-welcome window (`welcome_sent_at IS NULL`), bump `welcome_scheduled_for` to `now + 5min`** — see "Welcome email" below.
+For the investments table, keep the column header blank and use a compact icon split button in each row: the mail icon sends to the group, and the caret opens `Join` or `Leave`.
 
-Failures here do NOT block the deployment. Errors are logged and surfaced as a banner on the company page ("Investor mailing list sync failed — retry") with a retry button.
+For the member/profile page, model the widget on the existing investments/portfolio tile: a card header, a small stat row, and a bordered `max-height` table that scrolls after several rows. Each row uses the same compact mail split button for email plus `Join` or `Leave`.
 
-### Manual (just-in-time)
+The Google Group should accept mail from anyone on the internet. This is deliberate: a member does not need to be subscribed to send a message, and external senders can reply or forward relevant context into the discussion.
 
-Wherever "Email investors" lives today (and on every portfolio company surface): show a single chip / button:
+Membership controls:
 
-- **If group exists**: `📬 Email 12 investors` → `mailto:emerald-battery-labs-investors@e8angels.com`
-- **If group does not exist**: `📬 Email investors` → opens dialog (see Mockup §3):
-  - Title: "Create investor mailing list?"
-  - Body: "There's no mailing list yet for **{Company}**. Create one now?"
-  - Footnote with the eventual address and the resolved investor count.
-  - Confirm → provisions, then dialog flips to a success state with the address as a `mailto:` link and a "Copy address" button.
+- Who receives messages sent to the group.
+- Who sees the group in their Company Discussion Groups widget as "Joined".
+- Who can leave/unsubscribe through the portal.
+- Who appears in the admin roster.
 
-For the 1-investor case the dialog explains it'll be a 1-person list and asks to confirm anyway (rather than silently refusing).
+Membership does not control who can send.
 
----
+### 2. Naming and collisions
 
-## Privacy / Google Groups settings
+Use `-chat`, because the group is broader than investors.
 
-Applied at creation (Groups Settings API):
+Slug rules:
 
-| Setting | Value | Why |
+- Lowercase.
+- Alphanumeric plus hyphens.
+- Max 50 characters before `-chat`.
+- Derive from the company's canonical portal name.
+
+Do not resolve collisions by appending `-2`, `-3`, etc. Two companies should not have the same canonical name. If the generated address is already taken:
+
+1. Do not create a different address silently.
+2. Send an alert email to the Support Manager.
+3. Include the attempted address, the company record ID, the company name, and any existing group/company record that owns the address.
+4. Keep the company visible in the admin Chats table with the normal compact columns and make the repair path available from the table context.
+
+### 3. Company renames
+
+If a company name changes after a group exists:
+
+1. Generate the new canonical address.
+2. Change the Google Group primary address to the new address.
+3. Add the old address as an alias/forwarder so mail to the old address still reaches the group.
+4. Update the portal row so users see only the new correct address.
+5. Keep the old address in alias history for repair visibility.
+
+If Google rejects the rename or alias creation, alert the Support Manager and make the repair path available from the admin Chats table context.
+
+### 4. Who gets auto-subscribed
+
+Auto-add:
+
+- Investors: people tied to deployment records for the company.
+- Diligence team: the canonical list in the system of people on the diligence team for the company.
+
+When either source changes after the group exists, run the same sync function and add the new person unless they have opted out.
+
+Opt-out rule:
+
+- If someone leaves the list and later invests again in the same company, do not auto-re-add them.
+- They can still add themselves back from the portal.
+- An admin can add them back from the admin roster.
+
+### 5. Source badges
+
+The admin roster shows why each person is on the list. A person can have multiple source badges:
+
+- `Investor`
+- `Diligence`
+- `Self-add`
+- `Admin-add`
+
+Examples:
+
+- Someone who invested and was also on diligence shows `Investor` and `Diligence`.
+- Someone who added themselves shows `Self-add`.
+- Someone staff added manually shows `Admin-add`.
+
+This is a current-state label, not an event log.
+
+### 6. Self-subscribe
+
+Any authenticated portal user can join any company discussion group from:
+
+- The company page.
+- The investments table row.
+- The Company Discussion Groups tile on the member/profile page.
+
+Self-join behavior:
+
+1. If the Google Group is missing for a portfolio company, auto-create it just in time.
+2. Add the current user's canonical email to the Google Group.
+3. Remove any opt-out row for that user/company.
+4. Add or update the local membership mirror with the `Self-add` source.
+5. Immediately show the row as Joined.
+
+No admin request/approval flow.
+
+### 7. Unsubscribe and opt-outs
+
+The portal "Leave" action is the primary unsubscribe path.
+
+When a person leaves:
+
+- Remove them from the Google Group.
+- Insert or update an opt-out row for that company/email.
+- Remove them from the current local membership mirror.
+- Keep the opt-out across future investor and diligence syncs.
+- Show the member-facing state as "Not joined" with a Join action.
+
+Google native unsubscribe should still be allowed if Google requires it for normal mailing-list behavior. The nightly reconciliation job should detect Google-side removals and update the local mirror. If it can match the email to a person, it should also record the opt-out so automated sync does not add the person back.
+
+### 8. Google-native subscribe by email
+
+The product preference is: do not allow people to subscribe by sending a subscribe email to the list alias.
+
+Recommended setting:
+
+- Set `whoCanJoin=INVITED_CAN_JOIN`.
+- Keep add/invite/approve controls manager-owned.
+- Let the portal service account add members through the Admin SDK when a user self-joins.
+
+Implementation should explicitly verify this behavior in the E8 Google Workspace tenant. If Google still permits a native subscribe-email path despite `INVITED_CAN_JOIN`, document the limitation and rely on portal reconciliation/visibility as the source of truth.
+
+### 9. Admin management
+
+Entry point:
+
+```text
+Manage -> Company -> Chats
+```
+
+In the Manage -> Company menu, put Chats below Leads.
+
+Default table columns:
+
+- Company.
+- Group email, displayed in compact form such as `emerald-battery-labs@...` with the full address available for mailto/copy actions.
+- Members.
+- Sources.
+- Kebab menu.
+
+Do not show message activity or audit history. Do not show a sync timestamp in the dashboard table. The dashboard is for current state and repair needs.
+
+Table interaction:
+
+- Clicking a row opens that company's roster as a right-side slide-out panel, matching the admin/people slide-out pattern.
+- The kebab menu offers `Edit`, `Email`, and `Delete`.
+- `Edit` opens the same roster slide-out.
+- `Email` opens `mailto:{groupAddress}`.
+- `Delete` opens a concise alert confirmation modal before any destructive action.
+
+Roster slide-out:
+
+- Members: admin-only current roster, add/remove, source badges, opt-out status.
+
+Repair action:
+
+- Add a "Create missing alias" button when the group is missing, the primary address is wrong, or the expected alias is absent.
+- This should rarely be needed, but gives staff a controlled repair tool when Google or sync state drifts.
+
+No portal backfill controls. Backfill is a one-time script, not an admin dashboard feature.
+
+### 10. Reconciliation
+
+We maintain a local mirror of current Google Group membership, not an event history.
+
+Update the local mirror immediately when:
+
+- A portal user joins.
+- A portal user leaves.
+- An admin adds a member.
+- An admin removes a member.
+- A new deployment creates an investor membership.
+- A canonical diligence-team change creates a diligence membership.
+- The one-time backfill script creates or syncs groups.
+
+Add a nightly reconciliation job using the existing scheduled-jobs infrastructure and its existing UI:
+
+- Runs once per day at night, during a window when no other jobs are scheduled.
+- Lists every company discussion group.
+- Reads the Google Group member list.
+- Rebuilds or updates the local current-membership mirror.
+- Refreshes member counts and source badges where they can be derived from portal data.
+- Flags mismatches or API failures as current issues on the admin dashboard.
+
+We do not store:
+
+- Who was added.
+- Who was removed.
+- Who performed a sync.
+- What messages were sent.
+- Message sender, subject, body, delivery, or moderation history.
+
+### 11. Updates email forwarding
+
+The portal already has code that processes emails sent to `updates@e8angels.com`. Extend that workflow:
+
+1. When the updates processor determines that an email is relevant to a particular company, resolve that company's discussion group address.
+2. If the company is a portfolio company and the group is missing, create it just in time before forwarding.
+3. Send an alert email to:
+   - The company-relevant email target already used or determined by the updates workflow.
+   - The company's discussion group address.
+4. Include the original email in full:
+   - Original From.
+   - Original To/Cc when available.
+   - Original Subject.
+   - Original received date.
+   - Full HTML body with formatting preserved.
+   - Plain-text fallback.
+   - Attachments.
+   - Inline images/content IDs when available.
+5. Make the wrapper clear that this came through `updates@e8angels.com` and why the company was matched.
+
+The forwarded email should preserve the original content as faithfully as the existing email infrastructure allows. If full attachment pass-through is not currently supported by the updates processor, add it to the implementation scope rather than stripping attachments silently.
+
+## Hardcoded Google Group Configuration
+
+Recommended MVP settings:
+
+These settings should be hardcoded in the Google Groups creation/configuration code. There is no admin UI for editing them.
+
+| Setting | Value | Reason |
 |---|---|---|
-| `whoCanViewMembership` | `ALL_OWNERS_CAN_VIEW` | Members can't enumerate other members. |
-| `whoCanViewGroup` | `ALL_MEMBERS_CAN_VIEW` | Members can read messages. |
-| `whoCanPostMessage` | `ANYONE_CAN_POST` | A member can email it; an outside investor or LP candidate can ask the group a question; our own outbound infra (e.g. MailGun-relayed welcome message) gets through without needing to be a member. |
-| `spamModerationLevel` | `MODERATE` | With `ANYONE_CAN_POST` we accept any sender, so let Google's spam scoring quarantine obvious junk. List addresses are never published outside the portal, so volume should stay near zero. |
-| `whoCanContactOwner` | `ALL_MEMBERS_CAN_CONTACT` | For unsubscribe / questions. |
-| `whoCanJoin` | `INVITED_CAN_JOIN` | We control membership. |
-| `replyTo` | `REPLY_TO_SENDER` | Prevents reply-all from revealing the roster of recipients via Cc. |
-| `includeInGlobalAddressList` | `false` | Doesn't appear in autocomplete or directory. |
-| `showInGroupDirectory` | `false` | Not listed at groups.google.com. |
-| `allowExternalMembers` | `true` | Investors may have non-e8angels.com emails. |
-| `archiveOnly` | `false` | List is for sending. |
-| `messageModerationLevel` | `MODERATE_NONE` | No moderation overhead. |
+| `whoCanPostMessage` | `ANYONE_CAN_POST` | Anyone on the internet can send mail to the group address. |
+| `whoCanJoin` | `INVITED_CAN_JOIN` | Prevents Google-native self-join/request flow; portal self-join adds members by API. |
+| `whoCanAdd` | `ALL_MANAGERS_CAN_ADD` | Only managers/service account can add outside the portal flow. |
+| `whoCanInvite` | `ALL_MANAGERS_CAN_INVITE` | Keeps native invitations controlled. |
+| `allowExternalMembers` | `true` | Investors may use non-E8 emails. |
+| `whoCanViewMembership` | `ALL_MANAGERS_CAN_VIEW` | Hides roster from normal members. |
+| `whoCanViewGroup` | `ALL_MANAGERS_CAN_VIEW` | Keeps any Google-hosted group UI private to managers. |
+| `isArchived` | `false` | No message archive/audit requirement in the portal. |
+| `archiveOnly` | `false` | The group receives mail. |
+| `messageModerationLevel` | `MODERATE_NONE` | Keeps normal delivery simple; spam moderation still applies. |
+| `spamModerationLevel` | `MODERATE` | Sends likely spam to moderation. |
+| `replyTo` | `REPLY_TO_SENDER` | Reduces accidental full-list replies. |
+| `whoCanDiscoverGroup` | `ALL_MEMBERS_CAN_DISCOVER` or stricter tenant-supported value | Groups should not be broadly discoverable outside intended portal surfaces. |
+| `includeInGlobalAddressList` | `false` | Keeps lists out of Workspace autocomplete. |
+| `whoCanLeaveGroup` | `ALL_MEMBERS_CAN_LEAVE` | Allows native unsubscribe if a member uses Google tools. |
 
-**Anonymity caveat to flag to the team:** when a member sends to the list, the recipients see the sender's "From" address. We can't hide that via group settings. Anonymity in this design means *you can't enumerate the list*; it does NOT mean *posts are anonymous*. The tooltip copy reflects this.
+Implementation note: the official Groups Settings API defines `ANYONE_CAN_POST` as the internet-wide posting option and `INVITED_CAN_JOIN` as invited-only joining. Verify the exact accepted values in the E8 tenant during implementation because Workspace-wide policies can restrict group behavior.
 
-**Why "anyone can post":** beyond letting our own outbound infra send the welcome message, we want the list to be reachable by an interested non-investor (e.g. a member considering a follow-on, or someone who heard about the company through E8 and wants to ask the cap table a question). Since list addresses are never exposed outside the portal, abuse risk is low; spam moderation handles the long-tail.
+## Data Model
 
----
+New tables:
 
-## Welcome email (sent on creation, with a delay)
+```sql
+CREATE TABLE company_chat_groups (
+    company_record_id TEXT PRIMARY KEY,
+    group_email TEXT NOT NULL UNIQUE,
+    group_id TEXT,
+    status TEXT NOT NULL DEFAULT 'active',
+    member_count INTEGER NOT NULL DEFAULT 0,
+    auto_investor_count INTEGER NOT NULL DEFAULT 0,
+    auto_diligence_count INTEGER NOT NULL DEFAULT 0,
+    self_joined_count INTEGER NOT NULL DEFAULT 0,
+    admin_added_count INTEGER NOT NULL DEFAULT 0,
+    last_reconciled_at TEXT,
+    last_reconcile_status TEXT,
+    last_reconcile_error TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    created_by TEXT,
+    created_reason TEXT
+);
 
-When a group is created — auto or manual — we send a single introductory message to the list itself so every member receives it. **The send is delayed and debounced** so that batch deployment workflows (e.g. an admin recording several deployments for a closed round in one sitting) don't fire the welcome to the first 2 investors and then leave the 3rd, 4th, … out.
+CREATE TABLE company_chat_group_aliases (
+    company_record_id TEXT NOT NULL,
+    alias_email TEXT NOT NULL PRIMARY KEY,
+    is_current_primary INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    retired_at TEXT
+);
 
-**Mechanics — no scheduled jobs, no cron entries, no in-memory timers.** The "schedule" is a single column on the row:
+CREATE TABLE company_chat_group_members (
+    company_record_id TEXT NOT NULL,
+    person_record_id TEXT,
+    email TEXT NOT NULL,
+    source_json TEXT NOT NULL, -- ["Investor", "Diligence", "Self-add", "Admin-add"]
+    status TEXT NOT NULL DEFAULT 'active',
+    joined_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    left_at TEXT,
+    PRIMARY KEY (company_record_id, email)
+);
 
-- On create: `UPDATE … SET welcome_scheduled_for = now() + interval '5 min', welcome_sent_at = NULL`.
-- On every subsequent member-adding sync, while `welcome_sent_at IS NULL`: the same `UPDATE` runs again. It's an idempotent column write — pushing the deadline forward costs one row write, doesn't enqueue anything, and doesn't need to be cancelled.
-- One existing background worker (the same tick that drives `lib/recurring-emails/dispatcher.js` — runs every minute or so) executes one query per tick:
+CREATE TABLE company_chat_opt_outs (
+    company_record_id TEXT NOT NULL,
+    person_record_id TEXT,
+    email TEXT NOT NULL,
+    reason TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    created_by TEXT,
+    PRIMARY KEY (company_record_id, email)
+);
+```
 
-  ```sql
-  SELECT company_record_id, group_email
-  FROM company_investor_groups
-  WHERE welcome_sent_at IS NULL
-    AND welcome_scheduled_for <= datetime('now')
-  LIMIT 50;
-  ```
+No join-request table and no audit/event table.
 
-  For each row returned, it sends the welcome via the standard transactional mail path and stamps `welcome_sent_at`. The partial index `idx_cig_welcome_due` keeps that query O(due-rows), not O(table).
+Migration policy:
 
-- After `welcome_sent_at` is set, later additions are silent (no per-add notifications). New investors land on the list and start receiving any future messages, but no backfilled welcome.
+- Create an explicit migration script under `scripts/`.
+- Update `lib/cache-manager.js` `createTables()` for new environment setup only.
+- Update `docs/database-schema.md`.
+- Update `docs/data-query-glossary.md` because staff may ask which companies have discussion groups.
+- Update `docs/ai-relationship-registry.*` if present because this adds soft relationships among people, companies, group membership, aliases, and email forwarding metadata.
 
-**What this avoids:**
-- No per-group entries in any cron table or scheduled-task store. The set of "things to do" is just rows where one column is in the past.
-- No timers to cancel when the deadline gets bumped — the next tick simply re-reads the column.
-- No drift if the worker is restarted, the box reboots, or the deploy ships a fresh worker — state lives in the row.
-- Worst-case actual delay = 5 min + one tick interval (~6 min). Acceptable for a welcome message.
+## Sync Logic
 
-**Sender:** `support@e8angels.com` (or whatever the existing transactional sender is) addressed to the group itself, not to individual members. Because `whoCanPostMessage = ANYONE_CAN_POST`, this delivers cleanly. Reply-To = `support@e8angels.com` so confused replies reach a human, not the whole group.
+One shared entrypoint:
 
-**Body (draft — please edit):**
+```javascript
+await syncCompanyDiscussionGroup(companyRecordId, { trigger, actorEmail });
+```
 
-> Subject: You're on the **{Company} investors** mailing list
->
-> Hi — E8 just created a private mailing list for everyone who's invested in **{Company}**:
->
-> &nbsp;&nbsp;&nbsp;&nbsp;`{company-slug}-investors@e8angels.com`
->
-> Email that address to reach all the other investors at once. New investors are added automatically as they make a deployment.
->
-> A few things to know:
->
-> - The list is **private** — when you're on it, you can see the address but not the roster. Other investors can see when *you* post (your From line is visible) but not the other recipients.
-> - To leave the list, reply to this message and ask, or email `support@e8angels.com` and we'll remove you. (Google's `+unsubscribe` self-service also works.)
-> - Anyone can email the list, including non-investors with a question for the cap table.
->
-> Questions: `support@e8angels.com`.
+Use it from:
 
-**Manual override:** the admin Manage Members panel (Surface 4) shows the welcome status (`Welcome scheduled for HH:MM` / `Welcome sent at HH:MM`) and offers a **Send welcome now** button to fire early when the admin knows the membership is settled.
+- Deployment write path, after the deployment commit succeeds.
+- Diligence-team add/remove/change path, after the change commits.
+- Company rename path, after the name change commits.
+- Member self-join path.
+- One-time backfill script.
+- Updates processor when it needs to forward to a missing portfolio-company group.
 
----
+Sync behavior:
 
-## Leaving the list
+1. Resolve the expected primary group email from the current company name.
+2. If the company qualifies and the group is missing, create it.
+3. If the group email no longer matches the current company name, rename the group and create an alias for the old address.
+4. Compute expected auto members from investors and the canonical diligence team list.
+5. Exclude emails in `company_chat_opt_outs`.
+6. Add missing expected members.
+7. Never auto-remove members except when an explicit opt-out/removal exists.
+8. Update the current local member mirror, counts, source badges, and issue state.
 
-Two paths:
+Just-in-time creation:
 
-1. **Self-service via Google Groups** — `<group>+unsubscribe@e8angels.com` works natively. Members can also unsubscribe from groups.google.com if they sign in with the Google account that owns their list email.
-2. **Admin-managed (primary path)** — when someone emails E8 staff saying "please take me off", an admin opens **Manage › Companies**, finds the row, and uses the row kebab → **Investor mailing list…** to open a panel showing current members with a Remove button per row. This is also where admins can:
-   - Re-sync membership from current deployments (adds anyone who should be on it).
-   - Add a member by email (one-off, e.g. an investor whose record is missing an email).
-   - Delete the entire group (with confirmation), e.g. on company shutdown.
+- Portfolio companies should never have "no discussion group" as a member-facing steady state.
+- If a user opens a portfolio company and the group is missing, create it just in time.
+- If creation fails, show a concise repair/error state and alert the Support Manager.
 
-The admin panel is the only place the full member list is exposed in the portal — gated to admin role, never shown to members.
+## Backfill Plan
 
----
+Backfill is not an admin UI feature.
 
-## UI surfaces
+Add `scripts/backfill-company-chat-groups.js` with:
 
-### 1. Application-review page header (portfolio companies)
-The portfolio-company application-review header already shows a meta line:
+```text
+Usage:
+  node scripts/backfill-company-chat-groups.js --dry-run
+  node scripts/backfill-company-chat-groups.js --company=<company_record_id>
+  node scripts/backfill-company-chat-groups.js --limit=25
+  node scripts/backfill-company-chat-groups.js --env=prod --dry-run
+  node scripts/backfill-company-chat-groups.js --env=prod --limit=25
+```
 
-> Total invested: **$545,000** · First: Nov 2025 · Stage: Invested
+Per repo rules, the script must support `--env=prod` by swapping `TURSO_URL`, `TURSO_AUTH_TOKEN`, `AIRTABLE_BASE_ID`, and `AIRTABLE_API_KEY` from `PROD_*` values before loading config.
 
-Append one more dot-separated item, **only when the company has an investor group**:
+Backfill steps:
 
-> … · Stage: Invested · ✉ **Email investors** (12)
+1. Dry run locally/staging: list companies that would get groups, expected address, investor count, diligence-team count, missing emails, rename/collision alerts, and alias changes.
+2. Review the dry-run output with staff.
+3. Run production backfill once after explicit approval.
+4. Remove or archive the script after the one-time run if staff does not want it retained.
 
-- The `✉` is the Lucide `Mail` icon, sized to match the surrounding text.
-- The label and the count are part of the same `mailto:` link.
-- Hidden entirely when no group exists. Member-facing surfaces never show a "create" affordance — provisioning is automatic at the 2-investor threshold; manual creation lives in the admin grid (Surface 4).
-- This works because **only portfolio companies** ever get a group, so the meta line stays clean for non-portfolio companies (which don't show "Total invested" either).
-- Tooltip (delay 0): `12 people who invested in Emerald Battery Labs are on this list. Membership is private — you'll see the list address, not who's on it.`
+## API Routes
 
-### 2. /forms/investments table
-New **separate** column at the right end of the table, immediately before the row kebab. **No header text.** Each cell is just the Lucide `Mail` icon (no count, no pill chrome) — clicking opens `mailto:`. Hover tooltip (delay 0): `Email the 12 other people who invested in Emerald Battery Labs (membership is private)`.
+Member-facing:
 
-Rows for companies without a group show an empty cell.
+- `GET /api/company-discussion-groups/my`
+- `GET /api/companies/:id/discussion-group`
+- `POST /api/companies/:id/discussion-group/join`
+- `DELETE /api/companies/:id/discussion-group/membership/me`
 
-### 3. Create-list dialog
-Two states (prompt → success). On success the address is shown once with a Copy button and a `mailto:` link. Reached only from the admin grid (Surface 4) — never from member-facing surfaces.
+Admin:
 
-### 4. Admin Manage › Companies grid kebab (`CompaniesAdminIsland`)
-The admin URL the user pointed at is `/admin/company/:companyRecordId?tab=companies&companies_view=3`, the **CompaniesAdminIsland** grid. Each row already has a kebab menu (Record Valuation Event, Apply Cramdown, Most Recent Application, Delete). Add one item:
+- `GET /api/admin/company-chats`
+- `GET /api/admin/companies/:id/chat`
+- `POST /api/admin/companies/:id/chat`
+- `POST /api/admin/companies/:id/chat/sync`
+- `POST /api/admin/companies/:id/chat/create-missing-alias`
+- `GET /api/admin/companies/:id/chat/members`
+- `POST /api/admin/companies/:id/chat/members`
+- `DELETE /api/admin/companies/:id/chat/members/:email`
 
-- **Investor mailing list…** — opens the Manage members panel for that row's company.
-  - If no group exists, the panel opens in an empty state with a primary "Create mailing list" button (uses Surface 3's prompt copy inline).
-  - If it exists, the panel opens directly to the member list.
+Scheduled:
 
-The Manage members panel itself contains:
+- Nightly job/helper: `reconcileAllCompanyDiscussionGroups()`.
 
-- Header: group address (with copy), member count, "Last synced" timestamp, "Re-sync now" button.
-- Member table: email · status (Invited / Active / Bouncing — from Groups API) · Remove button.
-- Footer actions: "Add member by email…" inline input, and a destructive "Delete group" with a typed-confirmation guard.
-- **Welcome status** strip: `Welcome scheduled for 3:42 PM` (countdown to fire) or `Welcome sent at 11:08 AM Mar 12`. While pending, a **Send welcome now** button fires it immediately and stamps `welcome_sent_at`.
-- All actions hit the routes below; updates are optimistic.
+Updates processor:
 
----
+- Internal helper, not necessarily a route: `forwardCompanyUpdateToDiscussionGroup({ companyRecordId, originalMessage })`.
 
-## Implementation phases
+All SQL belongs in `lib/cache-manager/company-chat-groups.js`.
 
-1. **Schema + lib**
-   - Migration SQL `scripts/migrate-add-company-investor-groups.sql`; update `createTables()`.
-   - Extend `lib/google-groups.js`: `createGroup({ email, name, description })`, `applyGroupSettings(email, settings)`, `groupExists(email)`.
-   - Add `lib/cache-manager/investor-groups.js` with the SQL helpers (`getByCompany`, `upsert`, `incrementMemberCount`).
+## Dev Testing Safety
 
-2. **Sync service**
-   - `lib/investor-group-sync.js` with `syncCompany(companyRecordId, { trigger })` — single entrypoint used by both the deployment hook and the manual button. Bumps `welcome_scheduled_for` on every additive sync while `welcome_sent_at IS NULL`.
-   - Wire into the existing deployment write path post-commit (don't block writes).
+Google Groups are created in the real E8 Google Workspace, even when the portal is running against dev/staging data. Dev testing must therefore have a one-company creation mode.
 
-3. **Welcome dispatcher** (`lib/investor-group-welcome.js` + scheduled job)
-   - Polls `company_investor_groups` for `welcome_sent_at IS NULL AND welcome_scheduled_for <= now()` (uses the partial index above).
-   - Renders the welcome template (variables: company name, group address) and sends via the existing transactional mail path; uses the per-job idempotency-key pattern already used by other senders (key = `welcome:<company_record_id>`).
-   - Stamps `welcome_sent_at` on success; logs and retries with backoff on transient failures.
-   - Runs on the same scheduler as other portal jobs — interval ≤ 1 min so the worst-case actual delay is ~5–6 min.
+Recommended guardrail:
 
-4. **Routes**
-   - `GET /api/companies/:id/investor-group` → `{ exists, groupEmail, memberCount, lastSyncedAt, eligibleInvestorCount, welcomeSentAt, welcomeScheduledFor }`.
-   - `POST /api/companies/:id/investor-group` → manual provision.
-   - `POST /api/companies/:id/investor-group/sync` → re-sync members on demand (admin only).
-   - `POST /api/admin/companies/:id/investor-group/send-welcome` → fire the welcome immediately (admin override).
-   - `GET /api/admin/companies/:id/investor-group/members` → admin-only roster.
-   - `POST /api/admin/companies/:id/investor-group/members` `{ email }` → manual add.
-   - `DELETE /api/admin/companies/:id/investor-group/members/:email` → manual remove.
-   - `DELETE /api/admin/companies/:id/investor-group` → delete group entirely.
-   - Member-facing read endpoint embedded in the existing investments listing payload (one extra join — no separate roundtrip).
+- In non-production environments, block every Google Group create/rename/alias mutation unless the target company record ID matches an explicit allowlist.
+- Configure that allowlist with a single company at a time, for example `COMPANY_CHAT_GROUP_DEV_COMPANY_RECORD_ID=<company_record_id>`.
+- Require a second explicit enable flag before any non-production Google mutation, for example `COMPANY_CHAT_GROUP_DEV_ALLOW_GOOGLE_MUTATIONS=true`.
+- If the flag or company record ID is missing, dev/staging can render UI, calculate expected addresses, preview expected members, and update local mock state, but must not create or mutate a real Google Group.
+- If a dev/staging action targets any company other than the selected company, return a clear blocked response that names the configured company record ID requirement.
+- Just-in-time group creation, admin "create missing alias", updates-processor forwarding creation, and backfill creation must all use the same guard.
+- Nightly reconciliation in dev/staging may read existing Google Group membership for the selected company only. It must not create missing groups for all companies.
 
-5. **Frontend**
-   - Reusable `<InvestorGroupChip companyId={...} />` used in the portfolio header and the investments table cell.
-   - Reusable `<InvestorGroupCreateDialog />` (alert-dialog pattern from design guide §2.13 — plain `Button`, manual close).
-   - Manage-members panel includes the welcome status strip and "Send welcome now" button.
-   - Tooltip via `ourtooltip` shorthand with `delayDuration={0}`.
+Dev smoke-test command shape:
 
-6. **Tests** (per AGENTS.md test-first rule)
-   - Unit: slug generation, collision handling, threshold logic (1 → no group, 2 → group), debounce-bump logic (each add resets the timer; bump is a no-op once `welcome_sent_at` is set).
-   - Route: provisioning idempotency, permission gating, missing-email handling, send-welcome override.
-   - Integration: deployment write triggers sync; second deployment for same company adds the new investor; **batch deployment scenario** (3 deployments inside the 5-min window) sends exactly one welcome that includes all 3 investors.
+```bash
+node scripts/backfill-company-chat-groups.js --company=<company_record_id> --dry-run
+COMPANY_CHAT_GROUP_DEV_ALLOW_GOOGLE_MUTATIONS=true COMPANY_CHAT_GROUP_DEV_COMPANY_RECORD_ID=<company_record_id> node scripts/backfill-company-chat-groups.js --company=<company_record_id> --create
+```
 
----
+The second command should create or repair only that one company list. It should refuse to run if `--company` is omitted or does not match `COMPANY_CHAT_GROUP_DEV_COMPANY_RECORD_ID`.
 
-## Open questions for the team
+## Implementation Phases
 
-1. **Domain confirmation.** Are we OK with `e8angels.com` as the group domain? (Service account must have admin SDK delegation for that workspace; confirm it does.)
-2. **Member-facing visibility.** Should members see the chip on companies *they* didn't invest in (so they could ask to be added), or only on their own holdings? Mockup shows the latter.
-3. **Investor email source.** Use the person's primary work email, or a preference field if one exists? Need to confirm there is one canonical "communications" email per person.
-4. **Sender-anonymity expectation.** Confirm the team understands that recipients see the sender's address (group privacy ≠ post privacy). Tooltip wording reflects this — adjust if you want a different framing.
-5. **Renaming.** If a company is renamed post-creation, do we want to (a) keep old slug forever, (b) create a Google alias on the new slug, or (c) rename the group? (a) is the simplest and what's drafted.
+### Phase 1: Foundations
+
+- Add schema, docs, cache-manager module, and Google Groups service wrapper.
+- Implement create group, apply settings, add/remove/list members, rename group, create alias.
+- Implement Support Manager alert emails for collisions, failed creation, failed rename, and missing alias repair.
+- Implement non-production Google mutation guardrails so dev/staging can create or repair only one explicitly selected company list.
+- Add unit tests for slugging, collision alerting, expected membership, opt-outs, self-join, admin-add, rename/alias behavior, and idempotency.
+
+### Phase 2: Member Experience
+
+- Add company-page discussion group affordance visible to portal users.
+- Add investment-table controls that show email, join/leave state, and member count.
+- Add Company Discussion Groups tile to the member/profile page, modeled on the investments tile with a bounded scroll table.
+- Add self-join and leave-list flows.
+- Add just-in-time group creation for missing portfolio groups.
+
+### Phase 3: Admin Console
+
+- Add `Manage -> Company -> Chats` below Leads.
+- Build admin table, kebab row actions, delete confirmation modal, and roster slide-out.
+- Add create missing alias, create group, add member, and remove member flows.
+- Add route tests for admin permission gating and membership operations.
+
+### Phase 4: Reconciliation
+
+- Add nightly reconciliation job using the existing scheduled-job mechanism.
+- Schedule it once per day at night, avoiding existing scheduled jobs.
+- Refresh local current-membership mirror and counts from Google Group membership.
+- Surface reconciliation failures as current issues, not history.
+
+### Phase 5: Backfill
+
+- Add dry-run/backfill script.
+- Run staging dry run and review output.
+- Run one production backfill after explicit approval.
+
+### Phase 6: Updates Processor
+
+- Extend `updates@e8angels.com` processing to forward company-relevant updates to the company's discussion group.
+- Preserve HTML body, text fallback, metadata, inline content, and attachments.
+- Add tests for matched company forwarding, missing group just-in-time creation, attachment forwarding, and no-match behavior.
+
+## Tests
+
+Required tests for implementation:
+
+- Slug generation and collision alert behavior.
+- Google settings payload builder, including `ANYONE_CAN_POST` and `INVITED_CAN_JOIN`.
+- Expected member calculation for investors and canonical diligence team members.
+- Roster source badge calculation, including multiple badges for the same person.
+- Diligence-team addition triggers sync after the group exists.
+- Opt-out prevents auto-readd after later deployment, including a second investment.
+- Self-join removes opt-out and adds the `Self-add` source.
+- Admin add can override opt-out and adds the `Admin-add` source.
+- Member summary returns address, count, and current user's membership state but not roster.
+- Admin-only roster endpoint rejects non-admin users.
+- Backfill dry run does not mutate data.
+- Non-production Google mutation guard rejects broad create/rename/alias actions and permits only the explicitly selected company when the dev enable flag is set.
+- Deployment write triggers sync for pre-existing group.
+- Missing portfolio-company group is created just in time.
+- Rename changes primary group email and creates old-address alias.
+- Collision sends Support Manager alert and does not create a silent alternate address.
+- Nightly reconciliation refreshes local membership from Google Groups.
+- Nightly reconciliation preserves source badges derivable from portal data.
+- Updates processor forwards full HTML and attachments to the company address and discussion group.
+
+## Clarifying Questions
+
+1. What exact system field/table is the canonical diligence-team list for a company?
+2. Who is the Support Manager email recipient for collision/repair alerts?
+3. What is "the email address relevant to the company" in the updates workflow: primary contact, company owner, deal lead, or an existing processor target?
+4. Should people who self-join receive a confirmation email, or is the immediate joined state in the portal enough?
+5. What nightly time window is currently clear of other scheduled jobs?
+
+## Design Guide Compliance
+
+- Form layout: Pass. Member actions use compact controls and avoid long forms.
+- Control sizing/spacing: Pass. Buttons and row actions are compact and content-width.
+- Table density, paging, and sticky-header behavior: Pass. Admin table is dense and should paginate when 50+ rows.
+- Search input icon/text spacing: Pass. Mockups reserve left padding where search icons appear.
+- Dialog/copy minimalism: Pass. Self-join/leave copy is short and action-focused.
+- Mobile behavior: Pass in concept. Member widget stacks on mobile; admin detail drawer moves below the table.
