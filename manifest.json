@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-31T17:26:57+00:00",
+  "generated": "2026-06-05T23:57:16+00:00",
   "plans": [
     {
       "slug": "Live-Chat-Codex",
@@ -226,20 +226,30 @@
     },
     {
       "slug": "per-company-investor-groups",
-      "title": "Per-Company Investor Google Groups",
+      "title": "Company Discussion Groups",
       "status": "draft",
       "owner": "jordan",
       "created": "2026-05-16",
-      "last_updated": "2026-05-16",
+      "last_updated": "2026-06-05",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38Z",
+      "last_changed_at": "2026-06-05T16:53:48-07:00",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
         {
+          "name": "admin-console",
+          "path": "per-company-investor-groups/admin-console.html",
+          "is_home": false
+        },
+        {
+          "name": "member-experience",
+          "path": "per-company-investor-groups/member-experience.html",
+          "is_home": true
+        },
+        {
           "name": "mockup",
           "path": "per-company-investor-groups/mockup.html",
-          "is_home": true
+          "is_home": false
         }
       ]
     },
