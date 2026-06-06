@@ -1,5 +1,6 @@
 # Changelog — Per-Company Investor Google Groups
 
+- 2026-06-06 — jordan — Added a detailed execution plan with subagent handoff checklists, shared contracts, validation steps, and rollout criteria.
 - 2026-06-05 — jordan — Added dev testing safety guardrails so non-production can create or repair only one explicitly selected real Google Workspace group.
 - 2026-06-05 — jordan — Simplified Manage -> Company -> Chats table to company, compact group email, members, sources, and kebab actions; row clicks now open a roster slide-out and Delete shows a confirmation modal.
 - 2026-06-05 — jordan — Removed admin UI for reconciliation and Google group settings; reconciliation uses existing scheduled-job UI and settings are hardcoded in code.

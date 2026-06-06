@@ -3,7 +3,7 @@ title: "Company Discussion Groups"
 status: draft
 owner: jordan
 created: 2026-05-16
-last_updated: 2026-06-05
+last_updated: 2026-06-06
 home: member-experience
 ---
 
@@ -42,6 +42,7 @@ Example: `emerald-battery-labs-chat@e8angels.com`.
 - [Member experience](member-experience.html): company page, investment table, self-join, and the member/profile widget.
 - [Admin console](admin-console.html): `Manage -> Company -> Chats`, current roster, source badges, and repair alias creation.
 - [Overview](mockup.html): compact entry page linking the variants.
+- [Execution plan](execution-plan.md): implementation checklist and subagent handoff plan.
 
 ## Core UX Decisions
 
