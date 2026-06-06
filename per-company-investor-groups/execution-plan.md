@@ -288,6 +288,8 @@ Work items:
 - [ ] Allow admin-add to clear/override opt-out.
 - [ ] Implement `syncCompanyDiscussionGroup(companyRecordId, { trigger, actorEmail })`.
 - [ ] Trigger sync after new deployment creation.
+- [ ] When a person becomes an investor through a deployment write, add them to the company's Google Group and local current-membership mirror after the deployment commit succeeds, unless they previously opted out.
+- [ ] If the investor deployment is the first event that needs the group and the company is a portfolio company, create the company Google Group just in time before adding the investor.
 - [ ] Trigger sync after canonical diligence-team add/remove/change.
 - [ ] Trigger sync after company rename.
 - [ ] Trigger just-in-time create when a portfolio company group is missing.
@@ -301,6 +303,9 @@ Validation:
 - [ ] Unit test opt-out after second investment.
 - [ ] Unit test self-join and admin-add opt-out override.
 - [ ] Integration test deployment write triggers sync for existing group.
+- [ ] Integration test a new investor deployment adds that investor to the Google Group and local current-membership mirror when they have not opted out.
+- [ ] Integration test a new investor deployment creates the missing company group just in time and then adds the investor.
+- [ ] Integration test a new investor deployment does not readd an investor who previously opted out.
 - [ ] Integration test diligence-team addition triggers sync.
 
 Output:
@@ -559,6 +564,7 @@ Work items:
 - [ ] Verify broad dev/staging group creation is blocked.
 - [ ] Verify no member-facing API exposes roster names/emails.
 - [ ] Verify Google group can receive email from a non-member sender.
+- [ ] Verify a newly created deployment automatically adds the investor to the company's Google Group and local current-membership mirror.
 - [ ] Verify portal Leave removes Google membership and records opt-out.
 - [ ] Verify later deployment does not readd opted-out member.
 - [ ] Verify self-join can add the user back.
@@ -594,6 +600,8 @@ Dependencies:
 - [ ] Address is visible on company page, investments table, and member/profile widget.
 - [ ] Member can send email via `mailto`.
 - [ ] Member can join without approval.
+- [ ] When someone becomes an investor in a company, they are automatically added to that company's discussion group unless they previously opted out.
+- [ ] If that company's discussion group does not exist yet, the investor-triggered sync creates it just in time and then adds the investor.
 - [ ] Member can leave and is not auto-readded after later investment.
 - [ ] Member can self-join again after leaving.
 - [ ] Admin can add member.

@@ -365,6 +365,7 @@ await syncCompanyDiscussionGroup(companyRecordId, { trigger, actorEmail });
 Use it from:
 
 - Deployment write path, after the deployment commit succeeds.
+- Investor creation path: when someone becomes an investor in a company, add them to that company's discussion group after the investment/deployment commit succeeds, unless they previously opted out.
 - Diligence-team add/remove/change path, after the change commits.
 - Company rename path, after the name change commits.
 - Member self-join path.
@@ -526,6 +527,7 @@ Required tests for implementation:
 - Backfill dry run does not mutate data.
 - Non-production Google mutation guard rejects broad create/rename/alias actions and permits only the explicitly selected company when the dev enable flag is set.
 - Deployment write triggers sync for pre-existing group.
+- New investor deployment adds the investor to the company discussion group and local current-membership mirror unless they previously opted out.
 - Missing portfolio-company group is created just in time.
 - Rename changes primary group email and creates old-address alias.
 - Collision sends Support Manager alert and does not create a silent alternate address.
