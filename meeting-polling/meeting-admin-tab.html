@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meeting Admin Tab — Meeting Polling</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  body { background: #0b1220; }
+  .stage { display: grid; grid-template-columns: 1fr 360px; height: 100vh; }
+  .video { background: #111827; display: flex; align-items: center; justify-content: center; color: #475569; flex-direction: column; gap: 8px; }
+  .video .frame { width: 70%; aspect-ratio: 16/9; border: 1px dashed #334155; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  /* dark side panel mirroring MeetingPlaybackIsland */
+  .side { background: #0f172a; border-left: 1px solid #1e293b; display: flex; flex-direction: column; }
+  .tabs { display: flex; gap: 2px; border-bottom: 1px solid #1e293b; background: #0b1220; padding: 0 8px; }
+  .tab { border: none; background: none; color: #64748b; font-size: 12px; font-weight: 600; padding: 12px 10px; border-bottom: 2px solid transparent; cursor: pointer; }
+  .tab.active { color: #fff; border-bottom-color: #14b8a6; }
+  .side-body { padding: 14px; overflow-y: auto; color: #cbd5e1; }
+  .admin-sec { background: #111c33; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+  .admin-sec h4 { margin: 0 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; }
+  .admin-sec .sub { font-size: 12px; color: #64748b; margin: 0 0 10px; }
+  .dk-select { width: 100%; background: #0b1220; border: 1px solid #334155; color: #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: 13px; }
+  .dk-row { display: flex; gap: 8px; align-items: center; }
+  .dk-chip { display: inline-flex; align-items: center; gap: 6px; background: #0b1220; border: 1px solid #334155; color: #e2e8f0; border-radius: 8px; padding: 5px 10px; font-size: 12px; }
+  .teal-solid { background: #0f766e; color: #fff; border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .teal-solid:hover { background: #115e59; }
+  .pill-live { background: rgba(20,184,166,.15); color: #5eead4; border: 1px solid #134e4a; border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+  .resp-count { font-size: 28px; font-weight: 700; color: #fff; }
+  .danger-solid { background: transparent; border: 1px solid #7f1d1d; color: #fca5a5; border-radius: 8px; padding: 8px 12px; font-size: 13px; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="video">
+    <div class="frame">Zoom video — TerraBlock Materials · Decarbon8 Pitch</div>
+    <div style="font-size:12px">/meeting/terrablock-materials-decarbon8-pitch-2026-06-08/live</div>
+  </div>
+
+  <div class="side">
+    <div class="tabs">
+      <button class="tab">Agenda</button>
+      <button class="tab">Chat</button>
+      <button class="tab">Company Q&amp;A</button>
+      <button class="tab active">Admin</button>
+    </div>
+    <div class="side-body">
+
+      <!-- Company Q&A admin (moved here from the Company Q&A panel) -->
+      <div class="admin-sec">
+        <h4>Company Q&amp;A</h4>
+        <p class="sub">Focus the audience Q&amp;A on a company, then release.</p>
+        <div class="dk-row">
+          <select class="dk-select"><option>TerraBlock Materials</option><option>Helio Grid</option><option>Verdant Foods</option></select>
+          <button class="teal-solid">Release</button>
+        </div>
+        <div style="margin-top:12px">
+          <div style="font-size:12px;color:#94a3b8;margin-bottom:6px">Moderators (2)</div>
+          <div class="dk-row wrap" style="flex-wrap:wrap">
+            <span class="dk-chip">Dana Okafor ✕</span>
+            <span class="dk-chip">Lee Tran ✕</span>
+            <span class="dk-chip" style="border-style:dashed;color:#64748b">+ Add moderator</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Poll admin (new) -->
+      <div class="admin-sec">
+        <h4>Poll Admin</h4>
+        <p class="sub">Release a poll to everyone on this page.</p>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:8px">Active poll: <strong style="color:#e2e8f0">Member Meeting Poll</strong> <span style="color:#64748b">· change</span></div>
+        <div class="dk-row">
+          <select class="dk-select"><option>TerraBlock Materials</option><option>Helio Grid</option><option>Verdant Foods</option></select>
+          <button class="teal-solid">Release poll</button>
+        </div>
+      </div>
+
+      <!-- Released state -->
+      <div class="admin-sec" style="border-color:#134e4a">
+        <div class="flex between center-y">
+          <h4 style="margin:0">Poll live</h4>
+          <span class="pill-live">● LIVE</span>
+        </div>
+        <p class="sub" style="margin-top:6px">Member Meeting Poll · <strong style="color:#cbd5e1">TerraBlock Materials</strong></p>
+        <div class="flex between center-y" style="margin-top:6px">
+          <div><span class="resp-count">23</span> <span style="font-size:12px;color:#64748b">responses</span></div>
+          <button class="danger-solid">Close poll</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

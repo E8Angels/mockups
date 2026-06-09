@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Poll Results — June 2026</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  .co-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--card-border); margin-bottom: 0; }
+  .co-tab { border: 1px solid var(--card-border); border-bottom: none; background: #f8fafc; color: var(--text-muted); padding: 9px 16px; border-radius: 10px 10px 0 0; cursor: pointer; font-size: 13px; font-weight: 600; }
+  .co-tab.active { background: #fff; color: var(--text); border-color: var(--card-border); position: relative; top: 1px; }
+  .results-card { border-top-left-radius: 0; }
+  .scroll { overflow-x: auto; }
+
+  .sheet { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .sheet th, .sheet td { border: 1px solid #e5e7eb; padding: 8px 10px; text-align: left; vertical-align: top; }
+  .sheet thead th { background: #f1f5f9; font-size: 11px; font-weight: 700; color: #334155; position: sticky; top: 0; z-index: 2; }
+  .sheet thead th.q { min-width: 150px; }
+  .sheet td.name { font-weight: 600; white-space: nowrap; }
+  .sheet tbody tr:nth-child(even) { background: #fafafa; }
+
+  /* sortable header */
+  th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+  th.sortable:hover { background: #e8edf3; }
+  th .th-inner { display: flex; align-items: center; gap: 6px; justify-content: space-between; }
+  th .arrow { color: var(--text-subtle); font-size: 10px; }
+  th.sort-asc .arrow, th.sort-desc .arrow { color: var(--teal); }
+  th.sort-asc .arrow::after { content: "▲"; }
+  th.sort-desc .arrow::after { content: "▼"; }
+  th.sortable:not(.sort-asc):not(.sort-desc) .arrow::after { content: "↕"; }
+
+  /* filter row */
+  tr.filter-row th { background: #fff; position: sticky; top: 30px; z-index: 1; padding: 6px 8px; }
+  .fctl { width: 100%; border: 1px solid var(--card-border); border-radius: 6px; padding: 5px 7px; font-size: 11.5px; font-family: inherit; background: #fff; color: var(--text); }
+  .fctl:focus { outline: none; border-color: var(--teal-ring); box-shadow: 0 0 0 2px rgba(20,184,166,.15); }
+
+  .tag { display: inline-block; background: var(--chip-blue-bg); border: 1px solid var(--chip-blue-border); color: var(--chip-blue-text); border-radius: 999px; padding: 1px 7px; font-size: 11px; margin: 1px 2px 1px 0; }
+  .yes { color: var(--ok); font-weight: 600; } .no { color: var(--text-muted); }
+
+  .summary { display:flex; gap: 18px; margin-bottom: 14px; align-items: center; }
+  .stat { background:#fff;border:1px solid var(--card-border);border-radius:12px;padding:10px 16px; }
+  .stat .n { font-size: 22px; font-weight: 700; } .stat .l { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+  .toolbar { display: flex; align-items: center; gap: 10px; margin: 12px 0; }
+  .shown-count { font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="nav">
+  <div class="brand"><span class="brand-logo"></span> E8 Portal</div>
+  <div class="links"><a href="index.html">Mockups</a><a href="pipeline-committee.html">Pipeline Committee</a><a class="active">Poll Results</a></div>
+  <div class="me">JS</div>
+</div>
+<div class="page">
+  <div class="breadcrumb"><a href="pipeline-committee.html">Pipeline Committee</a> › Poll Results</div>
+  <h1 class="page-title">Member Meeting Poll Results — June 2026</h1>
+  <p class="page-sub">Member meeting · June 8, 2026 · 3 companies pitched</p>
+
+  <div class="summary">
+    <div class="stat"><div class="n">68</div><div class="l">Total responses</div></div>
+    <div class="stat"><div class="n">31</div><div class="l">Unique members</div></div>
+    <div class="stat"><div class="n">3</div><div class="l">Companies</div></div>
+  </div>
+
+  <div class="co-tabs">
+    <div class="co-tab active" onclick="setTab(this)">TerraBlock Materials</div>
+    <div class="co-tab" onclick="setTab(this)">Helio Grid</div>
+    <div class="co-tab" onclick="setTab(this)">Verdant Foods</div>
+  </div>
+
+  <div class="card results-card">
+    <div class="toolbar">
+      <span class="shown-count" id="shownCount">Showing 5 of 5 responders</span>
+      <span class="uc-spacer" style="flex:1"></span>
+      <button class="btn ghost-btn" onclick="clearFilters()">Clear filters</button>
+    </div>
+    <div class="scroll">
+      <table class="sheet" id="sheet">
+        <thead>
+          <tr>
+            <th class="sortable" data-type="text"    onclick="sortBy(0,this)"><span class="th-inner">Name <span class="arrow"></span></span></th>
+            <th class="sortable" data-type="text"    onclick="sortBy(1,this)"><span class="th-inner">Role(s) <span class="arrow"></span></span></th>
+            <th class="sortable q" data-type="num"    onclick="sortBy(2,this)"><span class="th-inner">Follow-up meeting? <span class="arrow"></span></span></th>
+            <th class="sortable q" data-type="num"    onclick="sortBy(3,this)"><span class="th-inner">Interested in diligence? <span class="arrow"></span></span></th>
+            <th class="sortable q" data-type="num"    onclick="sortBy(4,this)"><span class="th-inner">Likelihood to invest $10,000 <span class="arrow"></span></span></th>
+            <th class="sortable q" data-type="num"    onclick="sortBy(5,this)"><span class="th-inner">Aspects driving the answer <span class="arrow"></span></span></th>
+          </tr>
+          <tr class="filter-row">
+            <th><input class="fctl" data-col="0" type="text" placeholder="Filter name…" oninput="applyFilters()" autocomplete="off"></th>
+            <th>
+              <select class="fctl" data-col="1" onchange="applyFilters()">
+                <option value="">All roles</option><option>Member</option><option>Corporate Member</option><option>Investor</option>
+              </select>
+            </th>
+            <th>
+              <select class="fctl" data-col="2" onchange="applyFilters()"><option value="">All</option><option>Yes</option><option>No</option></select>
+            </th>
+            <th>
+              <select class="fctl" data-col="3" onchange="applyFilters()"><option value="">All</option><option>Yes</option><option>No</option></select>
+            </th>
+            <th>
+              <select class="fctl" data-col="4" onchange="applyFilters()"><option value="">All</option><option>Not at all</option><option>Maybe</option><option>Likely</option><option>—</option></select>
+            </th>
+            <th>
+              <select class="fctl" data-col="5" onchange="applyFilters()">
+                <option value="">All aspects</option>
+                <option>Personal Investment Focus</option><option>Technical Validation</option><option>Team</option><option>Traction</option>
+                <option>Competitive Advantage</option><option>GTM</option><option>Valuation</option><option>Return Potential</option>
+              </select>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- data-filter = lowercase searchable text; data-sort = numeric rank for ordinal cols -->
+          <tr>
+            <td class="name" data-filter="maria pino" data-sort="maria pino">Maria Pino</td>
+            <td data-filter="member"><span class="tag">Member</span></td>
+            <td class="yes" data-filter="yes" data-sort="2">Yes</td>
+            <td class="yes" data-filter="yes" data-sort="2">Yes</td>
+            <td data-filter="likely" data-sort="3">Likely</td>
+            <td data-filter="team traction return potential" data-sort="3"><span class="tag">Team</span><span class="tag">Traction</span><span class="tag">Return Potential</span></td>
+          </tr>
+          <tr>
+            <td class="name" data-filter="raj khanna" data-sort="raj khanna">Raj Khanna</td>
+            <td data-filter="member investor"><span class="tag">Member</span><span class="tag">Investor</span></td>
+            <td class="yes" data-filter="yes" data-sort="2">Yes</td>
+            <td class="no" data-filter="no" data-sort="1">No</td>
+            <td data-filter="maybe" data-sort="2">Maybe</td>
+            <td data-filter="technical validation competitive advantage" data-sort="2"><span class="tag">Technical Validation</span><span class="tag">Competitive Advantage</span></td>
+          </tr>
+          <tr>
+            <td class="name" data-filter="erin webb" data-sort="erin webb">Erin Webb</td>
+            <td data-filter="corporate member"><span class="tag">Corporate Member</span></td>
+            <td class="no" data-filter="no" data-sort="1">No</td>
+            <td class="no" data-filter="no" data-sort="1">No</td>
+            <td class="muted" data-filter="—" data-sort="0">—</td>
+            <td data-filter="valuation" data-sort="1"><span class="tag">Valuation</span></td>
+          </tr>
+          <tr>
+            <td class="name" data-filter="lee tran" data-sort="lee tran">Lee Tran</td>
+            <td data-filter="member"><span class="tag">Member</span></td>
+            <td class="yes" data-filter="yes" data-sort="2">Yes</td>
+            <td class="yes" data-filter="yes" data-sort="2">Yes</td>
+            <td data-filter="likely" data-sort="3">Likely</td>
+            <td data-filter="personal investment focus team gtm" data-sort="3"><span class="tag">Personal Investment Focus</span><span class="tag">Team</span><span class="tag">GTM</span></td>
+          </tr>
+          <tr>
+            <td class="name" data-filter="jordan schwartz" data-sort="jordan schwartz">Jordan Schwartz</td>
+            <td data-filter="member investor"><span class="tag">Member</span><span class="tag">Investor</span></td>
+            <td class="yes" data-filter="yes" data-sort="2">Yes</td>
+            <td class="yes" data-filter="yes" data-sort="2">Yes</td>
+            <td data-filter="maybe" data-sort="2">Maybe</td>
+            <td data-filter="traction competitive advantage return potential" data-sort="3"><span class="tag">Traction</span><span class="tag">Competitive Advantage</span><span class="tag">Return Potential</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="hint">Click a column header to sort (toggles ascending ▲ / descending ▼). Use the filter row to narrow by any column — text match on Name, role/answer match on the rest. Yes/No and likelihood sort by rank, not alphabetically. Empty cell = question not shown to / answered by that member.</p>
+</div>
+
+<script>
+  function setTab(el){document.querySelectorAll('.co-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');}
+
+  const tbody = () => document.querySelector('#sheet tbody');
+  const rows  = () => Array.from(tbody().querySelectorAll('tr'));
+
+  function applyFilters(){
+    const filters = Array.from(document.querySelectorAll('.fctl')).map(c => ({col:+c.dataset.col, val:c.value.trim().toLowerCase()}));
+    let shown = 0;
+    rows().forEach(tr => {
+      const cells = tr.children;
+      const ok = filters.every(f => {
+        if(!f.val) return true;
+        const cellText = (cells[f.col].dataset.filter || cells[f.col].textContent).toLowerCase();
+        // text input (col 0) = substring; selects = contains the chosen token
+        return cellText.includes(f.val);
+      });
+      tr.style.display = ok ? '' : 'none';
+      if(ok) shown++;
+    });
+    document.getElementById('shownCount').textContent = `Showing ${shown} of ${rows().length} responders`;
+  }
+
+  function clearFilters(){
+    document.querySelectorAll('.fctl').forEach(c => { c.value=''; });
+    applyFilters();
+  }
+
+  let sortState = { col:null, dir:1 };
+  function sortBy(col, th){
+    const type = th.dataset.type;
+    sortState.dir = (sortState.col === col) ? -sortState.dir : 1;
+    sortState.col = col;
+    document.querySelectorAll('th.sortable').forEach(h => h.classList.remove('sort-asc','sort-desc'));
+    th.classList.add(sortState.dir === 1 ? 'sort-asc' : 'sort-desc');
+
+    const sorted = rows().sort((a,b) => {
+      const av = a.children[col].dataset.sort ?? a.children[col].textContent;
+      const bv = b.children[col].dataset.sort ?? b.children[col].textContent;
+      let cmp;
+      if(type === 'num') cmp = (parseFloat(av)||0) - (parseFloat(bv)||0);
+      else cmp = String(av).localeCompare(String(bv));
+      return cmp * sortState.dir;
+    });
+    sorted.forEach(r => tbody().appendChild(r));
+  }
+</script>
+</body>
+</html>

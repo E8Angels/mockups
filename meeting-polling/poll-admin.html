@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Poll Management — Meeting Polling</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  .editor-grid { display: grid; grid-template-columns: 1fr 320px; gap: 18px; align-items: start; }
+  .q-type-tag { font-family: ui-monospace, monospace; }
+  .qe-options { margin-top: 10px; }
+  .qe-option { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .qe-option .input { flex: 1; }
+  .toggle { width: 38px; height: 22px; border-radius: 999px; background: var(--teal); position: relative; cursor: pointer; flex-shrink: 0; }
+  .toggle::after { content: ""; position: absolute; top: 2px; left: 18px; width: 18px; height: 18px; border-radius: 999px; background: #fff; transition: left .12s; }
+  .toggle.off { background: #cbd5e1; } .toggle.off::after { left: 2px; }
+  .calendar-toolbar { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--card-border); border-radius: 12px; background: #fff; margin-bottom: 18px; }
+  .uc-spacer { flex: 1; }
+  details.adv { border: 1px solid var(--card-border); border-radius: 10px; padding: 0 12px; margin-top: 8px; }
+  details.adv summary { cursor: pointer; padding: 10px 0; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+  details.adv[open] { padding-bottom: 12px; }
+</style>
+</head>
+<body>
+<div class="nav">
+  <div class="brand"><span class="brand-logo"></span> E8 Portal</div>
+  <div class="links"><a>Calendar</a><a class="active">Polls</a><a>Committees</a></div>
+  <div class="me">JS</div>
+</div>
+
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Mockups</a> › <a>Admin</a> › Polls</div>
+
+  <!-- Reference: where the entry-point button lives on /admin/calendar -->
+  <div class="note" style="margin-bottom:14px">
+    Entry point on <code>/admin/calendar</code> — a <strong>Polls</strong> button sits to the left of <strong>Add calendar item</strong>:
+  </div>
+  <div class="calendar-toolbar">
+    <span class="badge badge-gray">Month</span><span class="badge badge-gray">Week</span><span class="badge badge-gray">Table</span>
+    <span class="uc-spacer"></span>
+    <button class="btn ghost-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg> Filters</button>
+    <button class="btn ghost-btn" style="border-color:var(--teal);color:var(--teal)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Polls</button>
+    <button class="btn pri-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add calendar item</button>
+  </div>
+
+  <h1 class="page-title">Polls</h1>
+  <p class="page-sub">Build reusable polls and release them during live meetings.</p>
+
+  <!-- POLLS LIST -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">All polls</div>
+      <button class="btn pri-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> New poll</button>
+    </div>
+    <table class="data">
+      <thead><tr><th>Name</th><th>Questions</th><th>Designation</th><th>Updated</th><th class="right">Actions</th></tr></thead>
+      <tbody>
+        <tr class="clickable" onclick="document.getElementById('editor').scrollIntoView({behavior:'smooth'})">
+          <td><strong>Member Meeting Poll</strong></td>
+          <td>4</td>
+          <td><span class="badge badge-teal">★ Member Meeting Poll</span></td>
+          <td class="muted">Jun 6, 2026</td>
+          <td class="right"><button class="link-btn">Edit</button> · <button class="link-btn">Duplicate</button></td>
+        </tr>
+        <tr class="clickable">
+          <td><strong>Deep-Dive Diligence Survey</strong></td>
+          <td>7</td>
+          <td class="muted">—</td>
+          <td class="muted">May 28, 2026</td>
+          <td class="right"><button class="link-btn">Edit</button> · <button class="link-btn">Duplicate</button></td>
+        </tr>
+        <tr class="clickable">
+          <td><strong>Sourcing Pulse Check</strong></td>
+          <td>3</td>
+          <td class="muted">—</td>
+          <td class="muted">May 12, 2026</td>
+          <td class="right"><button class="link-btn">Edit</button> · <button class="link-btn">Duplicate</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- POLL EDITOR -->
+  <h2 class="page-title" id="editor" style="font-size:20px;margin-top:30px">Edit poll</h2>
+  <div class="editor-grid">
+    <div>
+      <div class="card">
+        <label class="field"><span>Poll name</span><input class="input" value="Member Meeting Poll"></label>
+        <div class="flex center-y gap-12" style="margin-bottom:4px">
+          <div class="toggle" onclick="this.classList.toggle('off')"></div>
+          <div><div style="font-weight:600">Member Meeting Poll</div><div class="hint mt-0">The poll released by default at member meetings. Only one poll can hold this.</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Questions <span class="muted" style="font-weight:400">· drag to reorder</span></div>
+          <button class="btn ghost-btn" onclick="document.getElementById('qeditor').scrollIntoView({behavior:'smooth'})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add question</button>
+        </div>
+
+        <div id="qlist">
+          <div class="q-row" draggable="true">
+            <div class="drag-handle">⋮⋮</div>
+            <div class="q-main">
+              <div class="q-label">Should we invite you to a follow-up meeting with <span class="token">{company}</span>?</div>
+              <div class="q-meta"><span class="badge badge-gray">Radio</span><span class="badge badge-gray">Yes / No</span><span class="badge badge-amber">Required</span></div>
+            </div>
+            <button class="icon-btn">✎</button>
+          </div>
+
+          <div class="q-row" draggable="true">
+            <div class="drag-handle">⋮⋮</div>
+            <div class="q-main">
+              <div class="q-label">Are you interested in participating in diligence?</div>
+              <div class="q-meta"><span class="badge badge-gray">Radio</span><span class="badge badge-gray">Yes / No</span></div>
+            </div>
+            <button class="icon-btn">✎</button>
+          </div>
+
+          <div class="q-row" draggable="true">
+            <div class="drag-handle">⋮⋮</div>
+            <div class="q-main">
+              <div class="q-label">How likely will you directly invest <span class="token">{min check size}</span> in this company?</div>
+              <div class="q-meta"><span class="badge badge-gray">Radio</span><span class="badge badge-gray">Not at all / Maybe / Likely</span></div>
+              <div class="q-cond">↳ Shown after “Are you interested in participating in diligence?” is answered</div>
+            </div>
+            <button class="icon-btn">✎</button>
+          </div>
+
+          <div class="q-row" draggable="true">
+            <div class="drag-handle">⋮⋮</div>
+            <div class="q-main">
+              <div class="q-label">Which aspects of this company made a significant contribution to your investment answer?</div>
+              <div class="q-meta"><span class="badge badge-violet">Multi-select · buttons</span><span class="badge badge-gray">8 options</span></div>
+              <div class="q-cond">↳ Shown when “How likely will you directly invest…” <strong>is&nbsp;“Likely”</strong></div>
+              <div class="q-cond">👤 Investors only · E8 Fund vintage 2026</div>
+            </div>
+            <button class="icon-btn">✎</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUESTION EDITOR (inline) -->
+      <div class="card" id="qeditor">
+        <div class="card-title" style="margin-bottom:12px">Question editor</div>
+        <label class="field"><span>Label <span class="muted" style="font-weight:400">— use {company} and {min check size} to insert live values</span></span>
+          <input class="input" value="Which aspects of this company made a significant contribution to your investment answer?"></label>
+        <label class="field"><span>Type</span>
+          <select class="input">
+            <option>Checkbox</option><option>Radio button</option>
+            <option>Multi-select — Type 1 (chips)</option><option selected>Multi-select — Type 2 (buttons)</option>
+            <option>Single-line input</option><option>Text area</option>
+          </select>
+        </label>
+
+        <div class="qe-options">
+          <span style="font-size:12px;font-weight:600;color:var(--text-muted)">Options</span>
+          <div class="qe-option"><span class="drag-handle">⋮⋮</span><input class="input" value="Personal Investment Focus"><button class="icon-btn">✕</button></div>
+          <div class="qe-option"><span class="drag-handle">⋮⋮</span><input class="input" value="Technical Validation"><button class="icon-btn">✕</button></div>
+          <div class="qe-option"><span class="drag-handle">⋮⋮</span><input class="input" value="Team"><button class="icon-btn">✕</button></div>
+          <div class="qe-option"><span class="drag-handle">⋮⋮</span><input class="input" value="Traction"><button class="icon-btn">✕</button></div>
+          <button class="link-btn">+ Add option</button>
+        </div>
+
+        <div class="flex center-y gap-8" style="margin-top:14px">
+          <div class="toggle off" onclick="this.classList.toggle('off')"></div><span>Required</span>
+        </div>
+
+        <details class="adv" open>
+          <summary>Conditional visibility</summary>
+          <label class="field"><span>Show this question only when…</span>
+            <select class="input" id="condQ" onchange="populateCondValues()">
+              <option value="">— Always show —</option>
+              <option data-opts="Yes|No">Should we invite you to a follow-up meeting with {company}?</option>
+              <option data-opts="Yes|No">Are you interested in participating in diligence?</option>
+              <option data-opts="Not at all|Maybe|Likely" selected>How likely will you directly invest {min check size} in this company?</option>
+            </select>
+          </label>
+          <div class="flex gap-8">
+            <label class="field mb-0" style="width:150px"><span>Condition</span>
+              <select class="input" id="condOp" onchange="populateCondValues()">
+                <option value="answered">has any answer</option>
+                <option value="is" selected>is</option>
+                <option value="isnot">is not</option>
+                <option value="oneof">is one of</option>
+              </select>
+            </label>
+            <label class="field mb-0" style="flex:1" id="condValWrap"><span>Answer</span>
+              <select class="input" id="condVal"></select>
+            </label>
+          </div>
+          <div class="hint">Appears only when the member’s answer to the selected question matches. Gating question must come earlier in the poll.</div>
+        </details>
+
+        <details class="adv">
+          <summary>Audience targeting</summary>
+          <label class="field"><span>Only show to roles</span>
+            <div class="chip-input"><span class="chip">Member <span class="x">✕</span></span><span class="chip">Corporate Member <span class="x">✕</span></span><span class="chip-plus">+</span></div>
+          </label>
+          <div class="flex gap-8">
+            <label class="field mb-0" style="flex:1"><span>E8 Fund family</span><select class="input"><option>Any</option><option selected>E8 Fund</option><option>Decarbon8</option></select></label>
+            <label class="field mb-0" style="flex:1"><span>Vintage</span><select class="input"><option>Any</option><option selected>2026</option><option>2025</option></select></label>
+          </div>
+          <div class="hint">Only investors in the selected fund vintage will see this question.</div>
+        </details>
+
+        <div class="flex between center-y" style="margin-top:16px">
+          <button class="btn danger-btn">Delete question</button>
+          <div class="flex gap-8"><button class="btn ghost-btn">Cancel</button><button class="btn teal-btn">Save question</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT RAIL -->
+    <div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px">Live values</div>
+        <p class="hint mt-0">Insert these tokens in any question label; members see the resolved value.</p>
+        <p style="margin:10px 0 4px"><span class="token">{company}</span> <span class="muted">→ the pitching company's name</span></p>
+        <p style="margin:0"><span class="token">{min check size}</span> <span class="muted">→ deal-terms minimum check, e.g. “$10,000”. Empty if none.</span></p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px">Tips</div>
+        <ul style="margin:0;padding-left:18px;color:var(--text-muted);font-size:13px">
+          <li>Conditional questions can only depend on an <em>earlier</em> question.</li>
+          <li>A question hidden by role/vintage targeting is skipped, not just disabled.</li>
+          <li>Reorder with the ⋮⋮ handle; order is how members see them.</li>
+        </ul>
+      </div>
+      <div class="flex gap-8" style="margin-top:4px"><button class="btn ghost-btn" style="flex:1">Cancel</button><button class="btn pri-btn" style="flex:1">Save poll</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Conditional-visibility editor: populate answer values from the gating question,
+// hide the value picker when the operator is "has any answer".
+function populateCondValues(){
+  const q = document.getElementById('condQ');
+  const op = document.getElementById('condOp').value;
+  const wrap = document.getElementById('condValWrap');
+  const val = document.getElementById('condVal');
+  const opts = (q.selectedOptions[0]?.dataset.opts || '').split('|').filter(Boolean);
+  if(!q.value || op === 'answered' || !opts.length){ wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  wrap.querySelector('span').textContent = (op === 'oneof') ? 'Answers' : 'Answer';
+  const prev = val.value;
+  val.innerHTML = opts.map(o => `<option ${o===prev?'selected':''}>${o}</option>`).join('');
+  if(!prev) val.value = 'Likely';
+}
+populateCondValues();
+
+// Minimal drag-reorder affordance for the mockup
+let dragEl=null;
+document.querySelectorAll('#qlist .q-row').forEach(row=>{
+  row.addEventListener('dragstart',()=>{dragEl=row;row.classList.add('dragging');});
+  row.addEventListener('dragend',()=>{row.classList.remove('dragging');dragEl=null;});
+  row.addEventListener('dragover',e=>{e.preventDefault();
+    const list=document.getElementById('qlist');const after=[...list.querySelectorAll('.q-row:not(.dragging)')]
+      .find(el=>e.clientY<=el.getBoundingClientRect().top+el.offsetHeight/2);
+    if(after) list.insertBefore(dragEl,after); else list.appendChild(dragEl);});
+});
+</script>
+</body>
+</html>

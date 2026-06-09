@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meeting Polling — Mockups</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  .hub-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .hub-card { display: block; text-decoration: none; color: inherit; }
+  .hub-card .card { transition: border-color .15s, box-shadow .15s; height: 100%; }
+  .hub-card:hover .card { border-color: var(--teal-ring); box-shadow: 0 6px 18px rgba(0,0,0,.06); }
+  .hub-card h3 { margin: 0 0 6px; font-size: 15px; }
+  .hub-card p { margin: 0; color: var(--text-muted); font-size: 13px; }
+  .step { font-size: 11px; font-weight: 700; color: var(--teal); letter-spacing: .04em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="nav">
+  <div class="brand"><span class="brand-logo"></span> E8 Portal</div>
+  <div class="links"><a>Calendar</a><a class="active">Meeting Polling</a><a>Committees</a></div>
+  <div class="me">JS</div>
+</div>
+<div class="page page-narrow">
+  <h1 class="page-title">Meeting Polling — Mockups</h1>
+  <p class="page-sub">Live, in-meeting polls for member meetings. Click through the flow below. See <a href="plan.md">plan.md</a> for the full spec & data model.</p>
+
+  <div class="hub-grid">
+    <a class="hub-card" href="poll-admin.html"><div class="card"><div class="step">Admin · build</div><h3>Poll management</h3><p>Polls list + editor: questions, drag-drop reorder, conditional logic, role/vintage targeting, label tokens. Entry from the <strong>Polls</strong> button on /admin/calendar.</p></div></a>
+    <a class="hub-card" href="question-types.html"><div class="card"><div class="step">Admin · reference</div><h3>Question types</h3><p>All six types, including Multi-select Type 1 (Sector Interests chips) and Type 2 (depressible option buttons).</p></div></a>
+    <a class="hub-card" href="meeting-admin-tab.html"><div class="card"><div class="step">Live · run</div><h3>Meeting Admin tab</h3><p>New Admin tab on the live (Zoom) side panel. Q&A admin moves here; Poll Admin (company picker + Release) added below.</p></div></a>
+    <a class="hub-card" href="live-poll-modal.html"><div class="card"><div class="step">Live · respond</div><h3>Live poll modal</h3><p>What every viewer sees when a poll is released — the pre-seeded Member Meeting Poll, with conditional questions revealing as you answer.</p></div></a>
+    <a class="hub-card" href="pipeline-committee.html"><div class="card"><div class="step">Results · rollup</div><h3>Pipeline Committee dashboard</h3><p>Members / Tasks / Meetings / Documents / Notes, with a Member Meeting Poll Results table where "At a Glance" sits.</p></div></a>
+    <a class="hub-card" href="poll-results-detail.html"><div class="card"><div class="step">Results · detail</div><h3>Per-meeting results</h3><p>Spreadsheet-style: company tabs across the top, one row per responder, one column per question.</p></div></a>
+  </div>
+
+  <div class="note" style="margin-top:20px">These are static mockups for design review — not wired to data. Token placeholders like <span class="token">{company}</span> are shown with sample values where a member would see them resolved.</div>
+</div>
+</body>
+</html>
