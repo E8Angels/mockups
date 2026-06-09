@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-06T05:05:16+00:00",
+  "generated": "2026-06-09T04:35:42+00:00",
   "plans": [
     {
       "slug": "Live-Chat-Codex",
@@ -170,6 +170,55 @@
           "name": "mockup",
           "path": "meeting-live-chat/mockup.html",
           "is_home": true
+        }
+      ]
+    },
+    {
+      "slug": "meeting-polling",
+      "title": "Meeting Polling",
+      "status": "draft",
+      "owner": "jordan",
+      "created": "2026-06-08",
+      "last_updated": "2026-06-08",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-06-08T21:35:32-07:00",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": [
+        {
+          "name": "index",
+          "path": "meeting-polling/index.html",
+          "is_home": true
+        },
+        {
+          "name": "live-poll-modal",
+          "path": "meeting-polling/live-poll-modal.html",
+          "is_home": false
+        },
+        {
+          "name": "meeting-admin-tab",
+          "path": "meeting-polling/meeting-admin-tab.html",
+          "is_home": false
+        },
+        {
+          "name": "pipeline-committee",
+          "path": "meeting-polling/pipeline-committee.html",
+          "is_home": false
+        },
+        {
+          "name": "poll-admin",
+          "path": "meeting-polling/poll-admin.html",
+          "is_home": false
+        },
+        {
+          "name": "poll-results-detail",
+          "path": "meeting-polling/poll-results-detail.html",
+          "is_home": false
+        },
+        {
+          "name": "question-types",
+          "path": "meeting-polling/question-types.html",
+          "is_home": false
         }
       ]
     },
