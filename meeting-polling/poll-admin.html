@@ -19,6 +19,19 @@
   details.adv { border: 1px solid var(--card-border); border-radius: 10px; padding: 0 12px; margin-top: 8px; }
   details.adv summary { cursor: pointer; padding: 10px 0; font-size: 12px; font-weight: 600; color: var(--text-muted); }
   details.adv[open] { padding-bottom: 12px; }
+  /* Investment Interest mapping */
+  .ii-map { border: 1px solid var(--card-border); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; }
+  .ii-q { font-weight: 600; margin-bottom: 4px; }
+  .ii-q .role { font-weight: 400; }
+  .ii-rows { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .ii-row { display: flex; align-items: center; gap: 10px; }
+  .ii-row .opt { width: 150px; font-size: 13px; }
+  .ii-row .arrow { color: var(--text-subtle); }
+  .ii-row select { max-width: 220px; }
+  .src-likely { color: var(--ok); font-weight: 600; }
+  .src-maybe { color: var(--warn); font-weight: 600; }
+  .src-follow { color: #0369a1; font-weight: 600; }
+  .src-none { color: var(--text-subtle); }
 </style>
 </head>
 <body>
@@ -103,7 +116,7 @@
             <div class="drag-handle">⋮⋮</div>
             <div class="q-main">
               <div class="q-label">Should we invite you to a follow-up meeting with <span class="token">{company}</span>?</div>
-              <div class="q-meta"><span class="badge badge-gray">Radio</span><span class="badge badge-gray">Yes / No</span><span class="badge badge-amber">Required</span></div>
+              <div class="q-meta"><span class="badge badge-gray">Radio</span><span class="badge badge-gray">Yes / No</span><span class="badge badge-amber">Required</span><span class="badge badge-green">⊕ Investment Interest</span></div>
             </div>
             <button class="icon-btn">✎</button>
           </div>
@@ -121,7 +134,7 @@
             <div class="drag-handle">⋮⋮</div>
             <div class="q-main">
               <div class="q-label">How likely will you directly invest <span class="token">{min check size}</span> in this company?</div>
-              <div class="q-meta"><span class="badge badge-gray">Radio</span><span class="badge badge-gray">Not at all / Maybe / Likely</span></div>
+              <div class="q-meta"><span class="badge badge-gray">Radio</span><span class="badge badge-gray">Not at all / Maybe / Likely</span><span class="badge badge-green">⊕ Investment Interest · Source</span></div>
               <div class="q-cond">↳ Shown after “Are you interested in participating in diligence?” is answered</div>
             </div>
             <button class="icon-btn">✎</button>
@@ -138,6 +151,41 @@
             <button class="icon-btn">✎</button>
           </div>
         </div>
+      </div>
+
+      <!-- INVESTMENT INTEREST MAPPING (poll-level; shown for the Member Meeting Poll) -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Investment Interest mapping</div>
+          <span class="badge badge-green">Replaces the meeting spreadsheet import</span>
+        </div>
+        <p class="hint mt-0">When this poll is released at a member meeting, responses add members to the <strong>Investment Interest</strong> list automatically — no spreadsheet import. Map each answer of the decisive questions to an outcome. A member is added when an answer maps to a Source; <em>Don’t add</em> excludes it. If more than one question qualifies a member, the highest-priority Source wins: <span class="src-likely">Likely</span> ▸ <span class="src-maybe">Maybe</span> ▸ <span class="src-follow">Follow-up Only</span>.</p>
+
+        <div class="ii-map">
+          <div class="ii-q">How likely will you directly invest <span class="token">{min check size}</span> in this company? <span class="role muted">— Source driver</span></div>
+          <div class="ii-rows">
+            <div class="ii-row"><span class="opt">Likely</span><span class="arrow">→</span>
+              <select class="input"><option selected>Source: Likely</option><option>Source: Maybe</option><option>Source: Follow-up Only</option><option>Don’t add</option></select></div>
+            <div class="ii-row"><span class="opt">Maybe</span><span class="arrow">→</span>
+              <select class="input"><option>Source: Likely</option><option selected>Source: Maybe</option><option>Source: Follow-up Only</option><option>Don’t add</option></select></div>
+            <div class="ii-row"><span class="opt">Not at all</span><span class="arrow">→</span>
+              <select class="input"><option>Source: Likely</option><option>Source: Maybe</option><option>Source: Follow-up Only</option><option selected>Don’t add</option></select></div>
+          </div>
+        </div>
+
+        <div class="ii-map">
+          <div class="ii-q">Should we invite you to a follow-up meeting with <span class="token">{company}</span>? <span class="role muted">— adds as Follow-up Only</span></div>
+          <div class="ii-rows">
+            <div class="ii-row"><span class="opt">Yes</span><span class="arrow">→</span>
+              <select class="input"><option>Source: Likely</option><option>Source: Maybe</option><option selected>Source: Follow-up Only</option><option>Don’t add</option></select></div>
+            <div class="ii-row"><span class="opt">No</span><span class="arrow">→</span>
+              <select class="input"><option>Source: Likely</option><option>Source: Maybe</option><option>Source: Follow-up Only</option><option selected>Don’t add</option></select></div>
+          </div>
+        </div>
+
+        <button class="link-btn">+ Designate another question</button>
+
+        <div class="note" style="margin-top:12px">Resulting rule: a member is added when their likelihood is <strong>Likely</strong> or <strong>Maybe</strong>, or they ask for a follow-up. Their Source is the highest-priority match. Matches the current importer’s <code>likely</code> / <code>maybe</code> / <code>follow_up_only</code> values exactly.</div>
       </div>
 
       <!-- QUESTION EDITOR (inline) -->

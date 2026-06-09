@@ -124,6 +124,57 @@ Label text may contain:
 Token substitution happens server-side when building the live poll payload and again for
 results display, so stored responses are not affected.
 
+## 6a. Investment Interest mapping (replaces the spreadsheet import)
+
+Today, `/admin/investment-interest` has an **Import from Meeting** flow
+(`src/islands/InvestmentInterestIsland.jsx`, `routes/investment-interest.js`) that pastes
+a Google Sheet of meeting results and, per row, classifies each member into a **Source**
+and adds them to the `investment_interest` list:
+
+- Spreadsheet "Likelihood" = *likely* → `source = 'likely'`
+- "Likelihood" = *maybe* → `source = 'maybe'`
+- "Attended?"/follow-up = *yes* with no likelihood → `source = 'follow_up_only'`
+- otherwise → not added
+
+`investment_interest.source` is one of `likely | maybe | follow_up_only | manual`, and a
+member is added whenever they get any non-empty source (created with `committed = 0`).
+
+The Member Meeting Poll **replaces that import**: when the poll is released and closed for
+a company, responses feed the Investment Interest list directly. To make this work, the
+poll editor designates which questions are *decisive* via an **answer→outcome map**:
+
+- A question can be marked as feeding Investment Interest. For each of its answer options
+  the admin picks an outcome: **Source: Likely**, **Source: Maybe**, **Source: Follow-up
+  Only**, or **Don't add**.
+- **Add-to-list** = a member is added if *any* designated answer maps to a Source.
+  ("Don't add" excludes that answer.) This is the "question that determines whether the
+  person is added."
+- **Source column** = when several designated answers qualify the same member, the
+  highest-priority Source wins, using the importer's existing precedence
+  **Likely ▸ Maybe ▸ Follow-up Only**. This is the "question that feeds the Source column."
+
+A question that is purely informational (e.g. the *aspects* multi-select) is left
+unmapped and never affects the list.
+
+**Default mapping for the pre-seeded Member Meeting Poll** (reproduces the spreadsheet
+exactly):
+
+| Question | Answer | Outcome |
+|----------|--------|---------|
+| How likely will you directly invest {min check size}? | Likely | Source: Likely |
+| | Maybe | Source: Maybe |
+| | Not at all | Don't add |
+| Should we invite you to a follow-up meeting with {company}? | Yes | Source: Follow-up Only |
+| | No | Don't add |
+
+Net effect: added when likelihood is Likely/Maybe **or** they want a follow-up; Source is
+the highest-priority match. Records are created via the existing
+`cache.createInvestmentInterest()` with `application_record_id`, `member`, `member_name`,
+`company_name`, `source`, `committed = 0`, deduped on person+application (so re-running or
+re-releasing never double-adds). Surface a **preview/confirm** step on the Admin tab when
+closing the poll: "N members will be added to Investment Interest (X Likely, Y Maybe,
+Z Follow-up Only)."
+
 ## 7. Meeting live page — Admin tab
 
 On `/meeting/:slug/live` (`src/islands/MeetingPlaybackIsland.jsx`), add an **Admin** tab
@@ -214,6 +265,8 @@ poll_questions
   conditional_value (JSON, nullable),            -- the answer(s) to match (string or array)
   required_roles (JSON array, nullable),         -- role gate (§5)
   required_fund_family (nullable), required_fund_vintage (nullable),  -- vintage gate
+  investment_interest_map (JSON, nullable),      -- §6a: { "<answer>": "likely|maybe|follow_up_only" }
+                                                 --       answers absent / mapped to null = "Don't add"
   settings (JSON), created_at, updated_at
 
 poll_releases
@@ -240,7 +293,12 @@ poll_responses
   reorder (`PUT .../questions/reorder`).
 - `POST /api/meetings/:meetingId/poll/release` `{ poll_id, application_record_id }` →
   creates `poll_releases`, broadcasts on the meeting realtime channel.
-- `POST /api/meetings/:meetingId/poll/close`.
+- `POST /api/meetings/:meetingId/poll/close` — closes the release and, for the Member
+  Meeting Poll, runs the §6a Investment Interest mapping: returns a preview
+  `{ toAdd: [...], counts: {likely, maybe, follow_up_only} }`, then on confirm upserts
+  `investment_interest` rows via `cache.createInvestmentInterest()` (deduped on
+  person+application). Reuses the existing source values/labels, so the
+  `/admin/investment-interest` UI shows poll-sourced rows identically.
 - `GET /api/meetings/:meetingId/poll/active` → payload with token-substituted labels,
   audience-filtered questions for the current user.
 - `POST /api/meetings/:meetingId/poll/respond` `{ release_id, answers: [...] }`.
