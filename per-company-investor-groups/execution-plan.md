@@ -211,19 +211,32 @@ Work items:
 - [ ] Implement Google Groups service wrapper.
 - [ ] Hardcode group settings:
   - [ ] `whoCanPostMessage=ANYONE_CAN_POST`
-  - [ ] `whoCanJoin=INVITED_CAN_JOIN`
-  - [ ] `whoCanAdd=ALL_MANAGERS_CAN_ADD`
-  - [ ] `whoCanInvite=ALL_MANAGERS_CAN_INVITE`
-  - [ ] `allowExternalMembers=true`
+  - [ ] `messageModerationLevel=MODERATE_NONE`
+  - [ ] `spamModerationLevel=SILENTLY_MODERATE`
+  - [ ] `replyTo=REPLY_TO_LIST`
+  - [ ] `membersCanPostAsTheGroup=false`
+  - [ ] `allowWebPosting=true`
+  - [ ] `sendMessageDenyNotification=false`
   - [ ] `whoCanViewMembership=ALL_MANAGERS_CAN_VIEW`
   - [ ] `whoCanViewGroup=ALL_MANAGERS_CAN_VIEW`
-  - [ ] `isArchived=false`
-  - [ ] `archiveOnly=false`
-  - [ ] `messageModerationLevel=MODERATE_NONE`
-  - [ ] `spamModerationLevel=MODERATE`
-  - [ ] `replyTo=REPLY_TO_SENDER`
+  - [ ] `whoCanDiscoverGroup=ALL_MEMBERS_CAN_DISCOVER`
+  - [ ] `showInGroupDirectory=false`
   - [ ] `includeInGlobalAddressList=false`
+  - [ ] `isArchived=true`
+  - [ ] `archiveOnly=false`
+  - [ ] `whoCanJoin=INVITED_CAN_JOIN`
+  - [ ] `whoCanAdd=ALL_MEMBERS_CAN_ADD`
+  - [ ] `whoCanInvite=ALL_MEMBERS_CAN_INVITE`
   - [ ] `whoCanLeaveGroup=ALL_MEMBERS_CAN_LEAVE`
+  - [ ] `whoCanContactOwner=ALL_MEMBERS_CAN_CONTACT`
+  - [ ] `whoCanModerateMembers=ALL_MEMBERS`
+  - [ ] `whoCanModerateContent=OWNERS_AND_MANAGERS`
+  - [ ] `allowExternalMembers=true`
+  - [ ] `enableCollaborativeInbox=false`
+  - [ ] `includeCustomFooter=true`
+  - [ ] `customFooterText=To leave this list... https://app.e8angels.com/member/profile.`
+  - [ ] `primaryLanguage=en_US`
+- [ ] Add welcome email copy for reply-to-list behavior, reply-all dedupe, private roster visibility, visible From addresses, and unsubscribe paths.
 - [ ] Verify accepted Google Groups Settings API values in the E8 tenant.
 - [ ] Implement slug generation.
 - [ ] Implement collision detection and Support Manager alert.

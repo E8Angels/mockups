@@ -3,7 +3,7 @@ title: "Company Discussion Groups"
 status: draft
 owner: jordan
 created: 2026-05-16
-last_updated: 2026-06-06
+last_updated: 2026-06-09
 home: member-experience
 ---
 
@@ -274,22 +274,57 @@ These settings should be hardcoded in the Google Groups creation/configuration c
 | Setting | Value | Reason |
 |---|---|---|
 | `whoCanPostMessage` | `ANYONE_CAN_POST` | Anyone on the internet can send mail to the group address. |
-| `whoCanJoin` | `INVITED_CAN_JOIN` | Prevents Google-native self-join/request flow; portal self-join adds members by API. |
-| `whoCanAdd` | `ALL_MANAGERS_CAN_ADD` | Only managers/service account can add outside the portal flow. |
-| `whoCanInvite` | `ALL_MANAGERS_CAN_INVITE` | Keeps native invitations controlled. |
+| `whoCanJoin` | `INVITED_CAN_JOIN` | Prevents Google-native self-join/request flow; portal adds members by API. |
+| `whoCanAdd` | `ALL_MEMBERS_CAN_ADD` | Members can add other investors (e.g. a co-investor whose record lacks the right email). |
+| `whoCanInvite` | `ALL_MEMBERS_CAN_INVITE` | Same as above, native-invite path. |
+| `whoCanModerateMembers` | `ALL_MEMBERS` | Members can manage membership. **Caveat:** this also lets a member remove other members; for an investor list with small membership this is acceptable, flag if revisited. |
+| `whoCanModerateContent` | `OWNERS_AND_MANAGERS` | Only the impersonated admin (effectively the service-account owner) can approve/reject moderated content. With `spamModerationLevel: SILENTLY_MODERATE` below, the queue should stay empty. |
 | `allowExternalMembers` | `true` | Investors may use non-E8 emails. |
 | `whoCanViewMembership` | `ALL_MANAGERS_CAN_VIEW` | Hides roster from normal members. |
 | `whoCanViewGroup` | `ALL_MANAGERS_CAN_VIEW` | Keeps any Google-hosted group UI private to managers. |
-| `isArchived` | `false` | No message archive/audit requirement in the portal. |
-| `archiveOnly` | `false` | The group receives mail. |
-| `messageModerationLevel` | `MODERATE_NONE` | Keeps normal delivery simple; spam moderation still applies. |
-| `spamModerationLevel` | `MODERATE` | Sends likely spam to moderation. |
-| `replyTo` | `REPLY_TO_SENDER` | Reduces accidental full-list replies. |
-| `whoCanDiscoverGroup` | `ALL_MEMBERS_CAN_DISCOVER` or stricter tenant-supported value | Groups should not be broadly discoverable outside intended portal surfaces. |
+| `whoCanDiscoverGroup` | `ALL_MEMBERS_CAN_DISCOVER` | Most-restrictive value the API offers — non-members and the public internet cannot find the group. Portal handles discovery on our side. |
+| `showInGroupDirectory` | `false` | Not listed at groups.google.com. |
 | `includeInGlobalAddressList` | `false` | Keeps lists out of Workspace autocomplete. |
-| `whoCanLeaveGroup` | `ALL_MEMBERS_CAN_LEAVE` | Allows native unsubscribe if a member uses Google tools. |
+| `isArchived` | `true` | Keeps a member-readable archive so a late joiner can see the history (still gated by `whoCanViewGroup`). |
+| `archiveOnly` | `false` | The group receives mail. |
+| `messageModerationLevel` | `MODERATE_NONE` | Normal delivery, no manual approval. |
+| `spamModerationLevel` | `SILENTLY_MODERATE` | Google drops obvious spam silently — no moderation queue to babysit. (Switched from `MODERATE`; see "Moderation: how it actually works" below.) |
+| `replyTo` | `REPLY_TO_LIST` | This is a **chat group**, not a broadcast list — replies go back to the group by default so threads stay coherent. Members who want to whisper to the sender must change the To address by hand. See "Reply behavior" note below. |
+| `whoCanLeaveGroup` | `ALL_MEMBERS_CAN_LEAVE` | Self-service unsubscribe via `<group>+unsubscribe@` and Mail-client one-click. |
+| `membersCanPostAsTheGroup` | `false` | Prevents anyone from sending mail that appears to come from the list itself (impersonation). |
+| `enableCollaborativeInbox` | `false` | This isn't a support queue. |
+| `allowWebPosting` | `true` | Members who'd rather use groups.google.com can. Realistically near-zero usage because the group is not discoverable — they'd have to bookmark the URL — but turning it off doesn't gain anything. |
+| `includeCustomFooter` | `true` | Auto-append unsubscribe / preferences instructions to every message. |
+| `customFooterText` | See below | |
+| `primaryLanguage` | `en_US` | Explicit beats default. |
 
-Implementation note: the official Groups Settings API defines `ANYONE_CAN_POST` as the internet-wide posting option and `INVITED_CAN_JOIN` as invited-only joining. Verify the exact accepted values in the E8 tenant during implementation because Workspace-wide policies can restrict group behavior.
+**Custom footer text:**
+
+> To leave this list: click **Unsubscribe** at the top of this message, or email `{group}+unsubscribe@e8angels.com`. You can also manage your communication preferences in your profile at https://app.e8angels.com/member/profile.
+
+Notes:
+- The one-click **Unsubscribe** link in mail clients comes from the `List-Unsubscribe` header that Google Workspace adds automatically to outbound group messages. No code change needed for that to work in Gmail, Apple Mail, Outlook, etc.
+- The profile-page link assumes we'll add a "Mailing lists you're on" section to `/member/profile` so the link is actionable for the member. **Follow-up task:** thread investor-group memberships into the user's profile page (read from `company_investor_groups` joined with `cacheManager.listGroupMemberEmails`).
+
+### Reply behavior
+
+`REPLY_TO_LIST` makes the group behave like a thread — hit Reply, everyone sees it. This is the right default for an investor "chat" where the typical exchange is "FYI we're considering a follow-on" → "we are too, here's what I'm hearing on valuation".
+
+Surface these behaviors in the welcome email so nobody is surprised:
+- **Replies go to the whole list.** If you want to whisper to the sender, change the To address by hand.
+- **Reply-all does NOT add the list twice.** Google's group handling dedupes — clicking Reply All sends one copy to the list (which fans out to everyone), not one copy each.
+- **Membership is private.** Members can see the list address and count, not the roster. When someone posts, recipients still see that sender's From address.
+- **Leaving is self-service.** Members can use one-click Unsubscribe in their mail client, email the `+unsubscribe@` address, or ask `support@e8angels.com` for admin removal.
+
+This raises the privacy bar slightly: a member can no longer reply "privately" by reflex. Spell it out in the welcome body and accept that — for a chat group it's the right trade.
+
+### Moderation: how it actually works
+
+With `spamModerationLevel: MODERATE` (the previously-listed value), Google holds suspected spam in a queue visible at `groups.google.com/forum/#!pendingmsg/<group>`. Notifications go to the group's owners (the impersonated admin `director@e8angels.com`) as a periodic digest — there is **no real-time alert, webhook, or Slack integration**, and in practice these emails are easy to miss. For a private list nobody outside the portal knows the address of, the queue should stay empty 99% of the time, but the 1% would sit indefinitely.
+
+`SILENTLY_MODERATE` (now recommended) tells Google to drop obvious spam without holding anything for review. Trade-off: no recourse if a legitimate sender gets misclassified. Given list volume will be ~handful-of-messages-per-month, the friction of an unmonitored queue is worse than the rare false positive. **Flag for the team** if you'd rather keep `MODERATE` and accept the babysitting cost.
+
+Implementation note: the official Groups Settings API defines `ANYONE_CAN_POST` as the internet-wide posting option and `INVITED_CAN_JOIN` as invited-only joining. Verify the exact accepted values in the E8 tenant during implementation because Workspace-wide policies can restrict group behavior. Use `scripts/test-investor-group-settings.js` to round-trip every setting against a throwaway group before shipping.
 
 ## Data Model
 
