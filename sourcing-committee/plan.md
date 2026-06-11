@@ -3,7 +3,7 @@ title: "Sourcing Committee Metrics"
 status: draft
 owner: sarah
 created: 2026-05-26
-last_updated: 2026-05-26
+last_updated: 2026-06-11
 home: mockup
 ---
 

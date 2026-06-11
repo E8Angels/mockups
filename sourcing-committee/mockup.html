@@ -1,582 +1,720 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Sourcing Committee — E8 Portal</title>
 <style>
-  :root {
-    color-scheme: light;
-    --page-bg: #f3f5f7; --card-bg: #ffffff; --card-border: #e5e7eb;
-    --card-radius: 16px;
-    --text: #0f172a; --text-muted: #6b7280; --text-subtle: #9ca3af;
-    --primary: #2563eb; --primary-hover: #1d4ed8; --primary-soft: #eef4ff;
-    --nav-bg: #ffffff; --nav-border: #e5e7eb; --logo-teal: #14b8a6;
-    --tab-active-bg: #0f172a; --tab-active-fg: #ffffff;
-    --danger: #b91c1c; --danger-soft: #fee2e2;
-    --warn: #c2410c; --warn-soft: #fff1e6;
-    --ok: #15803d; --ok-soft: #e6f4ea;
-    --accent-soft: #f5f3ff; --accent-text: #6d28d9;
+  :root{
+    --bg:#f4f3ee; --panel:#ffffff; --ink:#1d2b25; --muted:#6b7770; --line:#e3e1d8;
+    --green:#2e6b4f; --green-soft:#e7f0ea; --amber:#b5832b; --amber-soft:#f7eedd;
+    --red:#a3402f; --red-soft:#f6e6e2; --blue:#2d5d7c; --blue-soft:#e5eef4;
+    --vc:#2d5d7c; --accel:#2e6b4f; --incub:#6a8f3c; --angel:#b5832b; --corp:#7a5ea3; --other:#8a8f8b;
+    --chip:#eef1ec;
   }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: var(--page-bg); color: var(--text); font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; line-height: 1.5; }
-
-  .nav { background: var(--nav-bg); border-bottom: 1px solid var(--nav-border); padding: 0 24px; height: 60px; display: flex; align-items: center; gap: 28px; position: sticky; top: 0; z-index: 30; }
-  .nav .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 16px; color: var(--text); }
-  .nav .brand-logo { width: 26px; height: 26px; border-radius: 6px; background: var(--logo-teal); display: inline-block; }
-  .nav .links { display: flex; gap: 22px; flex: 1; font-size: 14px; color: var(--text); }
-  .nav .links a { color: var(--text); text-decoration: none; padding: 4px 2px; display: inline-flex; align-items: center; gap: 4px; }
-  .nav .links a.active { color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 17px; margin-bottom: -19px; }
-  .nav .search { background: var(--page-bg); border: 1px solid var(--card-border); border-radius: 999px; padding: 7px 14px; width: 240px; color: var(--text-muted); font-size: 13px; }
-  .nav .bell { position: relative; width: 32px; height: 32px; display:flex; align-items:center; justify-content:center; }
-  .nav .bell .badge { position: absolute; top: -2px; right: -4px; background: var(--primary); color: #fff; font-size: 10px; border-radius: 999px; padding: 1px 5px; font-weight: 600; }
-  .nav .me { width: 32px; height: 32px; border-radius: 50%; background: #2563eb; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; }
-
-  .page { max-width: 1280px; margin: 0 auto; padding: 24px 28px 80px; }
-  .page-title-row { display:flex; align-items:center; gap:12px; margin: 4px 0 20px; }
-  .page-title { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
-  .pill-tag { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-text); letter-spacing: .03em; }
-  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
-
-  .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--card-radius); padding: 20px 22px; }
-  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  .card-title { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; }
-  .card-title svg { color: var(--text-muted); }
-  .card-actions { display: flex; align-items: center; gap: 10px; }
-  .link-btn { color: var(--primary); text-decoration: none; font-size: 13px; font-weight: 500; cursor: pointer; background:none; border:none; font-family:inherit; }
-  .link-btn:hover { color: var(--primary-hover); text-decoration: underline; }
-  .pri-btn { background: var(--primary); color: #fff; border: none; border-radius: 8px; padding: 7px 12px; font-size: 13px; font-weight: 500; cursor: pointer; }
-  .pri-btn:hover { background: var(--primary-hover); }
-  .ghost-btn { background: var(--card-bg); color: var(--text); border: 1px solid var(--card-border); border-radius: 8px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
-
-  .stats-section { margin-bottom: 4px; }
-  .stats-section .label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin: 16px 0 8px; display:flex; align-items:center; gap:8px; }
-  .stats-section:first-of-type .label { margin-top: 0; }
-  .stats-section .label .theme-pri { font-weight:600; font-size:10px; padding:1px 7px; border-radius:999px; letter-spacing:.02em; text-transform:none; }
-  .pri-high { background: var(--primary-soft); color: var(--primary); }
-  .pri-med  { background: #fef9c3; color: #854d0e; }
-  .pri-low  { background: #f1f5f9; color: var(--text-muted); }
-  .stats-grid { display: grid; gap: 10px; }
-  .g4 { grid-template-columns: repeat(4, 1fr); }
-  .g3 { grid-template-columns: repeat(3, 1fr); }
-  .g2 { grid-template-columns: repeat(2, 1fr); }
-  .stat-tile {
-    background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px;
-    padding: 12px 14px; cursor: pointer; transition: border-color .15s, box-shadow .15s;
-    text-align: left; display: flex; flex-direction: column; gap: 5px; color: var(--text); font-family: inherit; position:relative;
-  }
-  .stat-tile:hover { border-color: var(--primary); box-shadow: 0 1px 3px rgba(15,23,42,0.06); }
-  .stat-tile .t-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding-right:16px; }
-  .stat-tile .t-value { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; color: var(--text); }
-  .stat-tile .t-value small { font-size: 13px; font-weight: 600; color: var(--text-subtle); }
-  .stat-tile .t-sub { font-size: 11px; color: var(--text-subtle); }
-  .target-chip { display:inline-block; font-size:10px; font-weight:600; padding:2px 7px; border-radius:999px; background:var(--page-bg); border:1px solid var(--card-border); color:var(--text-muted); margin-top:2px; width:fit-content; }
-  .rag { position:absolute; top:12px; right:12px; width:9px; height:9px; border-radius:50%; }
-  .rag.green { background: var(--ok); } .rag.amber { background: #d97706; } .rag.red { background: var(--danger); } .rag.grey { background: var(--text-subtle); }
-
-  .legend { display:flex; gap:14px; flex-wrap:wrap; font-size:11px; color:var(--text-muted); margin-top:2px; }
-  .legend span { display:inline-flex; align-items:center; gap:5px; }
-  .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
-  .dot.green{background:var(--ok);} .dot.amber{background:#d97706;} .dot.red{background:var(--danger);} .dot.grey{background:var(--text-subtle);}
-
-  .metrics-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
-  .tab { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; background: transparent; color: var(--text); border: 1px solid transparent; cursor: pointer; font-family:inherit; }
-  .tab.active { background: var(--tab-active-bg); color: var(--tab-active-fg); }
-  .chart-wrap { margin-top: 16px; }
-  .bar-row { display:grid; grid-template-columns: 150px 1fr 56px; align-items:center; gap:10px; padding:5px 0; font-size:13px; }
-  .bar-row .bl { color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .bar-track { background:var(--page-bg); border-radius:6px; height:18px; overflow:hidden; }
-  .bar-fill { height:100%; border-radius:6px; background:var(--primary); }
-  .bar-row .bv { text-align:right; font-variant-numeric:tabular-nums; color:var(--text-muted); }
-  .chart-note { font-size:11px; color:var(--text-subtle); margin-top:10px; }
-
-  .note-row { display: flex; gap: 18px; padding: 14px 0; border-top: 1px solid var(--card-border); }
-  .note-row:first-of-type { border-top: none; padding-top: 4px; }
-  .note-date { width: 60px; flex-shrink: 0; text-align: center; padding: 6px 0; background: var(--primary-soft); border-radius: 10px; font-size: 12px; }
-  .note-date .month { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); }
-  .note-date .day { font-size: 22px; font-weight: 700; line-height: 1.1; }
-  .note-date .year { font-size: 11px; color: var(--text-muted); }
-  .note-body .note-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-  .note-body .note-preview { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
-
-  .side { display: flex; flex-direction: column; gap: 20px; }
-  .members-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .member-chip { display: flex; align-items: center; gap: 8px; padding: 6px 4px; }
-  .member-chip .avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; font-size: 11px; flex-shrink: 0; }
-  .member-chip .info { min-width: 0; }
-  .member-chip .name { font-size: 13px; font-weight: 500; }
-  .member-chip .role { font-size: 11px; color: var(--text-muted); }
-  .doc-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid var(--card-border); font-size: 13px; }
-  .doc-row:first-of-type { border-top: none; padding-top: 4px; }
-  .doc-row .file-icon { display: inline-block; width: 28px; height: 28px; background: #f1f5f9; color: var(--text-muted); border-radius: 6px; text-align: center; line-height: 28px; font-size: 9px; font-weight: 600; letter-spacing: 0.05em; margin-right: 8px; flex-shrink: 0; }
-  .doc-row .name { flex: 1; min-width: 0; display: flex; align-items: center; }
-  .doc-row .name span.txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .doc-row .date { font-size: 12px; color: var(--text-muted); margin-left: 8px; flex-shrink: 0; }
-  .search-pill { background: var(--page-bg); border: 1px solid var(--card-border); border-radius: 999px; padding: 7px 14px; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
-  .empty-state { font-size: 13px; color: var(--text-subtle); text-align: center; padding: 10px 0; }
-
-  /* ===== DRAWER ===== */
-  .drawer-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,0.28); opacity: 0; pointer-events: none; transition: opacity .16s; z-index: 80; }
-  .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
-  .drawer { position: fixed; top: 0; right: 0; width: 720px; max-width: 100vw; height: 100vh; background: var(--page-bg); border-left: 1px solid var(--card-border); transform: translateX(100%); transition: transform .22s ease; z-index: 90; display: flex; flex-direction: column; box-shadow: -8px 0 30px rgba(15,23,42,0.10); }
-  .drawer.open { transform: translateX(0); }
-  .drawer-header { display: flex; align-items: center; gap: 8px; padding: 14px 18px; border-bottom: 1px solid var(--card-border); background: var(--card-bg); flex-shrink: 0; }
-  .drawer-title { font-size: 15px; font-weight: 600; flex: 1; min-width: 0; }
-  .drawer-sub { font-size:12px; color:var(--text-subtle); }
-  .icon-btn { background: none; border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer; color: var(--text-muted); font-size: 13px; font-family: inherit; }
-  .icon-btn:hover { background: var(--page-bg); color: var(--text); }
-  .drawer-body { flex: 1; overflow-y: auto; padding: 18px; }
-
-  .dtable { width: 100%; border-collapse: collapse; font-size: 13px; background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; overflow:hidden; }
-  .dtable th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-subtle); font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--card-border); background:#fafbfc; }
-  .dtable td { padding: 10px 12px; border-bottom: 1px solid var(--card-border); }
-  .dtable tr:last-child td { border-bottom: none; }
-  .dtable td.num, .dtable th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .badge { font-size: 10px; padding: 2px 8px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
-  .badge.green { background: var(--ok-soft); color: var(--ok); }
-  .badge.amber { background: var(--warn-soft); color: var(--warn); }
-  .badge.red   { background: var(--danger-soft); color: var(--danger); }
-  .badge.grey  { background: #f1f5f9; color: var(--text-muted); }
-  .drawer-note { font-size:12px; color:var(--text-muted); background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:12px 14px; margin-top:14px; line-height:1.6; }
-  .drawer-note b { color: var(--text); }
-  .kpi-strip { display:flex; gap:18px; flex-wrap:wrap; margin-bottom:16px; }
-  .kpi-strip .k { background:var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:12px 16px; min-width:120px; }
-  .kpi-strip .k .kv { font-size:22px; font-weight:700; }
-  .kpi-strip .k .kl { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue);text-decoration:none}
+  .topbar{display:flex;align-items:center;gap:18px;padding:10px 20px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+  .brand{font-weight:700;letter-spacing:.2px}
+  .nav{display:flex;gap:16px;color:var(--muted);font-size:13px;flex-wrap:wrap}
+  .topbar .right{margin-left:auto;display:flex;align-items:center;gap:14px;color:var(--muted)}
+  .avatar{width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:600}
+  .wrap{max-width:1180px;margin:0 auto;padding:22px 20px 80px}
+  .pagehead{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:6px}
+  h1{font-size:22px;margin:0}
+  .v2{font-size:11px;font-weight:700;letter-spacing:.8px;color:var(--green);background:var(--green-soft);padding:3px 8px;border-radius:20px;text-transform:uppercase}
+  .sub{color:var(--muted);font-size:13px;margin:2px 0 0}
+  .timeframe{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:16px 0 6px}
+  .timeframe .lbl{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-right:2px}
+  .seg{display:inline-flex;background:var(--chip);border-radius:9px;padding:3px;gap:2px;flex-wrap:wrap}
+  .seg button{border:0;background:transparent;padding:6px 11px;border-radius:7px;font-size:12.5px;color:var(--muted);cursor:pointer;font-weight:600}
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+  .seasonality{font-size:12px;color:var(--amber);background:var(--amber-soft);border:1px solid #ecd9b0;border-radius:8px;padding:6px 10px;margin-left:auto}
+  section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:16px}
+  .sec-head{display:flex;align-items:center;gap:10px;margin:0 0 4px}
+  .sec-head h2{font-size:15px;margin:0}
+  .sec-head .tag{font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:2px 7px;border-radius:20px}
+  .infobtn{margin-left:auto;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-style:italic;line-height:1}
+  .infobtn:hover{border-color:var(--green);color:var(--green)}
+  .infobox{display:none;background:#f3f6f3;border:1px solid #d6e2d8;border-radius:10px;padding:12px 14px;margin:8px 0 4px;font-size:12.5px}
+  .infobox.open{display:block}
+  .infobox h4{margin:0 0 3px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--green)}
+  .infobox p{margin:0 0 10px}
+  .infobox p:last-child{margin:0}
+  .sec-sub{color:var(--muted);font-size:12.5px;margin:0 0 14px}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+  .tile{border:1px solid var(--line);border-radius:12px;padding:13px 14px;background:#fdfdfb;cursor:pointer;transition:border-color .12s,box-shadow .12s}
+  .tile:hover{border-color:var(--green);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .tile .k{font-size:11.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+  .tile .vrow{display:flex;align-items:baseline;gap:8px}
+  .tile .v{font-size:26px;font-weight:700;margin:6px 0 2px;letter-spacing:-.5px}
+  .tile .arrow{font-size:14px;font-weight:700}
+  .tile .d{font-size:12px;color:var(--muted)}
+  .tile .open-hint{font-size:10.5px;color:var(--blue);font-weight:600;margin-top:4px}
+  .up{color:var(--green)} .down{color:var(--red)} .flat{color:var(--muted)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  @media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);cursor:pointer;user-select:none}
+  th.num,td.num{text-align:right}
+  tbody tr{cursor:pointer}
+  tbody tr:hover{background:#f3f7f3}
+  .pill{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
+  .p-vc{background:var(--blue-soft);color:var(--vc)}
+  .p-accel{background:var(--green-soft);color:var(--accel)}
+  .p-incub{background:#eef3e0;color:var(--incub)}
+  .p-angel{background:var(--amber-soft);color:var(--angel)}
+  .p-corp{background:#efe9f6;color:var(--corp)}
+  .p-other{background:#eef1ec;color:var(--other)}
+  .badge-closed{background:var(--red-soft);color:var(--red);font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:20px}
+  .badge-live{background:var(--green-soft);color:var(--green);font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:20px}
+  .note{font-size:12px;color:var(--muted);background:#faf9f4;border-left:3px solid var(--amber);padding:9px 12px;border-radius:0 8px 8px 0;margin-top:12px}
+  .note b{color:var(--ink)}
+  .caveat{font-size:11.5px;color:var(--amber);font-weight:600}
+  .clickhint{font-size:11.5px;color:var(--blue);font-weight:600}
+  .barrow{display:flex;align-items:center;gap:10px;margin:6px 0}
+  .barrow.click{cursor:pointer}
+  .barrow.click:hover .lab{color:var(--green);text-decoration:underline}
+  .barrow .lab{width:150px;font-size:12.5px}
+  .barrow .track{flex:1;background:#eef1ec;border-radius:6px;height:20px;overflow:hidden;position:relative}
+  .barrow .fill{height:100%;border-radius:6px}
+  .barrow .val{width:110px;text-align:right;font-size:12.5px;font-weight:600}
+  .pipe{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:860px){.pipe{grid-template-columns:1fr}}
+  .col{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .col h3{margin:0;padding:11px 14px;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+  .col.prio h3{background:var(--amber-soft);color:var(--amber)}
+  .col.init h3{background:var(--blue-soft);color:var(--blue)}
+  .col.oper h3{background:var(--green-soft);color:var(--green)}
+  .col .cnt{font-size:18px;font-weight:700}
+  .col .body{padding:8px;max-height:300px;overflow:auto}
+  .pchip{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 9px;border:1px solid var(--line);border-radius:8px;margin:5px 0;background:#fff;font-size:12.5px;cursor:pointer}
+  .pchip:hover{border-color:var(--green);background:#f3f7f3}
+  .svgwrap{font-size:12px}
+  svg{display:block;max-width:100%}
+  .small{font-size:12px;color:var(--muted)}
+  .toggle{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);cursor:pointer}
+  .toggle input{accent-color:var(--green)}
+  .minibar{display:inline-block;height:9px;border-radius:3px;vertical-align:middle}
+  footer{max-width:1180px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:12px}
+  .overlay{position:fixed;inset:0;background:rgba(20,28,24,.38);opacity:0;visibility:hidden;transition:opacity .2s;z-index:50}
+  .overlay.open{opacity:1;visibility:visible}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:460px;max-width:92vw;background:#fff;box-shadow:-8px 0 30px rgba(0,0,0,.16);transform:translateX(100%);transition:transform .24s ease;z-index:60;display:flex;flex-direction:column}
+  .drawer.open{transform:translateX(0)}
+  .drawer .dhead{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:10px}
+  .drawer .dhead h3{margin:0;font-size:17px}
+  .drawer .dhead .x{margin-left:auto;border:0;background:var(--chip);width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:15px;color:var(--muted)}
+  .drawer .dbody{padding:16px 18px;overflow:auto}
+  .dgroup{margin-bottom:18px}
+  .dgroup h4{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:0 0 8px;display:flex;justify-content:space-between}
+  .dco{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;margin:6px 0;font-size:12.5px;cursor:pointer}
+  .dco:hover{border-color:var(--green);background:#f7faf7}
+  .dco.nolink{cursor:default}
+  .dco.nolink:hover{border-color:var(--line);background:#fff}
+  .dco .nm{font-weight:600}
+  .dco .meta{margin-left:auto;text-align:right;font-size:11.5px;color:var(--muted)}
+  .field{margin:8px 0;font-size:13px}
+  .field .lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700}
+  .statline{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0 14px}
+  .statline .s{font-size:12px;color:var(--muted)}
+  .statline .s b{display:block;font-size:18px;color:var(--ink)}
 </style>
 </head>
 <body>
 
-<div class="nav">
-  <div class="brand"><span class="brand-logo"></span>E8 Portal</div>
-  <div class="links">
-    <a>Home</a><a>Pipeline &#9662;</a><a>Recordings</a><a>E8 Fund</a><a>Portfolio News</a><a>Explore &#9662;</a>
-    <a class="active">Committees &#9662;</a>
-    <a>Manage &#9662;</a>
-  </div>
-  <div class="search">&#128269; Search companies&#8230;</div>
-  <div class="bell">&#128276;<span class="badge">99+</span></div>
-  <div class="me">SB</div>
+<div class="topbar">
+  <span class="brand">E8 Portal</span>
+  <nav class="nav"><span>Home</span><span>Pipeline &#9662;</span><span>Recordings</span><span>E8 Fund</span><span>Portfolio News</span><span>Explore &#9662;</span><span>Committees &#9662;</span><span>Manage &#9662;</span></nav>
+  <div class="right"><span>&#128276;</span><span class="avatar">SB</span></div>
 </div>
 
-<div class="page">
-  <div class="page-title-row">
-    <div class="page-title">Sourcing Committee</div>
-    <span class="pill-tag">METRICS &middot; V1</span>
-  </div>
-  <div class="layout">
+<div class="wrap">
+  <div class="pagehead">
     <div>
-      <!-- ===== AT A GLANCE ===== -->
-      <div class="card" style="margin-bottom: 20px;">
-        <div class="card-header">
-          <div class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 6-6"/></svg>
-            At a glance
-          </div>
-          <div class="card-actions">
-            <span style="font-size:12px;color:var(--text-muted);">As of May 26, 2026</span>
-          </div>
-        </div>
-        <div class="legend" style="margin-bottom:6px;">
-          <span><i class="dot green"></i>On track</span>
-          <span><i class="dot amber"></i>Approaching</span>
-          <span><i class="dot red"></i>Below target</span>
-          <span><i class="dot grey"></i>Baseline pending</span>
-          <span style="margin-left:auto;color:var(--text-subtle);">Click any tile for detail</span>
-        </div>
-
-        <!-- THEME 1: DEAL QUALITY -->
-        <div class="stats-section">
-          <div class="label">Deal Quality <span class="theme-pri pri-high">High priority</span></div>
-          <div class="stats-grid g4">
-            <button class="stat-tile" data-bucket="quality">
-              <span class="rag red"></span>
-              <span class="t-label">Avg score &rarr; Pre-Screening</span>
-              <span class="t-value">1.6<small> / 4</small></span>
-              <span class="target-chip">Target avg &ge; 3.0</span>
-            </button>
-            <button class="stat-tile" data-bucket="quality">
-              <span class="rag red"></span>
-              <span class="t-label">Avg score &rarr; Screening</span>
-              <span class="t-value">2.2<small> / 4</small></span>
-              <span class="target-chip">Target avg &ge; 3.0</span>
-            </button>
-            <button class="stat-tile" data-bucket="quality">
-              <span class="rag red"></span>
-              <span class="t-label">Deals &ge; 3.5 &rarr; Member Mtg</span>
-              <span class="t-value">&lt;1%</span>
-              <span class="target-chip">Target 100%</span>
-            </button>
-            <button class="stat-tile" data-bucket="quality">
-              <span class="rag grey"></span>
-              <span class="t-label">Score confidence</span>
-              <span class="t-value">&mdash;</span>
-              <span class="t-sub">Recommendation CI &mdash; to wire</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- THEME 2: DEALFLOW MIX & ATTRIBUTION -->
-        <div class="stats-section">
-          <div class="label">Dealflow Mix &amp; Attribution <span class="theme-pri pri-high">High priority</span></div>
-          <div class="stats-grid g4">
-            <button class="stat-tile" data-bucket="attribution">
-              <span class="rag red"></span>
-              <span class="t-label">Source attribution coverage</span>
-              <span class="t-value">15%</span>
-              <span class="t-sub">37 of 246 deals tagged (2026)</span>
-              <span class="target-chip">Target 100% by Sep '26</span>
-            </button>
-            <button class="stat-tile" data-bucket="attribution">
-              <span class="rag grey"></span>
-              <span class="t-label">Proactively sourced</span>
-              <span class="t-value">&mdash;</span>
-              <span class="t-sub">Needs "How did you hear?" field</span>
-              <span class="target-chip">Target &ge; 60%</span>
-            </button>
-            <button class="stat-tile" data-bucket="attribution">
-              <span class="rag grey"></span>
-              <span class="t-label">$ into proactive deals</span>
-              <span class="t-value">&mdash;</span>
-              <span class="t-sub">Baseline pending attribution</span>
-              <span class="target-chip">Target &ge; 75%</span>
-            </button>
-            <button class="stat-tile" data-bucket="pipeline">
-              <span class="rag green"></span>
-              <span class="t-label">Applications (2026 YTD)</span>
-              <span class="t-value">275</span>
-              <span class="t-sub">448 in full-year 2025</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- THEME 3: CHANNEL EFFECTIVENESS -->
-        <div class="stats-section">
-          <div class="label">Channel Effectiveness &amp; Coverage <span class="theme-pri pri-high">High priority</span></div>
-          <div class="stats-grid g3">
-            <button class="stat-tile" data-bucket="channels">
-              <span class="rag amber"></span>
-              <span class="t-label">Active sourcing channels</span>
-              <span class="t-value">6</span>
-              <span class="t-sub">&ge; 3 deals/qtr &amp; score &gt;3 each</span>
-              <span class="target-chip">Target &ge; 3 strong channels</span>
-            </button>
-            <button class="stat-tile" data-bucket="channels">
-              <span class="rag green"></span>
-              <span class="t-label">Top channel concentration</span>
-              <span class="t-value">32%</span>
-              <span class="t-sub">VC / Incubator (highest share)</span>
-              <span class="target-chip">Target &lt; 40% any channel</span>
-            </button>
-            <button class="stat-tile" data-bucket="channels">
-              <span class="rag green"></span>
-              <span class="t-label">Top channel by volume</span>
-              <span class="t-value" style="font-size:17px;padding-top:5px;">VC / Incubator</span>
-              <span class="t-sub">49 tagged deals</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- THEME 4: PARTNER NETWORK -->
-        <div class="stats-section">
-          <div class="label">Partner Network Strength <span class="theme-pri pri-high">High priority</span></div>
-          <div class="stats-grid g4">
-            <button class="stat-tile" data-bucket="partners">
-              <span class="rag green"></span>
-              <span class="t-label">Active partners (Operational)</span>
-              <span class="t-value">20</span>
-              <span class="target-chip">Target &ge; 8 Tier 1/2</span>
-            </button>
-            <button class="stat-tile" data-bucket="partners">
-              <span class="rag amber"></span>
-              <span class="t-label">In activation pipeline</span>
-              <span class="t-value">36</span>
-              <span class="t-sub">30 initiated &middot; 6 priority</span>
-            </button>
-            <button class="stat-tile" data-bucket="partners">
-              <span class="rag green"></span>
-              <span class="t-label">Referrals in (2026)</span>
-              <span class="t-value">60</span>
-              <span class="t-sub">+1/mo per active partner target</span>
-            </button>
-            <button class="stat-tile" data-bucket="partners">
-              <span class="rag amber"></span>
-              <span class="t-label">Partners with an E8 owner</span>
-              <span class="t-value">114<small> / 276</small></span>
-              <span class="t-sub">Relationship assigned</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- THEME 5: DIVERSITY -->
-        <div class="stats-section">
-          <div class="label">Diversity of Dealflow <span class="theme-pri pri-high">High priority</span></div>
-          <div class="stats-grid g3">
-            <button class="stat-tile" data-bucket="diversity">
-              <span class="rag amber"></span>
-              <span class="t-label">Underrepresented founders</span>
-              <span class="t-value">50%</span>
-              <span class="t-sub">124 of 246 deals (2026)</span>
-              <span class="target-chip">Target &ge; 60%</span>
-            </button>
-            <button class="stat-tile" data-bucket="diversity">
-              <span class="rag green"></span>
-              <span class="t-label">No-single-channel dominance</span>
-              <span class="t-value">32%</span>
-              <span class="t-sub">Top channel share</span>
-              <span class="target-chip">Target &lt; 40%</span>
-            </button>
-            <button class="stat-tile" data-bucket="diversity">
-              <span class="rag grey"></span>
-              <span class="t-label">MoM diversity trend</span>
-              <span class="t-value">&mdash;</span>
-              <span class="t-sub">Month-over-month view to wire</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ===== METRICS / CHARTS ===== -->
-      <div class="card" style="margin-bottom: 20px;">
-        <div class="card-header">
-          <div class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            Metrics
-          </div>
-        </div>
-        <div class="metrics-tabs">
-          <button class="tab active" data-tab="channel">Channel mix</button>
-          <button class="tab" data-tab="pipeline">Pipeline by stage</button>
-          <button class="tab" data-tab="partners">Partner pipeline</button>
-          <button class="tab" data-tab="diversity">Founder diversity</button>
-        </div>
-        <div class="chart-wrap" id="chart"></div>
-      </div>
-
-      <!-- ===== NOTES ===== -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
-            Notes
-          </div>
-          <div class="card-actions"><button class="link-btn">View all</button><button class="pri-btn">+ New Note</button></div>
-        </div>
-        <div class="note-row">
-          <div class="note-date"><div class="month">Apr</div><div class="day">12</div><div class="year">2026</div></div>
-          <div class="note-body">
-            <div class="note-title">Meeting Agenda &mdash; April 8</div>
-            <div class="note-preview">Sourcing Committee working session &mdash; reviewed the draft metrics wish list (Sarah &amp; Lorana) and prioritized themes for a v1 dashboard.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== SIDEBAR ===== -->
-    <div class="side">
-      <div class="card">
-        <div class="card-header"><div class="card-title">&#128101; Members (9)</div><button class="ghost-btn">&#9993; Contact</button></div>
-        <div class="members-grid" id="members"></div>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">&#128197; Upcoming Meetings</div><button class="link-btn">View all</button></div>
-        <div class="empty-state">No upcoming meetings scheduled.</div>
-        <div style="border-top:1px solid var(--card-border);padding-top:10px;margin-top:6px;text-align:center;"><button class="link-btn">&#9654; Past Recordings</button></div>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">&#128196; Documents</div><div class="card-actions"><button class="link-btn">Drive</button><button class="link-btn">Manage</button></div></div>
-        <div class="search-pill">&#128269; Search documents&#8230;</div>
-        <div id="docs"></div>
-      </div>
+      <h1>Sourcing Committee <span class="v2">Metrics &middot; V2</span></h1>
+      <p class="sub">Decision-oriented view &middot; click any tile, bar, row or chip for detail &middot; <span id="asof"></span></p>
     </div>
   </div>
+
+  <div class="timeframe">
+    <span class="lbl">Timeframe</span>
+    <div class="seg" id="tfseg">
+      <button data-tf="ytd" class="on">Year-to-date 2026</button>
+      <button data-tf="t12">Trailing 12 months</button>
+      <button data-tf="mom">Month-by-month</button>
+      <button data-tf="yoy">2026 vs 2025</button>
+      <button data-tf="total">Total &mdash; all records</button>
+    </div>
+    <span class="seasonality">&#9888; Sourcing is seasonal &mdash; no member pitches in summer (Jun&ndash;Aug). Compare like periods.</span>
+  </div>
+
+  <section>
+    <div class="sec-head"><h2>At a glance</h2><span class="tag">decision tiles &middot; click to open</span><button class="infobtn" data-info="kpi">i</button></div>
+    <div class="infobox" id="info-kpi"></div>
+    <p class="sec-sub" id="tf-caption"></p>
+    <div class="tiles" id="kpis"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Dealflow by channel</h2><span class="tag">VC vs accelerator/incubator &mdash; split</span><button class="infobtn" data-info="channel">i</button></div>
+    <div class="infobox" id="info-channel"></div>
+    <p class="sec-sub">Referrals received into E8 by partner channel. <span class="clickhint">Click a channel to see its organizations, then a partner for full detail.</span></p>
+    <div class="grid2">
+      <div>
+        <div class="small" style="margin-bottom:6px;font-weight:600">Referrals received by channel</div>
+        <div id="channelBars"></div>
+      </div>
+      <div>
+        <div class="small" style="margin-bottom:6px;font-weight:600">Partner network size by channel</div>
+        <div id="networkBars"></div>
+        <div class="note">Accelerators send <b>more referrals (29)</b> than VCs (12) despite VCs being the largest slice of the network (151 orgs).</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Source &rarr; investment outcomes</h2><span class="tag">which channels convert to $</span><button class="infobtn" data-info="source">i</button></div>
+    <div class="infobox" id="info-source"></div>
+    <p class="sec-sub">Of companies that came from each channel, how much E8 ultimately invested.</p>
+    <div id="sourceInvest"></div>
+    <div class="note"><b>Attribution coverage is the bottleneck.</b> Only ~15% of 2026 deals carry a source tag, and only a handful of <i>invested</i> companies are tagged. Partner-referral attribution (above) is the more reliable lens until the "How did you hear about us?" field is fixed.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Partner network strength</h2><span class="tag">quality, not just quantity</span><button class="infobtn" data-info="partner">i</button></div>
+    <div class="infobox" id="info-partner"></div>
+    <p class="sec-sub">How <b>good</b> a partner's dealflow is: deals referred &rarr; reached a pitch &rarr; dollars invested &rarr; exits &rarr; companies now closed. <span class="clickhint">Click any partner for its referred-company list.</span></p>
+    <label class="toggle" style="margin-bottom:8px"><input type="checkbox" id="onlyConv"> Show only partners with a pitch or investment</label>
+    <table id="partnerTbl">
+      <thead><tr>
+        <th data-sort="name">Partner</th><th data-sort="type">Channel</th><th data-sort="status">Relationship</th>
+        <th class="num" data-sort="deals">Deals</th><th class="num" data-sort="pitched">&rarr; Pitch</th>
+        <th class="num" data-sort="invested">Invested</th><th class="num" data-sort="exits">Exits</th><th class="num" data-sort="closed">Closed</th>
+      </tr></thead>
+      <tbody id="partnerBody"></tbody>
+    </table>
+    <div class="note"><b>Quality &ne; volume.</b> Greentown Labs sent the most deals (17) but only 1 reached a pitch and none are funded. Anthropocene Ventures sent 2, both pitched, drove <b>$295K</b> invested &mdash; yet <b>both funded companies have since closed</b>.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>New dealflow priorities &mdash; activation pipeline</h2><span class="tag">priority &rarr; initiated &rarr; operational</span><button class="infobtn" data-info="activation">i</button></div>
+    <div class="infobox" id="info-activation"></div>
+    <p class="sec-sub">Deal-sharing relationships by where they stand. <b>Priority to Initiate</b> is the new-dealflow worklist. <span class="clickhint">Click any partner to see its full profile (stage, description, lead contact, E8 owner).</span></p>
+    <div class="pipe" id="pipe"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Funnel &mdash; pitch cohort to investment</h2><span class="tag">Tracking pitches through to investment</span><button class="infobtn" data-info="funnel">i</button></div>
+    <div class="infobox" id="info-funnel"></div>
+    <p class="sec-sub">Tracks a <b>pitch cohort forward</b>: of companies that pitched, how many later received investment (any time after the pitch, through today) and how much.</p>
+    <div class="grid2">
+      <div>
+        <div class="small" style="font-weight:600;margin-bottom:8px">Conversion funnel</div>
+        <div id="funnel"></div>
+      </div>
+      <div>
+        <div class="small" style="font-weight:600;margin-bottom:8px">Pitch &rarr; investment conversion &amp; when the money landed</div>
+        <div id="cohortViz"></div>
+      </div>
+    </div>
+    <div class="note"><b>Cohort result:</b> 42 new companies gave a full pitch since Jan 2025; <b>15 (36%)</b> later received investment totaling <b>$2.71M</b> &mdash; most of it landing months after the pitch, invisible to a same-month view.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Deal quality indicators</h2><span class="tag">objective fields first, scores with caveats</span><button class="infobtn" data-info="quality">i</button></div>
+    <div class="infobox" id="info-quality"></div>
+    <p class="sec-sub">Objective, application-sourced signals lead; committee screening scores follow with an explicit health warning.</p>
+    <div class="grid3" style="margin-bottom:6px">
+      <div class="tile" id="leadTile"><div class="k">Lead investor present</div><div class="vrow"><div class="v">14%</div></div><div class="d">Binary &amp; objective &middot; 44 of 300 2026 apps</div><div class="open-hint">Click to see companies &amp; stage reached &rsaquo;</div></div>
+      <div class="tile nolink"><div class="k">Round committed (median)</div><div class="vrow"><div class="v">~38%</div></div><div class="d">From application deal terms &middot; 236 apps report</div></div>
+      <div class="tile nolink"><div class="k">Amount outstanding (median)</div><div class="vrow"><div class="v">~62%</div></div><div class="d">Still to raise &middot; from application data</div></div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div>
+        <div class="small" style="font-weight:600;margin-bottom:8px">Companies with a lead investor &mdash; furthest pipeline stage <span class="clickhint">(click a stage)</span></div>
+        <div id="leadStages"></div>
+        <div class="small" style="margin-top:6px">Lead-investor presence is attractive because it is binary and objective (per Lorana). This shows how far companies that <i>have</i> a lead get in the E8 pipeline.</div>
+      </div>
+      <div>
+        <div class="small" style="font-weight:600;margin-bottom:8px">Screening scores &mdash; pre-screening vs screening</div>
+        <div id="scoreBars"></div>
+        <div class="note"><b>Screening scores are interim, imperfect indicators &mdash; not a verdict.</b> Scorers are inconsistent, committee membership rotates, standards are subjective, monthly cohorts vary, and counterintuitive deals often score low and succeed anyway.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Member interest by company</h2><span class="tag">interest &rarr; investment, by deal</span><button class="infobtn" data-info="interest">i</button></div>
+    <div class="infobox" id="info-interest"></div>
+    <p class="sec-sub">Which companies drew the most member interest at their member meeting, and whether it converted into <b>direct</b> member investment and <b>Annual Fund</b> investment. <span class="clickhint">Click a company for the full breakdown.</span></p>
+    <div class="grid2">
+      <div>
+        <div class="small" style="font-weight:600;margin-bottom:8px">Does interest predict dollars? (each dot = a company)</div>
+        <div id="interestScatter"></div>
+        <div class="small" style="margin-top:4px">X = members interested at the meeting &middot; Y = total invested (direct + fund). Dot size = members who invested.</div>
+      </div>
+      <div>
+        <div class="small" style="font-weight:600;margin-bottom:8px">Top companies by member interest</div>
+        <div style="max-height:360px;overflow:auto">
+        <table id="interestTbl">
+          <thead><tr>
+            <th data-sort="name">Company</th><th data-sort="cat">Sector</th>
+            <th class="num" data-sort="signals" title="Members who registered interest">Int.</th>
+            <th class="num" data-sort="committed" title="Members who committed to invest">Cmt.</th>
+            <th class="num" data-sort="investors" title="Members who actually invested">Inv&middot;#</th>
+            <th class="num" data-sort="direct_inv">Direct</th><th class="num" data-sort="fund_inv">Fund</th>
+          </tr></thead>
+          <tbody id="interestBody"></tbody>
+        </table>
+        </div>
+        <div class="small" style="margin-top:6px">Int. = interested &middot; Cmt. = committed to invest &middot; Inv&middot;# = members who invested</div>
+      </div>
+    </div>
+    <div class="note"><b>Interest is a real but imperfect predictor.</b> Emerald Battery Labs drew 27 interested members, <b>21 committed</b> and <b>20 actually invested</b> ($395K direct + $150K fund). But high-interest deals like It's Electric, Aslan Renewables and agapyo drew 22&ndash;27 interested members and <b>0 investors</b> so far. The E8 Fund (56 voters in 2026) is a second, independent demand signal.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Diversity of dealflow</h2><button class="infobtn" data-info="diversity">i</button></div>
+    <div class="infobox" id="info-diversity"></div>
+    <p class="sec-sub">Drawn from verified application fields (founder gender, race/ethnicity, underrepresented flag). <span class="clickhint">Click the underrepresented chart to see the diversity view across the pipeline.</span></p>
+    <div class="grid2">
+      <div>
+        <div class="small" style="font-weight:600;margin-bottom:8px">Underrepresented-founder share <span class="clickhint">(click for pipeline view)</span></div>
+        <div id="diversityBars"></div>
+      </div>
+      <div>
+        <div class="small" style="font-weight:600;margin-bottom:8px">Founder race / ethnicity (full labels)</div>
+        <div id="raceBars"></div>
+      </div>
+    </div>
+    <div class="note"><b>Label fix:</b> the metric previously shown as "<b>MoM</b>" (heard as "MDM"/"Mom") was being read as a diversity category. It actually meant <b>Month-over-Month trend</b> &mdash; a chart type, not a founder group. Race/ethnicity codes are spelled out (e.g. "MENA" &rarr; "Middle Eastern or North African").</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Report-card metrics</h2><span class="tag">survivability &amp; follow-on &mdash; maturing</span><button class="infobtn" data-info="report">i</button></div>
+    <div class="infobox" id="info-report"></div>
+    <p class="sec-sub">Stronger, slower-maturing quality signals &mdash; the truest back-end measure of whether sourcing found good companies.</p>
+    <div class="grid3">
+      <div class="tile nolink"><div class="k">Portfolio still active</div><div class="vrow"><div class="v">89%</div></div><div class="d">512 active instruments &middot; 1 written off</div></div>
+      <div class="tile nolink"><div class="k">Exits to date</div><div class="vrow"><div class="v">17</div></div><div class="d">62 instruments marked exited</div></div>
+      <div class="tile nolink"><div class="k">Shutdowns</div><div class="vrow"><div class="v">47</div></div><div class="d">Companies dissolved &middot; survivability back-end</div></div>
+    </div>
+    <div class="grid3" style="margin-top:12px">
+      <div class="tile nolink"><div class="k">Raised a later round</div><div class="vrow"><div class="v">36</div></div><div class="d">Companies w/ a post-investment financing round</div></div>
+      <div class="tile nolink"><div class="k">Seed / Series A progression</div><div class="vrow"><div class="v">placeholder</div></div><div class="d">Round-stage tracking &mdash; to wire from instruments</div></div>
+      <div class="tile nolink"><div class="k">Business progress</div><div class="vrow"><div class="v">placeholder</div></div><div class="d">Customers &middot; revenue &middot; bench&rarr;pilot&rarr;mfg (varies by company type)</div></div>
+    </div>
+    <div class="note"><b>What counts as an E8 portfolio company?</b> Retrospective views can be filtered by an objective threshold &mdash;
+      <label class="toggle"><input type="radio" name="thr" checked> 3+ E8 members invested</label> &nbsp;
+      <label class="toggle"><input type="radio" name="thr"> E8 Fund investment only</label> &nbsp;
+      <label class="toggle"><input type="radio" name="thr"> Any member-reported</label>
+      &mdash; separating fund-backed companies from looser member-reported definitions. (Illustrative in this mockup.)</div>
+  </section>
+
+  <footer>Mockup &middot; Sourcing Committee Metrics V2. Numbers are pulled from the live E8 portal database (as of Jun 8, 2026). Where a timeframe other than "Total" is selected, time-bounded figures are scaled to that window for illustration.</footer>
 </div>
 
-<div class="drawer-backdrop" id="backdrop"></div>
-<div class="drawer" id="drawer">
-  <div class="drawer-header">
-    <div><div class="drawer-title" id="drawer-title">Detail</div><div class="drawer-sub" id="drawer-sub"></div></div>
-    <button class="icon-btn" id="close-btn" style="margin-left:auto;">&#10005;</button>
-  </div>
-  <div class="drawer-body" id="drawer-body"></div>
-</div>
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer">
+  <div class="dhead"><h3 id="dTitle">Detail</h3><button class="x" id="dClose">&#10005;</button></div>
+  <div class="dbody" id="dBody"></div>
+</aside>
 
 <script>
-/* ---- Live data (E8 portal pull: May 26, 2026) ---- */
-const DATA = {
-  members: [
-    { name: "Jim Huston", role: "Chair", c:"#2563eb" },
-    { name: "Sarah Bell", role: "Chair", c:"#db2777" },
-    { name: "Bina Shukla", role: "", c:"#a855f7" },
-    { name: "Jordan Schwartz", role: "", c:"#f97316" },
-    { name: "Karin Kidder", role: "", c:"#14b8a6" },
-    { name: "Kevin Schwartz", role: "", c:"#6366f1" },
-    { name: "Lorana Quintero", role: "", c:"#65a30d" },
-    { name: "Scott Pinizzotto", role: "", c:"#0891b2" },
-    { name: "Steve Petitpas", role: "", c:"#be185d" }
-  ],
-  docs: [
-    { n:"1.1 E8 SOURCING COMMITTEE CHARTER 2026.docx", t:"FILE", d:"Apr 21, 2026" },
-    { n:"1.2 E8 Sourcing Committee System of Record", t:"DOC", d:"May 15, 2026" },
-    { n:"1.3 Sourcing Committee Minutes", t:"DOC", d:"May 19, 2026" },
-    { n:"Sourcing Committee Metrics", t:"DOC", d:"May 26, 2026" },
-    { n:"Sourcing Committee Agenda - May 2026", t:"DOC", d:"May 15, 2026" },
-    { n:"E8 Portfolio Company Showcase - May 2026", t:"DOC", d:"May 19, 2026" },
-    { n:"E8 Partner and Collaboration Playbook", t:"DOC", d:"Apr 21, 2026" },
-    { n:"E8 - Partner Deck Feb 2026", t:"SLD", d:"May 14, 2026" },
-    { n:"Principles: What Makes a Good Deal for E8", t:"DOC", d:"Apr 21, 2026" }
-  ],
-  channels: [
-    { name:"VC / Incubator", deals:49 },
-    { name:"Industry Event", deals:36 },
-    { name:"Speed Networking", deals:28 },
-    { name:"Pitch Event", deals:15 },
-    { name:"Personal", deals:15 },
-    { name:"PortCo (founder ref)", deals:3 }
-  ],
-  pipeline: [
-    { name:"Watchlist", n:60 },
-    { name:"Pre-Screening", n:36 },
-    { name:"Pre-Diligence", n:6 },
-    { name:"Diligence", n:6 },
-    { name:"Invested", n:20 }
-  ],
-  partnerPipeline: [
-    { name:"Operational", n:20, rag:"green" },
-    { name:"Initiated", n:30, rag:"amber" },
-    { name:"Priority to initiate", n:6, rag:"amber" },
-    { name:"Not started", n:138, rag:"red" }
-  ],
-  partnerTypes: [
-    { name:"VC", n:151 }, { name:"Accelerator", n:43 }, { name:"Incubator", n:12 },
-    { name:"Angel Group", n:12 }, { name:"Corporate", n:10 }, { name:"Other / PE / FO", n:17 }
-  ],
-  topReferrers: [
-    { name:"Greentown Labs", type:"Accelerator", refs:17, rag:"green" },
-    { name:"Keiretsu Forum", type:"Angel Group", refs:6, rag:"green" },
-    { name:"Third Derivative", type:"Accelerator", refs:4, rag:"green" },
-    { name:"Silicon Valley Social Venture Fund", type:"Angel Group", refs:4, rag:"green" },
-    { name:"EnVest", type:"Other", refs:3, rag:"amber" },
-    { name:"CleanTech Alliance", type:"Other", refs:3, rag:"amber" },
-    { name:"Anthropocene Ventures", type:"VC", refs:2, rag:"amber" },
-    { name:"gener8tor Sustainability", type:"Accelerator", refs:2, rag:"amber" }
-  ],
-  diversity: [
-    { name:"Underrepresented founders", n:124 },
-    { name:"Other", n:122 }
-  ]
+/* ===== timeframe ===== */
+var TF='ytd';
+var TF_FACTOR={ytd:0.46,t12:0.72,mom:0.12,yoy:0.46,total:1};
+function F(){return TF_FACTOR[TF];}
+function sN(x){if(!x)return 0;var v=Math.round(x*F());return v<1?1:v;}
+function sUsd(x){return x*F();}
+
+var KPI={
+ ytd:{cap:'Year-to-date 2026 (Jan 1 – Jun 8). Arrows compare to 2025 YTD.',tiles:[
+   {key:'applications',k:'Applications',v:'300',d:'2025 YTD: 262',delta:'15%',dir:'up'},
+   {key:'invested',k:'Companies invested',v:'15',d:'2025 YTD: 11',delta:'36%',dir:'up'},
+   {key:'dollars',k:'$ invested into Companies who pitched',v:'$2.71M',d:'2025 YTD: $2.2M',delta:'23%',dir:'up'},
+   {key:'lead',k:'Lead investor present',v:'14%',d:'2025 YTD: 10%',delta:'4pt',dir:'up'}]},
+ t12:{cap:'Trailing 12 months. Arrows compare to the prior 12 months.',tiles:[
+   {key:'applications',k:'Applications',v:'612',d:'Prior 12m: 588',delta:'4%',dir:'up'},
+   {key:'invested',k:'Companies invested',v:'24',d:'Prior 12m: 27',delta:'11%',dir:'down'},
+   {key:'dollars',k:'$ invested into Companies who pitched',v:'$5.9M',d:'Prior 12m: $5.4M',delta:'9%',dir:'up'},
+   {key:'lead',k:'Lead investor present',v:'13%',d:'Prior 12m: 12%',delta:'1pt',dir:'up'}]},
+ mom:{cap:'May 2026. Arrows compare to April 2026.',tiles:[
+   {key:'applications',k:'Applications',v:'48',d:'Apr: 41',delta:'17%',dir:'up'},
+   {key:'invested',k:'Companies invested',v:'2',d:'Apr: 3',delta:'1',dir:'down'},
+   {key:'dollars',k:'$ invested into Companies who pitched',v:'$0.6M',d:'Apr: $0.6M',delta:'0%',dir:'flat'},
+   {key:'lead',k:'Lead investor present',v:'15%',d:'Apr: 13%',delta:'2pt',dir:'up'}]},
+ yoy:{cap:'2026 YTD vs 2025 YTD (same Jan–Jun window). Arrows = year-over-year.',tiles:[
+   {key:'applications',k:'Applications',v:'300',d:'2025: 262',delta:'15%',dir:'up'},
+   {key:'invested',k:'Companies invested',v:'15',d:'2025: 11',delta:'36%',dir:'up'},
+   {key:'dollars',k:'$ invested into Companies who pitched',v:'$2.71M',d:'2025: $2.2M',delta:'23%',dir:'up'},
+   {key:'lead',k:'Lead investor present',v:'14%',d:'2025: 10%',delta:'4pt',dir:'up'}]},
+ total:{cap:'Total — all records to date. No comparative period.',tiles:[
+   {key:'applications',k:'Applications',v:'2,727',d:'All submitted, all years',delta:'',dir:'flat'},
+   {key:'invested',k:'Companies invested',v:'187',d:'All-time E8 deployments',delta:'',dir:'flat'},
+   {key:'dollars',k:'$ invested into Companies who pitched',v:'$76.1M',d:'All-time, post-pitch',delta:'',dir:'flat'},
+   {key:'lead',k:'Lead investor present',v:'11%',d:'335 of 2,919 apps',delta:'',dir:'flat'}]}
 };
 
-/* ---- Sidebar render ---- */
-function initials(name){ const p=name.trim().split(/\s+/); return (p.length===1?p[0][0]:p[0][0]+p[p.length-1][0]).toUpperCase(); }
-document.getElementById('members').innerHTML = DATA.members.map(m=>`
-  <div class="member-chip">
-    <div class="avatar" style="background:${m.c}">${initials(m.name)}</div>
-    <div class="info"><div class="name">${m.name}</div>${m.role?`<div class="role">${m.role}</div>`:''}</div>
-  </div>`).join('');
-document.getElementById('docs').innerHTML = DATA.docs.map(d=>`
-  <div class="doc-row"><div class="name"><span class="file-icon">${d.t}</span><span class="txt">${d.n}</span></div><div class="date">${d.d}</div></div>`).join('');
+/* lead-investor companies + furthest stage */
+var STAGES=['Applied','Pre-Screening','Screening','Pitch','Follow-Up','Diligence','Investment'];
+var leadCompanies=[
+ ['Enzinc','Investment'],['GoPowerEV','Investment'],["It's Electric Inc.",'Investment'],['Sparkz','Investment'],['Volexion','Investment'],['ZILA BioWorks','Investment'],['agapyo','Investment'],
+ ['Furno Materials','Diligence'],['NALA Membranes','Diligence'],['TerraSafe Materials','Diligence'],
+ ['Alithic','Follow-Up'],
+ ['2S Water','Screening'],['Adaviv','Screening'],['Carbion','Screening'],['CarbonBridge Inc','Screening'],['Powder Watts','Screening'],['SVX','Screening'],['T-Phite','Screening'],
+ ['Beagle Services','Pre-Screening'],['Bingo Technologies','Pre-Screening'],['CRX.Pro','Pre-Screening'],['Enkara','Pre-Screening'],['GreenIRR','Pre-Screening'],['Licube3','Pre-Screening'],['Nirvana Carbon','Pre-Screening'],['RETRN','Pre-Screening'],['Resiliocs Intelligence','Pre-Screening'],['ShowerStream','Pre-Screening'],['Tiopur','Pre-Screening'],['Variablegrid','Pre-Screening'],['Wireless PnC','Pre-Screening'],
+ ['AUTODIVE','Applied'],['Asoba','Applied'],['Avisa Myko','Applied'],['Carbon GeoCapture Corporation','Applied'],['DLP Labs','Applied'],['EVject','Applied'],['Elven Technologies','Applied'],['Folia Materials','Applied'],['Lucent BioSciences, Inc.','Applied'],['Okovate Sustainable Energy','Applied'],['Pasture Biosciences','Applied'],['InventWood','Applied']
+];
 
-/* ---- Charts ---- */
-function barChart(rows, opts){
-  opts = opts || {};
-  const max = Math.max(...rows.map(r=>r.value));
-  const body = rows.map(r=>{
-    const pct = max>0 ? Math.round(r.value/max*100) : 0;
-    const color = r.color || 'var(--primary)';
-    return `<div class="bar-row"><div class="bl">${r.label}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
-      <div class="bv">${r.display!==undefined?r.display:r.value}</div></div>`;
-  }).join('');
-  return `<div>${body}</div>${opts.note?`<div class="chart-note">${opts.note}</div>`:''}`;
+var DATA={
+ network:[{ch:'VC',cls:'vc',n:151},{ch:'Accelerator',cls:'accel',n:45},{ch:'Angel Group',cls:'angel',n:12},{ch:'Incubator',cls:'incub',n:12},{ch:'Corporate',cls:'corp',n:10},{ch:'Other',cls:'other',n:12}],
+ channels:[
+   {ch:'Accelerator',cls:'accel',n:29,type:'Accelerator'},
+   {ch:'Angel Group',cls:'angel',n:14,type:'Angel Group'},
+   {ch:'VC',cls:'vc',n:12,type:'VC'},
+   {ch:'Events',cls:'other',n:3,sub:true},
+   {ch:'Service Provider',cls:'other',n:2,sub:true,orgs:['CleanTech Alliance','Enduring Planet']},
+   {ch:'Incubator',cls:'incub',n:1,type:'Incubator'},
+   {ch:'Member',cls:'other',n:1,sub:true},
+   {ch:'Search',cls:'other',n:1,sub:true}
+ ],
+ sourceInvest:[{ch:'VC',cls:'vc',cos:3,amt:535000},{ch:'Accelerator',cls:'accel',cos:1,amt:125000},{ch:'Personal / referral',cls:'angel',cos:1,amt:125000},{ch:'Industry Event',cls:'other',cos:1,amt:100000}],
+ partners:[
+   {name:'Greentown Labs',type:'Accelerator',status:'Operational',exits:0},
+   {name:'Anthropocene Ventures',type:'VC',status:'Operational',exits:0},
+   {name:'Titletown Tech',type:'VC',status:'Operational',exits:0},
+   {name:'CleanTech Alliance',type:'Other',status:'Operational',exits:0},
+   {name:'Silicon Valley Social Venture Fund',type:'Angel Group',status:'Operational',exits:0},
+   {name:'Keiretsu Forum',type:'Angel Group',status:'Operational',exits:0},
+   {name:'Burnt Island',type:'VC',status:'Operational',exits:0},
+   {name:'Third Derivative',type:'Accelerator',status:'Not Started',exits:0},
+   {name:'EnVest',type:'Other',status:'—',exits:0},
+   {name:'AirMiners',type:'Accelerator',status:'Operational',exits:0},
+   {name:'gener8tor Sustainability',type:'Accelerator',status:'—',exits:0},
+   {name:'Activate Capital',type:'Accelerator',status:'Initiated',exits:0},
+   {name:'Starshot Capital',type:'VC',status:'Operational',exits:0},
+   {name:'SOSV',type:'VC',status:'Operational',exits:0},
+   {name:'Tandem Launch',type:'Incubator',status:'Not Started',exits:0},
+   {name:'Columbia Technology Ventures',type:'VC',status:'Initiated',exits:0},
+   {name:'Azolla Ventures',type:'VC',status:'Initiated',exits:0},
+   {name:'Plug and Play Tech Center',type:'Accelerator',status:'Initiated',exits:0},
+   {name:'Alliance of Angels',type:'Angel Group',status:'Initiated',exits:0},
+   {name:'Clean Energy Venture Group',type:'Angel Group',status:'Not Started',exits:0}
+ ],
+ partnerCos:{
+   'Greentown Labs':[['Carbon To Stone','Carbon',1,0,0],['10DQ','Energy Storage',0,0,0],['Helix Earth','Energy Efficiency',0,0,0],['Harmony Desalting','Water',0,0,0],['Capwell','Carbon',0,0,0],['HGenium','Carbon',0,0,0],['CLS Wind','Energy Generation',0,0,0],['PooPoof','Environmental Cleanup',0,0,0],['Andros Innovations','—',0,0,0],['Biospheric AI','—',0,0,0],['MCatalysis','—',0,0,0],['MagDrive','—',0,0,0],['Mithril Technologies','—',0,0,0],['PlaSene','—',0,0,0],['PolyQor (Concept Loop)','—',0,0,0],['Realizse','—',0,0,0]],
+   'Anthropocene Ventures':[['Scape Carbon','Carbon',1,175000,1],['Circe Bioscience','Sustainable Materials',1,120000,1]],
+   'Titletown Tech':[['Ateios Systems','Energy Storage',1,240000,0]],
+   'CleanTech Alliance':[['Algafilm','Water',1,125000,0],['Biobead','—',0,0,0],['DCarbon','Energy Generation',0,0,0]],
+   'Silicon Valley Social Venture Fund':[["It's Electric Inc.",'Transportation',1,0,0],['Without','Recycling',1,0,0],['CarbonBridge Inc','Carbon',0,0,0],['Rise Reforming','Sustainable Materials',0,0,0],['SunChem','—',0,0,0],['Telluscope','—',0,0,0]],
+   'Keiretsu Forum':[['Leitnium','Infrastructure',0,0,0],['Rangeway Energy','Transportation',0,0,0],['Skip Technology','Energy Storage',0,0,0],['EV Labs','—',0,0,0],['Helios Charging','—',0,0,0],['Mussell Polymers','—',0,0,0]],
+   'Burnt Island':[['2S Water','Water',1,0,0],['Undesert Corporation','Water',1,0,0]],
+   'Third Derivative':[['Metal Light','Energy Storage',0,0,0],['SVX','Energy Storage',0,0,0],['Sylvatex Inc','Energy Generation',0,0,0],['Determinant Materials','—',0,0,0]],
+   'EnVest':[['Kai Pono Solutions','Water',0,0,0],['Blue Sonde','—',0,0,0]],
+   'AirMiners':[['Carbon Square','—',0,0,0],['Teracarbon Energy','—',0,0,0]],
+   'gener8tor Sustainability':[['Psigryph.Inc','AgTech & Food',0,0,0],['Lacuum','—',0,0,0]],
+   'Activate Capital':[['Andros Innovations','—',0,0,0],['Fluorityx','—',0,0,0]],
+   'Starshot Capital':[['Adaviv','—',0,0,0],['CLS Wind','—',0,0,0]],
+   'SOSV':[['TrelliSense','Carbon',1,0,0]],
+   'Tandem Launch':[['agapyo','Sustainable Materials',1,0,0]],
+   'Columbia Technology Ventures':[['REEgen','Recycling',0,0,0]],
+   'Azolla Ventures':[['Dig Energy','—',0,0,0]],
+   'Plug and Play Tech Center':[['Reenvision AI','—',0,0,0]],
+   'Alliance of Angels':[['Flow Environmental','Built Environment',0,0,0]],
+   'Clean Energy Venture Group':[['Fast Metals','—',0,0,0]]
+ },
+ activation:{
+   prio:['New Climate Ventures','Powerhouse Ventures','Starlight Ventures','Thin Line Capital','Urban Innovation Fund','Virta Ventures'],
+   init:['Clean Energy Ventures','Azolla Ventures','Pangaea Ventures','Columbia Technology Ventures','Juniper VC','B.Capital','Creative Destruction Lab','MassCEC','Plug and Play Tech Center','Activate Capital','Alliance of Angels','IKEA CVC','Elemental Impact','NeoTerra Climate','Prime Coalition','Chevron','JP Morgan','WWF'],
+   oper:['Greentown Labs','AirMiners','Stage 2 Capital','Anthropocene Ventures','Breakthrough Energy','Burnt Island','SOSV','Starshot Capital','Titletown Tech','MCJ Collective','Ecosphere','The 22 Fund','Keiretsu Forum','Chemical Angel Network','Silicon Valley Social Venture Fund','CleanTech Alliance','Enduring Planet']
+ },
+ funnel:[{s:'Applicants',n:300,c:'#2d5d7c'},{s:'Screened',n:117,c:'#3a7a86'},{s:'Pitched (full)',n:42,c:'#2e6b4f'},{s:'Later invested',n:15,c:'#b5832b'}],
+ cohort:[{m:'0–1 mo',n:2,d:0.30},{m:'2–3 mo',n:5,d:0.90},{m:'4–6 mo',n:10,d:1.80},{m:'7–9 mo',n:14,d:2.50},{m:'10+ mo',n:15,d:2.71}],
+ scores:[{lab:'Pre-screening avg',v:1.61,cls:'angel'},{lab:'Screening avg',v:2.21,cls:'vc'}],
+ diversity:[{lab:'Underrepresented founders',n:147,pct:48,cls:'accel'},{lab:'Female founder on team',n:109,pct:35,cls:'angel'},{lab:'Prefer not to answer',n:15,pct:5,cls:'other'}],
+ divPipeline:[{stage:'Applied',total:312,ur:134},{stage:'Screening',total:33,ur:20},{stage:'Pitch',total:2,ur:2},{stage:'Diligence',total:8,ur:4},{stage:'Invested',total:26,ur:16}],
+ race:[{lab:'White',n:302},{lab:'Asian',n:182},{lab:'Hispanic, Latino or Spanish origin',n:110},{lab:'Black or African American',n:79},{lab:'Middle Eastern or North African',n:65},{lab:'American Indian or Alaska Native',n:18}],
+ interest:[
+   {name:'NxLite',cat:'Energy Efficiency',signals:41,committed:5,direct_inv:560000,fund_inv:150000,investors:12},
+   {name:'Cala',cat:'Built Environment',signals:35,committed:3,direct_inv:150000,fund_inv:100000,investors:5},
+   {name:'Ateios Systems',cat:'Energy Storage',signals:32,committed:5,direct_inv:115000,fund_inv:125000,investors:5},
+   {name:'Ocean Build',cat:'Sustainable Materials',signals:28,committed:0,direct_inv:200000,fund_inv:0,investors:3},
+   {name:'InventWood',cat:'Sustainable Materials',signals:28,committed:2,direct_inv:320000,fund_inv:149990,investors:6},
+   {name:'Sparkz',cat:'Sustainable Materials',signals:28,committed:0,direct_inv:265000,fund_inv:0,investors:6},
+   {name:'Imperium Technologies, Inc.',cat:'Energy Efficiency',signals:27,committed:1,direct_inv:25000,fund_inv:125000,investors:1},
+   {name:"It's Electric Inc.",cat:'Transportation',signals:27,committed:2,direct_inv:0,fund_inv:0,investors:0},
+   {name:'Emerald Battery Labs',cat:'Energy Storage',signals:27,committed:21,direct_inv:395000,fund_inv:150000,investors:20},
+   {name:'Aslan Renewables',cat:'Energy Generation',signals:26,committed:0,direct_inv:0,fund_inv:0,investors:0},
+   {name:'Photon Marine',cat:'Transportation',signals:26,committed:0,direct_inv:214999,fund_inv:90000,investors:9},
+   {name:'Nature Coatings Inc.',cat:'Sustainable Materials',signals:25,committed:0,direct_inv:25000,fund_inv:99999,investors:1},
+   {name:'ZILA BioWorks',cat:'Sustainable Materials',signals:24,committed:1,direct_inv:58624,fund_inv:0,investors:3},
+   {name:'AquaPoro',cat:'Water',signals:23,committed:0,direct_inv:12000,fund_inv:0,investors:2},
+   {name:'agapyo',cat:'Sustainable Materials',signals:22,committed:0,direct_inv:0,fund_inv:0,investors:0},
+   {name:'Algafilm',cat:'Water',signals:22,committed:1,direct_inv:0,fund_inv:125000,investors:0},
+   {name:'60Hz',cat:'Software',signals:21,committed:2,direct_inv:392800,fund_inv:0,investors:17},
+   {name:'Inovues',cat:'Built Environment',signals:21,committed:0,direct_inv:125000,fund_inv:125000,investors:4}
+ ]
+};
+
+/* partner profiles for activation drawer: name -> [type,stage,hq,owner,contact,email,descr] */
+var PROFILES={
+ 'New Climate Ventures':['VC','Early Stage, Seed, Series A','Bellaire, TX','—','—','—','Invests in innovative carbon reduction and avoidance technology companies across various sectors.'],
+ 'Powerhouse Ventures':['VC','Seed, Series A, Series B','Oakland, CA','David Jackson','Emily Kirsch','emily@powerhouse.fund','Software for rapid decarbonization of global energy and mobility systems.'],
+ 'Starlight Ventures':['VC','Seed, Series A','Miami, FL','—','—','—','Early-stage "progress at scale" across frontier tech incl. climate and industrial decarbonization.'],
+ 'Thin Line Capital':['VC','Seed','Pasadena, CA','David Jackson','Aaron Fyke','aaronfyke@gmail.com','$300-400k into seed, low-capex renewable energy, transport electrification and climate resiliency.'],
+ 'Urban Innovation Fund':['VC','Seed','San Francisco, CA','—','—','—','Seed capital and regulatory support for entrepreneurs enhancing city livability and sustainability.'],
+ 'Virta Ventures':['VC','Seed, Pre-seed','Hailey, ID','Scott Pinizzotto','Russell Sprole','russell@virtaventures.co','Early-stage equity-light solutions to fight climate change.'],
+ 'Clean Energy Ventures':['VC','Early Stage','Boston, MA','Jean-Noel Poirier','Yi Jean Chow','ychow@cleanenergyventures.com','Disruptive advanced energy tech and business-model innovation for large GHG reductions.'],
+ 'Azolla Ventures':['VC','Early Stage','Cambridge, MA','Ernie Chow','Jillian Chase','jillian@azollaventures.com','Catalyzing climate breakthroughs with gigaton-scale CO2e reduction potential.'],
+ 'Pangaea Ventures':['VC','Early Stage / Series A','Vancouver, BC','Jim Huston','David Weekes','david@pangaeaventures.com','Hard tech (materials, chemistry, biology); Series A; $2-5M first check.'],
+ 'Columbia Technology Ventures':['VC','Pre-seed, Seed','Columbia (NY)','sarah bell','Sophia Sulimirski','ss7470@columbia.edu','Columbia University tech-transfer / ventures arm.'],
+ 'Juniper VC':['VC','Early Stage / Seed','United States','Jim Huston','Michael Luciani','michael@junipervc.com','Deep-tech/biotech for the bioindustrial revolution; climate & bio convergence at Seed.'],
+ 'B.Capital':['VC','Series B','—','sarah bell','Nate Johnson','njohnson@b.capital','Growth stage (Series B+) across the electricity value chain; $20-40M checks.'],
+ 'Creative Destruction Lab':['Accelerator','Seed, Series A','Toronto, ON','sarah bell','Amelie Schumacher','amelie.schumacher@creativedestructionlab.com','Program for scalable seed-stage science/tech companies; mentorship-driven.'],
+ 'MassCEC':['Accelerator','Early Stage, Seed','Boston, MA','Larry Aller','Mike Condon','MCondon@masscec.com','Accelerates Massachusetts clean-energy sector growth.'],
+ 'Plug and Play Tech Center':['Accelerator','Early Stage, Seed','Sunnyvale, CA','sarah bell','—','—','Connects startups with corporations; accelerator + VC investments.'],
+ 'Activate Capital':['Accelerator','Series B, Series C+','San Francisco, CA','—','—','—','Invests in high-growth companies scaling tech for a sustainable, resilient future.'],
+ 'Alliance of Angels':['Angel Group','Seed, Early Stage','Seattle, WA','Andrew Wang','Angie Parker','angie@allianceofangels.com','Finance and support for early-stage high-growth startups.'],
+ 'IKEA CVC':['Corporate','Seed','—','—','Rafaelle Giovinazzi','raffaele.giovinazzi@inter.ikea.com','Corporate VC arm of Inter IKEA Group; strategic investments.'],
+ 'Elemental Impact':['Corporate','Seed – Series C+','Honolulu, HI','Karin Kidder','Maddie Lee','maddie@elementalimpact.com','Funds climate technologies with significant community impact.'],
+ 'NeoTerra Climate':['Incubator','Early Stage, Pre-seed','—','—','Chris Piedmonte','chris.piedmonte@neoterra.capital','Inception-stage venture firm; concept and pre-seed founders.'],
+ 'Prime Coalition':['Other','Seed, Series A','—','—','Genevieve Hummer','genevieve.hummer@primecoalition.org','Catalytic capital for early climate infrastructure.'],
+ 'Chevron':['Corporate','Series A, Series B, Seed','—','—','Ryan Owen','ryan.owen@chevron.com','CVC investing $1-10M in companies fueling the energy transition.'],
+ 'JP Morgan':['Corporate','—','—','sarah bell','Jenny Wang','jenny.x.wang@jpmorgan.com','Corporate / strategic relationship.'],
+ 'WWF':['Other','—','—','Eric Berman','Elizabeth Duncan','elizabeth.duncan@wwfus.org','WWF invests in mission-aligned companies.'],
+ 'Greentown Labs':['Accelerator','Seed, Series A','Somerville, MA','Steve Petitpas','Sarah Millar','smillar@greentownlabs.com','Climatetech incubator: resources, equipment, programming and startup space.'],
+ 'AirMiners':['Accelerator','Early Stage, Pre-Seed, Seed','Bay Area, CA','Phil Li','Jason Grillo','jason@airminers.com','Accelerates carbon-removal startups; community plus carbon-removal purchases.'],
+ 'Stage 2 Capital':['Accelerator','Seed, Series A','USA','sarah bell','Sean Po','sean@stage2.capital','B2B software-led venture firm; strong operational/GTM support.'],
+ 'Anthropocene Ventures':['VC','Pre-seed, Seed, Series A','San Francisco, CA','Jordan Schwartz','Matt McGraw','matt@anthro.ventures','Deep-tech climate fund; exponential tech and hard science for resilience.'],
+ 'Breakthrough Energy':['VC','Series A','Boston, MA','Jean-Noel Poirier','Taylor Carvalho Karp','taylor@breakthroughenergy.org','Accelerates the clean-energy transition; R&D plus company investment.'],
+ 'Burnt Island':['VC','Seed – Series B','New York, NY','Jim Huston','Tom Ferguson','tom@burntislandventures.com','Water management and climate; substantial sector-specific support.'],
+ 'SOSV':['VC','Seed, Series A','Princeton, NJ','Sarah Chong','Andrew Gollach','andrew.gollach@sosv.com','Global multi-stage VC; pre-seed development programs for deep-tech founders.'],
+ 'Starshot Capital':['VC','Pre-Seed – Series A','USA','sarah bell','Praveen Mahendran','praveen@starshotcapital.com','Early-stage gigaton-scale climate; sector-agnostic.'],
+ 'Titletown Tech':['VC','Seed, Series A','USA','sarah bell','Grace Schattner','schattnerg@titletowntech.com','Green Bay Packers + Microsoft VC; early-stage scalable ventures.'],
+ 'MCJ Collective':['VC','Seed','Boston, MA','Jim Huston','Yin Liu','yin@mcj.vc','Backs Seed-stage founders scaling climate solutions.'],
+ 'Ecosphere':['VC','Pre-seed, Seed','Houston, TX','sarah bell','Adil Jafry','adil@ecosphere.vc','Houston pre-seed to late-seed climate-tech and sustainability.'],
+ 'The 22 Fund':['VC','Series B, Series C+','Los Angeles, CA','sarah bell','Rajan Kassetty','rkasetty@the22fund.com','Tech-based manufacturing; women and BIPOC-led focus.'],
+ 'Keiretsu Forum':['Angel Group','Seed, Series A','San Francisco, CA','sarah bell','Juan Arango','juan@keiretsuforum.com','Global network of capital and dealflow for emerging-tech startups.'],
+ 'Chemical Angel Network':['Angel Group','Early Stage','Los Angeles, CA','sarah bell','Andreas Stonas','andreas.stonas@gmail.com','Angel network focused on chemistry/materials startups.'],
+ 'Silicon Valley Social Venture Fund':['Angel Group','Seed, Pre-seed','Silicon Valley, CA','Lee Otis','John Franceski','jfranceski@sv2.org','Invests in social ventures and nonprofits; skills and networks.'],
+ 'CleanTech Alliance':['Other','—','Seattle, WA','Karin Kidder','Mel Clark','mel@cleantechalliance.org','Seattle trade association for clean tech, climate tech and clean energy.'],
+ 'Enduring Planet':['Other','Seed, Pre-seed','Portland, OR','sarah bell','Erin Davis','erin@enduringplanet.com','Founder-friendly working capital against grants/contracts; advisory services.']
+};
+
+var INFO={
+ kpi:['Submitted applications, companies that received E8 investment, dollars invested into companies that pitched, and lead-investor presence (applications.have_lead) — filtered to the selected timeframe. The arrow compares the headline to the previous comparable period.','A one-line health check each meeting: enough new companies, are they converting to investment, and is deal quality (lead investor) trending up? Click any tile to see the underlying companies.'],
+ channel:['Referrals received are recommendation_lists (direction = in), joined to the partner record and grouped by partner type. "Other" is broken into sub-channels (Events, Service Provider, Member, Search). Network size counts partner organisations by type.','Decide where to spend relationship effort. Click a channel to drill into its organisations and then any partner for deals/pitches/investment/closed.'],
+ source:['Companies carry a lead_source tag; this sums actual E8 investment (deployments) into companies from each tagged source, blended with partner-referral attribution because coverage is partial.','Identify which channels actually produce invested dollars — then double down and fix attribution so the picture is complete.'],
+ partner:['Per partner: deals = companies referred in; Pitch = how many reached a Pitch event; Invested = E8 deployments into them; Exits and Closed come from valuation_events. Click a partner for the company list.','Rank partners by quality, not volume. Re-up with partners whose referrals pitch and get funded; the Closed column shows where funded referrals did not survive.'],
+ activation:['Each partner carries a deal_flow_sharing_status (Priority to Initiate / Initiated / Operational). Clicking a partner shows its full profile — channel, investment stage, HQ, description, lead contact and the E8 owner — from the partner record.','Run partner development like a sales pipeline: work the Priority column, move relationships to Initiated, then Operational.'],
+ funnel:['Applicants and screened come from pipeline stages; the pitch cohort is every company with a full Pitch event since Jan 2025, then we follow each forward and sum any deployment dated after its pitch. The donut shows the conversion rate; the bars show when the money landed relative to the pitch.','See true conversion: a same-month view understates success because money often lands months later.'],
+ quality:['Objective fields come from the application (have_lead, capital_seeking, funding_to_date). The stage chart takes every 2026 company that has a lead investor and shows the furthest pipeline stage it reached. Screening scores aggregate member ratings (0-4) by stage.','Lead with objective signals; click a stage to see exactly which lead-backed companies got that far.'],
+ interest:['Member interest is the investment_interest table. Int. = members who registered interest; Cmt. = members who marked themselves committed to invest (a stronger signal than exploratory interest); Inv.# = members who actually deployed (distinct investors on deployments). Direct vs Annual Fund splits deployments by whether a fund_id is attached.','Test whether appetite at the meeting predicts dollars, and chase high-interest deals that have not yet converted.'],
+ diversity:['Founder demographics on the company record (underrepresented flag, gender, race_ethnicity). Bars show the count and the share of populated records. Clicking the underrepresented chart opens the Portal pipeline view: underrepresented share at each stage from Applied to Invested.','Track whether dealflow reflects E8 access goals and whether under-represented founders advance through the funnel at the same rate.'],
+ report:['Survivability and follow-on come from instruments.status, valuation_events (exit / shutdown / financing_round) and portfolio_events. These mature slowly, so most are multi-year lagging indicators (placeholders where not yet wired).','The eventual report card: did sourced companies survive, exit and raise follow-on rounds? Use the portfolio-definition threshold to compare like-for-like cohorts.']
+};
+
+/* ===== helpers ===== */
+var $=function(s){return document.querySelector(s);};
+var $$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s));};
+function usd(n){return n>=1e6?'$'+(n/1e6).toFixed(2)+'M':n>=1e3?'$'+Math.round(n/1e3)+'K':(n>0?'$'+Math.round(n):'—');}
+var clsColor={vc:'#2d5d7c',accel:'#2e6b4f',incub:'#6a8f3c',angel:'#b5832b',corp:'#7a5ea3',other:'#8a8f8b'};
+var typeCls={'VC':'p-vc','Accelerator':'p-accel','Incubator':'p-incub','Angel Group':'p-angel','Corporate':'p-corp','Other':'p-other'};
+var sectorColor={'Energy Storage':'#2d5d7c','Sustainable Materials':'#2e6b4f','Energy Efficiency':'#6a8f3c','Built Environment':'#b5832b','Transportation':'#7a5ea3','Water':'#3a8fa3','Carbon':'#4a6b2e','Energy Generation':'#a3702f','Recycling':'#5e8a6b','Software':'#8a5e7a','Infrastructure':'#7a8f3c','AgTech & Food':'#9a8f3c','Environmental Cleanup':'#3c8f6b'};
+function sc(c){return sectorColor[c]||'#8a8f8b';}
+function esc(s){return String(s).replace(/"/g,'&quot;');}
+document.getElementById('asof').textContent='as of Jun 8, 2026';
+
+DATA.partners.forEach(function(p){var cos=DATA.partnerCos[p.name]||[];p.deals=cos.length;p.pitched=cos.filter(function(c){return c[2];}).length;p.invested=cos.reduce(function(s,c){return s+c[3];},0);p.closed=cos.filter(function(c){return c[3]>0&&c[4];}).length;});
+
+/* ===== drawer ===== */
+function openDrawer(title,html){$('#dTitle').innerHTML=title;$('#dBody').innerHTML=html;$('#drawer').classList.add('open');$('#overlay').classList.add('open');}
+function closeDrawer(){$('#drawer').classList.remove('open');$('#overlay').classList.remove('open');}
+$('#dClose').onclick=closeDrawer;$('#overlay').onclick=closeDrawer;
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeDrawer();});
+
+function coRow(c,link){return '<div class="dco'+(link?'':' nolink')+'"'+(link?' data-p="'+esc(c[0])+'"':'')+'><span class="pill" style="background:'+sc(c[1])+'22;color:'+sc(c[1])+'">'+c[1]+'</span><span class="nm">'+c[0]+'</span><span class="meta">'+(c[3]>0?usd(c[3]):(c[2]?'pitched':'referred'))+' '+(c[3]>0?(c[4]?'<span class="badge-closed">closed</span>':'<span class="badge-live">active</span>'):'')+'</span></div>';}
+
+function partnerDrawer(name){
+  var p=null;DATA.partners.forEach(function(x){if(x.name===name)p=x;});
+  var cos=(DATA.partnerCos[name]||[]).slice().sort(function(a,b){return b[3]-a[3]||b[2]-a[2];});
+  var prof=PROFILES[name];
+  var title=name+(prof?' <span class="pill '+(typeCls[prof[0]]||'p-other')+'" style="font-size:11px;vertical-align:middle">'+prof[0]+'</span>':'');
+  if(!cos.length&&prof){activationProfileDrawer(name);return;}
+  if(!cos.length){openDrawer(name,'<p class="small">No referred companies on record yet.</p>');return;}
+  var invested=cos.filter(function(c){return c[3]>0;}),pitchedOnly=cos.filter(function(c){return c[2]&&c[3]===0;}),rest=cos.filter(function(c){return !c[2]&&c[3]===0;});
+  var html='';
+  if(p)html+='<div class="statline"><span class="s"><b>'+p.deals+'</b>deals referred</span><span class="s"><b>'+p.pitched+'</b>reached pitch</span><span class="s"><b>'+usd(p.invested)+'</b>invested</span><span class="s"><b>'+p.closed+'</b>now closed</span></div>';
+  if(prof)html+='<div class="field"><span class="lab">E8 owner</span> '+prof[3]+' &nbsp; <span class="lab">Lead contact</span> '+prof[4]+'</div>';
+  if(invested.length)html+='<div class="dgroup"><h4>Invested <span>'+invested.length+'</span></h4>'+invested.map(function(c){return coRow(c,0);}).join('')+'</div>';
+  if(pitchedOnly.length)html+='<div class="dgroup"><h4>Reached a pitch (not funded) <span>'+pitchedOnly.length+'</span></h4>'+pitchedOnly.map(function(c){return coRow(c,0);}).join('')+'</div>';
+  if(rest.length)html+='<div class="dgroup"><h4>Referred — not yet pitched <span>'+rest.length+'</span></h4>'+rest.map(function(c){return coRow(c,0);}).join('')+'</div>';
+  openDrawer(title,html);
 }
-const ragColor = { green:'var(--ok)', amber:'#d97706', red:'var(--danger)', grey:'var(--text-subtle)' };
-const CHARTS = {
-  channel: ()=>barChart(DATA.channels.map(c=>({label:c.name,value:c.deals})),
-    {note:'Tagged deals by source channel. Only ~15% of 2026 applicants carry a source tag today — see Attribution.'}),
-  pipeline: ()=>barChart(DATA.pipeline.map(p=>({label:p.name,value:p.n})),
-    {note:'Current count of companies at each pipeline stage (snapshot, not a single-cohort funnel).'}),
-  partners: ()=>barChart(DATA.partnerPipeline.map(p=>({label:p.name,value:p.n,color:ragColor[p.rag]})),
-    {note:'Partner activation pipeline by deal-flow-sharing status across 276 partner organizations.'}),
-  diversity: ()=>barChart(DATA.diversity.map(d=>({label:d.name,value:d.n,color:d.name==='Other'?'var(--text-subtle)':'var(--primary)'})),
-    {note:'2026 applicant companies by founder diversity flag (124 of 246 = 50%; target ≥60%).'})
-};
-function renderChart(key){ document.getElementById('chart').innerHTML = CHARTS[key](); }
-renderChart('channel');
-document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-  t.classList.add('active'); renderChart(t.dataset.tab);
-}));
-
-/* ---- Drawer ---- */
-const backdrop=document.getElementById('backdrop'), drawer=document.getElementById('drawer');
-function openDrawer(title, sub, html){
-  document.getElementById('drawer-title').textContent=title;
-  document.getElementById('drawer-sub').textContent=sub||'';
-  document.getElementById('drawer-body').innerHTML=html;
-  backdrop.classList.add('open'); drawer.classList.add('open');
+function activationProfileDrawer(name){
+  var pr=PROFILES[name];
+  if(!pr){openDrawer(name,'<p class="small">No partner profile on record yet — relationship is being worked toward operational deal-sharing.</p>');return;}
+  var title=name+' <span class="pill '+(typeCls[pr[0]]||'p-other')+'" style="font-size:11px;vertical-align:middle">'+pr[0]+'</span>';
+  var html='<div class="field"><span class="lab">Investment stage</span><div>'+pr[1]+'</div></div>'+
+    '<div class="field"><span class="lab">Headquarters</span><div>'+pr[2]+'</div></div>'+
+    '<div class="field"><span class="lab">Description</span><div>'+pr[6]+'</div></div>'+
+    '<div class="field"><span class="lab">Lead contact</span><div>'+pr[4]+(pr[5]!=='—'?' &middot; <a href="mailto:'+pr[5]+'">'+pr[5]+'</a>':'')+'</div></div>'+
+    '<div class="field"><span class="lab">E8 owner (lead member)</span><div>'+pr[3]+'</div></div>';
+  var cos=DATA.partnerCos[name];
+  if(cos&&cos.length)html+='<div class="dgroup" style="margin-top:14px"><h4>Referred companies <span>'+cos.length+'</span></h4>'+cos.slice().sort(function(a,b){return b[3]-a[3];}).map(function(c){return coRow(c,0);}).join('')+'</div>';
+  openDrawer(title,html);
 }
-function closeDrawer(){ backdrop.classList.remove('open'); drawer.classList.remove('open'); }
-backdrop.addEventListener('click',closeDrawer);
-document.getElementById('close-btn').addEventListener('click',closeDrawer);
+function companyDrawer(i){
+  var c=DATA.interest[i];var total=c.direct_inv+c.fund_inv;
+  var verdict=total>0?(c.investors>0?c.investors+' member'+(c.investors>1?'s':'')+' invested — interest converted into dollars.':'Investment recorded via the fund.'):'High interest, no investor yet — a candidate for committee follow-up.';
+  openDrawer(c.name+' <span class="pill" style="background:'+sc(c.cat)+'22;color:'+sc(c.cat)+';font-size:11px;vertical-align:middle">'+c.cat+'</span>',
+   '<div class="statline"><span class="s"><b>'+sN(c.signals)+'</b>interested</span><span class="s"><b>'+sN(c.committed)+'</b>committed to invest</span><span class="s"><b>'+sN(c.investors)+'</b>invested (#)</span></div>'+
+   '<div class="dgroup"><h4>Member interest at the meeting</h4><div class="dco nolink"><span class="nm">Members interested</span><span class="meta">'+sN(c.signals)+'</span></div><div class="dco nolink"><span class="nm">Committed to invest</span><span class="meta">'+sN(c.committed)+'</span></div></div>'+
+   '<div class="dgroup"><h4>Did it convert to investment?</h4><div class="dco nolink"><span class="nm">Members who invested</span><span class="meta">'+sN(c.investors)+'</span></div><div class="dco nolink"><span class="nm">Direct member investment</span><span class="meta">'+usd(sUsd(c.direct_inv))+'</span></div><div class="dco nolink"><span class="nm">Annual Fund investment</span><span class="meta">'+usd(sUsd(c.fund_inv))+'</span></div><div class="dco nolink"><span class="nm">Total invested</span><span class="meta"><b>'+usd(sUsd(total))+'</b></span></div></div>'+
+   '<p class="small">'+verdict+'</p>');
+}
 
-const DRAWERS = {
-  quality: ()=>({ title:'Deal Quality', sub:'Screening scores by stage · 0–4 scale',
-    html:`<div class="kpi-strip">
-        <div class="k"><div class="kv">1.6</div><div class="kl">Pre-Screening avg</div></div>
-        <div class="k"><div class="kv">2.2</div><div class="kl">Screening avg</div></div>
-        <div class="k"><div class="kv">757</div><div class="kl">Pre-Screening rated</div></div>
-      </div>
-      <table class="dtable"><thead><tr><th>Stage</th><th class="num">Deals rated</th><th class="num">Avg score</th><th class="num">Target</th></tr></thead>
-      <tbody>
-        <tr><td>Pre-Screening</td><td class="num">757</td><td class="num">1.6</td><td class="num">&ge; 3.0</td></tr>
-        <tr><td>Screening</td><td class="num">199</td><td class="num">2.2</td><td class="num">&ge; 3.0</td></tr>
-        <tr><td>To Member Meeting</td><td class="num">&mdash;</td><td class="num">&lt;1% &ge;3.5</td><td class="num">100% &ge;3.5</td></tr>
-      </tbody></table>
-      <div class="drawer-note"><b>How this is measured.</b> Scores come from the portal's screening rubric (8 categories, each Dealbreaker→Strong = 0–4). The value shown is the composite average across all submissions at that stage, full history. The doc notes the single <b>Recommendation</b> measure (with confidence intervals) may be the better signal — open question for v1. Window (full history vs. trailing 12 months vs. current cycle) is also TBD.</div>`}),
-  attribution: ()=>({ title:'Dealflow Mix & Attribution', sub:'Where deals come from',
-    html:`<div class="kpi-strip">
-        <div class="k"><div class="kv">15%</div><div class="kl">Tagged (2026)</div></div>
-        <div class="k"><div class="kv">37</div><div class="kl">of 246 deals</div></div>
-        <div class="k"><div class="kv">100%</div><div class="kl">Target by Sep '26</div></div>
-      </div>
-      <div class="drawer-note"><b>Attribution is the gating metric.</b> Only 37 of 246 (15%) of 2026 applicant companies currently carry a source tag, so proactive-vs-reactive share and "% of investment into proactive deals" can't yet be computed reliably. The existing <b>lead_source</b> tags (VC/Incubator, Industry Event, Speed Networking, Pitch Event, Personal, PortCo) are all proactive-style — there is no "reactive / inbound" category, which is why the doc recommends adding a <b>"How did you hear about E8?"</b> dropdown to the application. Once that lands and tagging hits ~100%, the two pending tiles populate automatically.</div>
-      <table class="dtable" style="margin-top:14px;"><thead><tr><th>Source channel (tagged)</th><th class="num">Deals</th></tr></thead><tbody>
-      ${DATA.channels.map(c=>`<tr><td>${c.name}</td><td class="num">${c.deals}</td></tr>`).join('')}
-      </tbody></table>`}),
-  channels: ()=>({ title:'Channel Effectiveness & Coverage', sub:'Volume, quality & conversion by channel',
-    html:`<table class="dtable"><thead><tr><th>Channel</th><th class="num">Tagged deals</th><th class="num">Avg score</th><th class="num">&rarr; Pre-Screening</th></tr></thead><tbody>
-      ${DATA.channels.map(c=>`<tr><td>${c.name}</td><td class="num">${c.deals}</td><td class="num">&mdash;</td><td class="num">&mdash;</td></tr>`).join('')}
-      </tbody></table>
-      <div class="drawer-note"><b>Volume is live; quality & conversion are pending.</b> Deal counts per channel come straight from the portal. Average score and conversion-to-pre-screening per channel need the source field wired through the pipeline (and consistent tagging) before they populate. Target: at least 3 channels each generating ≥3 deals/quarter that average &gt;3 at pre-screening, with no single channel &gt;40% of dealflow (currently 32%).</div>`}),
-  partners: ()=>({ title:'Partner Network Strength', sub:'276 partner organizations',
-    html:`<div class="kpi-strip">
-        <div class="k"><div class="kv">20</div><div class="kl">Operational</div></div>
-        <div class="k"><div class="kv">60</div><div class="kl">Referrals in (2026)</div></div>
-        <div class="k"><div class="kv">114</div><div class="kl">With E8 owner</div></div>
-      </div>
-      <table class="dtable"><thead><tr><th>Activation status</th><th class="num">Partners</th><th class="num">Status</th></tr></thead><tbody>
-      ${DATA.partnerPipeline.map(p=>`<tr><td>${p.name}</td><td class="num">${p.n}</td><td class="num"><span class="badge ${p.rag}">${p.rag.toUpperCase()}</span></td></tr>`).join('')}
-      </tbody></table>
-      <div class="subhead" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin:16px 0 8px;">Top referrers (2026)</div>
-      <table class="dtable"><thead><tr><th>Partner</th><th>Type</th><th class="num">Referrals</th></tr></thead><tbody>
-      ${DATA.topReferrers.map(r=>`<tr><td>${r.name}</td><td>${r.type}</td><td class="num">${r.refs}</td></tr>`).join('')}
-      </tbody></table>
-      <div class="drawer-note"><b>Target:</b> ≥8 active Tier 1/2 partners (20 are Operational today). The portal stores activation status (Not Started→Operational) but not an explicit Tier 1/2 — mapping status to tier, or adding a tier field, is an open question. Per-priority-partner targets (≥3 qualified referrals/quarter, ≥1 high-scoring deal/quarter) need the referral→score link wired.</div>`}),
-  diversity: ()=>({ title:'Diversity of Dealflow', sub:'2026 applicant companies',
-    html:`<div class="kpi-strip">
-        <div class="k"><div class="kv">50%</div><div class="kl">Underrepresented</div></div>
-        <div class="k"><div class="kv">124</div><div class="kl">of 246 deals</div></div>
-        <div class="k"><div class="kv">&ge;60%</div><div class="kl">Target</div></div>
-      </div>
-      <div class="drawer-note"><b>Female and/or underrepresented-minority founders.</b> 124 of 246 (50%) of 2026 applicant companies are flagged underrepresented, against a ≥60% target. The doc asks to split this into separate gender / minority metrics and add a month-over-month visualization — both are open items for v1. The "no single channel &gt;40%" homogeneity guard currently passes (top channel = 32%).</div>`})
-};
-document.querySelectorAll('.stat-tile').forEach(tile=>{
-  tile.addEventListener('click',()=>{
-    const key=tile.dataset.bucket;
-    if(key==='pipeline'){ document.querySelector('.tab[data-tab="pipeline"]').click(); document.getElementById('chart').scrollIntoView({behavior:'smooth',block:'center'}); return; }
-    const d=DRAWERS[key]; if(d){ const r=d(); openDrawer(r.title,r.sub,r.html); }
-  });
-});
+/* tile click-throughs */
+function tileDrawer(key){
+  if(key==='lead'){
+    var html='<p class="small">All 2026 companies that have a lead investor, grouped by the furthest stage they reached in the E8 pipeline.</p>';
+    for(var s=STAGES.length-1;s>=0;s--){var st=STAGES[s];var list=leadCompanies.filter(function(c){return c[1]===st;});if(!list.length)continue;html+='<div class="dgroup"><h4>'+st+' <span>'+list.length+'</span></h4>'+list.map(function(c){return '<div class="dco nolink"><span class="nm">'+c[0]+'</span><span class="meta">'+c[1]+'</span></div>';}).join('')+'</div>';}
+    openDrawer('Lead investor present — '+leadCompanies.length+' companies',html);return;
+  }
+  if(key==='invested'||key==='dollars'){
+    var inv=DATA.interest.filter(function(c){return (c.direct_inv+c.fund_inv)>0;}).sort(function(a,b){return (b.direct_inv+b.fund_inv)-(a.direct_inv+a.fund_inv);});
+    var rows=inv.map(function(c){var t=c.direct_inv+c.fund_inv;return '<div class="dco" data-ci="'+DATA.interest.indexOf(c)+'"><span class="pill" style="background:'+sc(c.cat)+'22;color:'+sc(c.cat)+'">'+c.cat+'</span><span class="nm">'+c.name+'</span><span class="meta">'+usd(sUsd(t))+' &middot; '+sN(c.investors)+' inv.</span></div>';}).join('');
+    var ttl=key==='dollars'?'$ invested into companies who pitched':'Companies invested';
+    openDrawer(ttl,'<p class="small">Companies that pitched and later received E8 investment (direct + Annual Fund). Click a company for the full breakdown.</p>'+rows);
+    $$('#dBody .dco[data-ci]').forEach(function(d){d.onclick=function(){companyDrawer(+d.getAttribute('data-ci'));};});return;
+  }
+  if(key==='applications'){
+    var sample=['NxLite','Cala','Ateios Systems','Ocean Build','InventWood','Sparkz','Emerald Battery Labs','Photon Marine','2S Water','Adaviv','Carbion','GreenIRR','RETRN','ShowerStream','Folia Materials','Avisa Myko'];
+    openDrawer('Applications — '+KPI[TF].tiles[0].v+' ('+tfLabel()+')','<p class="small">Submitted applications in the selected timeframe. Representative sample of companies shown (full list is in the Pipeline tab of the portal).</p>'+sample.map(function(n){return '<div class="dco nolink"><span class="nm">'+n+'</span></div>';}).join(''));return;
+  }
+}
+function tfLabel(){return {ytd:'YTD 2026',t12:'trailing 12m',mom:'May 2026',yoy:'2026 vs 2025',total:'all records'}[TF];}
+
+/* channel drilldown */
+function channelDrawer(ch){
+  var c=null;DATA.channels.forEach(function(x){if(x.ch===ch)c=x;});
+  var html='';var orgs=[];
+  if(c.type){orgs=DATA.partners.filter(function(p){return p.type===c.type;});}
+  else if(c.orgs){orgs=c.orgs.map(function(n){var p=null;DATA.partners.forEach(function(x){if(x.name===n)p=x;});return p||{name:n,type:'Other',deals:'—',pitched:'—',invested:0,profileOnly:true};});}
+  if(orgs.length){
+    html='<p class="small">Organizations in the '+ch+' channel. Click one for full partner detail.</p>'+orgs.map(function(p){return '<div class="dco" data-p="'+esc(p.name)+'"><span class="nm">'+p.name+'</span><span class="meta">'+(typeof p.deals==='number'?p.deals+' deals &middot; '+usd(p.invested):'profile')+'</span></div>';}).join('');
+    openDrawer(ch+' — '+sN(c.n)+' referrals',html);
+    $$('#dBody .dco[data-p]').forEach(function(d){d.onclick=function(){var nm=d.getAttribute('data-p');if(DATA.partnerCos[nm])partnerDrawer(nm);else activationProfileDrawer(nm);};});
+  } else {
+    openDrawer(ch+' — '+sN(c.n)+' referrals','<p class="small">'+ch+' is a sourcing sub-channel (split out of the former "Other" bucket). '+sN(c.n)+' referral(s) came in via '+ch.toLowerCase()+' in the selected timeframe. Individual organisations are not yet tagged to this sub-channel in the portal.</p>');
+  }
+}
+
+/* ===== renderers ===== */
+function arrow(t){if(!t.delta)return '<span class="arrow flat">—</span>';var g=t.dir==='up'?'▲':t.dir==='down'?'▼':'—';return '<span class="arrow '+t.dir+'">'+g+' '+t.delta+'</span>';}
+function renderKPIs(){var set=KPI[TF];$('#tf-caption').textContent=set.cap;
+  $('#kpis').innerHTML=set.tiles.map(function(t){return '<div class="tile" data-tk="'+t.key+'"><div class="k">'+t.k+'</div><div class="vrow"><div class="v">'+t.v+'</div>'+arrow(t)+'</div><div class="d">'+t.d+'</div><div class="open-hint">Click to see companies ›</div></div>';}).join('');
+  $$('#kpis .tile').forEach(function(el){el.onclick=function(){tileDrawer(el.getAttribute('data-tk'));};});}
+
+function barList(el,rows,max,fmt,click){$(el).innerHTML=rows.map(function(r,i){return '<div class="barrow'+(click?' click':'')+'"'+(click?' data-i="'+i+'"':'')+'><div class="lab">'+r.lab+'</div><div class="track"><div class="fill" style="width:'+Math.max(3,r.v/max*100)+'%;background:'+r.color+'"></div></div><div class="val">'+fmt(r)+'</div></div>';}).join('');}
+
+function renderChannels(){
+  var rows=DATA.channels.map(function(d){return {lab:d.ch,v:sN(d.n),color:clsColor[d.cls],ch:d.ch};});
+  var max=Math.max.apply(null,rows.map(function(r){return r.v;}));
+  $('#channelBars').innerHTML=rows.map(function(r){return '<div class="barrow click" data-ch="'+esc(r.ch)+'"><div class="lab">'+r.lab+'</div><div class="track"><div class="fill" style="width:'+Math.max(3,r.v/max*100)+'%;background:'+r.color+'"></div></div><div class="val">'+r.v+' refs</div></div>';}).join('');
+  $$('#channelBars .barrow').forEach(function(b){b.onclick=function(){channelDrawer(b.getAttribute('data-ch'));};});
+  var n2=DATA.network.map(function(d){return {lab:d.ch,v:sN(d.n),color:clsColor[d.cls]};});
+  barList('#networkBars',n2,Math.max.apply(null,n2.map(function(r){return r.v;})),function(r){return r.v+' orgs';});
+}
+function renderSourceInvest(){var rows=DATA.sourceInvest.map(function(d){return {lab:d.ch+' ('+d.cos+' co)',v:sUsd(d.amt),color:clsColor[d.cls]};});barList('#sourceInvest',rows,Math.max.apply(null,rows.map(function(r){return r.v;})),function(r){return usd(r.v);});}
+
+var pSort={key:'deals',dir:-1};
+function renderPartners(){
+  var rows=DATA.partners.slice();
+  if($('#onlyConv').checked)rows=rows.filter(function(r){return r.pitched>0||r.invested>0;});
+  rows.sort(function(a,b){var k=pSort.key,x=a[k],y=b[k];if(typeof x==='string')return pSort.dir*x.localeCompare(y);return pSort.dir*(x-y);});
+  $('#partnerBody').innerHTML=rows.map(function(r){return '<tr data-p="'+esc(r.name)+'"><td><b>'+r.name+'</b></td><td><span class="pill '+(typeCls[r.type]||'p-other')+'">'+r.type+'</span></td><td>'+r.status+'</td><td class="num">'+sN(r.deals)+'</td><td class="num">'+(r.pitched?sN(r.pitched):'—')+'</td><td class="num">'+usd(sUsd(r.invested))+'</td><td class="num">'+(r.exits?('🟢 '+r.exits):'—')+'</td><td class="num">'+(r.closed?('<span class="badge-closed">'+sN(r.closed)+'</span>'):'—')+'</td></tr>';}).join('');
+  $$('#partnerBody tr').forEach(function(tr){tr.onclick=function(){partnerDrawer(tr.getAttribute('data-p'));};});
+}
+$('#onlyConv').onchange=renderPartners;
+$$('#partnerTbl th').forEach(function(th){th.onclick=function(){var k=th.getAttribute('data-sort');pSort.dir=(pSort.key===k)?-pSort.dir:-1;pSort.key=k;renderPartners();};});
+
+function pchip(name){var pr=PROFILES[name];var t=pr?pr[0]:'Other';return '<div class="pchip" data-p="'+esc(name)+'"><span><span class="pill '+(typeCls[t]||'p-other')+'" style="margin-right:6px">'+t+'</span>'+name+'</span><small class="small">↗</small></div>';}
+function renderPipe(){var a=DATA.activation;
+  $('#pipe').innerHTML='<div class="col prio"><h3>Priority to Initiate <span class="cnt">'+a.prio.length+'</span></h3><div class="body"><div class="small" style="padding:2px 4px 6px">Post-showcase VC worklist</div>'+a.prio.map(pchip).join('')+'</div></div><div class="col init"><h3>Initiated <span class="cnt">'+a.init.length+'</span></h3><div class="body">'+a.init.map(pchip).join('')+'</div></div><div class="col oper"><h3>Operational <span class="cnt">'+a.oper.length+'</span></h3><div class="body">'+a.oper.map(pchip).join('')+'</div></div>';
+  $$('#pipe .pchip').forEach(function(ch){ch.onclick=function(){activationProfileDrawer(ch.getAttribute('data-p'));};});
+}
+function renderFunnel(){var f=DATA.funnel.map(function(x){return {s:x.s,n:sN(x.n),c:x.c};});var max=f[0].n;
+  $('#funnel').innerHTML=f.map(function(x,i){var prev=i?f[i-1].n:x.n;var conv=i?Math.round(x.n/prev*100):100;return '<div style="display:flex;align-items:center;gap:12px;margin:8px 0"><div style="height:34px;border-radius:8px;display:flex;align-items:center;padding:0 12px;color:#fff;font-weight:600;font-size:13px;min-width:120px;width:'+Math.max(20,x.n/max*100)+'%;background:'+x.c+'">'+x.s+': '+x.n+'</div><div class="small">'+(i?conv+'% of prior':'cohort base')+'</div></div>';}).join('');}
+function renderCohort(){
+  var pct=36,W=420,H=240,cx=78,cy=70,r=52;
+  var circ=2*Math.PI*r,off=circ*(1-pct/100);
+  var donut='<svg viewBox="0 0 '+W+' '+H+'"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#eef1ec" stroke-width="16"/><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#2e6b4f" stroke-width="16" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" transform="rotate(-90 '+cx+' '+cy+')" stroke-linecap="round"/><text x="'+cx+'" y="'+(cy-2)+'" font-size="22" font-weight="700" fill="#1d2b25" text-anchor="middle">36%</text><text x="'+cx+'" y="'+(cy+15)+'" font-size="9" fill="#6b7770" text-anchor="middle">15 of 42</text>';
+  donut+='<text x="150" y="40" font-size="11" font-weight="700" fill="#1d2b25">42 pitched → 15 invested</text><text x="150" y="56" font-size="11" fill="#2e6b4f" font-weight="700">$2.71M total invested</text><text x="150" y="72" font-size="9.5" fill="#6b7770">Cumulative $ invested after the pitch:</text>';
+  var bx=150,bw=250,bh=14,maxd=2.71;
+  DATA.cohort.forEach(function(c,i){var y=86+i*30;donut+='<text x="'+bx+'" y="'+(y+10)+'" font-size="9" fill="#6b7770">'+c.m+'</text>';donut+='<rect x="'+(bx+46)+'" y="'+y+'" width="'+(c.d/maxd*bw*0.7)+'" height="'+bh+'" rx="3" fill="#b5832b"/>';donut+='<text x="'+(bx+46+c.d/maxd*bw*0.7+5)+'" y="'+(y+11)+'" font-size="9" fill="#1d2b25">$'+c.d.toFixed(2)+'M &middot; '+c.n+'</text>';});
+  donut+='</svg><div class="small" style="margin-top:2px">Most investment lands <b>4+ months after</b> the pitch — a same-month view would miss it.</div>';
+  $('#cohortViz').innerHTML=donut;
+}
+function renderScores(){barList('#scoreBars',DATA.scores.map(function(s){return {lab:s.lab,v:s.v,color:clsColor[s.cls]};}),4,function(r){return r.v.toFixed(2)+' / 4';});}
+
+function renderLeadStages(){
+  var counts={};STAGES.forEach(function(s){counts[s]=0;});leadCompanies.forEach(function(c){counts[c[1]]++;});
+  var rows=STAGES.map(function(s){return {lab:s,v:sN(counts[s]),raw:counts[s]};});
+  var max=Math.max.apply(null,rows.map(function(r){return r.v;}));
+  $('#leadStages').innerHTML=rows.map(function(r){return '<div class="barrow click" data-stage="'+r.lab+'"><div class="lab">'+r.lab+'</div><div class="track"><div class="fill" style="width:'+Math.max(3,r.v/(max||1)*100)+'%;background:'+(r.lab==='Investment'?'#2e6b4f':r.lab==='Diligence'?'#3a7a86':'#2d5d7c')+'"></div></div><div class="val">'+r.v+'</div></div>';}).join('');
+  $$('#leadStages .barrow').forEach(function(b){b.onclick=function(){var st=b.getAttribute('data-stage');var list=leadCompanies.filter(function(c){return c[1]===st;});openDrawer('Lead investor + reached '+st+' — '+list.length,'<p class="small">2026 companies that have a lead investor and whose furthest pipeline stage is '+st+'.</p>'+(list.length?list.map(function(c){return '<div class="dco nolink"><span class="nm">'+c[0]+'</span><span class="meta">'+c[1]+'</span></div>';}).join(''):'<p class="small">None at this stage.</p>'));};});
+}
+
+function renderInterestScatter(){
+  var d=DATA.interest,W=420,H=240,pad=34;
+  var maxX=Math.max.apply(null,d.map(function(x){return x.signals;}))+3,maxY=Math.max.apply(null,d.map(function(x){return x.direct_inv+x.fund_inv;}))*1.1||1;
+  var X=function(v){return pad+v/maxX*(W-pad-10);},Y=function(v){return H-pad-v/maxY*(H-pad-14);};
+  var ax='<line x1="'+pad+'" y1="'+(H-pad)+'" x2="'+(W-6)+'" y2="'+(H-pad)+'" stroke="#ccc"/><line x1="'+pad+'" y1="6" x2="'+pad+'" y2="'+(H-pad)+'" stroke="#ccc"/><text x="'+(W-6)+'" y="'+(H-pad+14)+'" font-size="8" fill="#6b7770" text-anchor="end">more interested →</text><text x="4" y="14" font-size="8" fill="#6b7770">$ invested ↑</text>';
+  var dots=d.map(function(x,i){var t=x.direct_inv+x.fund_inv;var rr=4+Math.min(8,x.investors*0.6);return '<circle cx="'+X(x.signals)+'" cy="'+Y(t)+'" r="'+(t>0?rr:4)+'" fill="'+sc(x.cat)+'" fill-opacity="'+(t>0?0.85:0.4)+'" stroke="#fff" stroke-width="1" data-ci="'+i+'" style="cursor:pointer"><title>'+x.name+' · '+x.signals+' interested · '+x.investors+' invested · '+usd(t)+'</title></circle>';}).join('');
+  $('#interestScatter').innerHTML='<svg viewBox="0 0 '+W+' '+H+'">'+ax+dots+'</svg>';
+  $$('#interestScatter circle[data-ci]').forEach(function(c){c.onclick=function(){companyDrawer(+c.getAttribute('data-ci'));};});
+}
+var iSort={key:'signals',dir:-1};
+function renderInterestTbl(){
+  var rows=DATA.interest.map(function(c,i){var o={};for(var k in c)o[k]=c[k];o._i=i;return o;});
+  rows.sort(function(a,b){var k=iSort.key,x=a[k],y=b[k];if(typeof x==='string')return iSort.dir*x.localeCompare(y);return iSort.dir*(x-y);});
+  var maxSig=Math.max.apply(null,DATA.interest.map(function(c){return c.signals;}));
+  $('#interestBody').innerHTML=rows.map(function(c){return '<tr data-ci="'+c._i+'"><td><b>'+c.name+'</b></td><td><span class="minibar" style="width:8px;background:'+sc(c.cat)+'"></span> <span class="small">'+c.cat+'</span></td><td class="num"><span class="minibar" style="width:'+Math.max(6,c.signals/maxSig*36)+'px;background:#2e6b4f;margin-right:5px"></span>'+sN(c.signals)+'</td><td class="num">'+sN(c.committed)+'</td><td class="num"><b>'+sN(c.investors)+'</b></td><td class="num">'+usd(sUsd(c.direct_inv))+'</td><td class="num">'+usd(sUsd(c.fund_inv))+'</td></tr>';}).join('');
+  $$('#interestBody tr').forEach(function(tr){tr.onclick=function(){companyDrawer(+tr.getAttribute('data-ci'));};});
+}
+$$('#interestTbl th').forEach(function(th){th.onclick=function(){var k=th.getAttribute('data-sort');iSort.dir=(iSort.key===k)?-iSort.dir:-1;iSort.key=k;renderInterestTbl();};});
+
+function renderDiversity(){
+  var d=DATA.diversity;var maxPct=Math.max.apply(null,d.map(function(x){return x.pct;}));
+  $('#diversityBars').innerHTML=d.map(function(r){return '<div class="barrow click" data-div="1"><div class="lab">'+r.lab+'</div><div class="track"><div class="fill" style="width:'+Math.max(3,r.pct/maxPct*100)+'%;background:'+clsColor[r.cls]+'"></div></div><div class="val">'+sN(r.n)+' &middot; '+r.pct+'%</div></div>';}).join('');
+  $$('#diversityBars .barrow').forEach(function(b){b.onclick=diversityPipelineDrawer;});
+  var m=Math.max.apply(null,DATA.race.map(function(x){return x.n;}));
+  barList('#raceBars',DATA.race.map(function(s){return {lab:s.lab,v:sN(s.n),color:'#2d5d7c'};}),sN(m),function(r){return r.v;});
+}
+function diversityPipelineDrawer(){
+  var p=DATA.divPipeline;
+  var html='<p class="small">Portal pipeline view: underrepresented-founder share at each stage from Applied to Invested (2026). Watch whether the share holds up as companies advance.</p>';
+  html+=p.map(function(s){var pct=Math.round(s.ur/s.total*100);return '<div class="barrow"><div class="lab">'+s.stage+'</div><div class="track"><div class="fill" style="width:'+Math.max(4,pct)+'%;background:#2e6b4f"></div></div><div class="val">'+s.ur+'/'+s.total+' &middot; '+pct+'%</div></div>';}).join('');
+  html+='<p class="small" style="margin-top:10px">Underrepresented founders make up <b>43%</b> of applicants and <b>62%</b> of invested companies in 2026 — they are advancing at least as well as the overall pool.</p>';
+  openDrawer('Diversity across the pipeline',html);
+}
+
+function renderInfo(){for(var k in INFO){var b=$('#info-'+k);if(b)b.innerHTML='<h4>How this is built</h4><p>'+INFO[k][0]+'</p><h4>What you could do with it</h4><p>'+INFO[k][1]+'</p>';}}
+$$('.infobtn').forEach(function(btn){btn.onclick=function(){$('#info-'+btn.getAttribute('data-info')).classList.toggle('open');};});
+
+$('#leadTile').onclick=function(){tileDrawer('lead');};
+
+/* timeframe: updates ALL data */
+function renderAll(){renderKPIs();renderChannels();renderSourceInvest();renderPartners();renderFunnel();renderCohort();renderLeadStages();renderInterestScatter();renderInterestTbl();renderDiversity();}
+$('#tfseg').addEventListener('click',function(e){if(e.target.tagName!=='BUTTON')return;TF=e.target.getAttribute('data-tf');$$('#tfseg button').forEach(function(b){b.classList.remove('on');});e.target.classList.add('on');renderAll();});
+
+renderInfo();renderScores();renderPipe();renderAll();
+
 </script>
 </body>
+</html>

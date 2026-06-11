@@ -1,3 +1,4 @@
 # Changelog — Sourcing Committee Metrics
 
 - 2026-05-26 — sarah — Created plan and v1 mockup: "At a glance" card grouped by the seven sourcing themes (Deal Quality, Dealflow Mix & Attribution, Channel Effectiveness, Partner Network, Diversity), target chips + RAG status on every tile, a Metrics card with channel-mix / pipeline / partner-RAG / diversity bar charts, drill-in drawers, and the real committee roster and documents. Populated from live E8 portal data (pull dated May 26, 2026).
+- 2026-06-11 — Sarah Bell — V2 update: removed pitch tiles & renamed cohort $ tile; clickable KPI tiles; per-timeframe up/down arrows + Total timeframe that updates all data; channel drill-down (channel→orgs→partner) with Other split into sub-channels; activation pipeline partner profiles (stage/description/lead contact/owner); reworked funnel viz; lead-investor stage click-through; member-interest investor counts + clearer labels; diversity numbers+pipeline view; copy/label fixes.
