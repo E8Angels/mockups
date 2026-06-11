@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-09T05:17:27+00:00",
+  "generated": "2026-06-11T04:22:33+00:00",
   "plans": [
     {
       "slug": "Live-Chat-Codex",
@@ -346,9 +346,9 @@
       "status": "draft",
       "owner": "sarah",
       "created": "2026-05-26",
-      "last_updated": "2026-05-26",
-      "last_changed_by": "sarah",
-      "last_changed_at": "2026-05-26T21:57:55Z",
+      "last_updated": "2026-06-11",
+      "last_changed_by": "Sarah Bell",
+      "last_changed_at": "2026-06-11T04:22:25Z",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
