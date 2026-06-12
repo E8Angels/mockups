@@ -8,6 +8,7 @@
     :root {
         --slate-900: #0f172a;
         --slate-700: #334155;
+        --slate-600: #475569;
         --slate-500: #64748b;
         --slate-400: #94a3b8;
         --slate-300: #cbd5e1;
@@ -68,7 +69,7 @@
         border-bottom: 1px solid var(--slate-100);
     }
     .card-title { font-size: 13px; font-weight: 600; color: var(--slate-900); }
-    .card-body { padding: 12px 16px 16px; }
+    .card-body { padding: 14px 16px 16px; }
 
     /* Ghosted neighbor tiles (context only) */
     .ghost .card-title, .ghost-line { color: var(--slate-400); }
@@ -84,10 +85,9 @@
 
     /* ============ Pipeline Snapshot widget ============ */
 
-    .stage-section { padding-top: 4px; }
     .stage-section + .stage-section {
-        margin-top: 14px;
-        padding-top: 14px;
+        margin-top: 18px;
+        padding-top: 16px;
         border-top: 1px solid var(--slate-100);
     }
     .stage-label {
@@ -96,36 +96,76 @@
         gap: 7px;
         font-size: 11px;
         font-weight: 600;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.07em;
         text-transform: uppercase;
-        color: var(--slate-500);
-        margin-bottom: 8px;
+        color: var(--slate-400);
+        margin-bottom: 9px;
     }
-    .stage-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .stage-dot { width: 6px; height: 6px; border-radius: 50%; }
     .stage-dot.pitching { background: var(--blue-600); }
     .stage-dot.diligence { background: var(--teal-600); }
     .stage-dot.ready { background: var(--emerald-600); }
-    .stage-count { font-weight: 500; color: var(--slate-400); letter-spacing: 0; }
+    .stage-count { font-weight: 500; color: var(--slate-300); letter-spacing: 0; }
+    .stage-meta {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0;
+        text-transform: none;
+        color: var(--slate-500);
+    }
+    .stage-meta svg { width: 11px; height: 11px; }
 
+    /* Shared company sub-card */
+    .sub-card {
+        border: 1px solid var(--slate-200);
+        border-radius: 8px;
+        padding: 11px 12px;
+        background: #fff;
+    }
+    .sub-card + .sub-card { margin-top: 8px; }
+    .sub-card.your-team { background: var(--teal-50); border-color: var(--teal-200); }
+
+    .clickable { cursor: pointer; transition: border-color 0.12s ease, box-shadow 0.12s ease; }
+    .clickable:hover {
+        border-color: var(--blue-600);
+        box-shadow: 0 1px 8px rgba(37, 99, 235, 0.22);
+    }
+    .clickable:hover .co-name a { color: var(--blue-600); }
+
+    .co-head { display: flex; align-items: flex-start; gap: 11px; }
     .co-logo {
-        width: 32px; height: 32px;
-        border-radius: 7px;
+        width: 38px; height: 38px;
+        border-radius: 8px;
         border: 1px solid var(--slate-200);
         flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 700;
         color: #fff;
         overflow: hidden;
     }
-    a.co-logo-link { display: block; flex-shrink: 0; border-radius: 7px; }
+    a.co-logo-link { display: block; flex-shrink: 0; border-radius: 8px; }
     a.co-logo-link:hover { outline: 2px solid var(--blue-600); outline-offset: 1px; text-decoration: none; }
-    .co-name { font-size: 13px; font-weight: 600; }
+    .co-main { min-width: 0; flex: 1; }
+    .co-name { font-size: 13px; font-weight: 600; line-height: 1.3; }
     .co-name a { color: var(--slate-900); }
     .co-name a:hover { color: var(--blue-600); }
-    .co-category { font-size: 11px; color: var(--slate-500); margin-top: 1px; }
+    .co-tagline {
+        font-size: 11px;
+        color: var(--slate-500);
+        line-height: 1.4;
+        margin-top: 2px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
 
     .tag {
         display: inline-block;
@@ -140,102 +180,523 @@
     .tag.followon { background: var(--blue-50); color: var(--blue-700); }
     .tag.prediligence { background: var(--teal-50); color: var(--teal-700); border: 1px solid var(--teal-200); }
 
-    /* ---- Investment Ready ---- */
-    .ready-card {
-        border: 1px solid var(--slate-200);
-        border-radius: 8px;
-        padding: 10px 12px;
-        background: var(--slate-50);
+    /* Action buttons */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--slate-600);
+        background: #fff;
+        border: 1px solid var(--slate-300);
+        border-radius: 6px;
+        padding: 5px 10px;
+        white-space: nowrap;
     }
-    .ready-card + .ready-card { margin-top: 8px; }
-    .ready-head { display: flex; align-items: flex-start; gap: 10px; }
-    .ready-head .co-main { min-width: 0; flex: 1; }
-    .ready-actions {
+    .btn:hover { border-color: var(--blue-600); color: var(--blue-600); text-decoration: none; }
+    .btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .btn svg.icon-lg { width: 19px; height: 19px; }
+    .btn-stack { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.3; }
+    .btn-sub { font-size: 10px; font-weight: 400; color: var(--slate-400); white-space: nowrap; }
+    .btn:hover .btn-sub { color: var(--blue-600); }
+
+    .actions-col {
         display: flex;
         flex-direction: column;
         align-items: stretch;
         gap: 6px;
         flex-shrink: 0;
     }
-    .ready-actions .watch-btn { justify-content: center; }
-    .btn-stack { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.25; }
-    .btn-sub { font-size: 10px; font-weight: 500; color: var(--slate-500); white-space: nowrap; }
-    .report-btn { margin-top: 8px; }
+    .actions-col .btn { justify-content: flex-start; }
+    .co-tagline.full { display: block; -webkit-line-clamp: unset; overflow: visible; }
+    .dil-btn { float: right; margin: 0 0 6px 10px; }
 
-    /* ---- Diligence ---- */
-    .dil-card { border-radius: 8px; padding: 8px 10px; margin: 0 -10px; }
-    .dil-card.your-team { background: var(--teal-50); border: 1px solid var(--teal-200); }
-    .dil-head { display: flex; align-items: center; gap: 10px; }
-    .dil-head .co-main { min-width: 0; flex: 1; }
-    .watch-btn {
+    .deal-terms-mini {
+        margin: 9px 0 0 49px;
+        font-size: 11.5px;
+        color: var(--slate-600);
+        line-height: 1.5;
+    }
+    .deal-terms-mini .dt-label {
+        display: block;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--slate-400);
+        margin-bottom: 2px;
+    }
+
+    /* Investment interest modal */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.5);
+        display: none;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 48px 16px;
+        z-index: 50;
+        overflow-y: auto;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 10px 40px rgba(15, 23, 42, 0.25);
+        width: 100%;
+        max-width: 560px;
+        padding: 24px;
+        position: relative;
+    }
+    .modal-close {
+        position: absolute;
+        top: 14px; right: 14px;
+        background: none;
+        border: none;
+        color: var(--slate-400);
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+        padding: 4px;
+    }
+    .modal-close:hover { color: var(--slate-700); }
+    .modal h1 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+    .modal .intro { font-size: 13px; color: var(--slate-600); line-height: 1.5; margin-bottom: 14px; }
+    .deal-terms {
+        border: 1px solid var(--slate-200);
+        background: var(--slate-50);
+        border-radius: 6px;
+        padding: 10px 14px;
+        font-size: 13px;
+        color: var(--slate-700);
+        line-height: 1.5;
+        margin-bottom: 16px;
+    }
+    .deal-terms .dt-title { font-weight: 500; color: var(--slate-900); margin-bottom: 3px; }
+    .form-row {
+        display: grid;
+        grid-template-columns: 130px minmax(0, 1fr);
+        align-items: center;
+        gap: 4px 10px;
+        margin-bottom: 12px;
+    }
+    .form-row label { font-size: 13px; font-weight: 500; }
+    .form-input {
+        font: inherit;
+        font-size: 13px;
+        border: 1px solid var(--slate-200);
+        border-radius: 6px;
+        padding: 7px 10px;
+        width: 100%;
+        color: var(--slate-900);
+    }
+    .form-input[readonly] { background: var(--slate-50); }
+    .input-wrap { position: relative; }
+    .dealum-pill {
+        position: absolute;
+        right: 8px; top: 50%;
+        transform: translateY(-50%);
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--slate-700);
-        background: #fff;
+        gap: 5px;
         border: 1px solid var(--slate-300);
-        border-radius: 6px;
-        padding: 5px 10px;
-        white-space: nowrap;
-        flex-shrink: 0;
+        border-radius: 999px;
+        background: #fff;
+        font-size: 11px;
+        font-weight: 500;
+        padding: 3px 9px;
+        color: var(--slate-900);
     }
-    .watch-btn:hover { border-color: var(--blue-600); color: var(--blue-600); text-decoration: none; }
-    .watch-btn svg { width: 12px; height: 12px; }
-    .avatar-row { display: flex; align-items: center; margin: 8px 0 5px 2px; }
+    .amount-wrap { display: flex; align-items: center; gap: 8px; }
+    .amount-wrap .form-input { width: 130px; }
+    .amount-note { font-size: 12px; color: var(--slate-500); }
+    .comment-label { font-size: 13px; font-weight: 500; display: block; margin-bottom: 6px; }
+    .form-textarea {
+        font: inherit;
+        font-size: 13px;
+        border: 1px solid var(--slate-200);
+        border-radius: 6px;
+        padding: 8px 10px;
+        width: 100%;
+        min-height: 88px;
+        resize: vertical;
+        color: var(--slate-900);
+    }
+    .modal-actions { display: flex; flex-direction: column; gap: 10px; padding-top: 16px; }
+    .modal-btn {
+        font: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        border-radius: 6px;
+        padding: 9px 14px;
+        width: 100%;
+        cursor: pointer;
+        border: 1px solid transparent;
+    }
+    .modal-btn.primary { background: var(--slate-900); color: #fff; }
+    .modal-btn.primary:hover { background: var(--slate-700); }
+    .modal-btn.outline { background: #fff; border-color: var(--slate-300); color: var(--slate-900); }
+    .modal-btn.outline:hover { background: var(--slate-50); }
+    .modal-btn.destructive { background: #dc2626; color: #fff; }
+    .modal-btn.destructive:hover { background: #b91c1c; }
+
+    /* Diligence team */
+    .team-row { display: flex; align-items: center; gap: 9px; margin: 9px 0 0 49px; }
+    .avatar-row { display: flex; align-items: center; flex-shrink: 0; }
     .avatar {
-        width: 30px; height: 30px;
+        width: 26px; height: 26px;
         border-radius: 50%;
         border: 2px solid #fff;
         background: var(--slate-200);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 10px;
+        font-size: 9px;
         font-weight: 600;
         color: var(--slate-500);
         flex-shrink: 0;
     }
-    .avatar + .avatar { margin-left: -8px; }
-    .member-names { font-size: 11px; color: var(--slate-500); line-height: 1.35; }
+    .avatar + .avatar { margin-left: -7px; }
+    .member-names { font-size: 11px; color: var(--slate-500); line-height: 1.4; min-width: 0; }
     .member-names button {
         background: none; border: none; padding: 0;
         font: inherit; color: inherit; cursor: pointer;
     }
     .member-names button:hover { text-decoration: underline; }
-    .team-forming { font-size: 11px; color: var(--slate-400); margin: 6px 0 0 2px; font-style: italic; }
-    .workspace-link { display: inline-block; font-size: 12px; margin-top: 7px; }
+    .team-forming { font-size: 11px; font-style: italic; color: var(--slate-400); margin: 9px 0 0 49px; }
 
-    /* ---- Pitching ---- */
-    .meeting-group-label {
-        font-size: 11px;
-        color: var(--slate-500);
-        margin: 2px 0 8px;
-        padding-left: 2px;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-    .meeting-group-label svg { width: 11px; height: 11px; flex-shrink: 0; }
-    .meeting-group + .meeting-group { margin-top: 12px; }
+    /* Pitching grid */
     .pitch-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
     }
     .pitch-tile {
+        position: relative;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 9px;
         border: 1px solid var(--slate-200);
         border-radius: 8px;
-        padding: 8px 10px;
+        padding: 10px 11px;
         min-width: 0;
+        background: #fff;
     }
-    .pitch-tile .co-main { min-width: 0; }
-    .pitch-tile .co-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .pitch-tile .co-category { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .portfolio-label {
+        position: absolute;
+        top: -7px;
+        right: 10px;
+        background: #fff;
+        padding: 0 6px;
+        font-size: 9.5px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--slate-500);
+        line-height: 14px;
+    }
+    .pitch-tile .co-logo { width: 32px; height: 32px; font-size: 11px; border-radius: 7px; }
+    .pitch-tile .co-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ============ Investor View slide-over ============ */
+
+    .invest-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.45);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.22s ease;
+        z-index: 40;
+    }
+    .invest-overlay.open { opacity: 1; pointer-events: auto; }
+    .invest-panel {
+        position: fixed;
+        top: 0; right: 0; bottom: 0;
+        width: min(1400px, 90vw);
+        background: var(--slate-100);
+        box-shadow: -16px 0 48px rgba(15, 23, 42, 0.28);
+        display: flex;
+        flex-direction: column;
+        transform: translateX(103%);
+        transition: transform 0.26s ease;
+        z-index: 41;
+    }
+    .invest-panel.open { transform: none; }
+
+    .invest-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 20px 14px;
+        background: #fff;
+        border-bottom: 1px solid var(--slate-200);
+    }
+    .invest-head .co-logo { width: 44px; height: 44px; font-size: 14px; }
+    .invest-head-main { flex: 1; min-width: 0; }
+    .invest-name {
+        font-size: 17px;
+        font-weight: 600;
+        line-height: 1.2;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .tag.stage-tag { margin-left: 0; border: 1px solid transparent; }
+    .stage-tag.ready { background: var(--emerald-50); color: var(--emerald-700); border-color: var(--emerald-200); }
+    .stage-tag.diligence { background: var(--teal-50); color: var(--teal-700); border-color: var(--teal-200); }
+    .stage-tag.pitching { background: var(--blue-50); color: var(--blue-700); }
+    .invest-tagline { font-size: 12px; color: var(--slate-500); line-height: 1.45; margin-top: 3px; }
+    .invest-head-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .invest-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--slate-400);
+        font-size: 17px;
+        line-height: 1;
+        padding: 6px;
+    }
+    .invest-close:hover { color: var(--slate-700); }
+
+    .invest-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 14px 20px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .invest-card {
+        background: #fff;
+        border: 1px solid var(--slate-200);
+        border-radius: 8px;
+        padding: 14px 16px;
+    }
+    .sec-label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: var(--slate-400);
+        margin-bottom: 10px;
+    }
+    .sec-side {
+        margin-left: auto;
+        display: inline-flex;
+        gap: 6px;
+        letter-spacing: 0;
+        text-transform: none;
+        font-weight: 500;
+        font-size: 11px;
+    }
+    .sec-side a {
+        color: var(--slate-600);
+        border: 1px solid var(--slate-300);
+        border-radius: 5px;
+        padding: 2px 8px;
+    }
+    .sec-side a:hover { border-color: var(--blue-600); color: var(--blue-600); text-decoration: none; }
+
+    /* Deal terms band (privileged placement) */
+    .deal-band { border-color: var(--emerald-200); background: var(--emerald-50); }
+    .deal-band .sec-label { color: var(--emerald-700); margin-bottom: 12px; }
+    .deal-stats {
+        display: grid;
+        grid-template-columns: repeat(5, auto);
+        justify-content: space-between;
+        gap: 10px 18px;
+    }
+    .stat-v { font-size: 15px; font-weight: 600; color: var(--slate-900); white-space: nowrap; }
+    .stat-l { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--slate-500); margin-top: 2px; }
+    .deal-progress { margin-top: 13px; }
+    .deal-bar {
+        height: 6px;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid var(--emerald-200);
+        overflow: hidden;
+    }
+    .deal-bar-fill { height: 100%; background: var(--emerald-600); border-radius: 999px; }
+    .deal-bar-note { font-size: 11px; color: var(--slate-600); margin-top: 5px; }
+    .deal-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+    .deal-band .btn { background: #fff; }
+    .deal-terms-text {
+        margin-top: 13px;
+        background: #fff;
+        border: 1px solid var(--emerald-200);
+        border-radius: 6px;
+        padding: 10px 13px;
+        font-size: 12.5px;
+        color: var(--slate-700);
+        line-height: 1.55;
+    }
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 500;
+        color: #fff;
+        background: var(--slate-900);
+        border: 1px solid var(--slate-900);
+        border-radius: 6px;
+        padding: 6px 12px;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+    .btn-primary:hover { background: var(--slate-700); text-decoration: none; }
+    .btn-primary svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+    /* Media row: diligence report, pitch deck, recordings */
+    .media-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+    .dr-row { display: flex; gap: 11px; }
+    .dr-thumb {
+        width: 58px;
+        height: 76px;
+        flex-shrink: 0;
+        display: block;
+        background: #fff;
+        border: 1px solid var(--slate-300);
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+        padding: 7px 6px;
+        overflow: hidden;
+    }
+    a.dr-thumb:hover { outline: 2px solid var(--blue-600); outline-offset: 1px; text-decoration: none; }
+    .dr-thumb .t-bar { height: 4px; border-radius: 2px; background: var(--slate-700); margin-bottom: 3px; width: 72%; }
+    .dr-thumb .t-bar.sub { background: var(--slate-300); width: 52%; margin-bottom: 6px; }
+    .dr-thumb .t-line { height: 2px; border-radius: 2px; background: var(--slate-200); margin: 3px 0; }
+    .dr-thumb .t-line.short { width: 62%; }
+    .dr-main { flex: 1; min-width: 0; }
+    .dr-title { font-size: 12.5px; font-weight: 600; line-height: 1.35; }
+    .dr-meta { font-size: 11px; color: var(--slate-500); margin-top: 2px; }
+    .dr-team { font-size: 11px; color: var(--slate-500); line-height: 1.5; margin-top: 9px; }
+    .dr-team strong { font-weight: 600; color: var(--slate-600); }
+    .dr-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .video-embed {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        width: 100%;
+        border: 1px solid var(--slate-200);
+        border-radius: 6px;
+        overflow: hidden;
+        background: var(--slate-900);
+    }
+    .video-embed iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .media-caption { font-size: 11px; color: var(--slate-500); line-height: 1.45; margin-top: 7px; }
+
+    /* Embedded deck viewer */
+    .deck-stage {
+        position: relative;
+        border: 1px solid var(--slate-200);
+        border-radius: 6px;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: #fff;
+    }
+    .deck-slide-title { font-size: 22px; font-weight: 700; padding: 0 52px; }
+    .deck-slide-sub { font-size: 13px; opacity: 0.85; margin-top: 8px; padding: 0 52px; }
+    .deck-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(15, 23, 42, 0.45);
+        color: #fff;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 15px;
+        line-height: 1;
+    }
+    .deck-nav:hover { background: rgba(15, 23, 42, 0.7); }
+    .deck-nav.prev { left: 10px; }
+    .deck-nav.next { right: 10px; }
+    .deck-count {
+        position: absolute;
+        bottom: 8px;
+        right: 10px;
+        font-size: 11px;
+        background: rgba(15, 23, 42, 0.45);
+        color: #fff;
+        padding: 2px 8px;
+        border-radius: 999px;
+    }
+
+    /* Deck expand overlay */
+    .deck-expand-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.88);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 48px;
+        z-index: 55;
+    }
+    .deck-expand-overlay.open { display: flex; }
+    .deck-expand-overlay .deck-stage { width: min(1100px, 100%); border: none; }
+    .deck-expand-overlay .deck-slide-title { font-size: 34px; }
+    .deck-expand-overlay .deck-slide-sub { font-size: 17px; }
+    .deck-expand-close {
+        position: absolute;
+        top: 16px;
+        right: 22px;
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+        padding: 6px;
+    }
+    .deck-expand-close:hover { color: var(--slate-300); }
+
+    /* Overview / facts */
+    .fact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; }
+    .fact-v.preline { white-space: pre-line; }
+    .fact-v.empty { color: var(--slate-300); }
+    .fact.wide { grid-column: 1 / -1; }
+    .fact-l { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--slate-400); margin-bottom: 3px; }
+    .fact-v { font-size: 12px; color: var(--slate-700); line-height: 1.5; }
+
+    /* Team */
+    .team-list { display: flex; flex-direction: column; gap: 10px; }
+    .team-member { display: flex; gap: 10px; align-items: flex-start; }
+    .team-member .avatar { width: 30px; height: 30px; font-size: 10px; border: none; }
+    .tm-main { min-width: 0; }
+    .tm-name { font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .tm-title { font-size: 11px; font-weight: 400; color: var(--slate-500); }
+    .tm-name svg { width: 12px; height: 12px; color: var(--blue-600); flex-shrink: 0; }
+    .tm-bio { font-size: 11.5px; color: var(--slate-500); line-height: 1.45; margin-top: 1px; }
+
+    /* Raise details rows */
+    .kv-rows { display: grid; grid-template-columns: 140px 1fr; gap: 7px 14px; }
+    .kv-l { font-size: 11px; font-weight: 600; color: var(--slate-500); padding-top: 1px; }
+    .kv-v { font-size: 12px; color: var(--slate-700); line-height: 1.5; }
+
+    .invest-foot {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        background: #fff;
+        border-top: 1px solid var(--slate-200);
+    }
+    .foot-note { font-size: 11px; color: var(--slate-500); margin-right: auto; }
 
     /* States section */
     .states { max-width: 640px; margin: 32px auto 48px; }
@@ -244,14 +705,22 @@
 
     @media (max-width: 820px) {
         .home-grid { display: flex; flex-direction: column; }
-        .pitch-grid { grid-template-columns: repeat(2, 1fr); }
-        .ready-head { flex-wrap: wrap; }
+        .pitch-grid { grid-template-columns: 1fr; }
+        .co-head { flex-wrap: wrap; }
+        .team-row, .team-forming { margin-left: 0; }
+        .stage-label { flex-wrap: wrap; }
+        .stage-meta { margin-left: 0; width: 100%; padding-left: 13px; }
+        .deal-stats { grid-template-columns: repeat(3, auto); justify-content: start; }
+        .fact-grid { grid-template-columns: 1fr; }
+        .invest-panel { width: 100vw; }
+        .invest-head { flex-wrap: wrap; }
+        .deal-terms-mini { margin-left: 0; }
     }
 </style>
 </head>
 <body>
 
-<div class="mock-banner"><strong>Mockup:</strong> Pipeline Snapshot — new center-column widget above "What's New at E8"; replaces the left-column Diligence Team tile. Sample data.</div>
+<div class="mock-banner"><strong>Mockup:</strong> Pipeline Snapshot — new center-column widget above "What's New at E8"; replaces the left-column Diligence Team tile. Inovues uses real production data; other companies are sample data. Click <strong>any company tile</strong> to open its Investor View slide-over.</div>
 
 <div class="page">
     <div class="home-grid">
@@ -287,56 +756,19 @@
 
                     <!-- Investment Ready -->
                     <div class="stage-section">
-                        <div class="stage-label"><span class="stage-dot ready"></span> Investment Ready <span class="stage-count">· 2</span></div>
+                        <div class="stage-label"><span class="stage-dot ready"></span> Investment Ready <span class="stage-count">· 1</span></div>
 
-                        <div class="ready-card">
-                            <div class="ready-head">
-                                <a class="co-logo-link" href="#"><div class="co-logo" style="background:#c2410c">ES</div></a>
+                        <div class="sub-card clickable" onclick="openInvestorView(event, 'inovues')">
+                            <div class="co-head">
+                                <a class="co-logo-link" href="#"><div class="co-logo" style="background:#1e40af">IN</div></a>
                                 <div class="co-main">
-                                    <div class="co-name"><a href="#">Emberline Sensors</a></div>
-                                    <div class="co-category">Wildfire Tech</div>
-                                    <a class="watch-btn report-btn" href="#">
-                                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1.5h5.5L13 5v9a.5.5 0 0 1-.5.5h-8.5A.5.5 0 0 1 3.5 14V2a.5.5 0 0 1 .5-.5z"/><path d="M9.5 1.5V5H13M5.8 8h4.4M5.8 10.5h4.4"/></svg>
-                                        Diligence Report
-                                    </a>
-                                </div>
-                                <div class="ready-actions">
-                                    <a class="watch-btn" href="#">
-                                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg>
-                                        <span class="btn-stack">
-                                            <span>Diligence Debrief</span>
-                                            <span class="btn-sub">Wed, June 17, 2026 5:00 PM PT</span>
-                                        </span>
-                                    </a>
-                                    <a class="watch-btn" href="#">
-                                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.2v7.6M10 5.8c-.4-.7-1.1-1-2-1-1 0-1.8.5-1.8 1.4C6.2 8.6 10 8 10 9.8c0 .9-.9 1.4-2 1.4-.9 0-1.6-.3-2-1"/></svg>
-                                        Register Investment Interest
-                                    </a>
+                                    <div class="co-name"><a href="#">Inovues</a></div>
+                                    <div class="co-tagline full">Re-Energizing Building Facades — Without Replacement</div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="ready-card">
-                            <div class="ready-head">
-                                <a class="co-logo-link" href="#"><div class="co-logo" style="background:#4d7c0f">PS</div></a>
-                                <div class="co-main">
-                                    <div class="co-name"><a href="#">Petrichor Soil</a></div>
-                                    <div class="co-category">Regenerative Agriculture</div>
-                                    <a class="watch-btn report-btn" href="#">
-                                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1.5h5.5L13 5v9a.5.5 0 0 1-.5.5h-8.5A.5.5 0 0 1 3.5 14V2a.5.5 0 0 1 .5-.5z"/><path d="M9.5 1.5V5H13M5.8 8h4.4M5.8 10.5h4.4"/></svg>
-                                        Diligence Report
-                                    </a>
-                                </div>
-                                <div class="ready-actions">
-                                    <a class="watch-btn" href="#">
-                                        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5v11l9-5.5-9-5.5z"/></svg>
-                                        Watch DD Debrief
-                                    </a>
-                                    <a class="watch-btn" href="#">
-                                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.2v7.6M10 5.8c-.4-.7-1.1-1-2-1-1 0-1.8.5-1.8 1.4C6.2 8.6 10 8 10 9.8c0 .9-.9 1.4-2 1.4-.9 0-1.6-.3-2-1"/></svg>
-                                        Register Investment Interest
-                                    </a>
-                                </div>
+                            <div class="deal-terms-mini">
+                                <span class="dt-label">Deal Terms</span>
+                                INOVUES are raising up to $3M as a preferred equity round with a $17M pre-money valuation. They had an initial close of $1M in August 2025 and are looking to raise at least $1m of the remaining $2M approved by the Board. Minimum individual check size is $25K.
                             </div>
                         </div>
                     </div>
@@ -345,58 +777,57 @@
                     <div class="stage-section">
                         <div class="stage-label"><span class="stage-dot diligence"></span> Diligence <span class="stage-count">· 3</span></div>
 
-                        <div class="dil-card your-team">
-                            <div class="dil-head">
+                        <div class="sub-card your-team clickable" onclick="openInvestorView(event, 'northbeam')">
+                            <div class="co-head">
                                 <a class="co-logo-link" href="#"><div class="co-logo" style="background:#7c3aed">NH</div></a>
                                 <div class="co-main">
                                     <div class="co-name"><a href="#">Northbeam Hydrogen</a></div>
-                                    <div class="co-category">Hydrogen</div>
+                                    <a class="btn dil-btn" href="#" onclick="event.stopPropagation()">
+                                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 4.2l1.2 1.2 2-2.2M7.5 4.7h6M2.5 8.7l1.2 1.2 2-2.2M7.5 9.2h6M2.5 13.2l1.2 1.2 2-2.2M7.5 13.7h6"/></svg>
+                                        Diligence
+                                    </a>
+                                    <div class="co-tagline full">Modular electrolyzers for on-site industrial hydrogen at half the installed cost.</div>
                                 </div>
-                                <a class="watch-btn" href="#">
-                                    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5v11l9-5.5-9-5.5z"/></svg>
-                                    Watch Pitch
-                                </a>
                             </div>
-                            <div class="avatar-row">
-                                <div class="avatar">MC</div>
-                                <div class="avatar">TA</div>
-                                <div class="avatar">PN</div>
-                                <div class="avatar">SO</div>
+                            <div class="team-row" onclick="event.stopPropagation()">
+                                <div class="avatar-row">
+                                    <div class="avatar">MC</div>
+                                    <div class="avatar">TA</div>
+                                    <div class="avatar">PN</div>
+                                    <div class="avatar">SO</div>
+                                </div>
+                                <div class="member-names">
+                                    <button>Maya Chen (Lead)</button>, <button>Tom Alvarez</button>, <button>Priya Nair</button>, <button>Sam Ortiz (Fellow)</button>
+                                </div>
                             </div>
-                            <div class="member-names">
-                                <button>Maya Chen (Lead)</button>, <button>Tom Alvarez</button>, <button>Priya Nair</button>, <button>Sam Ortiz (Fellow)</button>
-                            </div>
-                            <a class="workspace-link" href="#">Go to Diligence Workspace →</a>
                         </div>
 
-                        <div class="dil-card">
-                            <div class="dil-head">
+                        <div class="sub-card clickable" onclick="openInvestorView(event, 'ferrostat')">
+                            <div class="co-head">
                                 <a class="co-logo-link" href="#"><div class="co-logo" style="background:#9f1239">FS</div></a>
                                 <div class="co-main">
                                     <div class="co-name"><a href="#">Ferrostat</a></div>
-                                    <div class="co-category">Long-Duration Storage</div>
+                                    <div class="co-tagline full">Iron-air batteries for multi-day grid storage at a tenth the cost of lithium.</div>
                                 </div>
-                                <a class="watch-btn" href="#">
-                                    <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5v11l9-5.5-9-5.5z"/></svg>
-                                    Watch Pitch
-                                </a>
                             </div>
-                            <div class="avatar-row">
-                                <div class="avatar">DK</div>
-                                <div class="avatar">LF</div>
-                                <div class="avatar">MW</div>
-                            </div>
-                            <div class="member-names">
-                                <button>David Kim (Lead)</button>, <button>Lena Fischer</button>, <button>Marcus Webb</button>
+                            <div class="team-row" onclick="event.stopPropagation()">
+                                <div class="avatar-row">
+                                    <div class="avatar">DK</div>
+                                    <div class="avatar">LF</div>
+                                    <div class="avatar">MW</div>
+                                </div>
+                                <div class="member-names">
+                                    <button>David Kim (Lead)</button>, <button>Lena Fischer</button>, <button>Marcus Webb</button>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="dil-card">
-                            <div class="dil-head">
+                        <div class="sub-card clickable" onclick="openInvestorView(event, 'clearcurrent')">
+                            <div class="co-head">
                                 <a class="co-logo-link" href="#"><div class="co-logo" style="background:#0369a1">CC</div></a>
                                 <div class="co-main">
                                     <div class="co-name"><a href="#">Clearcurrent</a><span class="tag prediligence">Pre-Diligence</span></div>
-                                    <div class="co-category">Water Tech</div>
+                                    <div class="co-tagline full">Real-time water quality monitoring for municipal systems.</div>
                                 </div>
                             </div>
                             <div class="team-forming">Team forming</div>
@@ -405,41 +836,43 @@
 
                     <!-- Pitching -->
                     <div class="stage-section">
-                        <div class="stage-label"><span class="stage-dot pitching"></span> Pitching <span class="stage-count">· 4</span></div>
-
-                        <div class="meeting-group">
-                            <div class="meeting-group-label">
+                        <div class="stage-label">
+                            <span class="stage-dot pitching"></span> Pitching <span class="stage-count">· 4</span>
+                            <span class="stage-meta">
                                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg>
-                                Pitching at the May 28, 2026 Member Meeting
+                                May 28, 2026 Member Meeting
+                            </span>
+                        </div>
+
+                        <!-- Pitch events first, then Follow-On Pitch -->
+                        <div class="pitch-grid">
+                            <div class="pitch-tile clickable" onclick="openInvestorView(event, 'helio')">
+                                <a class="co-logo-link" href="#"><div class="co-logo" style="background:#b45309">HF</div></a>
+                                <div class="co-main">
+                                    <div class="co-name"><a href="#">Helio Foundry</a></div>
+                                    <div class="co-tagline">Concentrated solar heat for steel and cement production.</div>
+                                </div>
                             </div>
-                            <div class="pitch-grid">
-                                <div class="pitch-tile">
-                                    <a class="co-logo-link" href="#"><div class="co-logo" style="background:#b45309">HF</div></a>
-                                    <div class="co-main">
-                                        <div class="co-name"><a href="#">Helio Foundry</a></div>
-                                        <div class="co-category">Industrial Decarbonization</div>
-                                    </div>
+                            <div class="pitch-tile clickable" onclick="openInvestorView(event, 'brinewise')">
+                                <a class="co-logo-link" href="#"><div class="co-logo" style="background:#0e7490">BW</div></a>
+                                <div class="co-main">
+                                    <div class="co-name"><a href="#">Brinewise</a></div>
+                                    <div class="co-tagline">Direct lithium extraction from geothermal brines.</div>
                                 </div>
-                                <div class="pitch-tile">
-                                    <a class="co-logo-link" href="#"><div class="co-logo" style="background:#0e7490">BW</div></a>
-                                    <div class="co-main">
-                                        <div class="co-name"><a href="#">Brinewise</a></div>
-                                        <div class="co-category">Critical Minerals</div>
-                                    </div>
+                            </div>
+                            <div class="pitch-tile clickable" onclick="openInvestorView(event, 'carbonloop')">
+                                <a class="co-logo-link" href="#"><div class="co-logo" style="background:#475569">CL</div></a>
+                                <div class="co-main">
+                                    <div class="co-name"><a href="#">Carbon Loop Materials</a></div>
+                                    <div class="co-tagline">Turning captured CO₂ into structural building polymers.</div>
                                 </div>
-                                <div class="pitch-tile">
-                                    <a class="co-logo-link" href="#"><div class="co-logo" style="background:#475569">CL</div></a>
-                                    <div class="co-main">
-                                        <div class="co-name"><a href="#">Carbon Loop Materials</a></div>
-                                        <div class="co-category">Carbon Capture &amp; Utilization</div>
-                                    </div>
-                                </div>
-                                <div class="pitch-tile">
-                                    <a class="co-logo-link" href="#"><div class="co-logo" style="background:#1d4ed8">VG</div></a>
-                                    <div class="co-main">
-                                        <div class="co-name"><a href="#">Voltaic Grid</a><span class="tag followon">Follow-On</span></div>
-                                        <div class="co-category">Grid Software</div>
-                                    </div>
+                            </div>
+                            <div class="pitch-tile clickable" onclick="openInvestorView(event, 'voltaic')">
+                                <span class="portfolio-label">Portfolio</span>
+                                <a class="co-logo-link" href="#"><div class="co-logo" style="background:#1d4ed8">VG</div></a>
+                                <div class="co-main">
+                                    <div class="co-name"><a href="#">Voltaic Grid</a><span class="tag followon">Follow-On</span></div>
+                                    <div class="co-tagline">Orchestration software for distributed energy resources.</div>
                                 </div>
                             </div>
                         </div>
@@ -492,25 +925,23 @@
             <div class="card-body">
                 <div class="stage-section">
                     <div class="stage-label"><span class="stage-dot diligence"></span> Diligence <span class="stage-count">· 1</span></div>
-                    <div class="dil-card">
-                        <div class="dil-head">
+                    <div class="sub-card clickable" onclick="openInvestorView(event, 'ferrostat')">
+                        <div class="co-head">
                             <a class="co-logo-link" href="#"><div class="co-logo" style="background:#9f1239">FS</div></a>
                             <div class="co-main">
                                 <div class="co-name"><a href="#">Ferrostat</a></div>
-                                <div class="co-category">Long-Duration Storage</div>
+                                <div class="co-tagline full">Iron-air batteries for multi-day grid storage at a tenth the cost of lithium.</div>
                             </div>
-                            <a class="watch-btn" href="#">
-                                <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5v11l9-5.5-9-5.5z"/></svg>
-                                Watch Pitch
-                            </a>
                         </div>
-                        <div class="avatar-row">
-                            <div class="avatar">DK</div>
-                            <div class="avatar">LF</div>
-                            <div class="avatar">MW</div>
-                        </div>
-                        <div class="member-names">
-                            <button>David Kim (Lead)</button>, <button>Lena Fischer</button>, <button>Marcus Webb</button>
+                        <div class="team-row" onclick="event.stopPropagation()">
+                            <div class="avatar-row">
+                                <div class="avatar">DK</div>
+                                <div class="avatar">LF</div>
+                                <div class="avatar">MW</div>
+                            </div>
+                            <div class="member-names">
+                                <button>David Kim (Lead)</button>, <button>Lena Fischer</button>, <button>Marcus Webb</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -518,6 +949,542 @@
         </div>
     </div>
 </div>
+
+<!-- Investor View slide-over — opened by clicking an Investment Ready company name/logo -->
+<div class="invest-overlay" id="investOverlay" onclick="closeInvestorView()"></div>
+<aside class="invest-panel" id="investPanel" role="dialog" aria-modal="true" aria-labelledby="investName">
+    <div class="invest-head">
+        <div class="co-logo" id="investLogo">IN</div>
+        <div class="invest-head-main">
+            <div class="invest-name"><span id="investName">Inovues</span><span class="tag stage-tag ready" id="investStageTag">Investment Ready</span></div>
+            <div class="invest-tagline" id="investTagline"></div>
+        </div>
+        <div class="invest-head-actions">
+            <a class="btn" href="#" title="History, AI insights, diligence workspace, and everything else">
+                Full Application
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 11l6-6M6 5h5v5"/></svg>
+            </a>
+            <button class="invest-close" type="button" onclick="closeInvestorView()" aria-label="Close">✕</button>
+        </div>
+    </div>
+    <div class="invest-body" id="investBody"></div>
+    <div class="invest-foot">
+        <span class="foot-note" id="investFootNote"></span>
+        <button class="btn-primary" type="button" id="investFootCta">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.2v7.6M10 5.8c-.4-.7-1.1-1-2-1-1 0-1.8.5-1.8 1.4C6.2 8.6 10 8 10 9.8c0 .9-.9 1.4-2 1.4-.9 0-1.6-.3-2-1"/></svg>
+            Register Investment Interest
+        </button>
+    </div>
+</aside>
+
+<!-- Expanded pitch deck overlay -->
+<div class="deck-expand-overlay" id="deckExpandOverlay">
+    <button class="deck-expand-close" type="button" onclick="closeDeckExpand()" aria-label="Close">✕</button>
+    <div class="deck-stage" id="deckExpandStage"></div>
+</div>
+
+<!-- Investment interest modal — contents mirror /forms/investment-interest -->
+<div class="modal-overlay" id="interestOverlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="interestTitle">
+        <button class="modal-close" type="button" onclick="closeInterestModal()" aria-label="Close">✕</button>
+        <h1 id="interestTitle">Investment Interest: Inovues</h1>
+        <div class="intro">The diligence team has completed its review and the company is open for member commitments. Indicate your interest below — this is non-binding and helps the deal lead gauge the round.</div>
+        <div class="deal-terms">
+            <div class="dt-title">Deal Terms</div>
+            <div>INOVUES are raising up to $3M as a preferred equity round with a $17M pre-money valuation. They had an initial close of $1M in August 2025 and are looking to raise at least $1m of the remaining $2M approved by the Board. Minimum individual check size is $25K.</div>
+        </div>
+        <div class="form-row">
+            <label>Name</label>
+            <input class="form-input" readonly value="Jordan Schwartz">
+        </div>
+        <div class="form-row">
+            <label>Company</label>
+            <div class="input-wrap">
+                <input class="form-input" readonly value="Inovues" id="interestCompanyInput">
+                <span class="dealum-pill">Dealum</span>
+            </div>
+        </div>
+        <div class="form-row">
+            <label>Amount</label>
+            <div class="amount-wrap">
+                <input class="form-input" value="$25,000">
+                <span class="amount-note">(optional)</span>
+            </div>
+        </div>
+        <div>
+            <label class="comment-label">Comment</label>
+            <textarea class="form-textarea" placeholder="Enter your comment..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn primary" type="button" onclick="closeInterestModal()">I plan to make a direct investment</button>
+            <button class="modal-btn outline" type="button" onclick="closeInterestModal()">I'm interested in learning more</button>
+            <button class="modal-btn destructive" type="button" onclick="closeInterestModal()">Not Interested</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openInterestModal(event, companyName) {
+        event.preventDefault();
+        document.getElementById('interestTitle').textContent = 'Investment Interest: ' + companyName;
+        document.getElementById('interestCompanyInput').value = companyName;
+        document.getElementById('interestOverlay').classList.add('open');
+    }
+    function closeInterestModal() {
+        document.getElementById('interestOverlay').classList.remove('open');
+    }
+    document.getElementById('interestOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeInterestModal();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key !== 'Escape') return;
+        if (document.getElementById('deckExpandOverlay').classList.contains('open')) {
+            closeDeckExpand();
+        } else if (document.getElementById('interestOverlay').classList.contains('open')) {
+            closeInterestModal();
+        } else {
+            closeInvestorView();
+        }
+    });
+    document.getElementById('deckExpandOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeDeckExpand();
+    });
+
+    /* ============ Investor View ============ */
+
+    function basics(o) {
+        return {
+            pre: [['Problem', o.problem || null], ['Solution', o.solution || null], ['Business Model', o.businessModel || null], ['Market', o.market || null], ['Go To Market', o.goToMarket || null], ['Competitive Advantage', o.competitiveAdvantage || null]],
+            traction: o.traction || null,
+            post: [['Competitors', o.competitors || null], ['Future Milestones', o.futureMilestones || null], ['Patentable Ideas', o.patentableIdeas || null], ['Environmental Impact', o.environmentalImpact || null]]
+        };
+    }
+
+    var investData = {
+        inovues: {
+            name: 'Inovues',
+            initials: 'IN',
+            logoBg: '#1e40af',
+            stageLabel: 'Investment Ready',
+            stageClass: 'ready',
+            tagline: 'Re-Energizing Building Facades — Without Replacement',
+            deal: {
+                stats: [['Instrument', 'Equity'], ['Capital Seeking', '$2M'], ['Round Close', 'Jul 31, 2026'], ['Lead Investor', 'Paulos Holdings']],
+                terms: 'INOVUES are raising up to $3M as a preferred equity round with a $17M pre-money valuation. They had an initial close of $1M in August 2025 and are looking to raise at least $1m of the remaining $2M approved by the Board. Minimum individual check size is $25K.',
+                footNote: 'Preferred equity · $17M pre-money · Min check $25K · Round closes Jul 31, 2026'
+            },
+            debrief: { upcoming: false },
+            report: {
+                title: 'Inovues Diligence Report - 2026-05-29',
+                finalized: 'Finalized June 5, 2026',
+                team: 'Arielle Cohen (Lead), Adam Robinson, Kristina Leach, Richard Jean, Rosemary Dunkle, Julisa Juarez (Fellow)'
+            },
+            deck: {
+                bg: 'linear-gradient(135deg, #172554, #1e40af)',
+                slides: [
+                    ['INOVUES', 'Re-Energizing Building Facades — Without Replacement'],
+                    ['The Problem', 'Inefficient facades drive up to 40% of building energy loss'],
+                    ['Our Solution', 'Non-invasive glazing retrofits — up to 90% lower cost'],
+                    ['Traction', 'Revenue up 352% YoY · 20 buildings across 10 states'],
+                    ['The Raise', '$3M preferred equity · $17M pre-money']
+                ]
+            },
+            media: {
+                pitch: {
+                    embed: 'https://www.youtube.com/embed/hgEn9Z0Vjjs?start=707',
+                    caption: 'Member Meeting: April 2026 · Apr 30, 2026 — queued to the Inovues pitch (11:47)'
+                },
+                debrief: {
+                    embed: 'https://www.youtube.com/embed/LtwQl16wCug',
+                    caption: 'Inovues Diligence Debrief · June 2, 2026'
+                }
+            },
+            basics: basics({
+                problem: '70% of all buildings today have energy-inefficient facades with obsolete single-pane or poor-performing double-pane windows, responsible for up to 40% of energy loss in buildings — the world’s largest energy-consuming and carbon-emitting sector. Traditional upgrades require full or partial replacement and months of disruption, making them cost-prohibitive as an energy conservation measure.',
+                solution: 'INOVUES developed non-invasive retrofit solutions that cut facade and window upgrade costs by up to 90%, delivering up to 10x faster payback compared to replacements. Our patented glazing retrofit systems enable integration of the latest energy-saving and smart glass technologies into building facades and windows — without removing, replacing, drilling, or altering any existing components.',
+                businessModel: 'INOVUES develops and manufactures innovative facade and window retrofits. We are an IP-driven engineering company with an asset-light manufacturing model. We have proprietary standardized systems/components and we leverage existing supply chains and fabrication facilities. We sell our products to end customers directly or through contractors/ESCO. We have low marginal costs, strong unit economics, and a large untapped market with growing demand.',
+                market: 'With 14 billion SF of inefficient glazing in U.S. commercial buildings, the market opportunity for facade and window retrofits is valued at $588Bn (over $3Tr globally), but it is largely untapped. The commercial window replacement market is less than 2% annually due to high costs and disruption. INOVUES is uniquely positioned to unlock this market opportunity with its cost-effective and non-disruptive retrofit solutions.',
+                traction: 'Key Traction KPIs (2025):\n- Revenue grew 352% YoY to $588k\n- Purchase orders increased 572% YoY to $955k\n- Quotes issued grew 426% YoY to $18M\n- Qualified sales pipeline expanded 125% YoY to $46M\n- Square footage contracted increased 323% YoY to 18,000 SF\n- Average closed-won deal size increased 300% YoY to $181k\n- Repeat customers tripled YoY, representing a growing share of new POs\n- Systems installed and operating in 20 buildings across 10 states\n- Gross margin maintained at ~52% while scaling deployments\nThese metrics reflect a transition from pilot-scale projects to commercial-scale deployments.'
+            }),
+            team: null,
+            raise: [
+                ['Capital Seeking', '$2M'],
+                ['Lead Investor', 'Paulos Holdings'],
+                ['Use of Funds', 'G&A: 35%, S&M: 29%, R&D: 21%, capex: 8%, working capital: 7%. This will help us expand our team to accelerate sales growth and order fulfillment. The goal is to reach break-even profitability by the end of 2026.'],
+                ['Financial Position', 'Cash on hand: ~$220k, burn rate: ~$80-90k, runway: backstopped by lead investor, future revenue secured to date for 2026 (POs under fullfillment): $275k'],
+                ['Round Close Date', 'July 31, 2026']
+            ]
+        },
+        northbeam: {
+            name: 'Northbeam Hydrogen',
+            initials: 'NH',
+            logoBg: '#7c3aed',
+            stageLabel: 'In Diligence',
+            stageClass: 'diligence',
+            tagline: 'Modular electrolyzers for on-site industrial hydrogen at half the installed cost.',
+            deal: {
+                stats: [['Instrument', 'SAFE'], ['Capital Seeking', '$1.5M'], ['Round Close', 'Sep 30, 2026']],
+                terms: 'Raising $1.5M on a post-money SAFE with a $10M cap. Minimum check size is $10K.'
+            },
+            debrief: { upcoming: false },
+            report: null,
+            deck: null,
+            media: {
+                pitch: {
+                    embed: 'https://www.youtube.com/embed/hgEn9Z0Vjjs?start=1192',
+                    caption: 'Member Meeting: April 2026 · Apr 30, 2026 — queued to the Northbeam pitch (sample)'
+                }
+            },
+            basics: basics({
+                problem: 'Industrial hydrogen is trucked in at $12–16/kg because on-site generation requires large, capital-intensive electrolyzer plants.',
+                solution: 'Containerized modular electrolyzers installed at the point of use, cutting installed cost roughly in half and deploying in weeks.',
+                market: 'U.S. industrial hydrogen demand exceeds 10M tons/year across food, glass, metals, and chemicals.'
+            }),
+            team: null,
+            raise: [
+                ['Capital Seeking', '$1.5M'],
+                ['Use of Funds', 'Pilot deployments and stack manufacturing scale-up.']
+            ]
+        },
+        ferrostat: {
+            name: 'Ferrostat',
+            initials: 'FS',
+            logoBg: '#9f1239',
+            stageLabel: 'In Diligence',
+            stageClass: 'diligence',
+            tagline: 'Iron-air batteries for multi-day grid storage at a tenth the cost of lithium.',
+            deal: {
+                stats: [['Instrument', 'Conv. Note'], ['Capital Seeking', '$2M']],
+                terms: 'Raising $2M on a convertible note with a $14M cap and 5% interest. Minimum check size is $10K.'
+            },
+            debrief: { upcoming: false },
+            report: null,
+            deck: null,
+            media: null,
+            basics: basics({
+                problem: 'Lithium-ion is uneconomical beyond ~4 hours of storage, leaving multi-day grid reliability unsolved.',
+                solution: 'Iron-air chemistry stores energy for 100+ hours using cheap, abundant materials.',
+                market: 'Long-duration energy storage is projected to be a $50B+ market by 2035.'
+            }),
+            team: null,
+            raise: [
+                ['Capital Seeking', '$2M'],
+                ['Use of Funds', 'Pilot cell line and utility demonstration projects.']
+            ]
+        },
+        clearcurrent: {
+            name: 'Clearcurrent',
+            initials: 'CC',
+            logoBg: '#0369a1',
+            stageLabel: 'Pre-Diligence',
+            stageClass: 'diligence',
+            tagline: 'Real-time water quality monitoring for municipal systems.',
+            deal: null,
+            debrief: { upcoming: false },
+            report: null,
+            deck: null,
+            media: null,
+            basics: basics({
+                problem: 'Municipal water systems rely on weekly grab samples, so contamination events are detected days late.',
+                solution: 'In-pipe sensor arrays stream continuous water-quality data with automated alerting.'
+            }),
+            team: null,
+            raise: null
+        },
+        helio: {
+            name: 'Helio Foundry',
+            initials: 'HF',
+            logoBg: '#b45309',
+            stageLabel: 'Pitching',
+            stageClass: 'pitching',
+            tagline: 'Concentrated solar heat for steel and cement production.',
+            deal: {
+                stats: [['Instrument', 'SAFE'], ['Capital Seeking', '$3M']],
+                terms: 'Raising $3M on a SAFE with a $20M cap. Minimum check size is $10K.'
+            },
+            debrief: { upcoming: false },
+            report: null,
+            deck: {
+                bg: 'linear-gradient(135deg, #431407, #b45309)',
+                slides: [
+                    ['Helio Foundry', 'Concentrated solar heat for heavy industry'],
+                    ['The Problem', 'Industrial heat is 20% of global emissions'],
+                    ['The Raise', '$3M SAFE · $20M cap']
+                ]
+            },
+            media: null,
+            basics: basics({
+                problem: 'Steel and cement need 1,000°C+ process heat that electrification can’t economically deliver, so it still comes from coal and gas.',
+                solution: 'Modular concentrated-solar arrays with thermal storage deliver continuous high-temperature heat at fuel parity.',
+                market: 'Industrial process heat accounts for roughly 20% of global CO₂ emissions.'
+            }),
+            team: null,
+            raise: [
+                ['Capital Seeking', '$3M'],
+                ['Use of Funds', 'First commercial array and thermal storage pilot.']
+            ]
+        },
+        brinewise: {
+            name: 'Brinewise',
+            initials: 'BW',
+            logoBg: '#0e7490',
+            stageLabel: 'Pitching',
+            stageClass: 'pitching',
+            tagline: 'Direct lithium extraction from geothermal brines.',
+            deal: null,
+            debrief: { upcoming: false },
+            report: null,
+            deck: null,
+            media: null,
+            basics: basics({
+                problem: 'Conventional lithium extraction takes 18 months in evaporation ponds and destroys local water tables.',
+                solution: 'Selective sorbents pull battery-grade lithium from geothermal brine in hours, with near-zero water loss.'
+            }),
+            team: null,
+            raise: null
+        },
+        carbonloop: {
+            name: 'Carbon Loop Materials',
+            initials: 'CL',
+            logoBg: '#475569',
+            stageLabel: 'Pitching',
+            stageClass: 'pitching',
+            tagline: 'Turning captured CO₂ into structural building polymers.',
+            deal: null,
+            debrief: { upcoming: false },
+            report: null,
+            deck: null,
+            media: null,
+            basics: basics({
+                problem: 'Captured CO₂ has few profitable destinations beyond enhanced oil recovery.',
+                solution: 'Catalytic conversion of CO₂ into structural polymers that displace petroleum-based building materials.'
+            }),
+            team: null,
+            raise: null
+        },
+        voltaic: {
+            name: 'Voltaic Grid',
+            initials: 'VG',
+            logoBg: '#1d4ed8',
+            stageLabel: 'Follow-On Pitch',
+            stageClass: 'pitching',
+            tagline: 'Orchestration software for distributed energy resources.',
+            deal: {
+                stats: [['Instrument', 'Equity'], ['Capital Seeking', '$4M']],
+                terms: 'Raising a $4M Series A extension at a $28M pre-money valuation. E8 members invested in the 2024 seed round. Minimum check size is $25K.'
+            },
+            debrief: { upcoming: false },
+            report: null,
+            deck: null,
+            media: null,
+            basics: basics({
+                problem: 'Utilities can’t see or dispatch the millions of batteries, EVs, and smart panels behind the meter.',
+                solution: 'A grid-edge orchestration platform that aggregates DERs into dispatchable virtual power plants.',
+                traction: 'Deployed with 3 utilities; 240 MW under management; ARR doubled since the seed round.'
+            }),
+            team: null,
+            raise: [
+                ['Capital Seeking', '$4M'],
+                ['Use of Funds', 'Utility integrations and market expansion.']
+            ]
+        }
+    };
+
+    var reportSvg = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1.5h5.5L13 5v9a.5.5 0 0 1-.5.5h-8.5A.5.5 0 0 1 3.5 14V2a.5.5 0 0 1 .5-.5z"/><path d="M9.5 1.5V5H13M5.8 8h4.4M5.8 10.5h4.4"/></svg>';
+    var calSvg = '<svg class="icon-lg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg>';
+    var dollarSvg = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.2v7.6M10 5.8c-.4-.7-1.1-1-2-1-1 0-1.8.5-1.8 1.4C6.2 8.6 10 8 10 9.8c0 .9-.9 1.4-2 1.4-.9 0-1.6-.3-2-1"/></svg>';
+
+    var deckSlides = [];
+    var deckIdx = 0;
+    var currentInvestCompany = null;
+
+    function debriefCalendarBtn(c) {
+        return '<a class="btn" href="#">' + calSvg +
+            '<span class="btn-stack"><span>Diligence Debrief</span><span class="btn-sub">' + c.debrief.when + '</span></span></a>';
+    }
+
+    function factHtml(f) {
+        var extra = f[2] || '';
+        if (f[1]) {
+            return '<div class="fact' + (extra ? ' wide' : '') + '"><div class="fact-l">' + f[0] + '</div><div class="fact-v' + extra + '">' + f[1] + '</div></div>';
+        }
+        return '<div class="fact"><div class="fact-l">' + f[0] + '</div><div class="fact-v empty">—</div></div>';
+    }
+
+    function videoTileHtml(label, media) {
+        return '<section class="invest-card">' +
+            '<div class="sec-label">' + label + '</div>' +
+            '<div class="video-embed"><iframe src="' + media.embed + '" title="' + label + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>' +
+            '<div class="media-caption">' + media.caption + '</div>' +
+        '</section>';
+    }
+
+    function investBodyHtml(c) {
+        var html = '';
+
+        if (c.deal) {
+            html += '<section class="invest-card deal-band">' +
+                '<div class="sec-label">Deal Terms</div>' +
+                '<div class="deal-stats">' + c.deal.stats.map(function(s) {
+                    return '<div><div class="stat-v">' + s[1] + '</div><div class="stat-l">' + s[0] + '</div></div>';
+                }).join('') + '</div>' +
+                '<div class="deal-terms-text">' + c.deal.terms + '</div>' +
+                (c.stageClass === 'ready' ?
+                    '<div class="deal-actions">' +
+                        '<button class="btn-primary" type="button" onclick="openInterestModal(event, \'' + c.name + '\')">' + dollarSvg + 'Register Investment Interest</button>' +
+                    '</div>' : '') +
+            '</section>';
+        }
+
+        var tiles = [];
+
+        if (c.report) {
+            tiles.push('<section class="invest-card">' +
+                '<div class="sec-label">Diligence Report</div>' +
+                '<div class="dr-row">' +
+                    '<a class="dr-thumb" href="#" title="Open the diligence report">' +
+                        '<div class="t-bar"></div><div class="t-bar sub"></div>' +
+                        '<div class="t-line"></div><div class="t-line"></div><div class="t-line short"></div>' +
+                        '<div class="t-line"></div><div class="t-line short"></div>' +
+                    '</a>' +
+                    '<div class="dr-main">' +
+                        '<div class="dr-title">' + c.report.title + '</div>' +
+                        '<div class="dr-meta">' + c.report.finalized + '</div>' +
+                        '<div class="dr-actions"><a class="btn" href="#">' + reportSvg + 'Open Report</a>' +
+                            (c.debrief.upcoming ? debriefCalendarBtn(c) : '') + '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="dr-team"><strong>Diligence Team:</strong> ' + c.report.team + '</div>' +
+            '</section>');
+        }
+
+        if (c.deck) {
+            tiles.push('<section class="invest-card">' +
+                '<div class="sec-label">Pitch Deck <span class="sec-side"><a href="#" onclick="expandDeck(event)">Expand</a><a href="#">Download</a></span></div>' +
+                '<div class="deck-stage" id="deckStage" style="background:' + c.deck.bg + '"></div>' +
+            '</section>');
+        }
+
+        if (c.media && c.media.pitch) {
+            tiles.push(videoTileHtml('Member Meeting Pitch', c.media.pitch));
+        }
+
+        if (c.media && c.media.debrief) {
+            tiles.push(videoTileHtml('DD Debrief Recording', c.media.debrief));
+        }
+
+        if (tiles.length) {
+            html += '<div class="media-row">' + tiles.join('') + '</div>';
+        }
+
+        html += '<section class="invest-card">' +
+            '<div class="sec-label">Company Overview</div>' +
+            '<div class="fact-grid">' +
+            c.basics.pre.map(factHtml).join('') +
+            factHtml(['Traction', c.basics.traction, ' preline']) +
+            c.basics.post.map(factHtml).join('') +
+            '</div>' +
+        '</section>';
+
+        if (c.team) {
+            html += '<section class="invest-card">' +
+                '<div class="sec-label">Team</div>' +
+                '<div class="team-list">' + c.team.map(function(t) {
+                    return '<div class="team-member"><div class="avatar">' + t[0] + '</div>' +
+                        '<div class="tm-main"><div class="tm-name">' + t[1] +
+                        '<span class="tm-title">' + t[2] + '</span>' +
+                        '</div><div class="tm-bio">' + t[3] + '</div></div></div>';
+                }).join('') + '</div>' +
+            '</section>';
+        }
+
+        if (c.raise) {
+            html += '<section class="invest-card">' +
+                '<div class="sec-label">Raise Details</div>' +
+                '<div class="kv-rows">' + c.raise.map(function(r) {
+                    return '<div class="kv-l">' + r[0] + '</div><div class="kv-v">' + r[1] + '</div>';
+                }).join('') + '</div>' +
+            '</section>';
+        }
+
+        return html;
+    }
+
+    function deckStageHtml() {
+        var s = deckSlides[deckIdx];
+        return '<div><div class="deck-slide-title">' + s[0] + '</div><div class="deck-slide-sub">' + s[1] + '</div></div>' +
+            '<button class="deck-nav prev" type="button" onclick="deckGo(-1)" aria-label="Previous slide">‹</button>' +
+            '<button class="deck-nav next" type="button" onclick="deckGo(1)" aria-label="Next slide">›</button>' +
+            '<span class="deck-count">' + (deckIdx + 1) + ' / ' + deckSlides.length + '</span>';
+    }
+
+    function renderDeck() {
+        if (!deckSlides.length) return;
+        var stage = document.getElementById('deckStage');
+        if (stage) stage.innerHTML = deckStageHtml();
+        var expandStage = document.getElementById('deckExpandStage');
+        if (expandStage && document.getElementById('deckExpandOverlay').classList.contains('open')) {
+            expandStage.innerHTML = deckStageHtml();
+        }
+    }
+
+    function deckGo(d) {
+        deckIdx = (deckIdx + d + deckSlides.length) % deckSlides.length;
+        renderDeck();
+    }
+
+    function expandDeck(event) {
+        event.preventDefault();
+        var overlay = document.getElementById('deckExpandOverlay');
+        document.getElementById('deckExpandStage').style.background = currentInvestCompany.deck.bg;
+        overlay.classList.add('open');
+        renderDeck();
+    }
+
+    function closeDeckExpand() {
+        document.getElementById('deckExpandOverlay').classList.remove('open');
+    }
+
+    function openInvestorView(event, key) {
+        event.preventDefault();
+        var c = investData[key];
+        currentInvestCompany = c;
+
+        var logo = document.getElementById('investLogo');
+        logo.textContent = c.initials;
+        logo.style.background = c.logoBg;
+        document.getElementById('investName').textContent = c.name;
+        document.getElementById('investTagline').textContent = c.tagline;
+        var stageTag = document.getElementById('investStageTag');
+        stageTag.textContent = c.stageLabel;
+        stageTag.className = 'tag stage-tag ' + c.stageClass;
+
+        document.getElementById('investBody').innerHTML = investBodyHtml(c);
+        deckSlides = c.deck ? c.deck.slides : [];
+        deckIdx = 0;
+        renderDeck();
+
+        var foot = document.querySelector('.invest-foot');
+        if (c.stageClass === 'ready') {
+            foot.style.display = '';
+            document.getElementById('investFootNote').textContent = c.deal.footNote;
+            document.getElementById('investFootCta').onclick = function(e) { openInterestModal(e, c.name); };
+        } else {
+            foot.style.display = 'none';
+        }
+
+        document.getElementById('investOverlay').classList.add('open');
+        document.getElementById('investPanel').classList.add('open');
+        document.getElementById('investBody').scrollTop = 0;
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeInvestorView() {
+        document.getElementById('investOverlay').classList.remove('open');
+        document.getElementById('investPanel').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+</script>
 
 </body>
 </html>
