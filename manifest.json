@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-12T03:45:08+00:00",
+  "generated": "2026-06-12T03:45:50+00:00",
   "plans": [
     {
       "slug": "Live-Chat-Codex",
@@ -176,12 +176,12 @@
     {
       "slug": "meeting-polling",
       "title": "Meeting Polling",
-      "status": "draft",
+      "status": "building",
       "owner": "jordan",
       "created": "2026-06-08",
-      "last_updated": "2026-06-08",
+      "last_updated": "2026-06-09",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-06-08T22:17:17-07:00",
+      "last_changed_at": "2026-06-11T20:45:13-07:00",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
@@ -219,6 +219,25 @@
           "name": "question-types",
           "path": "meeting-polling/question-types.html",
           "is_home": false
+        }
+      ]
+    },
+    {
+      "slug": "meeting-private-messages",
+      "title": "Private Messages in Meeting Chat",
+      "status": "draft",
+      "owner": "jordan",
+      "created": "2026-06-02",
+      "last_updated": "2026-06-02",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-06-11T20:45:13-07:00",
+      "has_plan": true,
+      "has_changelog": false,
+      "mockups": [
+        {
+          "name": "mockup",
+          "path": "meeting-private-messages/mockup.html",
+          "is_home": true
         }
       ]
     },
