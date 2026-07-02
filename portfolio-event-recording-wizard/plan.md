@@ -3,7 +3,7 @@ title: "Portfolio Event Recording Wizard"
 status: draft
 owner: jordan
 created: 2026-05-27
-last_updated: 2026-05-27
+last_updated: 2026-07-02
 home: mockup
 ---
 
@@ -121,7 +121,7 @@ The first implementation can be UI-heavy and reuse existing tables:
 Schema changes are probably not required for the first pass. Two follow-up schema/data-model questions remain:
 
 - Should company-level lifecycle vocabulary use `closed` in the UI while continuing to store `written_off` internally, or should a migration rename status values?
-- Should exits with actual returned capital create `fund_distributions` and/or deployment `record_type = 'return'` rows from this wizard, or should the first iteration only record the valuation event and prompt admins to reconcile distributions separately?
+- ~~Should exits with actual returned capital create `fund_distributions` and/or deployment `record_type = 'return'` rows from this wizard, or should the first iteration only record the valuation event and prompt admins to reconcile distributions separately?~~ **Answered (task 2.5, 2026-07-02):** the exit branch still creates exactly one canonical `exit` valuation event; when the admin knows per-member proceeds it additionally records `investor_return_events` (the member-level realized-proceeds store from Portfolio Returns Intelligence §8.3), one per filled investor row, via the claims-backed path so each carries provenance (a backing `portfolio_claims` row, `basis='reported'`, linked to the exit through `source_event_id`). Escrows/holdbacks ride in the high end of the return event's amount band rather than a separate receivable row. `fund_distributions` remains untouched — it is fund-vehicle-only (empty in prod) and is not written from this direct/member wizard flow. Neither the wizard nor this task writes `deployments.record_type='return'`; that legacy shape is superseded by `investor_return_events` (with the 9 legacy return rows backfilled separately). Proceeds are recorded through a follow-up call to `POST /api/admin/portfolio/valuation-events/:eventId/proceeds` so the exit valuation event stays atomic and proceeds are additive and idempotent (keyed per investor row).
 
 ## Implementation Plan
 
