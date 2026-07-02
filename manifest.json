@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-12T03:45:50+00:00",
+  "generated": "2026-07-02T04:47:48+00:00",
   "plans": [
     {
       "slug": "Live-Chat-Codex",
@@ -355,6 +355,25 @@
         {
           "name": "mockup",
           "path": "portfolio-event-recording-wizard/mockup.html",
+          "is_home": true
+        }
+      ]
+    },
+    {
+      "slug": "portfolio-returns-intelligence",
+      "title": "Portfolio Returns Intelligence",
+      "status": "draft",
+      "owner": "jordan",
+      "created": "2026-07-01",
+      "last_updated": "2026-07-01",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-07-01T21:47:38-07:00",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": [
+        {
+          "name": "mockup",
+          "path": "portfolio-returns-intelligence/mockup.html",
           "is_home": true
         }
       ]
