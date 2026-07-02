@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Development CRM — Event detail</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; }
+  .panel { background:#fff; border:1px solid #e2e8f0; border-radius:8px; }
+  .field-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#64748b; font-weight:700; }
+
+  /* Stage palette — matches staff-dashboard.html */
+  .stage-prospect    { background:#f1f5f9; color:#475569; }
+  .stage-outreach    { background:#e2e8f0; color:#334155; }
+  .stage-conversation{ background:#dbeafe; color:#1e3a8a; }
+  .stage-proposal    { background:#bfdbfe; color:#1d4ed8; }
+  .stage-committed   { background:#1d4ed8; color:#ffffff; }
+  .stage-received    { background:#059669; color:#ffffff; }
+  .stage-declined    { background:#f3f4f6; color:#6b7280; }
+
+  .type-chip { background:#f8fafc; color:#475569; border:1px solid #e2e8f0; }
+  .series-chip { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; }
+  .status-upcoming { background:#dbeafe; color:#1e3a8a; }
+  .audience-chip { background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; }
+
+  .partner-pill {
+    display:inline-flex; align-items:center; gap:6px; height:24px; max-width:100%; width:fit-content;
+    border:1px solid #bfdbfe; background:#eff6ff; color:#0f4bc2; border-radius:999px;
+    padding:0 8px; font-size:13px; line-height:1; white-space:nowrap; cursor:pointer;
+  }
+  .partner-pill:hover { background:#dbeafe; }
+  .add-partner {
+    width:28px; height:28px; border-radius:999px; border:1px dashed #cbd5e1; color:#64748b;
+    display:inline-flex; align-items:center; justify-content:center; background:#fff;
+  }
+  .add-partner:hover { border-color:#94a3b8; color:#0f172a; background:#f8fafc; }
+
+  .prop-row { display:grid; grid-template-columns:86px minmax(0,1fr); gap:10px; align-items:center; font-size:13px; }
+  .prop-row.top { align-items:start; }
+  .detail-row .edit-pencil { opacity:0; transition:opacity .12s ease; }
+  .detail-row:hover .edit-pencil { opacity:1; }
+  .detail-value { display:inline-flex; align-items:center; gap:6px; min-height:24px; border-radius:6px; padding:1px 6px; margin-left:-6px; width:fit-content; }
+  .detail-row:hover .detail-value { background:#f8fafc; }
+
+  .stat-tile { background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:8px 10px; min-width:0; }
+  .stat-tile .edit-pencil { opacity:0; transition:opacity .12s ease; }
+  .stat-tile:hover .edit-pencil { opacity:1; }
+
+  .detail-drawer { width:min(95vw, 1280px); }
+  .partner-drawer { width:min(92vw, 560px); }
+
+  .picker-pop {
+    position:absolute; left:0; top:34px; z-index:30; width:280px;
+    background:#fff; border:1px solid #e2e8f0; border-radius:8px;
+    box-shadow:0 10px 30px rgba(15,23,42,.14);
+  }
+  .picker-row { display:flex; align-items:baseline; gap:6px; width:100%; text-align:left; padding:7px 10px; font-size:13px; }
+  .picker-row:hover { background:#f8fafc; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-900 text-sm">
+
+<!-- ===== Muted Events grid behind the drawer ===== -->
+<main class="px-3 md:px-4 py-3 select-none" aria-hidden="true">
+  <div class="bg-white border border-slate-200 rounded-md px-3 py-2 flex items-center gap-2 mb-2 flex-wrap">
+    <div class="flex items-center bg-slate-100 rounded-md p-0.5 text-[13px]">
+      <button class="px-2.5 py-1 font-medium rounded text-slate-600">Opportunities</button>
+      <button class="px-2.5 py-1 font-medium rounded text-slate-600">Funders</button>
+      <button class="px-2.5 py-1 font-medium rounded bg-white shadow-sm">Events</button>
+    </div>
+    <div class="ml-auto flex items-center gap-2">
+      <button class="h-7 px-2.5 text-[13px] font-medium border border-slate-300 bg-white rounded">Columns</button>
+      <button class="h-7 px-2.5 text-[13px] font-medium text-white bg-blue-600 rounded">New event</button>
+    </div>
+  </div>
+  <div class="bg-white border border-slate-200 rounded-md overflow-hidden">
+    <table class="w-full text-[13px]">
+      <thead class="bg-slate-50 text-left text-[11px] uppercase tracking-wider text-slate-500">
+        <tr><th class="px-3 py-2">Name</th><th class="px-3 py-2">Series</th><th class="px-3 py-2">Date</th><th class="px-3 py-2">Status</th><th class="px-3 py-2">Type</th><th class="px-3 py-2">City</th><th class="px-3 py-2 text-right">Confirmed</th><th class="px-3 py-2 text-right">Pitched</th></tr>
+      </thead>
+      <tbody>
+        <tr class="border-t border-slate-100 bg-blue-50/60"><td class="px-3 py-2 font-semibold">Investing in Resilience</td><td class="px-3 py-2">PNW Climate Week</td><td class="px-3 py-2">Jul 14, 2026</td><td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-[11px] font-medium status-upcoming">Upcoming</span></td><td class="px-3 py-2">Panel</td><td class="px-3 py-2">Seattle</td><td class="px-3 py-2 text-right">$2,500</td><td class="px-3 py-2 text-right">$4,500</td></tr>
+        <tr class="border-t border-slate-100 text-slate-500"><td class="px-3 py-2 font-semibold">Summer Happy Hour</td><td class="px-3 py-2">—</td><td class="px-3 py-2">Aug 6, 2026</td><td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-[11px] font-medium status-upcoming">Upcoming</span></td><td class="px-3 py-2">Happy Hour</td><td class="px-3 py-2">Portland</td><td class="px-3 py-2 text-right">$1,000</td><td class="px-3 py-2 text-right">$3,000</td></tr>
+        <tr class="border-t border-slate-100 text-slate-500"><td class="px-3 py-2 font-semibold">E8 AGM 2026</td><td class="px-3 py-2">—</td><td class="px-3 py-2">Oct 22, 2026</td><td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-[11px] font-medium status-upcoming">Upcoming</span></td><td class="px-3 py-2">AGM</td><td class="px-3 py-2">Seattle</td><td class="px-3 py-2 text-right">$7,500</td><td class="px-3 py-2 text-right">$18,000</td></tr>
+        <tr class="border-t border-slate-100 text-slate-500"><td class="px-3 py-2 font-semibold">Spring Pitch Competition</td><td class="px-3 py-2">—</td><td class="px-3 py-2">Apr 9, 2026</td><td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-[11px] font-medium stage-declined">Completed</span></td><td class="px-3 py-2">Pitch Competition</td><td class="px-3 py-2">Seattle</td><td class="px-3 py-2 text-right">$4,000</td><td class="px-3 py-2 text-right">$6,500</td></tr>
+        <tr class="border-t border-slate-100 text-slate-500"><td class="px-3 py-2 font-semibold">Climate Learning Lab</td><td class="px-3 py-2">—</td><td class="px-3 py-2">—</td><td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-[11px] font-medium stage-prospect">Undated</span></td><td class="px-3 py-2">Learning Lab</td><td class="px-3 py-2">—</td><td class="px-3 py-2 text-right">—</td><td class="px-3 py-2 text-right">$1,000</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<!-- ===== Event slide-out panel (AdminDetailSheet) ===== -->
+<div id="eventOverlay" class="fixed inset-0 z-50 flex items-stretch justify-end bg-slate-950/25">
+  <section class="detail-drawer relative h-full bg-slate-50 shadow-2xl border-l border-slate-200 overflow-y-auto">
+    <button type="button" class="absolute right-3 top-3 z-10 h-8 w-8 rounded-md bg-white border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 inline-flex items-center justify-center" aria-label="Close detail panel">
+      <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+    </button>
+
+    <div class="px-4 md:px-6 py-4 md:py-5">
+
+      <!-- Header -->
+      <header class="pr-10">
+        <div class="flex items-center gap-2 flex-wrap">
+          <h1 class="text-2xl md:text-[28px] leading-tight font-semibold tracking-tight">Investing in Resilience</h1>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[12px] font-medium series-chip">PNW Climate Week</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[12px] font-medium type-chip">Panel</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[12px] font-medium status-upcoming">Upcoming</span>
+        </div>
+        <p class="mt-1.5 text-[14px] text-slate-600">Tue, July 14, 2026 · 9:00–11:00 AM PT · Seattle, Washington · 9Zero</p>
+      </header>
+
+      <!-- Two-column body -->
+      <div class="mt-4 grid gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] items-start">
+
+        <!-- LEFT: Details + Partners -->
+        <div class="space-y-3 min-w-0">
+          <section class="panel p-4">
+            <div class="field-label mb-2.5">Details</div>
+            <div class="space-y-1.5">
+              <div class="prop-row detail-row">
+                <div class="field-label">Name</div>
+                <div class="detail-value">Investing in Resilience
+                  <svg class="edit-pencil w-3.5 h-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+                </div>
+              </div>
+              <div class="prop-row detail-row">
+                <div class="field-label">Series</div>
+                <div class="detail-value border border-slate-200 bg-white !ml-0 px-2">PNW Climate Week
+                  <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd"/></svg>
+                </div>
+              </div>
+              <div class="prop-row detail-row">
+                <div class="field-label">Type</div>
+                <div class="detail-value">Panel
+                  <svg class="edit-pencil w-3.5 h-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+                </div>
+              </div>
+              <div class="prop-row detail-row">
+                <div class="field-label">Date</div>
+                <div class="detail-value">Tue, July 14, 2026
+                  <svg class="edit-pencil w-3.5 h-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+                </div>
+              </div>
+              <div class="prop-row detail-row">
+                <div class="field-label">Time</div>
+                <div class="detail-value">9:00 AM – 11:00 AM · Pacific
+                  <svg class="edit-pencil w-3.5 h-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+                </div>
+              </div>
+              <div class="prop-row detail-row">
+                <div class="field-label">Location</div>
+                <div class="detail-value">Seattle, Washington
+                  <svg class="edit-pencil w-3.5 h-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+                </div>
+              </div>
+              <div class="prop-row detail-row">
+                <div class="field-label">Venue</div>
+                <div class="detail-value">9Zero
+                  <svg class="edit-pencil w-3.5 h-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+                </div>
+              </div>
+              <div class="prop-row detail-row">
+                <div class="field-label">Audience</div>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium audience-chip w-fit">Investors</span>
+                  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium audience-chip w-fit">Founders</span>
+                  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium audience-chip w-fit">Ecosystem</span>
+                </div>
+              </div>
+              <div class="prop-row detail-row">
+                <div class="field-label">Size</div>
+                <div class="detail-value tabular-nums">100
+                  <svg class="edit-pencil w-3.5 h-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+                </div>
+              </div>
+              <div class="prop-row top detail-row">
+                <div class="field-label pt-1.5">Notes</div>
+                <div class="relative rounded-md border border-slate-200 bg-white px-3 py-2 text-[13px] leading-5 text-slate-700">
+                  Co-programmed with PNW Climate Week organizers. Panel on financing resilient infrastructure; E8 moderating. Confirm AV needs with 9Zero by July 1.
+                  <svg class="edit-pencil absolute top-2 right-2 w-3.5 h-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Partners -->
+          <section class="panel p-4">
+            <div class="field-label mb-2.5">Partners</div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" class="partner-pill" data-partner="Snocap"><span>Snocap</span><span class="text-slate-400">×</span></button>
+              <button type="button" class="partner-pill" data-partner="9Zero"><span>9Zero</span><span class="text-slate-400">×</span></button>
+              <div class="relative">
+                <button type="button" class="add-partner" title="Add partner">
+                  <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
+                </button>
+                <!-- PartnerPicker popover (open state) -->
+                <div class="picker-pop">
+                  <div class="p-2 border-b border-slate-100">
+                    <input type="text" value="vertue" autocomplete="off" data-lpignore="true" data-form-type="other"
+                           class="h-8 w-full border border-slate-300 rounded px-2 text-[13px]" placeholder="Search partners…" />
+                  </div>
+                  <div class="py-1">
+                    <button type="button" class="picker-row"><span class="font-medium">Vertue Lab</span><span class="text-slate-500 text-[12px]">— Accelerator</span></button>
+                    <button type="button" class="picker-row border-t border-slate-50"><span class="font-medium">VertueX Capital</span><span class="text-slate-500 text-[12px]">— VC</span></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- spacer so the open popover doesn't overlap the annotation strip in the mock -->
+            <div class="h-28"></div>
+          </section>
+        </div>
+
+        <!-- RIGHT: Sponsorships -->
+        <section class="panel p-4 min-w-0">
+          <div class="field-label mb-2.5">Sponsorships</div>
+
+          <!-- Money tiles -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2">
+            <div class="stat-tile">
+              <div class="text-[11px] uppercase tracking-wide text-slate-500">Pitched</div>
+              <div class="mt-0.5 text-[15px] font-semibold tabular-nums">$4,500</div>
+            </div>
+            <div class="stat-tile">
+              <div class="text-[11px] uppercase tracking-wide text-slate-500">Confirmed</div>
+              <div class="mt-0.5 text-[15px] font-semibold tabular-nums text-blue-700">$2,500</div>
+            </div>
+            <div class="stat-tile">
+              <div class="text-[11px] uppercase tracking-wide text-slate-500">Received</div>
+              <div class="mt-0.5 text-[15px] font-semibold tabular-nums text-emerald-700">$1,500</div>
+            </div>
+            <div class="stat-tile">
+              <div class="text-[11px] uppercase tracking-wide text-slate-500">Est. Cost</div>
+              <div class="mt-0.5 text-[15px] font-semibold tabular-nums">$3,000</div>
+            </div>
+            <div class="stat-tile">
+              <div class="text-[11px] uppercase tracking-wide text-slate-500">Actual Cost</div>
+              <div class="mt-0.5 text-[15px] font-semibold tabular-nums inline-flex items-center gap-1.5">$2,800
+                <svg class="edit-pencil w-3.5 h-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+              </div>
+            </div>
+            <div class="stat-tile">
+              <div class="text-[11px] uppercase tracking-wide text-slate-500">Net</div>
+              <div class="mt-0.5 text-[15px] font-semibold tabular-nums text-red-700">−$300</div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="mt-3 flex items-center justify-end gap-2">
+            <button type="button" class="h-7 px-2.5 text-[13px] font-medium border border-slate-300 bg-white hover:bg-slate-50 rounded whitespace-nowrap">Link existing</button>
+            <button type="button" class="h-7 px-2.5 text-[13px] font-medium text-white bg-blue-600 hover:bg-blue-700 rounded inline-flex items-center gap-1 whitespace-nowrap">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
+              New sponsorship
+            </button>
+          </div>
+
+          <!-- Linked opportunities -->
+          <div class="mt-2 rounded border border-slate-200 overflow-hidden">
+            <table class="w-full text-[13px]">
+              <thead class="bg-slate-50 text-left text-[11px] uppercase tracking-wider text-slate-500">
+                <tr>
+                  <th class="px-3 py-2">Funder</th>
+                  <th class="px-3 py-2">Opportunity</th>
+                  <th class="px-3 py-2">Stage</th>
+                  <th class="px-3 py-2 text-right">Asked</th>
+                  <th class="px-3 py-2 text-right">Committed</th>
+                  <th class="px-3 py-2 text-right">Received</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-t border-slate-100 hover:bg-slate-50 cursor-pointer">
+                  <td class="px-3 py-2 font-medium whitespace-nowrap">J.P. Morgan</td>
+                  <td class="px-3 py-2">PNW Climate Week 2026 Sponsorship</td>
+                  <td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-[11px] font-medium stage-received">Received</span></td>
+                  <td class="px-3 py-2 text-right tabular-nums">$1,500</td>
+                  <td class="px-3 py-2 text-right tabular-nums">$1,500</td>
+                  <td class="px-3 py-2 text-right tabular-nums">$1,500</td>
+                </tr>
+                <tr class="border-t border-slate-100 hover:bg-slate-50 cursor-pointer">
+                  <td class="px-3 py-2 font-medium whitespace-nowrap">Cooley</td>
+                  <td class="px-3 py-2">Investing in Resilience Sponsorship</td>
+                  <td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-[11px] font-medium stage-committed">Committed</span></td>
+                  <td class="px-3 py-2 text-right tabular-nums">$1,000</td>
+                  <td class="px-3 py-2 text-right tabular-nums">$1,000</td>
+                  <td class="px-3 py-2 text-right tabular-nums text-slate-400">—</td>
+                </tr>
+                <tr class="border-t border-slate-100 hover:bg-slate-50 cursor-pointer">
+                  <td class="px-3 py-2 font-medium whitespace-nowrap">SVB (First Citizens Bank)</td>
+                  <td class="px-3 py-2">PNW CW Panel Sponsorship</td>
+                  <td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-[11px] font-medium stage-proposal">Proposal</span></td>
+                  <td class="px-3 py-2 text-right tabular-nums">$1,000</td>
+                  <td class="px-3 py-2 text-right tabular-nums text-slate-400">—</td>
+                  <td class="px-3 py-2 text-right tabular-nums text-slate-400">—</td>
+                </tr>
+                <tr class="border-t border-slate-100 hover:bg-slate-50 cursor-pointer">
+                  <td class="px-3 py-2 font-medium whitespace-nowrap">KBF Advisory</td>
+                  <td class="px-3 py-2">Investing in Resilience Ask</td>
+                  <td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-[11px] font-medium stage-conversation">Conversation</span></td>
+                  <td class="px-3 py-2 text-right tabular-nums">$1,000</td>
+                  <td class="px-3 py-2 text-right tabular-nums text-slate-400">—</td>
+                  <td class="px-3 py-2 text-right tabular-nums text-slate-400">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== Partner slide-out (opens from a partner pill) ===== -->
+<div id="partnerOverlay" class="fixed inset-0 z-[60] hidden items-stretch justify-end bg-slate-950/25">
+  <section class="partner-drawer relative h-full bg-slate-50 shadow-2xl border-l border-slate-200 overflow-y-auto">
+    <button id="closePartnerBtn" type="button" class="absolute right-3 top-3 z-10 h-8 w-8 rounded-md bg-white border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 inline-flex items-center justify-center" aria-label="Close partner panel">
+      <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+    </button>
+    <div class="px-4 md:px-5 py-4 md:py-5">
+      <header class="pr-10">
+        <div class="flex items-center gap-2 flex-wrap">
+          <h2 class="text-xl font-semibold tracking-tight">Snocap</h2>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[12px] font-medium type-chip">Accelerator</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[12px] font-medium series-chip">Active</span>
+        </div>
+      </header>
+      <section class="panel p-4 mt-3">
+        <div class="space-y-1.5">
+          <div class="prop-row detail-row">
+            <div class="field-label">E8 owner</div>
+            <button type="button" class="partner-pill justify-self-start"><span>Karin Kidder</span><span class="text-slate-400">×</span></button>
+          </div>
+          <div class="prop-row top detail-row">
+            <div class="field-label pt-1">Contacts</div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" class="partner-pill"><span>Maya Chen, Programs</span><span class="text-slate-400">×</span></button>
+              <button type="button" class="partner-pill"><span>Devon Park, Partnerships</span><span class="text-slate-400">×</span></button>
+              <button type="button" class="add-partner" title="Add contact">
+                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 5a.75.75 0 01.75.75v3.5h3.5a.75.75 0 010 1.5h-3.5v3.5a.75.75 0 01-1.5 0v-3.5h-3.5a.75.75 0 010-1.5h3.5v-3.5A.75.75 0 0110 5z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="prop-row top detail-row">
+            <div class="field-label pt-1.5">Notes</div>
+            <div class="relative rounded-md border border-slate-200 bg-white px-3 py-2 text-[13px] leading-5 text-slate-700">
+              Climate-tech accelerator; co-hosted the 2025 pitch night. Prefers co-branded invites and a shared attendee list after each event.
+              <svg class="edit-pencil absolute top-2 right-2 w-3.5 h-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/></svg>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+</div>
+
+<!-- Annotation strip -->
+<div class="fixed bottom-0 inset-x-0 z-[70] bg-slate-800 text-slate-300 text-[12px] px-4 py-1.5">
+  Mockup — event panel opens via AdminDetailSheet from the Events grid; partner pills open the partner panel.
+</div>
+
+<script>
+const partnerOverlay = document.getElementById('partnerOverlay');
+function openPartnerPanel() { partnerOverlay.classList.remove('hidden'); partnerOverlay.classList.add('flex'); }
+function closePartnerPanel() { partnerOverlay.classList.add('hidden'); partnerOverlay.classList.remove('flex'); }
+document.querySelectorAll('#eventOverlay .partner-pill').forEach(el => el.addEventListener('click', openPartnerPanel));
+document.getElementById('closePartnerBtn').addEventListener('click', closePartnerPanel);
+partnerOverlay.addEventListener('click', (event) => { if (event.target === partnerOverlay) closePartnerPanel(); });
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    if (!partnerOverlay.classList.contains('hidden')) { closePartnerPanel(); return; }
+    if (window.parent && window.parent !== window) window.parent.postMessage({ type: 'detailEscape' }, '*');
+  }
+});
+</script>
+</body>
+</html>
