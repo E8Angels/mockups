@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Portfolio Returns Intelligence — Mockup</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f8fafc;
+    --panel: #ffffff;
+    --line: #d8e0ea;
+    --line-strong: #b9c5d4;
+    --text: #0f172a;
+    --muted: #64748b;
+    --blue: #2563eb;
+    --blue-soft: #eff6ff;
+    --green: #047857;
+    --green-soft: #ecfdf5;
+    --amber: #b45309;
+    --amber-soft: #fffbeb;
+    --red: #b91c1c;
+    --red-soft: #fef2f2;
+    --violet: #6d28d9;
+    --violet-soft: #f5f3ff;
+    --gray-soft: #f1f5f9;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+  .page { padding: 20px; max-width: 1180px; margin: 0 auto; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+  h1 { margin: 0; font-size: 20px; font-weight: 650; }
+  h2 { margin: 0 0 8px; font-size: 15px; font-weight: 650; }
+  .tabs { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); }
+  .tab { border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--text); font: inherit; cursor: pointer; height: 28px; padding: 0 10px; font-size: 12px; }
+  .tab.active { background: #0f172a; color: white; }
+  .view { display: none; }
+  .view.active { display: block; }
+  .panel { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); overflow: hidden; margin-bottom: 14px; }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  .panel-body { padding: 12px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 12px; }
+  .tiny { font-size: 11px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); padding: 7px 10px; border-bottom: 1px solid var(--line-strong); background: #fbfdff; position: sticky; top: 0; }
+  td { padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  th.num { text-align: right; }
+  .badge { display: inline-block; border-radius: 5px; padding: 1px 7px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .b-reported { background: var(--green-soft); color: var(--green); }
+  .b-derived  { background: var(--blue-soft); color: var(--blue); }
+  .b-estimate { background: var(--amber-soft); color: var(--amber); }
+  .b-unknown  { background: var(--gray-soft); color: var(--muted); }
+  .b-zero     { background: var(--red-soft); color: var(--red); }
+  .b-pending  { background: var(--violet-soft); color: var(--violet); }
+  .range { color: var(--muted); font-size: 11px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .kpi { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 10px 12px; }
+  .kpi .label { font-size: 11px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); }
+  .kpi .value { font-size: 20px; font-weight: 650; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .kpi .sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .coverage { display: flex; height: 14px; border-radius: 7px; overflow: hidden; border: 1px solid var(--line); }
+  .coverage > div { height: 100%; }
+  .cov-reported { background: #059669; }
+  .cov-derived  { background: #3b82f6; }
+  .cov-estimate { background: #f59e0b; }
+  .cov-unknown  { background: #cbd5e1; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 6px; font-size: 11px; color: var(--muted); }
+  .legend .dot { display: inline-block; width: 8px; height: 8px; border-radius: 4px; margin-right: 4px; }
+  .button { border: 1px solid var(--line-strong); border-radius: 6px; background: var(--panel); color: var(--text); font: inherit; font-size: 12px; height: 28px; padding: 0 12px; cursor: pointer; }
+  .button.primary { background: #0f172a; border-color: #0f172a; color: white; }
+  .button.ghost { border-color: transparent; color: var(--blue); }
+  .button.danger { color: var(--red); }
+  textarea.freeform { width: 100%; min-height: 74px; border: 1px solid var(--line-strong); border-radius: 7px; padding: 9px 10px; font: inherit; resize: vertical; }
+  .intake-hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .claim-card { border: 1px solid var(--line); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+  .claim-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; background: #fbfdff; border-bottom: 1px solid var(--line); }
+  .claim-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 16px; padding: 10px 12px; }
+  .claim-grid .field label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); margin-bottom: 2px; }
+  .claim-grid .field input, .claim-grid .field select { width: 100%; border: 1px solid var(--line-strong); border-radius: 6px; height: 28px; padding: 0 8px; font: inherit; font-size: 13px; background: white; }
+  .quote { margin: 0 12px 10px; padding: 7px 10px; border-left: 3px solid var(--line-strong); background: var(--gray-soft); font-size: 12px; color: var(--muted); font-style: italic; border-radius: 0 6px 6px 0; }
+  .claim-actions { display: flex; gap: 8px; padding: 0 12px 10px; }
+  .provenance { position: relative; display: inline-block; }
+  .prov-pop { border: 1px solid var(--line-strong); border-radius: 8px; background: white; box-shadow: 0 8px 24px rgba(15,23,42,.12); padding: 10px 12px; font-size: 12px; width: 320px; }
+  .prov-pop dt { font-weight: 600; margin-top: 6px; }
+  .prov-pop dt:first-child { margin-top: 0; }
+  .prov-pop dd { margin: 0; color: var(--muted); }
+  .queue-meta { display: flex; gap: 10px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .barrow { display: flex; align-items: center; gap: 8px; }
+  .barrow .bar { height: 9px; border-radius: 4px; background: var(--blue); opacity: .85; }
+  .chart { display: flex; align-items: flex-end; gap: 8px; height: 130px; padding: 8px 4px 0; }
+  .chart .col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 3px; }
+  .chart .whisker { width: 2px; background: var(--line-strong); }
+  .chart .bar { width: 100%; border-radius: 3px 3px 0 0; background: #3b82f6; }
+  .chart .bar.realized { background: #059669; }
+  .chart .xlabel { font-size: 10px; color: var(--muted); margin-top: 4px; }
+  .footnote { font-size: 11px; color: var(--muted); padding: 8px 12px; border-top: 1px solid var(--line); }
+  .chat-msg { max-width: 720px; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 13px; }
+  .chat-msg p { margin: 0 0 8px; }
+  .chat-msg p:last-child { margin-bottom: 0; }
+  .chat-msg.user { background: #0f172a; color: white; margin-left: auto; }
+  .chat-msg.claude { background: var(--gray-soft); border: 1px solid var(--line); }
+  .chat-table { margin: 8px 0; background: white; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+  .chat-table th { position: static; }
+  @media (max-width: 860px) {
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .claim-grid { grid-template-columns: repeat(2, 1fr); }
+    .split { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="topbar">
+    <h1>Portfolio Returns Intelligence</h1>
+    <div class="tabs">
+      <button class="tab active" data-view="cowork">Cowork intake</button>
+      <button class="tab" data-view="member">Member statement</button>
+      <button class="tab" data-view="intake">Report an outcome</button>
+      <button class="tab" data-view="queue">Admin — intake review</button>
+      <button class="tab" data-view="org">Admin — group performance</button>
+    </div>
+  </div>
+
+  <!-- ============================== COWORK INTAKE ============================== -->
+  <section class="view active" id="view-cowork">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Claude Cowork — batch intake from email</h2>
+        <span class="small muted">the flagship flow: agents propose, governed actions commit, humans decide</span>
+      </div>
+      <div class="panel-body">
+
+        <div class="chat-msg user">
+          I just received 10 emails from members describing their exit events. Read them and do the right thing.
+        </div>
+
+        <div class="chat-msg claude">
+          <p>Read all 10. Here's what I did:</p>
+          <table class="chat-table">
+            <thead><tr><th>From</th><th>What they said</th><th>Outcome</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>P. Raman</td>
+                <td class="small muted">"got $130k cash on Impel, escrow pending"</td>
+                <td><span class="badge b-reported">2 claims saved</span> <span class="tiny muted">confirm link sent</span></td>
+              </tr>
+              <tr>
+                <td>D. Chen</td>
+                <td class="small muted">"took about 1.5× on my Impel SAFE"</td>
+                <td><span class="badge b-reported">1 claim saved</span> <span class="tiny muted">confirm link sent</span></td>
+              </tr>
+              <tr>
+                <td>S. Okafor</td>
+                <td class="small muted">"roughly doubled my money" — no amount, ambiguous company</td>
+                <td><span class="badge b-pending">Needs review</span> <span class="tiny muted">2 company candidates</span></td>
+              </tr>
+              <tr>
+                <td class="muted">…7 more</td>
+                <td class="small muted">clean member-level reports</td>
+                <td><span class="badge b-reported">11 claims saved</span> <span class="tiny muted">confirm links sent</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <p>Every email was stored verbatim first; each claim links back to the exact
+          sentence it came from. 14 claims are member-level and will auto-accept when the
+          members confirm. One thing needs you:</p>
+          <p><strong>Three emails mention that Impel was acquired by Vontier in March.</strong>
+          That's a company-level event — accepting it would re-mark 4 instruments and move
+          12 member positions. Want me to accept it as an attested exit claim and record
+          the valuation event?</p>
+        </div>
+
+        <div class="chat-msg user">
+          Yes, accept it. And what's our best guess on the Impel exit multiple now?
+        </div>
+
+        <div class="chat-msg claude">
+          <p>Done — exit recorded (previewed, then executed; mutation logged). Based on the
+          three member reports, the implied exit multiple is <strong>~2.6× – 2.8×</strong> on
+          the 2019 SAFE. Members who reported actuals show as “Reported”; the other 9
+          holders now carry an exit pro-rata estimate with a 0.6–1.1× haircut band until
+          they confirm their own numbers. Reported coverage on Impel went from 0% to 61%.</p>
+        </div>
+
+      </div>
+      <div class="footnote">
+        The agent can only call governed actions: store a source, propose claims, accept /
+        reject with preview, send confirm links. It cannot write tables directly —
+        deterministic server code validates, routes, and audits every step.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== MEMBER STATEMENT ============================== -->
+  <section class="view" id="view-member">
+    <div class="kpis">
+      <div class="kpi">
+        <div class="label">Invested</div>
+        <div class="value">$412,500</div>
+        <div class="sub">14 companies · first check 2014</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Realized</div>
+        <div class="value">$188,000</div>
+        <div class="sub">$171k reported by you · $17k derived</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Est. current value</div>
+        <div class="value">~$486,000</div>
+        <div class="sub">range $352k – $598k</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Total value / invested</div>
+        <div class="value">~1.6×</div>
+        <div class="sub">range 1.3× – 1.9× · realized 0.46×</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>How solid are these numbers?</h2>
+        <span class="small muted">share of portfolio value by source</span>
+      </div>
+      <div class="panel-body">
+        <div class="coverage">
+          <div class="cov-reported" style="width:44%"></div>
+          <div class="cov-derived" style="width:14%"></div>
+          <div class="cov-estimate" style="width:30%"></div>
+          <div class="cov-unknown" style="width:12%"></div>
+        </div>
+        <div class="legend">
+          <span><span class="dot cov-reported"></span>Reported by you · 44%</span>
+          <span><span class="dot cov-derived"></span>Derived from known terms · 14%</span>
+          <span><span class="dot cov-estimate"></span>Estimated from last round · 30%</span>
+          <span><span class="dot cov-unknown"></span>Little data — wide estimate · 12%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Your investments</h2>
+        <button class="button primary">Report an outcome</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Company</th><th>First check</th><th class="num">Invested</th>
+            <th class="num">Realized</th><th class="num">Est. value</th>
+            <th class="num">Multiple</th><th>Source</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Impel Motors</td><td>2019</td><td class="num">$50,000</td>
+            <td class="num">$130,000</td>
+            <td class="num">$8,000 <div class="range">escrow $0 – $14k</div></td>
+            <td class="num">2.8×</td>
+            <td><span class="badge b-reported">Reported by you</span></td>
+            <td><button class="button ghost tiny">Details</button></td>
+          </tr>
+          <tr>
+            <td>EnerG2 → Group14</td><td>2014</td><td class="num">$25,000</td>
+            <td class="num">$0</td>
+            <td class="num">~$96,000 <div class="range">$77k – $115k</div></td>
+            <td class="num">~3.8×</td>
+            <td><span class="badge b-derived">Stock received in sale</span></td>
+            <td><button class="button ghost tiny">Details</button></td>
+          </tr>
+          <tr>
+            <td>Korvata</td><td>2021</td><td class="num">$40,000</td>
+            <td class="num">$0</td>
+            <td class="num">~$88,000 <div class="range">$44k – $106k</div></td>
+            <td class="num">~2.2×</td>
+            <td><span class="badge b-estimate">Based on 2024 round</span></td>
+            <td><button class="button ghost tiny">Details</button></td>
+          </tr>
+          <tr>
+            <td>Meadowlark Bio</td><td>2020</td><td class="num">$30,000</td>
+            <td class="num">$0</td>
+            <td class="num">~$30,000 <div class="range">$8k – $45k</div></td>
+            <td class="num">~1.0×</td>
+            <td><span class="badge b-unknown">No update since 2020</span></td>
+            <td><button class="button ghost tiny">Update</button></td>
+          </tr>
+          <tr>
+            <td>Cirro Systems</td><td>2017</td><td class="num">$25,000</td>
+            <td class="num">$0</td>
+            <td class="num">$0 <div class="range">$0 – $2.5k</div></td>
+            <td class="num">0×</td>
+            <td><span class="badge b-zero">Closed 2022</span></td>
+            <td><button class="button ghost tiny">Details</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="footnote">
+        Numbers with “~” are estimates. Every value shows where it came from — select
+        Details to see the method, the source, and the date behind it.
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>Behind a number</h2><span class="small muted">provenance popover, shown on Details</span></div>
+      <div class="panel-body">
+        <div class="prov-pop">
+          <dl style="margin:0">
+            <dt>EnerG2 → Group14 · ~$96,000</dt>
+            <dd>Derived from your reported stock consideration</dd>
+            <dt>What we know</dt>
+            <dd>You reported receiving Group14 shares for your EnerG2 note (confirmed Mar 2026). Group14’s Series C (Jun 2025) sets the current share value.</dd>
+            <dt>What we assume</dt>
+            <dd>No sales since receipt; ±20% band for round-price staleness.</dd>
+            <dt>Improve this</dt>
+            <dd><a href="#">Tell us if you’ve sold shares or know a newer value →</a></dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== INTAKE / CONFIRM FLOW ============================== -->
+  <section class="view" id="view-intake">
+    <div class="panel">
+      <div class="panel-head"><h2>Report an outcome</h2></div>
+      <div class="panel-body">
+        <textarea class="freeform">Impel was acquired by Vontier last March. I had $50k in the 2019 SAFE and got back about $130k in cash, plus some escrow that hasn't paid out yet — maybe another $10-15k if it all clears.</textarea>
+        <div class="intake-hint">Write it the way you’d tell a friend — amounts, dates, and company names in any order. You’ll confirm before anything is saved.</div>
+        <div style="margin-top:8px"><button class="button primary">Continue</button></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Here’s what we understood</h2>
+        <span class="small muted">edit anything that’s off, then confirm</span>
+      </div>
+      <div class="panel-body">
+
+        <div class="claim-card">
+          <div class="claim-head">
+            <strong>1 · Cash received — Impel Motors</strong>
+            <span class="badge b-reported">Your investment</span>
+          </div>
+          <div class="claim-grid">
+            <div class="field"><label>Company</label><input value="Impel Motors" /></div>
+            <div class="field"><label>Amount received</label><input value="$130,000" /></div>
+            <div class="field"><label>When</label><input value="March 2025" /></div>
+            <div class="field"><label>Kind</label><select><option>Acquisition proceeds</option><option>Secondary sale</option><option>Escrow release</option></select></div>
+          </div>
+          <div class="quote">“…got back about $130k in cash…”</div>
+        </div>
+
+        <div class="claim-card">
+          <div class="claim-head">
+            <strong>2 · Escrow still pending — Impel Motors</strong>
+            <span class="badge b-reported">Your investment</span>
+          </div>
+          <div class="claim-grid">
+            <div class="field"><label>Company</label><input value="Impel Motors" /></div>
+            <div class="field"><label>Expected range</label><input value="$0 – $15,000" /></div>
+            <div class="field"><label>When</label><input value="Unknown" /></div>
+            <div class="field"><label>Kind</label><select><option>Escrow / holdback</option></select></div>
+          </div>
+          <div class="quote">“…plus some escrow that hasn’t paid out yet — maybe another $10-15k…”</div>
+        </div>
+
+        <div class="claim-card">
+          <div class="claim-head">
+            <strong>3 · Company acquired — Impel Motors</strong>
+            <span class="badge b-pending">Affects other members — E8 will verify</span>
+          </div>
+          <div class="claim-grid">
+            <div class="field"><label>Company</label><input value="Impel Motors" /></div>
+            <div class="field"><label>Acquirer</label><input value="Vontier" /></div>
+            <div class="field"><label>When</label><input value="March 2025" /></div>
+            <div class="field"><label>Kind</label><select><option>Acquisition</option><option>IPO</option><option>Merger</option></select></div>
+          </div>
+          <div class="quote">“Impel was acquired by Vontier last March.”</div>
+        </div>
+
+        <div class="claim-actions">
+          <button class="button primary">Confirm all three</button>
+          <button class="button">Confirm 1 &amp; 2 only</button>
+          <button class="button ghost">Start over</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== ADMIN REVIEW QUEUE ============================== -->
+  <section class="view" id="view-queue">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Portfolio intake — review queue</h2>
+        <span class="small muted">7 pending · 2 awaiting member clarification</span>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Received</th><th>Reporter / source</th><th>Proposed</th><th>Basis</th><th>AI match</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="small">Jun 28<br /><span class="tiny muted">email reply</span></td>
+            <td>Priya Raman<br /><span class="tiny muted">member · confirmed via link</span></td>
+            <td>
+              <strong>Exit — Impel Motors</strong> acquired by Vontier, Mar 2025<br />
+              <span class="tiny muted">promotes to a company-wide update; 11 other member positions affected</span>
+            </td>
+            <td><span class="badge b-reported">Attested</span></td>
+            <td class="small">Impel Motors <span class="tiny muted">(98%)</span></td>
+            <td>
+              <button class="button">Accept</button>
+              <button class="button ghost">Edit</button>
+              <button class="button danger ghost">Reject</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="small">Jun 27<br /><span class="tiny muted">admin paste</span></td>
+            <td>Pitchbook excerpt<br /><span class="tiny muted">pasted by Jordan</span></td>
+            <td>
+              <strong>Exit — Korvata</strong> reported sale ~$45M, terms undisclosed<br />
+              <span class="tiny muted">would set an exit multiple range for 6 member positions</span>
+            </td>
+            <td><span class="badge b-estimate">Public source</span></td>
+            <td class="small">Korvata <span class="tiny muted">(95%)</span></td>
+            <td>
+              <button class="button">Accept</button>
+              <button class="button ghost">Edit</button>
+              <button class="button danger ghost">Reject</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="small">Jun 25<br /><span class="tiny muted">email reply</span></td>
+            <td>Sam Okafor<br /><span class="tiny muted">member · not yet confirmed</span></td>
+            <td>
+              <strong>Cash received — “Meadowlark”</strong> “roughly doubled my money” — amount unresolved<br />
+              <span class="tiny muted">no dollar figure in source; needs member’s check size confirmed</span>
+            </td>
+            <td><span class="badge b-derived">Reported</span></td>
+            <td class="small">Meadowlark Bio <span class="tiny muted">(71%)</span> · Meadowlark AI <span class="tiny muted">(64%)</span></td>
+            <td>
+              <button class="button">Ask to clarify</button>
+              <button class="button ghost">Edit</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="footnote">
+        Accepting materializes canonical records (a valuation event, a return record, or a
+        member-private mark) with a link back to the claim and the verbatim source text.
+        Nothing an AI extracted is stored as fact without a human accept or a member confirmation.
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>Accept — impact preview</h2><span class="small muted">same preview-then-commit pattern as valuation events today</span></div>
+      <div class="panel-body small">
+        <div class="queue-meta" style="margin-bottom:8px">
+          <span><strong>Exit — Impel Motors</strong></span>
+          <span>creates 1 company valuation event (global)</span>
+          <span>re-marks 4 instruments</span>
+          <span>affects 12 member positions</span>
+        </div>
+        <table>
+          <thead><tr><th>Member position</th><th class="num">Invested</th><th class="num">Value before</th><th class="num">Value after</th><th>Source after</th></tr></thead>
+          <tbody>
+            <tr><td>P. Raman — 2019 SAFE</td><td class="num">$50,000</td><td class="num">~$88,000</td><td class="num">$138,000 <span class="range">reported</span></td><td><span class="badge b-reported">Reported</span></td></tr>
+            <tr><td>D. Chen — 2019 SAFE</td><td class="num">$25,000</td><td class="num">~$44,000</td><td class="num">~$65,000 <span class="range">$42k – $72k</span></td><td><span class="badge b-estimate">Exit pro-rata</span></td></tr>
+            <tr><td>T. Nguyen — 2021 Note</td><td class="num">$10,000</td><td class="num">~$12,000</td><td class="num">~$14,500 <span class="range">$9k – $16k</span></td><td><span class="badge b-estimate">Exit pro-rata</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== ORG DASHBOARD ============================== -->
+  <section class="view" id="view-org">
+    <div class="kpis">
+      <div class="kpi">
+        <div class="label">Member capital deployed</div>
+        <div class="value">$76.3M</div>
+        <div class="sub">233 members · 188 companies · 2006–2026</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Est. current value</div>
+        <div class="value">~$118M</div>
+        <div class="sub">range $84M – $151M</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Group multiple</div>
+        <div class="value">~1.55×</div>
+        <div class="sub">realized 0.21× · unrealized ~1.34×</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Reported coverage</div>
+        <div class="value">31%</div>
+        <div class="sub">of value reported or derived · goal 60%</div>
+      </div>
+    </div>
+
+    <div class="split">
+      <div class="panel">
+        <div class="panel-head"><h2>Group value over time</h2><span class="small muted">quarterly runs · whiskers = range</span></div>
+        <div class="panel-body">
+          <div class="chart">
+            <div class="col"><div class="whisker" style="height:12px"></div><div class="bar realized" style="height:12px"></div><div class="bar" style="height:38px"></div><div class="xlabel">2023</div></div>
+            <div class="col"><div class="whisker" style="height:16px"></div><div class="bar realized" style="height:15px"></div><div class="bar" style="height:46px"></div><div class="xlabel">2024</div></div>
+            <div class="col"><div class="whisker" style="height:20px"></div><div class="bar realized" style="height:17px"></div><div class="bar" style="height:55px"></div><div class="xlabel">2025</div></div>
+            <div class="col"><div class="whisker" style="height:24px"></div><div class="bar realized" style="height:19px"></div><div class="bar" style="height:64px"></div><div class="xlabel">Q1 26</div></div>
+            <div class="col"><div class="whisker" style="height:26px"></div><div class="bar realized" style="height:20px"></div><div class="bar" style="height:70px"></div><div class="xlabel">Q2 26</div></div>
+          </div>
+          <div class="legend">
+            <span><span class="dot cov-reported"></span>Realized</span>
+            <span><span class="dot" style="background:#3b82f6"></span>Unrealized (expected)</span>
+            <span>Assumptions: <a href="#">Default 2026-Q3</a> · <a href="#">compare Conservative</a></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Vintages</h2><span class="small muted">by year of first member check</span></div>
+        <table>
+          <thead><tr><th>Vintage</th><th class="num">Invested</th><th class="num">Multiple</th><th class="num">Coverage</th></tr></thead>
+          <tbody>
+            <tr><td>2014–2016</td><td class="num">$9.1M</td><td class="num">~2.1× <span class="range">1.7–2.5</span></td><td class="num">52%</td></tr>
+            <tr><td>2017–2019</td><td class="num">$18.4M</td><td class="num">~1.8× <span class="range">1.3–2.2</span></td><td class="num">38%</td></tr>
+            <tr><td>2020–2022</td><td class="num">$24.6M</td><td class="num">~1.3× <span class="range">0.9–1.7</span></td><td class="num">24%</td></tr>
+            <tr><td>2023–2026</td><td class="num">$24.2M</td><td class="num">~1.0× <span class="range">0.8–1.3</span></td><td class="num">19%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Data health — where better data moves the needle most</h2>
+        <button class="button">Start outreach for selected</button>
+      </div>
+      <table>
+        <thead><tr><th></th><th>Company</th><th class="num">Member capital</th><th>Weakest link</th><th class="num">Value swing</th><th class="num">Members to ask</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox" checked /></td>
+            <td>Korvata</td><td class="num">$2.4M</td>
+            <td><span class="badge b-estimate">Exit terms unknown</span></td>
+            <td class="num">±$3.1M</td><td class="num">6</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" checked /></td>
+            <td>Meadowlark Bio</td><td class="num">$1.8M</td>
+            <td><span class="badge b-unknown">No update in 6 years</span></td>
+            <td class="num">±$2.7M</td><td class="num">14</td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td>Halcyon Grid</td><td class="num">$1.1M</td>
+            <td><span class="badge b-unknown">No mark on record</span></td>
+            <td class="num">±$1.6M</td><td class="num">9</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="footnote">
+        Ranked by member capital × uncertainty. Outreach sends the outcomes survey; replies
+        flow through the same intake pipeline into the review queue.
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
+      document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+      tab.classList.add('active');
+      document.getElementById('view-' + tab.dataset.view).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
