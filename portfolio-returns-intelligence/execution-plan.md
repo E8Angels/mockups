@@ -1,0 +1,129 @@
+# Execution Plan — Portfolio Returns Intelligence
+
+Companion to [plan.md](plan.md). This is the orchestration tracker: what gets built, in
+what order, by which model tier, with what verification, and where deferred work is
+registered. The orchestrator (main session) updates task statuses **immediately** on
+completion per AGENTS.md checklist discipline; this file is the source of truth for
+"what's been done and what hasn't."
+
+Legend: ⬜ not started · 🚧 in progress · ✅ done (verified) · ❌ blocked (reason noted) ·
+⏸ gated (needs explicit user approval)
+
+---
+
+## Ground rules (bind every subagent)
+
+### Model assignment
+
+Per AGENTS.md §Claude Subagent Model Selection: **opus** for anything touching schema,
+money arithmetic, auth/tokens, communications, dates, or judgment; **sonnet** for
+implementation against a fully-specified pattern, tests against a clear spec, and UI built
+from the mockup; **haiku** never used in this feature (every surface is
+correctness-sensitive or user-facing). When uncertain, escalate.
+
+### Deferred-work protocol (mandatory, verified by orchestrator)
+
+Lesser models tend to defer work and then report the task complete. Countermeasures,
+enforced on every task:
+
+1. **Marker**: any deferred, stubbed, partial, or follow-up item MUST carry a code
+   comment `TODO(pri): <what is missing> [D-<n>]` at the exact site. `pri` =
+   portfolio-returns-intelligence. No other TODO spelling counts as registered.
+2. **Register**: the same item MUST be added to the Deferred Work Register at the bottom
+   of this file with an ID (D-1, D-2, …), location, what's missing, and which task will
+   absorb it. A marker without a register row (or vice versa) is a defect.
+3. **Sweep**: a task is not ✅ until the orchestrator runs
+   `grep -rn "TODO(pri)" lib/ routes/ src/ scripts/ __tests__/` and confirms every hit
+   maps to a register row. Phase completion requires a full sweep with zero unregistered
+   hits.
+4. **Subagent contract**: every subagent prompt includes: "If you defer ANY part of this
+   task, mark it `TODO(pri): … [D-x]` in code and say so explicitly in your final report.
+   Reporting 'done' while silently deferring work is the single worst failure mode.
+   Deferring with a marker and a report is acceptable; hiding it is not."
+5. AGENTS.md **No Stubs or Dead Wiring** still applies: deferral is for genuinely
+   out-of-scope follow-ups, not for skipping the task's own acceptance criteria.
+
+### Verification gates (every task)
+
+- Tests added/updated and **run** in the same task (unit for logic, route tests for
+  endpoints) — per AGENTS.md Test-First Completion Rule.
+- UI tasks: browser smoke test via `pnpm run smoke:auth` against the worktree server;
+  Design Guide compliance checklist in the task report.
+- Subagent reports state what changed, what was verified, and anything unresolved.
+- Orchestrator reviews the diff before marking ✅ — especially for sonnet-tier tasks.
+
+### Git / DB rules
+
+- All work in the `claude/nice-carson-82d98f` worktree branch → **one PR** to main;
+  commit after each completed task (concise, present-tense).
+- Dev DB changes: allowed as needed. **Prod DB: never without explicit user approval** —
+  those steps are marked ⏸ and listed with exact SQL before asking.
+- No schema mutation in app startup code, ever. `createTables()` updated for
+  new-environment setup only.
+
+---
+
+## Phase 1 — Schema + governed agent surface
+
+Exit criterion: **the "10 emails" scenario works end to end from an external agent**
+against dev — sources ingested verbatim, claims proposed/validated, auto-accept routing
+correct, company-level claims held for review, everything audited.
+
+| ID | Task | Model | Depends on | Verification | Status |
+|----|------|-------|-----------|--------------|--------|
+| 1.1 | Apply schema to **dev** DB (plan.md §8 SQL: 5 new tables + ALTERs on marks/valuation_events/deployments); update `createTables()`; update `docs/database-schema.md` (new tables + the 4 documented drift fixes) | opus | — | `PRAGMA table_info` diff vs plan SQL; app boots; existing valuation tests still pass | ⬜ |
+| 1.2 | `lib/cache-manager/portfolio-returns.js`: service methods — create/list sources (dedup on gmail_message_id), create/list claims, claim transitions (accept/reject/clarify/supersede), create/list `investor_return_events`, backfill script for the 9 legacy `record_type='return'` rows (dev) | opus | 1.1 | unit tests per method incl. dedup, supersede chains, CHECK-violation rejections | ⬜ |
+| 1.3 | Materialization + routing: deterministic auto-accept rules (member-attested self-scoped → auto-accept; else pending), accept→materialize into `investor_return_events` / existing `createValuationEvent`+`applyValuationEvent` / member-private marks; stock-consideration → rollover deployment + instrument minting (`record_type='rollover'`, `origin_return_event_id`) | opus | 1.2 | unit tests: routing matrix (basis × claim_type × who), EnerG2→Group14 fixture end to end, rollover excluded from cash-in sums | ⬜ |
+| 1.4 | Governed agent surface in `routes/data-query.js`: `POST /portfolio/preview` + `/portfolio/execute`, `requirePortfolioWriteToken` policy, action registry (`ingest_source`, `propose_claims`, `accept_claim`, `reject_claim`, `request_clarification`, `record_return_event`, `record_valuation_event`, `send_confirm_requests` stub-free or explicitly deferred to 2.3 with D-row), `portfolio_data_query_mutations` log; entity-resolution validation with candidate return | opus | 1.2, 1.3 | route tests: token gating, confirmed:true required, invalid enums rejected, preview shows routing, audit rows written | ⬜ |
+| 1.5 | Schema legibility docs: `docs/data-query-glossary.md` entries (claims vs return events vs marks, tiers, auto-accept rule, gotchas: date precision = first-of-period, rollover ≠ cash-in, Decarbon8 exclusion) + `docs/ai-relationship-registry.*` (soft-FK paths, JSON shapes, member-private safety boundaries, "estimates are not facts" annotations) | sonnet (content fully specified in plan §6.3) | 1.1 | orchestrator review against plan §6.3 checklist | ⬜ |
+| 1.6 | data-query skill portfolio module (ingest recipes per plan §6.2: verbatim-first, ranges-not-points, candidates-not-guesses, surface company-level claims in-conversation) | opus (defines agent write behavior) | 1.4, 1.5 | dry-run transcript: skill instructions produce correct action sequences for 3 sample emails | ⬜ |
+| 1.7 | End-to-end dev rehearsal of the "10 emails" scenario: scripted client simulating agent calls with 10 realistic email fixtures (incl. 1 ambiguous company, 1 no-amount, 3 duplicate company-level exit) | sonnet (fixtures + script) then opus review | 1.4 | all fixtures land correctly; duplicates dedup; ambiguity → candidates; audit complete | ⬜ |
+| 1.8 | **Prod migration** — exact SQL from 1.1 presented for approval, then applied; legacy-returns backfill on prod | opus | 1.7 + **user approval** | post-migration PRAGMA checks; commands recorded | ⏸ |
+
+## Phase 2 — Member confirm loop
+
+| ID | Task | Model | Depends on | Verification | Status |
+|----|------|-------|-----------|--------------|--------|
+| 2.1 | `POST /api/portfolio/intake/parse`: in-app extraction via `AIHelper.createLoggedChatCompletion` (`json_object`, schema-in-prompt per `email-to-dealum-processor.js` conventions), session-user identity, directory fuzzy company resolution with candidates | opus | 1.4 | unit tests with recorded fixtures; malformed-JSON repair path; no dollar figures invented (fixture asserts) | ⬜ |
+| 2.2 | Member "Tell us what happened" UI: free-text box on portfolio page + per-company row, "Here's what we understood" editable claim cards, confirm → claims `basis='attested'` (mockup "Report an outcome" view is the spec) | sonnet | 2.1 | smoke:auth flow: type → parse → edit → confirm → claim rows exist; Design Guide checklist | ⬜ |
+| 2.3 | Confirm-link emails: tokenized link → confirm UI preloaded with pending claims; confirmation upgrades basis + triggers auto-accept; `send_confirm_requests` action wired | opus (communications + tokens) | 2.2 | route tests: token scope/expiry, idempotent send, EMAIL_TEST_MODE respected | ⬜ |
+| 2.4 | Admin "Portfolio Intake" review queue: list pending/needs-clarification claims (source quote, proposer incl. agent token, candidates, confidence), accept-with-repair / reject-with-note / request-clarification; impact preview for company-level accepts (reuse valuation preview primitives) | sonnet (pattern = `ValuationAdminPanel.jsx`) | 1.4 | smoke:auth: queue renders, each action round-trips; permission-gated `admin.portfolio.view` | ⬜ |
+| 2.5 | Record Portfolio Update wizard exit branch writes `investor_return_events` (per-member proceeds section, ranges + date precision) | opus (extends valuation flows) | 1.3 | regression tests for exit flow; wizard plan's open question resolved in its plan.md | ⬜ |
+| 2.6 | Member-visible "update pending verification" hint on positions with pending company-level claims (existence only) | sonnet | 2.4 | smoke test; no claim contents/reporter leaked (test asserts payload) | ⬜ |
+
+## Phase 3 — Estimation engine
+
+| ID | Task | Model | Depends on | Verification | Status |
+|----|------|-------|-----------|--------------|--------|
+| 3.1 | `lib/portfolio-estimation/`: pure waterfall (plan §4 tiers 1–7), band math from assumption set, realized/unrealized split, `inputs_json` provenance, `engine_version` | opus | 1.3 | unit tests per tier + tier-selection matrix + band monotonicity (higher tier ⊆ wider band never violated) | ⬜ |
+| 3.2 | Seed default `estimation_assumption_sets` row; cohort priors computed from E8 resolved history (script, dev) | opus | 3.1 | prior computation reproducible; documented in assumptions_json | ⬜ |
+| 3.3 | Annual Fund LP inclusion in member scope (via `fund_investors`, `funds.family='annual'`, pro-rated through fund deployments); Decarbon8 excluded | opus (fund semantics) | 3.1 | unit tests: member with direct + AF + D8 positions → D8 absent, AF pro-rata correct | ⬜ |
+| 3.4 | Live now-view API (SWR-cached member/org estimates) + quarterly snapshot runner writing `position_estimate_snapshots`; `run_estimates` action for the skill | opus | 3.1–3.3 | route tests; snapshot idempotency per (run, as_of, assumption set); SWR tags correct | ⬜ |
+| 3.5 | Retire `getMemberPortfolioSnapshot` beta path in favor of engine (keep API shape or migrate callers) | sonnet (prescribed swap) | 3.4 | existing member-profile tests pass; no dead code left | ⬜ |
+| 3.6 | Skill question/report recipes (member statement, org summary, vintage cohorts, data-health worklist — trust rules baked in) | sonnet | 3.4 | dry-run transcripts for the 4 canonical questions reviewed by orchestrator | ⬜ |
+
+## Phase 4 — Representation (deliberately deferred)
+
+Member statement GA (confidence UI, coverage bar, provenance popovers) and org views are
+**not scheduled** until Phases 1–3 have produced real data and on-demand reports have
+taught us what the surfaces should be. Tracked here so it isn't lost: **D-0** in the
+register below.
+
+---
+
+## Deferred Work Register
+
+Every `TODO(pri): … [D-n]` in code maps to a row here. Rows are removed only when the
+work ships (with the commit noted) — never silently.
+
+| ID | Location | What's deferred | Absorbed by | Status |
+|----|----------|-----------------|-------------|--------|
+| D-0 | (no code marker — plan-level) | Member statement GA + org dashboards | Phase 4, scheduled after Phase 3 review | open |
+| D-1 | (plan-level) | Automated standing inbound-email pipeline (Apps-Script/Mailgun → intake); Cowork covers batch email intake first | Revisit after Phase 2 | open |
+| D-2 | (plan-level) | Attachment/document parsing (closing statements, K-1s) in intake | Revisit after Phase 2 | open |
+
+## Progress log
+
+| Date | Event |
+|------|-------|
+| 2026-07-01 | Plan v2 published; execution plan drafted. No implementation started. |
