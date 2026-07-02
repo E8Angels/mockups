@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-02T16:36:13+00:00",
+  "generated": "2026-07-02T18:05:31+00:00",
   "plans": [
     {
       "slug": "Live-Chat-Codex",
@@ -367,7 +367,7 @@
       "created": "2026-07-01",
       "last_updated": "2026-07-01",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-07-02T09:36:02-07:00",
+      "last_changed_at": "2026-07-02T11:05:15-07:00",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
