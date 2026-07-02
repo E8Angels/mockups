@@ -165,7 +165,7 @@ different set".
 | 1 | `reported_actual` | Member attested/reported their own proceeds or current holding value | The reported figure | Reporter's own range, else ±0–10% by basis (`attested` tightest) |
 | 2 | `derived_allocation` | Ownership (shares/%) + exit terms both known | shares × per-share consideration | ±10% |
 | 3 | `exit_prorata` | Company exit multiple known, member terms unknown | member basis × company exit multiple | low 0.6×E … high 1.1×E (dilution + preference haircut) |
-| 4 | `last_round_mark` | Existing mark from a financing round / internal mark | basis × mark multiple (current behavior) | widens with mark age: <12mo ±20%; 1–3y 0.5–1.2×E; >3y 0.25–1.2×E |
+| 4 | `last_round_mark` | Existing mark from a financing round / internal mark | pre-mark basis × mark multiple + post-mark basis × 1.0 (basis deployed after the mark is valued at cost) | pre-mark component widens with mark age (<12mo ±20%; 1–3y 0.5–1.2×E; >3y 0.25–1.2×E); post-mark component takes the cost_basis band |
 | 5 | `cost_basis` | No mark usable (already today's "cost fallback") | basis × 1.0 | 0.25×–1.5× basis, widening with position age |
 | 6 | `status_prior` | Company known dead → 0; known exited but zero terms info → cohort exit prior | 0, or cohort median exit MOIC | dead: 0–0.1× basis; exited-unknown: cohort P25–P75 |
 | 7 | `cohort_imputed` | Nothing known at all (no mark, no status, stale) | cohort median MOIC by vintage/stage | cohort P10–P90 — the honest "we don't know" band |
@@ -182,7 +182,12 @@ Notes:
   cut the common/early-note holder's share — hence an asymmetric band centered below 1.0×
   of the naive number.
 - Tier 4 inherits `applyValuationEvent()`'s existing arithmetic unchanged; the new part is
-  the age-based band and the explicit tier label.
+  the age-based band and the explicit tier label. Per-tranche split: the mark multiple is
+  applied only to basis invested on or before the mark's effective date; basis deployed
+  after the mark is valued at cost (×1.0), so `expected = preMarkBasis × multiple +
+  postMarkBasis`, the pre-mark component takes the staleness band and the post-mark
+  component takes the cost_basis band, and the two are summed (a later top-up neither loses
+  the mark nor inherits a multiple set before that capital existed).
 - Tier 6/7 cohort priors are computed from **E8's own resolved history only** (the 62
   exited/written-off instruments and their marks; decided — revisit blending external
   benchmarks when resolved-n grows). They're stored in the assumption set so they're
