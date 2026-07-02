@@ -617,7 +617,8 @@ CREATE TABLE position_estimate_snapshots (
     company_record_id TEXT NOT NULL,
     method_tier TEXT NOT NULL CHECK (method_tier IN (
         'reported_actual','derived_allocation','exit_prorata',
-        'last_round_mark','cost_basis','status_prior','cohort_imputed')),
+        'last_round_mark','cost_basis','status_prior','cohort_imputed',
+        'realized_only')),
     invested_cents INTEGER NOT NULL,            -- cash-in basis (excludes rollover)
     realized_low_cents INTEGER NOT NULL,
     realized_cents INTEGER NOT NULL,
@@ -637,6 +638,13 @@ CREATE INDEX idx_pes_asof   ON position_estimate_snapshots(as_of_date, assumptio
 
 Quarterly snapshot runs are the statements of record; interactive "how am I doing right
 now" computes live via SWR (`swrGet`) with the same engine (decided: both).
+
+`method_tier` carries one of the seven unrealized-waterfall tiers OR the sentinel
+`'realized_only'`. The seven tiers describe how the *unrealized* value was estimated;
+`'realized_only'` is not a waterfall tier — it flags a purely-realized position (fully
+exited, no remaining valuation basis) whose unrealized band is zero and whose value is
+entirely realized proceeds. Including it in the CHECK from day one lets the snapshot writer
+persist those positions instead of silently dropping them (D-7).
 
 ### 8.9 `portfolio_data_query_mutations` — agent action audit (mirrors development)
 
