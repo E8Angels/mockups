@@ -474,6 +474,8 @@ CREATE TABLE portfolio_claims (
     quote TEXT,                                 -- verbatim supporting excerpt from source
     notes TEXT,
     event_payload TEXT,                         -- verbatim engine payload (JSON) for structured/precise entries; mirrors valuation_events.payload_json; NULL for AI-extracted prose; company-level only
+    materialization_scope TEXT                   -- intended valuation-event scope of a company-level claim; honored by applyPortfolioClaim so a claim accepted later via the generic route keeps its destination; NULL = global (legacy)
+        CHECK (materialization_scope IN ('global','member_private')),
     status TEXT NOT NULL DEFAULT 'pending_review'
         CHECK (status IN ('pending_review','needs_clarification',
                           'accepted','rejected','superseded')),
