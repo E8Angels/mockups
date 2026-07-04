@@ -111,6 +111,25 @@ register below.
 
 ---
 
+## Phase 5 — Unify recording: wizard becomes the structured mode of the claims system
+
+Owner decision (2026-07-04): close the capability gaps, then consolidate — one process, one
+database trail. Architecture: claims gain a verbatim `event_payload` passthrough to the
+existing engine; the wizard's structured forms become the "Enter details" mode of a single
+Record Portfolio Update dialog; admin structured entries auto-apply (one-step UX preserved)
+while writing full source→claim→event provenance. NOTHING is retired until the parity gate
+(5.6) passes. Cramdown stays in its separate dialog (out of scope — neither system does it).
+
+| ID | Task | Model | Depends on | Verification | Status |
+|----|------|-------|-----------|--------------|--------|
+| 5.1 | Schema: rebuild `portfolio_claims` (dev) — add `event_payload TEXT` (JSON, nullable) + claim_type values `conversion`, `valuation_update` (company-level) to the CHECK; copy 69 dev rows; createTables() + schema docs + glossary/registry updates; plan §8.2 SQL amended (prod table is EMPTY — rebuild is free, but still gated) | opus | — | PRAGMA + row-copy verified; docs updated | ⬜ |
+| 5.2 | Materialization passthrough: `applyPortfolioClaim` uses `claim.event_payload` verbatim for company-level claims when present (financing_round/exit/shutdown + new conversion/valuation_update mappings), else today's thin synthesis; accept-preview uses `previewValuationEventImpact` with the rich payload; new deterministic auto-apply rule: company-level claim WITH event_payload created via the admin structured endpoint by an `admin.portfolio.view` holder applies immediately with that actor (server-enforced) | opus | 5.1 | unit tests: payload passthrough per event type ≡ direct engine call; auto-apply rule matrix | ⬜ |
+| 5.3 | Unified dialog: refit `ValuationEventWizardDialog` branches (financing/exit incl. proceeds table/shutdown/conversion/manual) as the "Enter details" mode of the Record Portfolio Update dialog alongside "Describe it" (free-text); live impact preview before save; posts admin structured claims (5.2); ALL 6 admin mounts open the unified dialog | opus | 5.2 | smoke every branch from both /admin/companies and /admin/annual-fund mounts; DG checklist | ⬜ |
+| 5.4 | Member mount (#7 InvestmentsFormIsland "Adjust Valuation") switches to the member claims flow (member-private semantics preserved; holding_value / structured member-private events; promote pipeline untouched) | opus | 5.2 | member-private parity tests; smoke | ⬜ |
+| 5.5 | Agent parity: `record_valuation_event` data-query action goes claims-backed with optional rich `event_payload`; skill instructions doc updated | opus | 5.2 | route tests; payload-key verification vs code | ⬜ |
+| 5.6 | **Parity gate + retire**: golden tests run each legacy wizard scenario through BOTH paths asserting equivalent marks/portfolio_events/valuation_events; THEN remove the old direct-post wiring from the UI (admin route retained for repair/reapply/promote machinery); full battery + e2e | opus | 5.3–5.5 | golden parity suite green; sweep; battery | ⬜ |
+| 5.7 | Prod migration (claims rebuild — table empty) + deploy-time notes; committee guide touch-up for the unified dialog | opus | 5.6 + **user approval** | PRAGMA prod ≡ dev; guide rebuilt | ⏸ |
+
 ## Deferred Work Register
 
 Every `TODO(pri): … [D-n]` in code maps to a row here. Rows are removed only when the
