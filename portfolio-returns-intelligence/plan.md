@@ -445,6 +445,8 @@ CREATE TABLE portfolio_claims (
         'round_occurred',      -- company-level: financing round
         'company_shutdown',    -- company-level: dead
         'still_operating',     -- company-level: alive signal (refreshes staleness)
+        'conversion',          -- company-level: SAFE/NOTE -> equity (verbatim event_payload -> engine)
+        'valuation_update',    -- company-level: precise GLOBAL manual mark (verbatim event_payload -> engine)
         'other')),
     person_record_id TEXT,                      -- member the claim concerns (NULL = company-level)
     company_record_id TEXT,                     -- resolved company
@@ -471,6 +473,7 @@ CREATE TABLE portfolio_claims (
     created_by_token_id TEXT,                   -- data-query token when agent-proposed
     quote TEXT,                                 -- verbatim supporting excerpt from source
     notes TEXT,
+    event_payload TEXT,                         -- verbatim engine payload (JSON) for structured/precise entries; mirrors valuation_events.payload_json; NULL for AI-extracted prose; company-level only
     status TEXT NOT NULL DEFAULT 'pending_review'
         CHECK (status IN ('pending_review','needs_clarification',
                           'accepted','rejected','superseded')),
