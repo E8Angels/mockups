@@ -130,6 +130,49 @@ while writing full source→claim→event provenance. NOTHING is retired until t
 | 5.6 | **Parity gate + retire**: golden tests run each legacy wizard scenario through BOTH paths asserting equivalent marks/portfolio_events/valuation_events; THEN remove the old direct-post wiring from the UI (admin route retained for repair/reapply/promote machinery); full battery + e2e | opus | 5.3–5.5 | golden parity suite green; sweep; battery | ✅ 55f7bd0b+75e19150 (8/8 scenarios equivalent; wizard deleted; PR #438) |
 | 5.7 | Prod migration (gated): portfolio_claims rebuild (event_payload + conversion/valuation_update CHECK) **plus** `ALTER TABLE portfolio_claims ADD COLUMN materialization_scope TEXT CHECK (materialization_scope IN ('global','member_private'))` (review-fix F2) — table empty on prod; committee guide touch-up for the unified dialog | opus | 5.6 + **user approval** | PRAGMA prod ≡ dev; guide rebuilt | ✅ applied 2026-07-04 (rebuild + materialization_scope on prod, 0 rows, idempotent, prod ≡ dev; guide refreshed for the unified dialog; deployed v1288, endpoints verified) |
 
+## Phase 6 — Portfolio Committee portfolio view (company-axis)
+
+Goal: turn `/admin/companies?tab=portfolio` into an accurate, rich portfolio-health cockpit
+for the Portfolio Committee — exits, closes, and actives with markups/markdowns, all with
+the estimation engine's confidence tiers and low/expected/high ranges instead of the
+current marks-only point values. Owner-approved (2026-07-04) from the design writeup.
+
+**Root problem (why this exists):** the grid rows come from a marks-only SQL path
+(`_listPortfolioGridBaseRows` in lib/cache-manager.js ~45199, and `listAdminPortfolioCompanies`
+~17880) = `max(0,(invested − ROC) × latest_mark_multiple)`. It NEVER reads realized proceeds
+(`investor_return_events`) or exit payloads (`valuation_events`), so every exited company shows
+$0 / 0.00x — it renders winners as total losses. The header card already uses the engine
+(`computeOrgPortfolioEstimates`) but `buildAdminPortfolioSummaryPayload` discards realized/
+unrealized split, IRR, MOIC band, coverage.byTier, bySource. The engine aggregates only by
+MEMBER; there is NO company-axis rollup — that is the primary new backend piece.
+
+**Architecture line:** one value/badge/range/bar *per company* → the grid (engine-backed row
+fields + `renderCell`). Anything aggregating *across* companies into a chart/cohort/time-series
+→ a sibling component beside the grid (like the existing card), fed by engine output.
+
+**Cold-handoff pointers (key files):** grid = `src/islands/CompaniesAdminIsland.jsx` PortfolioTab
+(~997) + `renderPortfolioGridCell` (~1424) + `<RecordGrid tableKey="portfolio">` (~1528); portfolio
+grid config `lib/admin-grid-config.js:745`; row builder `lib/cache-manager.js:_listPortfolioGridBaseRows`
+(~45199); routes `routes/companies-admin.js` /portfolio (~2424), /portfolio/summary (~2462),
+payload builders (~45-97); engine `lib/cache-manager/portfolio-returns.js:computeOrgPortfolioEstimates`
+(~2482), `lib/portfolio-estimation/aggregate.js:aggregatePositions`, `estimate-position.js` per-position
+shape (~342); saved-view seeds `scripts/seed-admin-grid-default-views.js`; RecordGrid `renderCell`
+(~4317), summary_type/group subtotals, row_color_rules (already MOIC>1 green / <1 red).
+
+| ID | Task | Model | Depends on | Verification | Status |
+|----|------|-------|-----------|--------------|--------|
+| 6.1 | **Engine company-axis rollup**: add a `byCompany` grouping in `computeOrgPortfolioEstimates` (mirror the existing `byPerson` loop, reuse `aggregatePositions` unchanged) → per-company {invested, realized band, unrealized band, totalValue band, moic band, irr, coverage.byTier, positionCount=members, bySource}; derive DPI (realized.expected/invested), markup (totalValue.expected−invested), memberCount (distinct person), dominant/weakest tier, vintage (min firstInvestmentDate). New cache-manager method `computeCompanyPortfolioEstimates` (or extend org). SWR-cached like org. | opus | — | unit tests: company rollup ≡ sum of its member positions; DPI/markup/vintage correct; bands RSS-combine; cached | ⬜ |
+| 6.2 | **Enriched summary payload + committee dashboard header**: stop discarding realized/unrealized, IRR, MOIC band, coverage.byTier, bySource in `buildAdminPortfolioSummaryPayload`; build the header dashboard — headline TVPI + DPI + IRR (each with range), realized-vs-unrealized split, coverage/confidence composition bar, active/exited/closed composition; as-of date picker + assumption-set selector (Default/Conservative). | opus (API) + sonnet (UI from the design) | 6.1 or independent | route test: payload carries all engine fields; smoke the header renders the multiples + coverage bar; DG checklist | ⬜ |
+| 6.3 | **Grid rows on the engine**: back the portfolio grid rows with 6.1 (add fields est_value_low/high, confidence_tier, realized, dpi, markup, exit_date, exit_type, member_count, vintage to `lib/admin-grid-config.js` portfolio config + populate in the row builder from the engine, keeping marks only where genuinely needed); `renderCell` for value ranges, tier badges, green/red markup, stale-mark flag; markup as a `formula` field so it sorts/exports. Exited companies must now show realized value, not $0. | opus | 6.1 | tests: exited company row shows realized>0 when return events exist; range/tier fields present; smoke every status; DG checklist | ⬜ |
+| 6.4 | **Seeded per-status views**: add portfolio view seeds to `scripts/seed-admin-grid-default-views.js` — **Exited** (Company, Vintage, Invested, Realized, DPI, Exit date/type, Confidence, residual), **Active** (Invested, Est Value range, MOIC range, markup/markdown, last-mark + staleness, tier), **Closed/Written off** (Invested lost, close date, residual), **Needs attention** (rank by capital × confidence weakness = the D-10 worklist), **All grouped by status** with subtotals; portfolio `defaultSummaryTypes`. Dev seed; prod seed is gated + deploy field code first (is_empty-matches-all gotcha). | sonnet | 6.3 | seeded views render with own columns/filters; summary rows correct; prod-seed steps recorded | ⬜ |
+| 6.5 | **Sibling charts**: realized-vs-unrealized stacked bar, coverage composition bar, vintage-cohort table (invested/value/DPI/TVPI by year), value-over-time line from `position_estimate_snapshots` (quarterly). Sibling components beside/above the grid, fed by 6.1/6.2 engine output. | sonnet | 6.2 | smoke each chart renders with real dev data; DG checklist | ⬜ |
+| 6.6 | **Parity/verify + PR**: full battery, browser smoke across all views + header + charts, code-review sweep, PR to main. Prod: no schema change expected (grid fields are payload-level; if any custom formula field needs a column, gate it). | opus | 6.3–6.5 | battery green; smoke; review | ⬜ |
+
+**Related deliverable (not a code task):** D-10 backfill sign-off workbook for the Portfolio
+Committee — the 17 historical exits ($22.4M invested, 0 realized recorded) as an Excel
+worksheet for them to confirm/supply actual exit terms, which then feed the intake system and
+unlock real cohort priors. Delivered to ~/Desktop.
+
 ## Deferred Work Register
 
 Every `TODO(pri): … [D-n]` in code maps to a row here. Rows are removed only when the
