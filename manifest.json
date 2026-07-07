@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-07T04:09:01+00:00",
+  "generated": "2026-07-07T04:21:16+00:00",
   "plans": [
     {
       "slug": "Live-Chat-Codex",
@@ -351,6 +351,25 @@
       ]
     },
     {
+      "slug": "pipeline-portfolio",
+      "title": "Pipeline & Portfolio \u2014 internal view",
+      "status": "draft",
+      "owner": "sarah",
+      "created": "2026-07-06",
+      "last_updated": "2026-07-06",
+      "last_changed_by": "Sarah",
+      "last_changed_at": "2026-07-06T21:20:56-07:00",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": [
+        {
+          "name": "mockup",
+          "path": "pipeline-portfolio/mockup.html",
+          "is_home": true
+        }
+      ]
+    },
+    {
       "slug": "pipeline-snapshot",
       "title": "Home Page Pipeline Snapshot",
       "status": "draft",
@@ -434,7 +453,7 @@
       "created": "2026-05-26",
       "last_updated": "2026-07-06",
       "last_changed_by": "Sarah",
-      "last_changed_at": "2026-07-06T15:09:28-07:00",
+      "last_changed_at": "2026-07-06T21:20:56-07:00",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
