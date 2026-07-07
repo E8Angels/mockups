@@ -98,6 +98,12 @@ benchmark moved directly under Dealflow by channel and now lists all current par
 source→investment, funnel stages (incl. the 42→15 chart), round-committed amounts,
 lead-investor names, and diversity pipeline stages.
 
+V4 (2026-07-06): split per Sarah's review. Decide & act, Data discipline,
+PitchBook-assessed success and Source→investment outcomes moved to the internal
+**pipeline-portfolio** mockup (Sarah's view). Future-relationship radar now sits
+inside Dealflow by channel. Front/side-door kept (one sentence trimmed). At a
+glance, Timeframe, activation pipeline and all other sections unchanged.
+
 ## Open questions
 
 - **Score thresholds & scale.** The portal records scores 0–4 (Dealbreaker→Strong) and

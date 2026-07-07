@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pipeline &amp; Portfolio — E8 Portal (internal)</title>
+<style>
+  :root{
+    --bg:#f4f3ee; --panel:#ffffff; --ink:#1d2b25; --muted:#6b7770; --line:#e3e1d8;
+    --green:#2e6b4f; --green-soft:#e7f0ea; --amber:#b5832b; --amber-soft:#f7eedd;
+    --red:#a3402f; --red-soft:#f6e6e2; --blue:#2d5d7c; --blue-soft:#e5eef4;
+    --corp:#7a5ea3; --chip:#eef1ec;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue);text-decoration:none}
+  .topbar{display:flex;align-items:center;gap:18px;padding:10px 20px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+  .brand{font-weight:700;letter-spacing:.2px}
+  .nav{display:flex;gap:16px;color:var(--muted);font-size:13px;flex-wrap:wrap}
+  .topbar .right{margin-left:auto;display:flex;align-items:center;gap:14px;color:var(--muted)}
+  .avatar{width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:600}
+  .wrap{max-width:1180px;margin:0 auto;padding:22px 20px 80px}
+  h1{font-size:22px;margin:0}
+  .v2{font-size:11px;font-weight:700;letter-spacing:.8px;color:var(--corp);background:#efe9f6;padding:3px 8px;border-radius:20px;text-transform:uppercase}
+  .sub{color:var(--muted);font-size:13px;margin:2px 0 0}
+  section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:16px}
+  .sec-head{display:flex;align-items:center;gap:10px;margin:0 0 4px;flex-wrap:wrap}
+  .sec-head h2{font-size:15px;margin:0}
+  .sec-head .tag{font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:2px 7px;border-radius:20px}
+  .infobtn{margin-left:auto;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-style:italic;line-height:1}
+  .infobtn:hover{border-color:var(--green);color:var(--green)}
+  .infobox{display:none;background:#f3f6f3;border:1px solid #d6e2d8;border-radius:10px;padding:12px 14px;margin:8px 0 4px;font-size:12.5px}
+  .infobox.open{display:block}
+  .infobox h4{margin:0 0 3px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--green)}
+  .infobox p{margin:0 0 10px}
+  .infobox p:last-child{margin:0}
+  .sec-sub{color:var(--muted);font-size:12.5px;margin:0 0 14px}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+  .tile{border:1px solid var(--line);border-radius:12px;padding:13px 14px;background:#fdfdfb;cursor:pointer;transition:border-color .12s,box-shadow .12s}
+  .tile:hover{border-color:var(--green);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .tile .k{font-size:11.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+  .tile .vrow{display:flex;align-items:baseline;gap:8px}
+  .tile .v{font-size:26px;font-weight:700;margin:6px 0 2px;letter-spacing:-.5px}
+  .tile .arrow{font-size:14px;font-weight:700}
+  .tile .d{font-size:12px;color:var(--muted)}
+  .tile .open-hint{font-size:10.5px;color:var(--blue);font-weight:600;margin-top:4px}
+  .up{color:var(--green)} .flat{color:var(--muted)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:860px){.grid2{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);user-select:none}
+  th.num,td.num{text-align:right}
+  tbody tr{cursor:pointer}
+  tbody tr:hover{background:#f3f7f3}
+  .note{font-size:12px;color:var(--muted);background:#faf9f4;border-left:3px solid var(--amber);padding:9px 12px;border-radius:0 8px 8px 0;margin-top:12px}
+  .note b{color:var(--ink)}
+  .clickhint{font-size:11.5px;color:var(--blue);font-weight:600}
+  .small{font-size:12px;color:var(--muted)}
+  .barrow{display:flex;align-items:center;gap:10px;margin:6px 0}
+  .barrow.click{cursor:pointer}
+  .barrow.click:hover .lab{color:var(--green);text-decoration:underline}
+  .barrow .lab{width:170px;font-size:12.5px}
+  .barrow .track{flex:1;background:#eef1ec;border-radius:6px;height:20px;overflow:hidden;position:relative}
+  .barrow .fill{height:100%;border-radius:6px}
+  .barrow .val{width:110px;text-align:right;font-size:12.5px;font-weight:600}
+  svg{display:block;max-width:100%}
+  footer{max-width:1180px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:12px}
+  .overlay{position:fixed;inset:0;background:rgba(20,28,24,.38);opacity:0;visibility:hidden;transition:opacity .2s;z-index:50}
+  .overlay.open{opacity:1;visibility:visible}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:460px;max-width:92vw;background:#fff;box-shadow:-8px 0 30px rgba(0,0,0,.16);transform:translateX(100%);transition:transform .24s ease;z-index:60;display:flex;flex-direction:column}
+  .drawer.open{transform:translateX(0)}
+  .drawer .dhead{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:10px}
+  .drawer .dhead h3{margin:0;font-size:17px}
+  .drawer .dhead .x{margin-left:auto;border:0;background:var(--chip);width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:15px;color:var(--muted)}
+  .drawer .dbody{padding:16px 18px;overflow:auto}
+  .dgroup{margin-bottom:18px}
+  .dgroup h4{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:0 0 8px;display:flex;justify-content:space-between}
+  .dco{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;margin:6px 0;font-size:12.5px}
+  .dco .nm{font-weight:600}
+  .dco .meta{margin-left:auto;text-align:right;font-size:11.5px;color:var(--muted);max-width:230px}
+  .field{margin:8px 0;font-size:13px}
+  .field .lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700}
+  .statline{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0 14px}
+  .statline .s{font-size:12px;color:var(--muted)}
+  .statline .s b{display:block;font-size:18px;color:var(--ink)}
+  .acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .act{border:1px solid var(--line);border-left:4px solid var(--green);border-radius:10px;padding:12px 14px;background:#fdfdfb;font-size:12.5px;cursor:pointer;transition:box-shadow .12s}
+  .act:hover{box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .act.pursue{border-left-color:var(--green)} .act.fix{border-left-color:var(--red)} .act.review{border-left-color:var(--amber)} .act.reengage{border-left-color:var(--blue)}
+  .act .atag{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:2px 7px;border-radius:20px;display:inline-block;margin-bottom:6px}
+  .act.pursue .atag{background:var(--green-soft);color:var(--green)} .act.fix .atag{background:var(--red-soft);color:var(--red)} .act.review .atag{background:var(--amber-soft);color:var(--amber)} .act.reengage .atag{background:var(--blue-soft);color:var(--blue)}
+  .act b{display:block;margin-bottom:3px}
+  .act .actst{margin-top:7px;font-size:11px;color:var(--muted)}
+  .targetbar{position:relative;background:#eef1ec;border-radius:6px;height:16px;overflow:visible;margin:7px 0 3px}
+  .targetbar .fillq{height:100%;border-radius:6px;background:var(--green)}
+  .targetbar .tmark{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--red)}
+  .pb-leg{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin:4px 0 8px}
+  .pb-leg .dot,.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
+  .s-oper{background:var(--green)} .s-init{background:var(--blue)} .s-prio{background:var(--amber)} .s-none{background:#c0685a}
+  .rec{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .rec-pursue{background:var(--green-soft);color:var(--green)} .rec-reeng{background:var(--blue-soft);color:var(--blue)} .rec-hold{background:var(--chip);color:var(--muted)} .rec-review{background:var(--amber-soft);color:var(--amber)}
+  .illus{font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--corp);background:#efe9f6;padding:2px 8px;border-radius:20px}
+  .editbox{border:1px dashed #c9c6ba;border-radius:8px;padding:8px 10px;min-height:36px;font-size:12.5px;background:#fdfdfb;margin:6px 0}
+  .editbox:focus{outline:2px solid var(--green-soft);border-color:var(--green)}
+  .statuschips{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap}
+  .statuschips .sc{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--chip);color:var(--muted);cursor:pointer;border:1px solid var(--line)}
+  .statuschips .sc.on{background:var(--green);color:#fff;border-color:var(--green)}
+  .taskrow{display:flex;align-items:center;gap:8px;padding:6px 9px;border:1px solid var(--line);border-radius:8px;margin:5px 0;font-size:12.5px;background:#fff}
+  .taskrow input[type=checkbox]{accent-color:var(--green);cursor:pointer}
+  .taskrow .done{text-decoration:line-through;color:var(--muted)}
+  .addtask{display:flex;gap:6px;margin-top:6px}
+  .addtask input{flex:1;border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12.5px;font-family:inherit}
+  .addtask button{border:0;background:var(--green);color:#fff;border-radius:8px;padding:6px 12px;font-weight:600;cursor:pointer;font-size:12.5px}
+  .evrow{display:flex;justify-content:space-between;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;margin:5px 0;font-size:12.5px;background:#fdfdfb}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">E8 Portal</span>
+  <nav class="nav"><span>Home</span><span>Pipeline &#9662;</span><span>Recordings</span><span>E8 Fund</span><span>Portfolio News</span><span>Explore &#9662;</span><span>Committees &#9662;</span><span>Manage &#9662;</span></nav>
+  <div class="right"><span>&#128276;</span><span class="avatar">SB</span></div>
+</div>
+
+<div class="wrap">
+  <div>
+    <h1>Pipeline &amp; Portfolio <span class="v2">Internal &middot; V1</span></h1>
+    <p class="sub">Sarah's working view &middot; companion to the Sourcing Committee dashboard &middot; as of Jun 8, 2026</p>
+  </div>
+
+  <section>
+    <div class="sec-head"><h2>Decide &amp; act this quarter</h2><span class="tag">the dashboard's output</span><span class="illus">Illustrative &mdash; to confirm</span><button class="infobtn" data-info="actions">i</button></div>
+    <div class="infobox" id="info-actions"></div>
+    <p class="sec-sub">What the data suggests doing <b>now</b>. <span class="clickhint">Click a card to see the rationale, edit the decision, set its status, and track tasks.</span></p>
+    <div class="acts">
+      <div class="act pursue" data-act="pursue"><span class="atag">Pursue</span><b>Open 3 new partner conversations</b>Energy Impact Partners, Lowercarbon Capital and Congruent Ventures rank top-decile for cleantech exits (PitchBook) but have <b>no E8 relationship</b>. See PitchBook benchmark below.<div class="actst" id="actst-pursue"></div></div>
+      <div class="act reengage" data-act="reengage"><span class="atag">Re-engage</span><b>Wake two sleeping operational partners</b>SOSV and Breakthrough Energy are Operational yet sent &le;1 referral in 12 months &mdash; strong investors, dormant pipes.<div class="actst" id="actst-reengage"></div></div>
+      <div class="act fix" data-act="fix"><span class="atag">Fix</span><b>Ship the "How did you hear about us?" field</b>Attribution coverage is 15%. Every channel decision inherits that ceiling. Target: 100% of new apps tagged by Sep 2026.<div class="actst" id="actst-fix"></div></div>
+      <div class="act review" data-act="review"><span class="atag">Review</span><b>Reset qualification with Greentown Labs</b>Most deals referred (17) but 1 pitch and $0 invested. Agree what a qualified referral looks like before renewing effort.<div class="actst" id="actst-review"></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Data discipline</h2><span class="tag">the first KPI &mdash; baseline by Q4 2026</span><button class="infobtn" data-info="dataq">i</button></div>
+    <div class="infobox" id="info-dataq"></div>
+    <p class="sec-sub">The dashboards are only as good as their capture rates. These tiles track the data itself &mdash; red marker = target. Baseline snapshot locks <b>Oct 1, 2026</b>. <span class="clickhint">Click a tile for the source data.</span></p>
+    <div class="tiles" id="dataq"></div>
+    <div class="note"><b>Why lead with this:</b> historical referral and source data was captured inconsistently, so several committee-dashboard sections are partial views. Fixing capture is the fastest way to make every other number trustworthy.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>PitchBook-assessed success &mdash; who actually produces cleantech exits</h2><span class="tag">External benchmark &times; E8 partner network</span><span class="illus">Placeholder &mdash; PitchBook integration pending</span><button class="infobtn" data-info="pitchbook">i</button></div>
+    <div class="infobox" id="info-pitchbook"></div>
+    <p class="sec-sub">PitchBook's most successful cleantech investors (by exits since 2015) mapped onto E8's deal-flow relationships. Covers <b>all current deal-flow sharing partners</b> (PB match pending for some), <b>cleantech investors not yet in the system</b>, and an <b>Other</b> long-tail bucket. Top-right = strong investor already sending deals (protect). Bottom-right = strong investor E8 isn't tapping (pursue). Top-left = lots of referrals, weaker exit record (review effort). <span class="clickhint">Click a dot or row for detail.</span></p>
+    <div class="pb-leg">
+      <span><span class="dot s-oper"></span>Operational partner</span>
+      <span><span class="dot s-init"></span>Initiated</span>
+      <span><span class="dot s-prio"></span>Priority to Initiate</span>
+      <span><span class="dot s-none"></span>No E8 relationship</span>
+    </div>
+    <div class="grid2">
+      <div><div id="pbScatter"></div><div class="small" style="margin-top:4px">Scatter shows investors with a PitchBook exit count; partners awaiting a PB match appear in the table as "pending".</div></div>
+      <div style="max-height:380px;overflow:auto">
+        <table id="pbTbl">
+          <thead><tr><th>Investor</th><th class="num" title="Cleantech exits since 2015 (PitchBook, placeholder)">PB exits</th><th class="num" title="Referrals into E8, all time">Refs to E8</th><th>E8 status</th><th>Suggested</th></tr></thead>
+          <tbody id="pbBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="note"><b>The gap is the story.</b> Six of the top-decile cleantech-exit investors have <b>no E8 relationship at all</b>, while two Operational partners with strong exit records (SOSV, Breakthrough Energy) sent &le;1 referral. Meanwhile most E8 referral volume comes from partners in the bottom half of the exit table. Capacity is limited &mdash; every "pursue" should name the partner it replaces.</div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Source &rarr; investment outcomes</h2><span class="tag">which channels convert to $</span><button class="infobtn" data-info="source">i</button></div>
+    <div class="infobox" id="info-source"></div>
+    <p class="sec-sub">Of companies that came from each channel, how much E8 ultimately invested. <span class="clickhint">Click a channel for the underlying companies.</span></p>
+    <div id="sourceInvest"></div>
+    <div class="note"><b>Attribution coverage is the bottleneck.</b> Only ~15% of 2026 deals carry a source tag, and only a handful of <i>invested</i> companies are tagged. Partner-referral attribution is the more reliable lens until the "How did you hear about us?" field is fixed.</div>
+  </section>
+
+  <footer>Mockup &middot; Pipeline &amp; Portfolio internal view V1 (Sarah). Split out of Sourcing Committee Metrics V4 on 2026-07-06. PitchBook figures, action cards and samples are illustrative pending data integration. Edits to decisions/tasks persist for the session only in this mockup.</footer>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer">
+  <div class="dhead"><h3 id="dTitle">Detail</h3><button class="x" id="dClose">&#10005;</button></div>
+  <div class="dbody" id="dBody"></div>
+</aside>
+
+<script>
+var $=function(s){return document.querySelector(s);};
+var $$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s));};
+function usd(n){return n>=1e6?'$'+(n/1e6).toFixed(2)+'M':n>=1e3?'$'+Math.round(n/1e3)+'K':(n>0?'$'+Math.round(n):'—');}
+function esc(s){return String(s).replace(/"/g,'&quot;');}
+function openDrawer(title,html){$('#dTitle').innerHTML=title;$('#dBody').innerHTML=html;$('#drawer').classList.add('open');$('#overlay').classList.add('open');}
+function closeDrawer(){$('#drawer').classList.remove('open');$('#overlay').classList.remove('open');}
+$('#dClose').onclick=closeDrawer;$('#overlay').onclick=closeDrawer;
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeDrawer();});
+
+var DATA={
+ dataq:[
+   {k:'Source attribution coverage',v:15,target:100,tdate:'Sep 2026',d:'37 of 246 2026 applicant companies carry a source tag',trend:'+3pt vs Q1',
+    src:'applications.lead_source — the source tag on each applicant company',
+    sample:[['Tagged: 37 companies','VC/Incubator 49 · Event 36 · Speed Networking 28 · …'],['Untagged: 209 companies','e.g. Verdi, Ryp Labs, Harmony Desalting, Utilyst, Fluidion'],['Invested & untagged','8 of 15 2026 investments have no source — the costliest gap']]},
+   {k:'"How did you hear about us?"',v:0,target:100,tdate:'field ships Aug 2026',d:'Application field does not exist yet — the single highest-leverage fix',trend:'not started',
+    src:'Application form — planned dropdown, writes to applications.heard_via',
+    sample:[['Planned options','Referred by VC/fund · Accelerator/incubator · E8 member · Event · Search · Press · Other'],['Backfill plan','Email 2026 invested + pitched companies first (n≈57)']]},
+   {k:'Referral → partner linked',v:82,target:null,tdate:'',d:'Referrals-in with a partner org attached (vs free-text). No target — unlinked referrals are still welcome.',trend:'+9pt vs Q1',
+    src:'recommendation_lists.partner_id — whether an inbound referral is joined to a partner record',
+    sample:[['Linked ✓','"via Greentown demo day" → Greentown Labs'],['Free-text ✗','"intro from a friend of Lee\'s" — kept, just not partner-attributed'],['Why no target','Referrals without a partner are encouraged too; this only measures linkability']]},
+   {k:'Outcome fields current',v:61,target:90,tdate:'Q4 2026',d:'Portfolio companies with status / round data touched in last 12m',trend:'+5pt vs Q1',
+    src:'valuation_events + portfolio_events — recency of status, round and shutdown data',
+    sample:[['Fresh ✓','Emerald Battery Labs — updated May 2026'],['Stale ✗','Skip Technology — last touched Nov 2023'],['Impact','Stale records understate exits/shutdowns in the report card']]}
+ ],
+ pitchbook:[
+   {name:'Y Combinator',pb:33,refs:0,status:'none',rec:'pursue'},
+   {name:'Energy Impact Partners',pb:31,refs:0,status:'none',rec:'pursue'},
+   {name:'SOSV',pb:28,refs:1,status:'oper',rec:'reeng'},
+   {name:'Khosla Ventures',pb:26,refs:0,status:'none',rec:'hold'},
+   {name:'Lowercarbon Capital',pb:24,refs:0,status:'none',rec:'pursue'},
+   {name:'Breakthrough Energy',pb:22,refs:0,status:'oper',rec:'reeng'},
+   {name:'Greentown Labs',pb:21,refs:17,status:'oper',rec:'review'},
+   {name:'Prelude Ventures',pb:19,refs:0,status:'none',rec:'pursue'},
+   {name:'Congruent Ventures',pb:18,refs:0,status:'none',rec:'pursue'},
+   {name:'DCVC',pb:17,refs:0,status:'none',rec:'hold'},
+   {name:'Elemental Impact',pb:16,refs:0,status:'init',rec:'reeng'},
+   {name:'Plug and Play Tech Center',pb:15,refs:1,status:'init',rec:'hold'},
+   {name:'Clean Energy Ventures',pb:14,refs:0,status:'init',rec:'reeng'},
+   {name:'Third Derivative',pb:12,refs:4,status:'prio',rec:'pursue'},
+   {name:'Powerhouse Ventures',pb:11,refs:0,status:'prio',rec:'pursue'},
+   {name:'Azolla Ventures',pb:6,refs:1,status:'init',rec:'hold'},
+   {name:'Keiretsu Forum',pb:5,refs:6,status:'oper',rec:'hold'},
+   {name:'Anthropocene Ventures',pb:null,refs:2,status:'oper',rec:'hold'},
+   {name:'Silicon Valley Social Venture Fund',pb:null,refs:6,status:'oper',rec:'hold'},
+   {name:'CleanTech Alliance',pb:null,refs:3,status:'oper',rec:'hold'},
+   {name:'Burnt Island',pb:null,refs:2,status:'oper',rec:'hold'},
+   {name:'AirMiners',pb:null,refs:2,status:'oper',rec:'hold'},
+   {name:'Titletown Tech',pb:null,refs:1,status:'oper',rec:'hold'},
+   {name:'Starshot Capital',pb:null,refs:2,status:'oper',rec:'hold'},
+   {name:'MCJ Collective',pb:null,refs:0,status:'oper',rec:'hold'},
+   {name:'Stage 2 Capital',pb:null,refs:0,status:'oper',rec:'hold'},
+   {name:'Ecosphere',pb:null,refs:0,status:'oper',rec:'hold'},
+   {name:'The 22 Fund',pb:null,refs:0,status:'oper',rec:'hold'},
+   {name:'Chemical Angel Network',pb:null,refs:0,status:'oper',rec:'hold'},
+   {name:'Enduring Planet',pb:null,refs:0,status:'oper',rec:'hold'},
+   {name:'Other — cleantech investors not yet matched (long tail)',pb:null,refs:0,status:'none',rec:'hold'}
+ ],
+ sourceInvest:[
+   {ch:'VC',color:'#2d5d7c',cos:3,amt:535000,coList:[['Ateios Systems','$240K · via Titletown Tech'],['Scape Carbon','$175K · via Anthropocene Ventures'],['Circe Bioscience','$120K · via Anthropocene Ventures']]},
+   {ch:'Accelerator',color:'#2e6b4f',cos:1,amt:125000,coList:[['Algafilm','$125K Annual Fund · via CleanTech Alliance']]},
+   {ch:'Personal / referral',color:'#b5832b',cos:1,amt:125000,coList:[['Photon Marine','$125K · member referral']]},
+   {ch:'Industry Event',color:'#8a8f8b',cos:1,amt:100000,coList:[['Nature Coatings','$100K · Industry Event tag']]}
+ ]
+};
+
+var ACTS={
+ pursue:{title:'Open 3 new partner conversations',status:'Proposed',notes:'',
+  rationale:'<p class="small"><b>Rule that fired:</b> PitchBook cleantech exits in top decile AND no E8 relationship of any stage.</p>'+
+   '<div class="evrow"><span><b>Energy Impact Partners</b></span><span>31 exits · 0 refs · no relationship</span></div>'+
+   '<div class="evrow"><span><b>Lowercarbon Capital</b></span><span>24 exits · 0 refs · no relationship</span></div>'+
+   '<div class="evrow"><span><b>Congruent Ventures</b></span><span>18 exits · 0 refs · no relationship</span></div>'+
+   '<p class="small">Capacity note: adding a partner should name the partner it replaces — candidates are the bottom of the partner-strength table.</p>',
+  tasks:[{t:'Name an E8 owner for the EIP conversation',done:false},{t:'Map warm intro paths via co-investor radar',done:false},{t:'Pick which current partner each new one replaces',done:false}]},
+ reengage:{title:'Wake two sleeping operational partners',status:'Proposed',notes:'',
+  rationale:'<p class="small"><b>Rule that fired:</b> relationship status = Operational AND PitchBook exits &ge; 20 AND referrals in last 12 months &le; 1.</p>'+
+   '<div class="evrow"><span><b>SOSV</b></span><span>28 exits · Operational since 2023 · 1 referral all-time · ~10h/yr effort</span></div>'+
+   '<div class="evrow"><span><b>Breakthrough Energy</b></span><span>22 exits · Operational · 0 referrals on record</span></div>'+
+   '<p class="small">These are the two strongest investors E8 already has a working relationship with — the referral pipe exists but nothing is flowing through it. Cheapest possible dealflow win.</p>',
+  tasks:[{t:'Owner check-in call with SOSV (S. Chong)',done:false},{t:'Agree a pipeline-share cadence with Breakthrough Energy',done:false}]},
+ fix:{title:'Ship the "How did you hear about us?" field',status:'Proposed',notes:'',
+  rationale:'<p class="small"><b>Rule that fired:</b> Data-discipline tile below its target trajectory.</p>'+
+   '<div class="evrow"><span><b>Attribution coverage</b></span><span>15% (37 of 246) vs 100% target by Sep 2026</span></div>'+
+   '<div class="evrow"><span><b>Invested &amp; untagged</b></span><span>8 of 15 2026 investments carry no source</span></div>'+
+   '<p class="small">Every channel-ROI number has a 15% ceiling until this ships. Highest-leverage single fix across both dashboards.</p>',
+  tasks:[{t:'Spec the dropdown options (see Data discipline drawer)',done:false},{t:'Add field to application form — target Aug 2026',done:false},{t:'Backfill the 57 pitched/invested 2026 companies by email',done:false}]},
+ review:{title:'Reset qualification with Greentown Labs',status:'Proposed',notes:'',
+  rationale:'<p class="small"><b>Rule that fired:</b> highest referral volume AND pitch-conversion &lt; 10% AND highest effort in the network.</p>'+
+   '<div class="evrow"><span><b>Greentown Labs</b></span><span>17 deals · 1 pitch · $0 invested · ~40h/yr — most effort of any partner</span></div>'+
+   '<p class="small">Not a shut-down recommendation: Greentown scores well on PitchBook exits (21). The gap is qualification — their referrals aren\'t matched to what E8 invests in. Agree criteria before renewing effort.</p>',
+  tasks:[{t:'Draft qualified-referral criteria (stage, sector, raise size)',done:false},{t:'Review meeting with Greentown contact (S. Millar)',done:false},{t:'Re-check conversion in Q1 2027',done:false}]}
+};
+
+var INFO={
+ actions:['Cards are drafted from rules over the data: PitchBook-strong investors with no E8 relationship → Pursue; Operational partners with strong exit records but ≤1 referral/12m → Re-engage; capture-rate tiles below target → Fix; high-volume/low-conversion partners → Review. Status, notes and tasks are editable; in production each edit writes to a committee-actions table with an audit trail.','Turn the dashboards from reports into a worklist: leave each month with named actions, and next month see what happened to last month\'s.'],
+ dataq:['Each tile is a capture-rate: the share of records carrying the field the metrics depend on. Red marker = target and date. The Q4 2026 baseline snapshot freezes these values so later quarters measure improvement against them. The referral-linked tile has no target by design.','Make data quality a first-class KPI. If attribution stays at 15%, channel ROI stays guesswork — so track the fix like any other metric.'],
+ pitchbook:['X-axis: cleantech exits since 2015 per investor (PitchBook — placeholder until the integration lands). Y-axis: referrals that investor has sent E8. Color: current deal-flow relationship status. The table includes every current deal-flow partner ("pending" where no PB match yet), unaffiliated cleantech investors, and an Other bucket.','Judge partners by whether they are actually good investors, not just whether they send volume.'],
+ source:['Companies carry a lead_source tag; this sums actual E8 investment (deployments) into companies from each tagged source. Amounts are actuals, never scaled.','Identify which channels actually produce invested dollars — then double down, and fix attribution so the picture is complete.']
+};
+function renderInfo(){for(var k in INFO){var b=$('#info-'+k);if(b)b.innerHTML='<h4>How this is built</h4><p>'+INFO[k][0]+'</p><h4>What you could do with it</h4><p>'+INFO[k][1]+'</p>';}}
+$$('.infobtn').forEach(function(btn){btn.onclick=function(){$('#info-'+btn.getAttribute('data-info')).classList.toggle('open');};});
+
+/* Decide & act */
+function actStatusLine(k){var a=ACTS[k];var done=a.tasks.filter(function(t){return t.done;}).length;var el=$('#actst-'+k);if(el)el.textContent='Status: '+a.status+' · '+done+'/'+a.tasks.length+' tasks done · click to open';}
+function renderActStatuses(){for(var k in ACTS)actStatusLine(k);}
+function actDrawer(k){
+  var a=ACTS[k];
+  var html='<div class="dgroup"><h4>Why this was surfaced</h4>'+a.rationale+'</div>'+
+   '<div class="dgroup"><h4>Decision status (editable)</h4><div class="statuschips">'+['Proposed','Accepted','In progress','Dismissed'].map(function(s){return '<span class="sc'+(a.status===s?' on':'')+'" data-st="'+s+'">'+s+'</span>';}).join('')+'</div></div>'+
+   '<div class="dgroup"><h4>Notes (editable)</h4><div class="editbox" contenteditable="true" id="actnotes">'+(a.notes||'Click to add notes…')+'</div></div>'+
+   '<div class="dgroup"><h4>Tasks</h4><div id="acttasks">'+a.tasks.map(function(t,i){return '<label class="taskrow"><input type="checkbox" data-ti="'+i+'"'+(t.done?' checked':'')+'><span class="'+(t.done?'done':'')+'">'+t.t+'</span></label>';}).join('')+'</div>'+
+   '<div class="addtask"><input id="newtask" placeholder="Add a task…"><button id="addtaskbtn">Add</button></div></div>'+
+   '<p class="small">Edits persist for this session (mockup). In production they write to a committee-actions table with an audit trail.</p>';
+  openDrawer(a.title+' <span class="illus" style="vertical-align:middle">editable</span>',html);
+  $$('#dBody .sc').forEach(function(s){s.onclick=function(){a.status=s.getAttribute('data-st');actDrawer(k);renderActStatuses();};});
+  var nb=$('#actnotes');
+  nb.onfocus=function(){if(!a.notes)nb.textContent='';};
+  nb.oninput=function(){a.notes=nb.innerHTML;};
+  $$('#acttasks input').forEach(function(cb){cb.onchange=function(){a.tasks[+cb.getAttribute('data-ti')].done=cb.checked;actDrawer(k);renderActStatuses();};});
+  $('#addtaskbtn').onclick=function(){var v=$('#newtask').value.trim();if(v){a.tasks.push({t:v,done:false});actDrawer(k);renderActStatuses();}};
+}
+$$('.act').forEach(function(el){el.onclick=function(){actDrawer(el.getAttribute('data-act'));};});
+
+/* Data discipline */
+function renderDataQ(){
+  $('#dataq').innerHTML=DATA.dataq.map(function(t,i){
+    return '<div class="tile" data-dq="'+i+'"><div class="k">'+t.k+'</div><div class="vrow"><div class="v">'+t.v+'%</div><span class="arrow '+(t.v>0&&t.trend.indexOf('+')===0?'up':'flat')+'">'+t.trend+'</span></div>'+
+      '<div class="targetbar"><div class="fillq" style="width:'+Math.max(2,t.v)+'%"></div>'+(t.target!==null?'<div class="tmark" style="left:'+Math.min(99,t.target)+'%" title="Target '+t.target+'%"></div>':'')+'</div>'+
+      '<div class="d">'+t.d+(t.target!==null?' &middot; <b>target '+t.target+'% by '+t.tdate+'</b>':'')+'</div><div class="open-hint">Click to see the source data &rsaquo;</div></div>';
+  }).join('');
+  $$('#dataq .tile').forEach(function(el){el.onclick=function(){dataqDrawer(+el.getAttribute('data-dq'));};});
+}
+function dataqDrawer(i){
+  var t=DATA.dataq[i];
+  openDrawer(t.k,'<div class="field"><span class="lab">Where this comes from</span><div>'+t.src+'</div></div>'+
+    '<div class="statline"><span class="s"><b>'+t.v+'%</b>current</span>'+(t.target!==null?'<span class="s"><b>'+t.target+'%</b>target ('+t.tdate+')</span>':'<span class="s"><b>—</b>no target, by design</span>')+'<span class="s"><b>'+t.trend+'</b>trend</span></div>'+
+    '<div class="dgroup"><h4>Underlying data</h4>'+t.sample.map(function(s){return '<div class="dco"><span class="nm">'+s[0]+'</span><span class="meta">'+s[1]+'</span></div>';}).join('')+'</div>'+
+    '<p class="small">In production this opens the live record list behind the rate.</p>');
+}
+
+/* PitchBook */
+var pbStatusColor={oper:'#2e6b4f',init:'#2d5d7c',prio:'#b5832b',none:'#c0685a'};
+var pbStatusLbl={oper:'Operational',init:'Initiated',prio:'Priority',none:'Not in network'};
+var recCls={pursue:['rec-pursue','Pursue'],reeng:['rec-reeng','Re-engage'],review:['rec-review','Review effort'],hold:['rec-hold','Monitor']};
+function pbDrawer(name){
+  var e=null;DATA.pitchbook.forEach(function(x){if(x.name===name)e=x;});if(!e)return;
+  var rc=recCls[e.rec];
+  openDrawer(name,
+    '<div class="statline"><span class="s"><b>'+(e.pb===null?'pending':e.pb)+'</b>cleantech exits (PB)</span><span class="s"><b>'+e.refs+'</b>referrals to E8</span></div>'+
+    '<div class="field"><span class="lab">E8 relationship</span><div><span class="dot '+({oper:'s-oper',init:'s-init',prio:'s-prio',none:'s-none'})[e.status]+'"></span> '+pbStatusLbl[e.status]+'</div></div>'+
+    '<div class="field"><span class="lab">Suggested</span><div><span class="rec '+rc[0]+'">'+rc[1]+'</span></div></div>'+
+    '<p class="small">Full partner profile (referred companies, contacts, E8 owner) lives on the committee dashboard and the admin partner page. PitchBook exit counts are placeholders until the integration lands.</p>');
+}
+function renderPitchbook(){
+  var d=DATA.pitchbook,W=440,H=300,pad=40;
+  var maxX=36,maxY=Math.max.apply(null,d.map(function(x){return x.refs;}))+2;
+  var X=function(v){return pad+v/maxX*(W-pad-14);},Y=function(v){return H-pad-v/maxY*(H-pad-16);};
+  var svg='<line x1="'+pad+'" y1="'+(H-pad)+'" x2="'+(W-8)+'" y2="'+(H-pad)+'" stroke="#ccc"/><line x1="'+pad+'" y1="8" x2="'+pad+'" y2="'+(H-pad)+'" stroke="#ccc"/>';
+  svg+='<text x="'+(W-8)+'" y="'+(H-pad+14)+'" font-size="8.5" fill="#6b7770" text-anchor="end">cleantech exits (PitchBook) →</text><text x="6" y="16" font-size="8.5" fill="#6b7770">referrals to E8 ↑</text>';
+  svg+='<line x1="'+X(18)+'" y1="8" x2="'+X(18)+'" y2="'+(H-pad)+'" stroke="#e3e1d8" stroke-dasharray="3 3"/>';
+  svg+='<text x="'+(X(18)+6)+'" y="'+(H-pad-6)+'" font-size="8.5" fill="#b5832b" font-weight="700">strong investors, few/no referrals → pursue</text>';
+  svg+='<text x="'+(pad+6)+'" y="20" font-size="8.5" fill="#b5832b" font-weight="700">high volume, weaker exit record → review</text>';
+  svg+=d.filter(function(x){return x.pb!==null;}).map(function(x){return '<circle cx="'+X(x.pb)+'" cy="'+Y(x.refs)+'" r="7" fill="'+pbStatusColor[x.status]+'" fill-opacity="0.85" stroke="#fff" stroke-width="1.5" data-pb="'+esc(x.name)+'" style="cursor:pointer"><title>'+x.name+' · '+x.pb+' exits · '+x.refs+' referrals · '+pbStatusLbl[x.status]+'</title></circle>';}).join('');
+  $('#pbScatter').innerHTML='<svg viewBox="0 0 '+W+' '+H+'">'+svg+'</svg>';
+  $$('#pbScatter circle[data-pb]').forEach(function(c){c.onclick=function(){pbDrawer(c.getAttribute('data-pb'));};});
+  $('#pbBody').innerHTML=d.slice().sort(function(a,b){return (b.pb===null?-1:b.pb)-(a.pb===null?-1:a.pb);}).map(function(x){var rc=recCls[x.rec];
+    return '<tr data-pb="'+esc(x.name)+'"><td><b>'+x.name+'</b></td><td class="num">'+(x.pb===null?'<span class="small">pending</span>':x.pb)+'</td><td class="num">'+(x.refs||'—')+'</td><td><span class="dot '+({oper:'s-oper',init:'s-init',prio:'s-prio',none:'s-none'})[x.status]+'"></span><span class="small">'+pbStatusLbl[x.status]+'</span></td><td><span class="rec '+rc[0]+'">'+rc[1]+'</span></td></tr>';}).join('');
+  $$('#pbBody tr').forEach(function(tr){tr.onclick=function(){pbDrawer(tr.getAttribute('data-pb'));};});
+}
+
+/* Source → investment */
+function renderSourceInvest(){
+  var max=Math.max.apply(null,DATA.sourceInvest.map(function(d){return d.amt;}));
+  $('#sourceInvest').innerHTML=DATA.sourceInvest.map(function(d,i){return '<div class="barrow click" data-si="'+i+'"><div class="lab">'+d.ch+' ('+d.cos+' co)</div><div class="track"><div class="fill" style="width:'+Math.max(3,d.amt/max*100)+'%;background:'+d.color+'"></div></div><div class="val">'+usd(d.amt)+'</div></div>';}).join('');
+  $$('#sourceInvest .barrow').forEach(function(b){b.onclick=function(){var d=DATA.sourceInvest[+b.getAttribute('data-si')];
+    openDrawer(d.ch+' — invested companies','<p class="small">E8 investment into companies attributed to the '+d.ch+' channel. Amounts are actuals.</p>'+d.coList.map(function(c){return '<div class="dco"><span class="nm">'+c[0]+'</span><span class="meta">'+c[1]+'</span></div>';}).join('')+'<p class="small">Only ~15% of deals carry a source tag — these are the attributable ones, not the whole picture.</p>');};});
+}
+
+renderInfo();renderActStatuses();renderDataQ();renderPitchbook();renderSourceInvest();
+</script>
+<!-- Pipeline & Portfolio internal V1 · split from sourcing-committee V4 · 2026-07-06 -->
+</body>
+</html>
