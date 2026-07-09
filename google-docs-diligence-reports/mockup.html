@@ -106,7 +106,8 @@
   .screen.active { display: block; }
 
   .docs-app {
-    min-height: calc(100vh - 52px);
+    height: calc(100vh - 52px);
+    min-height: 0;
     display: grid;
     grid-template-rows: auto auto minmax(0, 1fr);
     background: #f1f3f4;
@@ -471,6 +472,113 @@
 
   .addon-body { padding: 12px; }
 
+  .section-context {
+    width: 128px;
+    height: 28px;
+    padding: 0 24px 0 8px;
+    border: 1px solid #bfdbfe;
+    border-radius: 7px;
+    color: #1d4ed8;
+    background: #eff6ff;
+    font-size: 10px;
+    font-weight: 750;
+  }
+
+  .launch-context {
+    margin-top: 5px;
+    color: #64748b;
+    font-size: 9px;
+    text-align: right;
+  }
+
+  .mode-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: #f1f5f9;
+  }
+
+  .mode-tab {
+    height: 31px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 6px;
+    color: #64748b;
+    background: transparent;
+    font-size: 10.5px;
+    font-weight: 750;
+  }
+
+  .mode-tab.active {
+    color: #1d4ed8;
+    background: white;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .1);
+  }
+
+  .mode-panel { display: none; }
+  .mode-panel.active { display: block; }
+
+  .resource-toolbar {
+    position: relative;
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .resource-button {
+    min-height: 30px;
+    padding: 0 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    color: #334155;
+    background: white;
+    font-size: 9.5px;
+    font-weight: 700;
+  }
+
+  .resource-button:hover { background: #f8fafc; }
+
+  .resource-menu {
+    position: absolute;
+    top: 34px;
+    right: 0;
+    z-index: 8;
+    width: 218px;
+    padding: 5px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, .14);
+  }
+
+  .resource-menu button {
+    width: 100%;
+    min-height: 31px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 5px;
+    color: #334155;
+    background: transparent;
+    font-size: 9.5px;
+    text-align: left;
+  }
+
+  .resource-menu button:hover { background: #f1f5f9; }
+
+  .context-warning {
+    margin-top: 10px;
+    padding: 8px 9px;
+    border: 1px solid #fde68a;
+    border-radius: 7px;
+    color: #78350f;
+    background: #fffbeb;
+    font-size: 9.5px;
+  }
+
   .source-alert {
     padding: 10px;
     display: grid;
@@ -537,6 +645,37 @@
 
   .panel { display: none; }
   .panel.active { display: block; }
+
+  .ask-thread {
+    margin-top: 12px;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: #f8fafc;
+  }
+
+  .ask-message {
+    padding: 8px 9px;
+    border-radius: 7px;
+    background: white;
+    color: #334155;
+    font-size: 10px;
+    line-height: 1.48;
+  }
+
+  .ask-message + .ask-message { margin-top: 7px; }
+  .ask-message.user { color: #1e3a8a; background: #eff6ff; }
+  .ask-message strong { display: block; margin-bottom: 3px; font-size: 9px; }
+
+  .citation-row {
+    margin-top: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: #64748b;
+    font-size: 8.8px;
+  }
 
   .selection-state {
     margin-top: 12px;
@@ -837,7 +976,7 @@
   .portal-grid {
     margin-top: 18px;
     display: grid;
-    grid-template-columns: 250px minmax(0, 1fr);
+    grid-template-columns: 330px minmax(0, 1fr);
     gap: 16px;
   }
 
@@ -855,7 +994,7 @@
     min-height: 42px;
     padding: 7px 8px;
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
     align-items: center;
     gap: 8px;
     border: 0;
@@ -868,6 +1007,13 @@
 
   .section-row:hover { background: #f8fafc; }
   .section-row.active { color: #1d4ed8; background: #eff6ff; font-weight: 750; }
+
+  .section-edit-label {
+    color: #1d4ed8;
+    font-size: 9px;
+    font-weight: 750;
+    white-space: nowrap;
+  }
 
   .status-dot {
     width: 8px;
@@ -920,6 +1066,22 @@
   .live-doc-banner strong, .live-doc-banner span { display: block; }
   .live-doc-banner strong { color: #1e3a8a; font-size: 11px; }
   .live-doc-banner span { color: #3b82f6; font-size: 9.5px; }
+
+  .report-state {
+    margin: 16px;
+    padding: 13px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    border: 1px solid #fde68a;
+    border-radius: 9px;
+    background: #fffbeb;
+  }
+
+  .report-state strong, .report-state span { display: block; }
+  .report-state strong { color: #78350f; font-size: 11px; }
+  .report-state span { color: #92400e; font-size: 9.5px; }
 
   .portal-form { padding: 0 16px 18px; }
 
@@ -1016,6 +1178,29 @@
   .principles ul { margin: 0; padding-left: 18px; color: #334155; font-size: 10.5px; }
   .principles li + li { margin-top: 4px; }
 
+  .dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(15, 23, 42, .42);
+  }
+
+  .dialog {
+    width: min(100%, 410px);
+    padding: 18px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    background: white;
+    box-shadow: var(--shadow);
+  }
+
+  .dialog h2 { margin: 0; font-size: 16px; }
+  .dialog p { margin: 7px 0 0; color: #64748b; font-size: 11px; }
+  .dialog .button-row { margin-top: 16px; }
+
   .mobile-fallback { display: none; }
 
   @media (max-width: 900px) {
@@ -1054,6 +1239,8 @@
     .section-list { grid-template-columns: 1fr; }
     .compact-select { width: 100%; }
   }
+
+  [hidden] { display: none; }
 </style>
 </head>
 <body>
@@ -1066,14 +1253,14 @@
       </div>
     </div>
     <nav class="view-switcher" aria-label="Mockup views">
-      <button class="view-button active" type="button" data-view="docs">Google Doc + E8 sidebar</button>
-      <button class="view-button" type="button" data-view="portal">Portal report workspace</button>
+      <button class="view-button active" type="button" data-view="portal">Portal section entry</button>
+      <button class="view-button" type="button" data-view="docs">Google Doc + E8 sidebar</button>
       <button class="view-button" type="button" data-view="notes">Behavior overview</button>
     </nav>
   </header>
 
   <main>
-    <section class="screen active" id="docsScreen" aria-label="Google Docs mockup">
+    <section class="screen" id="docsScreen" aria-label="Google Docs mockup">
       <div class="docs-app">
         <div class="docs-titlebar">
           <div class="docs-icon">▤</div>
@@ -1132,14 +1319,14 @@
                 <p>The current development plan targets full-size cells above 25% efficiency, followed by IEC 61215 testing and customer pilots. Durability, repeatability at scale, and manufacturing yield remain the central technical diligence questions.</p>
               </section>
 
-              <section class="section-anchor" data-section="Commercial">
+              <section class="section-anchor" data-section="Commercialization">
                 <h2>Commercialization</h2>
-                <p>Initial market entry is expected through applications that value high efficiency and can tolerate shorter product lifetimes. The company reports letters of intent spanning a niche one-megawatt opportunity and a larger residential-module opportunity.</p>
+                <p class="editable-paragraph cursor-target" data-section-target="Commercialization" tabindex="0">Initial market entry is expected through applications that value high efficiency and can tolerate shorter product lifetimes. The company reports letters of intent spanning a niche one-megawatt opportunity and a larger residential-module opportunity.</p>
               </section>
 
               <section class="section-anchor" data-section="Team">
                 <h2>Team</h2>
-                <div class="empty-range">This section has not been drafted yet.</div>
+                <div class="empty-range cursor-target" data-section-target="Team" tabindex="0">This section has not been drafted yet. Click here to simulate moving the cursor into Team.</div>
               </section>
             </article>
           </div>
@@ -1155,80 +1342,116 @@
                   <strong>Beyond Silicon</strong>
                   <span>2025 application · Investment Ready</span>
                 </div>
-                <span class="section-pill" id="activeSectionPill">Product</span>
+                <div>
+                  <select class="section-context" id="sectionContext" aria-label="Active report section">
+                    <option>Executive Summary</option>
+                    <option selected>Product</option>
+                    <option>Commercialization</option>
+                    <option>Team</option>
+                    <option>Finances &amp; Funding</option>
+                    <option>Environmental Impact</option>
+                  </select>
+                  <div class="launch-context" id="launchContext">Opened from Product in portal</div>
+                </div>
               </div>
             </div>
 
             <div class="addon-body">
-              <div class="source-alert" id="sourceAlert">
-                <div class="source-alert-icon">✦</div>
-                <div><strong>3 updates since review</strong><span>2 documents · 1 transcript</span></div>
-                <button class="link-button" type="button" id="reviewSourcesButton">Review</button>
+              <div class="mode-tabs" role="tablist" aria-label="Assistant mode">
+                <button class="mode-tab active" type="button" role="tab" aria-selected="true" data-mode="write">Write report</button>
+                <button class="mode-tab" type="button" role="tab" aria-selected="false" data-mode="ask">Ask E8</button>
               </div>
 
-              <div class="action-tabs" role="tablist" aria-label="AI actions">
-                <button class="action-tab active" type="button" role="tab" aria-selected="true" data-panel="edit">Improve selection</button>
-                <button class="action-tab" type="button" role="tab" aria-selected="false" data-panel="draft">Draft section</button>
+              <div class="resource-toolbar" aria-label="Diligence portal links">
+                <button class="resource-button portal-resource" type="button" data-resource="main diligence page">Diligence home</button>
+                <button class="resource-button" type="button" id="resourcesButton" aria-expanded="false">Portal resources ▾</button>
+                <div class="resource-menu" id="resourceMenu" hidden>
+                  <button class="portal-resource" type="button" data-resource="Findings">Findings</button>
+                  <button class="portal-resource" type="button" data-resource="Supporting Documents">Supporting Documents</button>
+                  <button class="portal-resource" type="button" data-resource="Reference Information">Reference Information</button>
+                  <button class="portal-resource" type="button" data-resource="Transcripts &amp; Recordings">Transcripts &amp; Recordings</button>
+                  <button class="portal-resource" type="button" data-resource="Team Meeting Minutes">Team Meeting Minutes</button>
+                </div>
               </div>
 
-              <section class="panel active" id="editPanel">
-                <div class="selection-state" id="selectionState">
-                  <div class="selection-label"><span>Selected in document</span><span id="selectionCount">39 words</span></div>
-                  <div class="selection-preview" id="selectionPreview">The company adds a solution-processed perovskite layer to conventional silicon cells…</div>
-                </div>
-                <div class="empty-selection" id="emptySelection" hidden>Click a paragraph in the document to simulate selecting text.</div>
+              <div class="context-warning" id="ownerWarning" hidden>You are not the owner of this section. E8 will confirm before an AI draft or revision.</div>
 
-                <label class="field-label" for="guidanceInput">What should change?</label>
-                <textarea class="guidance" id="guidanceInput" autocomplete="off" data-lpignore="true" data-form-type="other" placeholder="Make this tighter and explain why it matters to customers.">Make this tighter and explain why the efficiency gain matters to U.S. module manufacturers.</textarea>
-
-                <div class="button-row" id="editActionRow">
-                  <button class="button" type="button" id="clearSelectionButton">Clear</button>
-                  <button class="button primary" type="button" id="previewButton">Preview change</button>
+              <section class="mode-panel active" id="writeMode">
+                <div class="action-tabs" role="tablist" aria-label="AI writing actions">
+                  <button class="action-tab active" type="button" role="tab" aria-selected="true" data-panel="draft" id="sectionActionTab">Revise section</button>
+                  <button class="action-tab" type="button" role="tab" aria-selected="false" data-panel="edit">Improve selection</button>
                 </div>
 
-                <div class="proposal" id="proposalCard" hidden>
-                  <div class="proposal-header"><strong>Proposed replacement</strong><span>GPT-5.5 · 3 sources</span></div>
-                  <div class="diff-block before"><span class="diff-label">Current</span><span id="beforeText">The company adds a solution-processed perovskite layer to conventional silicon cells. Management expects the architecture to increase panel efficiency from roughly 22% to more than 28%, creating a differentiated premium product for domestic module manufacturers.</span></div>
-                  <div class="diff-block after"><span class="diff-label">Proposed</span><span id="afterText">Beyond Silicon adds a solution-processed perovskite layer to conventional silicon cells, targeting an efficiency increase from roughly 22% to more than 28%. For U.S. module manufacturers, that gain could support a differentiated premium product without requiring an entirely new production platform.</span></div>
-                  <div class="proposal-sources">Sources: Application · Pitch deck · Technical diligence transcript</div>
+                <section class="panel active" id="draftPanel">
+                  <div class="rating-card">
+                    <h3 id="draftHeading">Revise the Product section</h3>
+                    <p id="draftDescription">No selection needed. E8 uses the full section, ratings, prompts, and current portal data.</p>
+                    <div class="rating-row"><label for="differentiationRating">Differentiation</label><input id="differentiationRating" type="range" min="0" max="10" value="8"><span class="rating-value">8</span></div>
+                    <div class="rating-row"><label for="readinessRating">Readiness</label><input id="readinessRating" type="range" min="0" max="10" value="5"><span class="rating-value">5</span></div>
+                    <div class="rating-row"><label for="riskRating">Technical risk</label><input id="riskRating" type="range" min="0" max="10" value="7"><span class="rating-value">7</span></div>
+                  </div>
+                  <label class="field-label" for="draftGuidance">Optional guidance</label>
+                  <textarea class="guidance" id="draftGuidance" autocomplete="off" data-lpignore="true" data-form-type="other" placeholder="Add any emphasis or instructions for this section."></textarea>
                   <div class="button-row">
-                    <button class="button" type="button" id="discardButton">Discard</button>
-                    <button class="button success" type="button" id="applyButton">Apply to document</button>
+                    <button class="button" type="button" id="compareButton">Compare models</button>
+                    <button class="button primary" type="button" id="draftButton">Generate revision preview</button>
+                  </div>
+                  <div class="proposal" id="sectionProposal" hidden>
+                    <div class="proposal-header"><strong id="sectionProposalTitle">Proposed Product revision</strong><span>GPT-5.5 · full section</span></div>
+                    <div class="diff-block before"><span class="diff-label">Current section</span><span id="sectionBeforeText">Three existing Product paragraphs.</span></div>
+                    <div class="diff-block after"><span class="diff-label">Proposed section</span><span id="sectionAfterText">A structured Product draft with fixed subheadings for Product Differentiation and Competitive Positioning.</span></div>
+                    <div class="proposal-sources">Sources: Ratings · Findings · Application · Supporting documents · Transcripts</div>
+                    <div class="button-row">
+                      <button class="button" type="button" id="discardSectionButton">Discard</button>
+                      <button class="button success" type="button" id="applySectionButton">Apply section</button>
+                    </div>
+                  </div>
+                  <p class="microcopy">The whole-section proposal is reviewed before E8 replaces the registered section ranges.</p>
+                </section>
+
+                <section class="panel" id="editPanel">
+                  <div class="selection-state" id="selectionState">
+                    <div class="selection-label"><span>Selected in document</span><span id="selectionCount">39 words</span></div>
+                    <div class="selection-preview" id="selectionPreview">The company adds a solution-processed perovskite layer to conventional silicon cells…</div>
+                  </div>
+                  <div class="empty-selection" id="emptySelection" hidden>Select text in the active section to improve it.</div>
+
+                  <label class="field-label" for="guidanceInput">What should change?</label>
+                  <textarea class="guidance" id="guidanceInput" autocomplete="off" data-lpignore="true" data-form-type="other" placeholder="Make this tighter and explain why it matters to customers.">Make this tighter and explain why the efficiency gain matters to U.S. module manufacturers.</textarea>
+
+                  <div class="button-row" id="editActionRow">
+                    <button class="button" type="button" id="clearSelectionButton">Clear</button>
+                    <button class="button primary" type="button" id="previewButton">Preview change</button>
+                  </div>
+
+                  <div class="proposal" id="proposalCard" hidden>
+                    <div class="proposal-header"><strong>Proposed replacement</strong><span>GPT-5.5 · 3 sources</span></div>
+                    <div class="diff-block before"><span class="diff-label">Current</span><span id="beforeText">The company adds a solution-processed perovskite layer to conventional silicon cells. Management expects the architecture to increase panel efficiency from roughly 22% to more than 28%, creating a differentiated premium product for domestic module manufacturers.</span></div>
+                    <div class="diff-block after"><span class="diff-label">Proposed</span><span id="afterText">Beyond Silicon adds a solution-processed perovskite layer to conventional silicon cells, targeting an efficiency increase from roughly 22% to more than 28%. For U.S. module manufacturers, that gain could support a differentiated premium product without requiring an entirely new production platform.</span></div>
+                    <div class="proposal-sources">Sources: Application · Pitch deck · Technical diligence transcript</div>
+                    <div class="button-row">
+                      <button class="button" type="button" id="discardButton">Discard</button>
+                      <button class="button success" type="button" id="applyButton">Apply to document</button>
+                    </div>
+                  </div>
+
+                  <p class="microcopy">Nothing changes in the document until you choose Apply.</p>
+                </section>
+              </section>
+
+              <section class="mode-panel" id="askMode">
+                <div class="ask-thread">
+                  <div class="ask-message user"><strong>You</strong>What evidence supports the claimed efficiency advantage?</div>
+                  <div class="ask-message"><strong>Ask E8</strong>The application and pitch deck describe a target increase from roughly 22% to more than 28%. The technical diligence transcript supports the tandem architecture, but durability and full-size-cell validation are still open diligence items.
+                    <div class="citation-row"><span>3 cited sources</span><button class="link-button" type="button" id="useAnswerButton">Use in report</button></div>
                   </div>
                 </div>
-
-                <p class="microcopy">Nothing changes in the document until you choose Apply.</p>
-              </section>
-
-              <section class="panel" id="draftPanel">
-                <div class="rating-card">
-                  <h3>Draft the Product section</h3>
-                  <p>These ratings steer E8's existing section prompt.</p>
-                  <div class="rating-row"><label for="differentiationRating">Differentiation</label><input id="differentiationRating" type="range" min="0" max="10" value="8"><span class="rating-value">8</span></div>
-                  <div class="rating-row"><label for="readinessRating">Readiness</label><input id="readinessRating" type="range" min="0" max="10" value="5"><span class="rating-value">5</span></div>
-                  <div class="rating-row"><label for="riskRating">Technical risk</label><input id="riskRating" type="range" min="0" max="10" value="7"><span class="rating-value">7</span></div>
-                </div>
-                <label class="field-label" for="draftGuidance">Optional guidance</label>
-                <textarea class="guidance" id="draftGuidance" autocomplete="off" data-lpignore="true" data-form-type="other" placeholder="Add any emphasis or instructions for this section."></textarea>
+                <label class="field-label" for="askInput">Ask about this application</label>
+                <textarea class="guidance" id="askInput" autocomplete="off" data-lpignore="true" data-form-type="other" placeholder="Ask about findings, documents, transcripts, ratings, or application data."></textarea>
                 <div class="button-row">
-                  <button class="button" type="button" id="compareButton">Compare models</button>
-                  <button class="button primary" type="button" id="draftButton">Generate preview</button>
+                  <button class="button primary" type="button" id="askButton">Ask E8</button>
                 </div>
-                <p class="microcopy">A generated section is previewed before it replaces the named range.</p>
-              </section>
-
-              <section class="panel" id="sourcesPanel">
-                <div class="source-list">
-                  <div class="source-list-header"><strong>New evidence</strong><span>Choose what E8 should consider for the Product section.</span></div>
-                  <label class="source-item"><input type="checkbox" checked><span><strong>Technical validation memo</strong><span>Added today · Supporting document</span></span><span class="new-badge">New</span></label>
-                  <label class="source-item"><input type="checkbox" checked><span><strong>Customer reference notes</strong><span>Added yesterday · Google Doc</span></span><span class="new-badge">New</span></label>
-                  <label class="source-item"><input type="checkbox" checked><span><strong>July diligence call</strong><span>Transcript processed 2h ago</span></span><span class="new-badge">New</span></label>
-                </div>
-                <div class="button-row">
-                  <button class="button" type="button" id="cancelSourcesButton">Cancel</button>
-                  <button class="button primary" type="button" id="sourceUpdateButton">Propose focused update</button>
-                </div>
-                <p class="microcopy">E8 records the source IDs used in every proposal.</p>
+                <p class="microcopy">Answers cite portal sources. “Use in report” creates a proposal; it never inserts silently.</p>
               </section>
             </div>
           </aside>
@@ -1245,7 +1468,7 @@
       </div>
     </section>
 
-    <section class="screen" id="portalScreen" aria-label="Portal report workspace mockup">
+    <section class="screen active" id="portalScreen" aria-label="Portal report workspace mockup">
       <div class="portal-shell">
         <header class="portal-nav">
           <div class="portal-brand"><span class="e8-mark">E8</span> E8 Portal</div>
@@ -1255,39 +1478,38 @@
 
         <div class="portal-main">
           <div class="portal-heading">
-            <div><h1>Beyond Silicon · Diligence Report</h1><p>The Google Doc is the live report. Use the portal to coordinate sections, sources, and AI drafting.</p></div>
-            <button class="button primary" type="button" data-view-shortcut="docs">Open live Google Doc ↗</button>
+            <div><h1>Beyond Silicon · Diligence Report</h1><p>Research is underway. The report document will be created when someone begins editing a section.</p></div>
+            <button class="button primary edit-report" type="button" data-section="Product" data-owner="JS">Edit Product report</button>
           </div>
 
           <div class="portal-grid">
             <aside class="card section-list" aria-label="Report sections">
-              <button class="section-row" type="button"><span class="status-dot done"></span><span>Executive Summary</span><span class="owner-initials">AC</span></button>
-              <button class="section-row active" type="button"><span class="status-dot progress"></span><span>Product</span><span class="owner-initials">JS</span></button>
-              <button class="section-row" type="button"><span class="status-dot done"></span><span>Commercialization</span><span class="owner-initials">KG</span></button>
-              <button class="section-row" type="button"><span class="status-dot"></span><span>Team</span><span class="owner-initials">—</span></button>
-              <button class="section-row" type="button"><span class="status-dot"></span><span>Finances &amp; Funding</span><span class="owner-initials">SW</span></button>
-              <button class="section-row" type="button"><span class="status-dot"></span><span>Environmental Impact</span><span class="owner-initials">—</span></button>
-              <button class="section-row" type="button"><span class="status-dot"></span><span>Sources</span><span class="owner-initials">—</span></button>
+              <button class="section-row edit-report" type="button" data-section="Executive Summary" data-owner="AC"><span class="status-dot done"></span><span>Executive Summary</span><span class="owner-initials">AC</span><span class="section-edit-label">Edit report</span></button>
+              <button class="section-row active edit-report" type="button" data-section="Product" data-owner="JS"><span class="status-dot progress"></span><span>Product</span><span class="owner-initials">JS</span><span class="section-edit-label">Edit report</span></button>
+              <button class="section-row edit-report" type="button" data-section="Commercialization" data-owner="KG"><span class="status-dot done"></span><span>Commercialization</span><span class="owner-initials">KG</span><span class="section-edit-label">Edit report</span></button>
+              <button class="section-row edit-report" type="button" data-section="Team" data-owner=""><span class="status-dot"></span><span>Team</span><span class="owner-initials">—</span><span class="section-edit-label">Edit report</span></button>
+              <button class="section-row edit-report" type="button" data-section="Finances &amp; Funding" data-owner="SW"><span class="status-dot"></span><span>Finances &amp; Funding</span><span class="owner-initials">SW</span><span class="section-edit-label">Edit report</span></button>
+              <button class="section-row edit-report" type="button" data-section="Environmental Impact" data-owner=""><span class="status-dot"></span><span>Environmental Impact</span><span class="owner-initials">—</span><span class="section-edit-label">Edit report</span></button>
             </aside>
 
             <section class="card portal-content">
               <div class="portal-content-header">
-                <div><strong>Product</strong><span>Owner: Jordan Schwartz · Updated in Google Docs 18 minutes ago</span></div>
+                <div><strong>Product</strong><span>Owner: Jordan Schwartz · Findings in progress</span></div>
                 <button class="button" type="button">AI action history</button>
               </div>
 
-              <div class="live-doc-banner">
-                <div><strong>This section lives in the Google Doc</strong><span>Portal generation writes directly to the Product named range. Manual edits stay in Docs.</span></div>
-                <button class="button" type="button" data-view-shortcut="docs">View section in Docs ↗</button>
+              <div class="report-state" id="reportState">
+                <div><strong>The report document has not been created yet</strong><span>When editing begins, E8 will use the current team and deal terms to create one live Google Doc.</span></div>
+                <button class="button primary edit-report" type="button" data-section="Product" data-owner="JS">Create &amp; edit Product</button>
               </div>
 
               <div class="portal-form">
-                <h3>Draft or redraft this section</h3>
+                <h3>Product drafting settings</h3>
                 <div class="portal-form-row"><label for="portalModel">Model</label><select class="compact-select" id="portalModel"><option>GPT-5.5</option><option>Compare models…</option></select></div>
                 <div class="portal-form-row"><label for="portalDifferentiation">Differentiation</label><div class="portal-slider-wrap"><input id="portalDifferentiation" type="range" min="0" max="10" value="8"><span class="rating-value">8</span></div></div>
                 <div class="portal-form-row"><label for="portalReadiness">Readiness</label><div class="portal-slider-wrap"><input id="portalReadiness" type="range" min="0" max="10" value="5"><span class="rating-value">5</span></div></div>
                 <div class="portal-form-row"><label for="portalRisk">Technical risk</label><div class="portal-slider-wrap"><input id="portalRisk" type="range" min="0" max="10" value="7"><span class="rating-value">7</span></div></div>
-                <div class="portal-actions"><span>3 new sources will be considered. Existing content will be previewed before replacement.</span><button class="button primary" type="button" id="portalDraftButton">Generate section preview</button></div>
+                <div class="portal-actions"><span>E8 will create the report first, then preview a Product draft using the current portal data.</span><button class="button primary" type="button" id="portalDraftButton">Begin Product draft</button></div>
               </div>
             </section>
           </div>
@@ -1300,12 +1522,12 @@
         <h1>How the experience fits together</h1>
         <p>The report has one home. The portal supplies data and coordination; Google Docs supplies the authoring surface.</p>
         <div class="flow-grid">
-          <article class="flow-card"><div class="flow-number">1</div><h2>Provision once</h2><p>E8 creates the report template at the beginning of diligence and binds every section to a named range.</p></article>
-          <article class="flow-card"><div class="flow-number">2</div><h2>Draft from either surface</h2><p>Ratings and prompts remain in E8. Whole-section generation can start in the portal or the Docs sidebar.</p></article>
+          <article class="flow-card"><div class="flow-number">1</div><h2>Begin from a section</h2><p>Each portal section has an Edit report entry point. The first use creates the Doc with current team and deal terms.</p></article>
+          <article class="flow-card"><div class="flow-number">2</div><h2>Land in the right place</h2><p>The portal launch token opens the requested bookmark and scopes the assistant to that section.</p></article>
           <article class="flow-card"><div class="flow-number">3</div><h2>Edit natively</h2><p>Collaborators use normal Google Docs formatting, comments, suggestions, and version history.</p></article>
-          <article class="flow-card"><div class="flow-number">4</div><h2>Improve a selection</h2><p>The add-on reads the active selection and asks E8 for a context-aware replacement. Nothing changes before approval.</p></article>
-          <article class="flow-card"><div class="flow-number">5</div><h2>Bring in new evidence</h2><p>E8 tracks new database facts, documents, and transcripts, then proposes a focused update with source IDs.</p></article>
-          <article class="flow-card"><div class="flow-number">6</div><h2>Protect collaborators</h2><p>Revision and content checks prevent stale AI proposals from overwriting edits made while the AI was working.</p></article>
+          <article class="flow-card"><div class="flow-number">4</div><h2>Draft, then improve</h2><p>Whole-section drafting or revision comes first; selection-level improvement follows when text is selected.</p></article>
+          <article class="flow-card"><div class="flow-number">5</div><h2>Ask and investigate</h2><p>Ask E8 answers questions with citations, while toolbar links open findings and evidence in the portal.</p></article>
+          <article class="flow-card"><div class="flow-number">6</div><h2>Stay in context</h2><p>Cursor movement prompts before switching sections. Non-owners can proceed after a concise warning.</p></article>
         </div>
         <div class="principles">
           <h2>Design principles</h2>
@@ -1313,7 +1535,8 @@
             <li>Google Docs is canonical; the portal does not maintain a competing editable copy.</li>
             <li>AI proposes before it writes.</li>
             <li>Fixed template headings eliminate generated-heading translation problems.</li>
-            <li>Source freshness is explicit and user-controlled.</li>
+            <li>Portal launch context is primary; cursor polling is a guardrail.</li>
+            <li>Section ownership guides users without blocking collaboration.</li>
             <li>People without the add-on can still collaborate and use portal whole-section drafting.</li>
           </ul>
         </div>
@@ -1321,18 +1544,26 @@
     </section>
   </main>
 
+  <div class="dialog-backdrop" id="dialogBackdrop" hidden>
+    <section class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialogTitle" aria-describedby="dialogDescription">
+      <h2 id="dialogTitle">Create the diligence report?</h2>
+      <p id="dialogDescription">E8 will copy the report template using the current team and deal terms, then open Product.</p>
+      <div class="button-row">
+        <button class="button" type="button" id="dialogCancel">Cancel</button>
+        <button class="button primary" type="button" id="dialogConfirm">Create report</button>
+      </div>
+    </section>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"><span>✓</span><span id="toastMessage">Change applied to the Product section.</span></div>
 
 <script>
-  const originalParagraph = 'The company adds a solution-processed perovskite layer to conventional silicon cells. Management expects the architecture to increase panel efficiency from roughly 22% to more than 28%, creating a differentiated premium product for domestic module manufacturers.';
   const revisedParagraph = 'Beyond Silicon adds a solution-processed perovskite layer to conventional silicon cells, targeting an efficiency increase from roughly 22% to more than 28%. For U.S. module manufacturers, that gain could support a differentiated premium product without requiring an entirely new production platform.';
-
   const screens = {
     docs: document.getElementById('docsScreen'),
     portal: document.getElementById('portalScreen'),
     notes: document.getElementById('notesScreen')
   };
-
   const selectableParagraph = document.getElementById('selectableParagraph');
   const selectionState = document.getElementById('selectionState');
   const emptySelection = document.getElementById('emptySelection');
@@ -1340,8 +1571,33 @@
   const proposalCard = document.getElementById('proposalCard');
   const editActionRow = document.getElementById('editActionRow');
   const previewButton = document.getElementById('previewButton');
+  const sectionProposal = document.getElementById('sectionProposal');
+  const sectionContext = document.getElementById('sectionContext');
+  const ownerWarning = document.getElementById('ownerWarning');
   const toast = document.getElementById('toast');
   const toastMessage = document.getElementById('toastMessage');
+  const dialogBackdrop = document.getElementById('dialogBackdrop');
+  const dialogConfirm = document.getElementById('dialogConfirm');
+  const sectionOwners = {
+    'Executive Summary': 'AC',
+    Product: 'JS',
+    Commercialization: 'KG',
+    Team: '',
+    'Finances & Funding': 'SW',
+    'Environmental Impact': ''
+  };
+  const sectionHasContent = {
+    'Executive Summary': true,
+    Product: true,
+    Commercialization: true,
+    Team: false,
+    'Finances & Funding': false,
+    'Environmental Impact': false
+  };
+  const confirmedNonOwnerSections = new Set();
+  let activeSection = 'Product';
+  let reportProvisioned = false;
+  let dialogAction = null;
   let toastTimer;
 
   function setView(view) {
@@ -1359,6 +1615,40 @@
     toast.classList.add('show');
     window.clearTimeout(toastTimer);
     toastTimer = window.setTimeout(() => toast.classList.remove('show'), 2600);
+  }
+
+  function showDialog(title, description, confirmLabel, action) {
+    document.getElementById('dialogTitle').textContent = title;
+    document.getElementById('dialogDescription').textContent = description;
+    dialogConfirm.textContent = confirmLabel;
+    dialogAction = action;
+    dialogBackdrop.hidden = false;
+    dialogConfirm.focus();
+  }
+
+  function closeDialog() {
+    dialogBackdrop.hidden = true;
+    dialogAction = null;
+  }
+
+  function sectionOwnerMatches(section) {
+    return sectionOwners[section] === 'JS';
+  }
+
+  function confirmNonOwner(section, action) {
+    if (sectionOwnerMatches(section) || confirmedNonOwnerSections.has(section)) {
+      action();
+      return;
+    }
+    showDialog(
+      'You are not the owner of this section. Continue?',
+      `You can use E8 AI in ${section}. The action will be recorded under your name.`,
+      'Continue',
+      () => {
+        confirmedNonOwnerSections.add(section);
+        action();
+      }
+    );
   }
 
   function setSelection(selected) {
@@ -1380,8 +1670,82 @@
       tab.classList.toggle('active', active);
       tab.setAttribute('aria-selected', active ? 'true' : 'false');
     });
-    document.querySelectorAll('.addon-body .panel').forEach(panel => panel.classList.remove('active'));
+    document.querySelectorAll('#writeMode .panel').forEach(panel => panel.classList.remove('active'));
     document.getElementById(panelName + 'Panel').classList.add('active');
+  }
+
+  function setMode(modeName) {
+    document.querySelectorAll('.mode-tab').forEach(tab => {
+      const active = tab.dataset.mode === modeName;
+      tab.classList.toggle('active', active);
+      tab.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    document.querySelectorAll('.mode-panel').forEach(panel => panel.classList.remove('active'));
+    document.getElementById(modeName + 'Mode').classList.add('active');
+  }
+
+  function updateSectionContext(section, source) {
+    activeSection = section;
+    sectionContext.value = section;
+    document.getElementById('launchContext').textContent = source === 'portal'
+      ? `Opened from ${section} in portal`
+      : `Assistant switched to ${section}`;
+    ownerWarning.hidden = sectionOwnerMatches(section);
+    document.getElementById('resourceMenu').hidden = true;
+    document.getElementById('resourcesButton').setAttribute('aria-expanded', 'false');
+    setSelection(false);
+    sectionProposal.hidden = true;
+    const hasContent = sectionHasContent[section];
+    document.getElementById('sectionActionTab').textContent = hasContent ? 'Revise section' : 'Draft section';
+    document.getElementById('draftHeading').textContent = `${hasContent ? 'Revise' : 'Draft'} the ${section} section`;
+    document.getElementById('draftDescription').textContent = hasContent
+      ? 'No selection needed. E8 uses the full section, ratings, prompts, and current portal data.'
+      : 'No selection needed. E8 uses the ratings, prompts, findings, documents, and current portal data.';
+    document.getElementById('draftButton').textContent = hasContent ? 'Generate revision preview' : 'Generate draft preview';
+    setMode('write');
+    setActionPanel('draft');
+    const anchor = [...document.querySelectorAll('.section-anchor')].find(item => item.dataset.section === section || item.querySelector('h2')?.textContent === section);
+    if (anchor) {
+      document.querySelector('.document-stage').scrollTo({ top: Math.max(0, anchor.offsetTop - 90), behavior: 'smooth' });
+    }
+  }
+
+  function launchSection(section) {
+    setView('docs');
+    updateSectionContext(section, 'portal');
+    showToast(`Opened the live report at ${section}.`);
+  }
+
+  function openReportSection(section, owner) {
+    const continueToSection = () => {
+      if (owner === 'JS') {
+        launchSection(section);
+      } else {
+        confirmNonOwner(section, () => launchSection(section));
+      }
+    };
+
+    if (reportProvisioned) {
+      continueToSection();
+      return;
+    }
+
+    showDialog(
+      'Create the diligence report?',
+      `E8 will copy the template using the current team and deal terms, then open ${section}.`,
+      'Create report',
+      () => {
+        showToast('Creating the report with current team and deal terms…');
+        window.setTimeout(() => {
+          reportProvisioned = true;
+          document.getElementById('reportState').className = 'live-doc-banner';
+          document.getElementById('reportState').innerHTML = '<div><strong>The live Google Doc is ready</strong><span>Every section now opens this document at its registered bookmark.</span></div><button class="button" type="button" id="openProductButton">Open Product</button>';
+          document.getElementById('openProductButton').addEventListener('click', () => launchSection('Product'));
+          closeDialog();
+          continueToSection();
+        }, 850);
+      }
+    );
   }
 
   function pendingButton(button, label) {
@@ -1397,16 +1761,67 @@
   document.querySelectorAll('.view-button').forEach(button => button.addEventListener('click', () => setView(button.dataset.view)));
   document.querySelectorAll('[data-view-shortcut]').forEach(button => button.addEventListener('click', () => setView(button.dataset.viewShortcut)));
 
+  document.querySelectorAll('.edit-report').forEach(button => button.addEventListener('click', () => {
+    openReportSection(button.dataset.section, button.dataset.owner || '');
+  }));
+
+  document.querySelectorAll('.mode-tab').forEach(tab => tab.addEventListener('click', () => setMode(tab.dataset.mode)));
+
+  document.getElementById('resourcesButton').addEventListener('click', event => {
+    const menu = document.getElementById('resourceMenu');
+    menu.hidden = !menu.hidden;
+    event.currentTarget.setAttribute('aria-expanded', menu.hidden ? 'false' : 'true');
+  });
+
+  document.querySelectorAll('.portal-resource').forEach(button => button.addEventListener('click', () => {
+    document.getElementById('resourceMenu').hidden = true;
+    showToast(`Opening ${button.dataset.resource} for Beyond Silicon in the portal.`);
+  }));
+
+  sectionContext.addEventListener('change', () => updateSectionContext(sectionContext.value, 'manual'));
+
   selectableParagraph.addEventListener('click', () => {
+    if (activeSection !== 'Product') {
+      showDialog(
+        'Your cursor is in Product. Switch sections?',
+        `The assistant is currently scoped to ${activeSection}. Nothing changes unless you switch.`,
+        'Switch to Product',
+        () => {
+          updateSectionContext('Product', 'cursor');
+          setSelection(true);
+          setActionPanel('edit');
+        }
+      );
+      return;
+    }
     setSelection(true);
     setActionPanel('edit');
   });
   selectableParagraph.addEventListener('keydown', event => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      setSelection(true);
-      setActionPanel('edit');
+      selectableParagraph.click();
     }
+  });
+
+  document.querySelectorAll('.cursor-target').forEach(target => {
+    const moveCursor = () => {
+      const nextSection = target.dataset.sectionTarget;
+      if (nextSection === activeSection) return;
+      showDialog(
+        `Your cursor is in ${nextSection}. Switch sections?`,
+        `The assistant is currently scoped to ${activeSection}. Nothing changes unless you switch.`,
+        `Switch to ${nextSection}`,
+        () => updateSectionContext(nextSection, 'cursor')
+      );
+    };
+    target.addEventListener('click', moveCursor);
+    target.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        moveCursor();
+      }
+    });
   });
 
   document.getElementById('clearSelectionButton').addEventListener('click', () => setSelection(false));
@@ -1414,14 +1829,16 @@
   document.querySelectorAll('.action-tab').forEach(tab => tab.addEventListener('click', () => setActionPanel(tab.dataset.panel)));
 
   previewButton.addEventListener('click', () => {
-    const restore = pendingButton(previewButton, 'Generating proposal…');
-    window.setTimeout(() => {
-      restore();
-      document.getElementById('beforeText').textContent = selectableParagraph.textContent;
-      proposalCard.hidden = false;
-      editActionRow.hidden = true;
-      proposalCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }, 800);
+    confirmNonOwner(activeSection, () => {
+      const restore = pendingButton(previewButton, 'Generating proposal…');
+      window.setTimeout(() => {
+        restore();
+        document.getElementById('beforeText').textContent = selectableParagraph.textContent;
+        proposalCard.hidden = false;
+        editActionRow.hidden = true;
+        proposalCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 800);
+    });
   });
 
   document.getElementById('discardButton').addEventListener('click', () => {
@@ -1442,30 +1859,6 @@
     }, 650);
   });
 
-  document.getElementById('reviewSourcesButton').addEventListener('click', () => {
-    document.querySelectorAll('.addon-body .panel').forEach(panel => panel.classList.remove('active'));
-    document.getElementById('sourcesPanel').classList.add('active');
-    document.querySelectorAll('.action-tab').forEach(tab => {
-      tab.classList.remove('active');
-      tab.setAttribute('aria-selected', 'false');
-    });
-  });
-
-  document.getElementById('cancelSourcesButton').addEventListener('click', () => setActionPanel('edit'));
-
-  document.getElementById('sourceUpdateButton').addEventListener('click', event => {
-    const button = event.currentTarget;
-    const restore = pendingButton(button, 'Reviewing evidence…');
-    window.setTimeout(() => {
-      restore();
-      setActionPanel('edit');
-      setSelection(true);
-      document.getElementById('guidanceInput').value = 'Update this paragraph only where the newly selected evidence materially changes the analysis.';
-      document.getElementById('sourceAlert').hidden = true;
-      showToast('New evidence loaded. Preview a focused update when ready.');
-    }, 900);
-  });
-
   document.querySelectorAll('input[type="range"]').forEach(input => {
     input.addEventListener('input', () => {
       const value = input.parentElement.querySelector('.rating-value') || input.nextElementSibling;
@@ -1474,14 +1867,42 @@
   });
 
   document.getElementById('draftButton').addEventListener('click', event => {
-    const restore = pendingButton(event.currentTarget, 'Generating preview…');
+    const button = event.currentTarget;
+    confirmNonOwner(activeSection, () => {
+      const restore = pendingButton(button, 'Generating preview…');
+      window.setTimeout(() => {
+        restore();
+        const hasContent = sectionHasContent[activeSection];
+        document.getElementById('sectionProposalTitle').textContent = `Proposed ${activeSection} ${hasContent ? 'revision' : 'draft'}`;
+        document.getElementById('sectionBeforeText').textContent = hasContent ? `Existing ${activeSection} content.` : 'This section is empty.';
+        document.getElementById('sectionAfterText').textContent = `A structured ${activeSection} draft written into the template's registered content ranges.`;
+        sectionProposal.hidden = false;
+        sectionProposal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        showToast('Whole-section preview ready. The document is unchanged.');
+      }, 950);
+    });
+  });
+
+  document.getElementById('discardSectionButton').addEventListener('click', () => {
+    sectionProposal.hidden = true;
+    showToast('Whole-section proposal discarded.');
+  });
+
+  document.getElementById('applySectionButton').addEventListener('click', event => {
+    const restore = pendingButton(event.currentTarget, 'Applying section…');
     window.setTimeout(() => {
       restore();
-      setActionPanel('edit');
-      setSelection(true);
-      document.getElementById('guidanceInput').value = 'Review the proposed whole-section draft before replacing the Product named range.';
-      showToast('Section preview generated. Existing document content is unchanged.');
-    }, 950);
+      sectionHasContent[activeSection] = true;
+      if (activeSection === 'Team') {
+        const teamRange = document.querySelector('[data-section="Team"] .empty-range');
+        teamRange.classList.remove('empty-range');
+        teamRange.classList.add('editable-paragraph');
+        teamRange.textContent = 'Beyond Silicon is led by a technical founding team with experience in photovoltaic materials, process development, and early-stage commercialization.';
+      }
+      sectionProposal.hidden = true;
+      updateSectionContext(activeSection, 'manual');
+      showToast(`${activeSection} was updated in the live Google Doc.`);
+    }, 700);
   });
 
   document.getElementById('compareButton').addEventListener('click', event => {
@@ -1493,14 +1914,33 @@
   });
 
   document.getElementById('portalDraftButton').addEventListener('click', event => {
-    const restore = pendingButton(event.currentTarget, 'Generating preview…');
-    window.setTimeout(() => {
-      restore();
-      showToast('Section preview generated. Open the Google Doc to review it.');
-    }, 950);
+    openReportSection('Product', 'JS');
   });
 
-  setSelection(true);
+  document.getElementById('askButton').addEventListener('click', event => {
+    const restore = pendingButton(event.currentTarget, 'Searching E8…');
+    window.setTimeout(() => {
+      restore();
+      showToast('Answer ready with citations from portal data.');
+    }, 800);
+  });
+
+  document.getElementById('useAnswerButton').addEventListener('click', () => {
+    setMode('write');
+    setActionPanel('edit');
+    document.getElementById('guidanceInput').value = 'Use the cited evidence from Ask E8 to strengthen this analysis without overstating technical validation.';
+    showToast('Answer added as guidance for a reviewable report proposal.');
+  });
+
+  document.getElementById('dialogCancel').addEventListener('click', closeDialog);
+  dialogConfirm.addEventListener('click', () => {
+    const action = dialogAction;
+    closeDialog();
+    if (action) action();
+  });
+
+  setSelection(false);
+  updateSectionContext('Product', 'portal');
 </script>
 </body>
 </html>
