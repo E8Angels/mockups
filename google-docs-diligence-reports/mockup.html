@@ -1,0 +1,1506 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Google Docs-Native Diligence Reports — Mockup</title>
+<style>
+  :root {
+    --ink: #0f172a;
+    --muted: #64748b;
+    --line: #dbe3ed;
+    --line-strong: #cbd5e1;
+    --surface: #ffffff;
+    --surface-soft: #f8fafc;
+    --canvas: #eef2f6;
+    --blue: #2563eb;
+    --blue-dark: #1d4ed8;
+    --blue-soft: #eff6ff;
+    --green: #16865a;
+    --green-soft: #ecfdf5;
+    --amber: #a16207;
+    --amber-soft: #fffbeb;
+    --red: #b91c1c;
+    --red-soft: #fef2f2;
+    --shadow: 0 18px 45px rgba(15, 23, 42, .11);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: #e9eef4;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.45;
+  }
+
+  button, input, textarea, select { font: inherit; }
+
+  button { cursor: pointer; }
+
+  button:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .25);
+    outline-offset: 2px;
+  }
+
+  .prototype-bar {
+    min-height: 52px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    background: #0f172a;
+    color: white;
+  }
+
+  .prototype-title {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .prototype-title strong { font-size: 14px; }
+  .prototype-title span { color: #cbd5e1; font-size: 12px; }
+
+  .e8-mark {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 auto;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    color: white;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: -.04em;
+    background: linear-gradient(145deg, #2563eb, #1e40af);
+  }
+
+  .view-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px;
+    border-radius: 9px;
+    background: rgba(255,255,255,.1);
+  }
+
+  .view-button {
+    height: 30px;
+    padding: 0 11px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 650;
+  }
+
+  .view-button:hover { color: white; background: rgba(255,255,255,.08); }
+  .view-button.active { color: #0f172a; background: white; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .docs-app {
+    min-height: calc(100vh - 52px);
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    background: #f1f3f4;
+  }
+
+  .docs-titlebar {
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 14px;
+    background: white;
+    border-bottom: 1px solid #e8eaed;
+  }
+
+  .docs-icon {
+    width: 32px;
+    height: 38px;
+    border-radius: 4px 4px 7px 7px;
+    display: grid;
+    place-items: center;
+    background: #4285f4;
+    color: white;
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .doc-title-block { min-width: 0; flex: 1; }
+
+  .doc-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .doc-title {
+    min-width: 0;
+    max-width: 620px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 17px;
+    font-weight: 500;
+    color: #202124;
+  }
+
+  .saved-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #5f6368;
+    font-size: 11px;
+  }
+
+  .cloud-check {
+    width: 15px;
+    height: 15px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 50%;
+    color: white;
+    background: var(--green);
+    font-size: 9px;
+  }
+
+  .docs-menu {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-top: 3px;
+  }
+
+  .docs-menu span {
+    padding: 2px 6px;
+    color: #3c4043;
+    font-size: 12px;
+  }
+
+  .title-actions { display: flex; align-items: center; gap: 7px; }
+
+  .icon-button {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    color: #475569;
+    background: transparent;
+    font-size: 15px;
+  }
+
+  .icon-button:hover { background: #f1f5f9; }
+
+  .share-button {
+    height: 34px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 18px;
+    color: #0b57d0;
+    background: #c2e7ff;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #dbeafe;
+    color: #1e40af;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .docs-toolbar {
+    min-height: 42px;
+    margin: 0 14px 8px;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    overflow: hidden;
+    border-radius: 22px;
+    background: #edf2fa;
+    color: #3c4043;
+  }
+
+  .toolbar-button {
+    height: 28px;
+    min-width: 28px;
+    padding: 0 7px;
+    display: inline-grid;
+    place-items: center;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: inherit;
+    font-size: 12px;
+  }
+
+  .toolbar-button:hover { background: rgba(60, 64, 67, .08); }
+
+  .toolbar-select {
+    height: 28px;
+    padding: 0 24px 0 9px;
+    border: 0;
+    border-radius: 5px;
+    color: #3c4043;
+    background: transparent;
+    font-size: 11px;
+  }
+
+  .toolbar-divider { width: 1px; height: 22px; background: #c7d0dd; }
+
+  .workspace {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(640px, 1fr) 336px;
+    border-top: 1px solid #e4e8ee;
+  }
+
+  .document-stage {
+    min-width: 0;
+    overflow: auto;
+    padding: 28px 34px 70px;
+    background: #f1f3f4;
+  }
+
+  .document-page {
+    width: min(100%, 760px);
+    min-height: 980px;
+    margin: 0 auto;
+    padding: 68px 76px 90px;
+    background: white;
+    box-shadow: 0 1px 4px rgba(60, 64, 67, .25);
+    color: #202124;
+  }
+
+  .report-kicker {
+    margin-bottom: 6px;
+    color: #1d4ed8;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .document-page h1 {
+    margin: 0 0 8px;
+    color: #1f2937;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 30px;
+    line-height: 1.15;
+  }
+
+  .report-meta {
+    margin-bottom: 38px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #2563eb;
+    color: #64748b;
+    font-size: 12px;
+  }
+
+  .document-page h2 {
+    margin: 28px 0 10px;
+    color: #1e3a8a;
+    font-size: 18px;
+  }
+
+  .document-page h3 {
+    margin: 18px 0 7px;
+    color: #334155;
+    font-size: 14px;
+  }
+
+  .document-page p {
+    margin: 0 0 12px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 13.5px;
+    line-height: 1.67;
+  }
+
+  .section-anchor {
+    position: relative;
+    scroll-margin-top: 30px;
+  }
+
+  .section-anchor::before {
+    content: attr(data-section);
+    position: absolute;
+    left: -66px;
+    top: 3px;
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: #64748b;
+    background: #f1f5f9;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+
+  .section-anchor:hover::before { opacity: 1; }
+
+  .editable-paragraph {
+    margin-left: -5px !important;
+    padding: 3px 5px;
+    border-radius: 3px;
+    transition: background .15s, box-shadow .15s;
+  }
+
+  .editable-paragraph:hover {
+    background: #f8fafc;
+    box-shadow: inset 0 0 0 1px #e2e8f0;
+  }
+
+  .editable-paragraph.selected {
+    background: #dbeafe;
+    box-shadow: inset 0 0 0 1px #93c5fd;
+  }
+
+  .empty-range {
+    margin-top: 8px;
+    padding: 18px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    color: #94a3b8;
+    background: #f8fafc;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .addon-sidebar {
+    min-width: 0;
+    overflow: auto;
+    background: white;
+    border-left: 1px solid #d8dee8;
+    box-shadow: -4px 0 12px rgba(15, 23, 42, .03);
+  }
+
+  .addon-header {
+    padding: 13px 14px 11px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .addon-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .brand-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .brand-logo {
+    width: 25px;
+    height: 25px;
+    display: grid;
+    place-items: center;
+    border-radius: 7px;
+    color: white;
+    background: #1d4ed8;
+    font-size: 10px;
+    font-weight: 900;
+  }
+
+  .connection-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .connection-dot::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #22c55e;
+  }
+
+  .context-row {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .company-context { min-width: 0; }
+  .company-context strong, .company-context span { display: block; }
+  .company-context strong { font-size: 12px; }
+  .company-context span { color: var(--muted); font-size: 10.5px; }
+
+  .section-pill {
+    width: fit-content;
+    max-width: 132px;
+    padding: 3px 8px;
+    overflow: hidden;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    color: #1d4ed8;
+    background: #eff6ff;
+    font-size: 10px;
+    font-weight: 750;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .addon-body { padding: 12px; }
+
+  .source-alert {
+    padding: 10px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    background: var(--amber-soft);
+  }
+
+  .source-alert-icon {
+    width: 27px;
+    height: 27px;
+    display: grid;
+    place-items: center;
+    border-radius: 7px;
+    color: #92400e;
+    background: #fef3c7;
+    font-size: 13px;
+  }
+
+  .source-alert strong, .source-alert span { display: block; }
+  .source-alert strong { color: #78350f; font-size: 11px; }
+  .source-alert span { color: #92400e; font-size: 9.5px; }
+
+  .link-button {
+    padding: 3px 0;
+    border: 0;
+    color: #1d4ed8;
+    background: transparent;
+    font-size: 10px;
+    font-weight: 750;
+    white-space: nowrap;
+  }
+
+  .action-tabs {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: #f1f5f9;
+  }
+
+  .action-tab {
+    height: 30px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 6px;
+    color: #64748b;
+    background: transparent;
+    font-size: 10.5px;
+    font-weight: 750;
+  }
+
+  .action-tab.active {
+    color: #1d4ed8;
+    background: white;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .1);
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .selection-state {
+    margin-top: 12px;
+    padding: 9px 10px;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    background: var(--blue-soft);
+  }
+
+  .selection-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: #1e40af;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+
+  .selection-preview {
+    margin-top: 5px;
+    display: -webkit-box;
+    overflow: hidden;
+    color: #334155;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 10.5px;
+    line-height: 1.45;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .empty-selection {
+    margin-top: 12px;
+    padding: 18px 12px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    color: #64748b;
+    background: #f8fafc;
+    font-size: 10.5px;
+    text-align: center;
+  }
+
+  .field-label {
+    display: block;
+    margin: 12px 0 5px;
+    color: #475569;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+
+  .guidance {
+    width: 100%;
+    min-height: 86px;
+    padding: 9px 10px;
+    resize: vertical;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    color: #0f172a;
+    background: white;
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  .guidance::placeholder { color: #94a3b8; }
+
+  .button-row {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 7px;
+  }
+
+  .button {
+    min-height: 32px;
+    padding: 0 11px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    color: #334155;
+    background: white;
+    font-size: 10.5px;
+    font-weight: 750;
+  }
+
+  .button:hover { background: #f8fafc; }
+  .button:disabled { cursor: not-allowed; opacity: .6; }
+
+  .button.primary {
+    border-color: var(--blue);
+    color: white;
+    background: var(--blue);
+  }
+
+  .button.primary:hover { background: var(--blue-dark); }
+
+  .button.success {
+    border-color: var(--green);
+    color: white;
+    background: var(--green);
+  }
+
+  .button.full { width: 100%; }
+
+  .spinner {
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    margin-right: 6px;
+    border: 2px solid rgba(255,255,255,.42);
+    border-top-color: white;
+    border-radius: 50%;
+    vertical-align: -2px;
+    animation: spin .7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .proposal {
+    margin-top: 12px;
+    overflow: hidden;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    background: white;
+  }
+
+  .proposal-header {
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    border-bottom: 1px solid var(--line);
+    background: #f8fafc;
+  }
+
+  .proposal-header strong { font-size: 10.5px; }
+  .proposal-header span { color: var(--muted); font-size: 9px; }
+
+  .diff-block { padding: 8px 10px; font-size: 10px; line-height: 1.48; }
+  .diff-block + .diff-block { border-top: 1px solid var(--line); }
+
+  .diff-label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+
+  .diff-block.before { color: #7f1d1d; background: var(--red-soft); }
+  .diff-block.before .diff-label { color: var(--red); }
+  .diff-block.after { color: #14532d; background: var(--green-soft); }
+  .diff-block.after .diff-label { color: var(--green); }
+
+  .proposal-sources {
+    padding: 8px 10px;
+    color: #64748b;
+    background: white;
+    font-size: 9px;
+  }
+
+  .rating-card {
+    margin-top: 12px;
+    padding: 11px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: #f8fafc;
+  }
+
+  .rating-card h3 { margin: 0 0 3px; font-size: 12px; }
+  .rating-card p { margin: 0 0 10px; color: var(--muted); font-size: 9.5px; }
+
+  .rating-row {
+    display: grid;
+    grid-template-columns: 86px 1fr 22px;
+    align-items: center;
+    gap: 7px;
+    margin-top: 8px;
+  }
+
+  .rating-row label { color: #475569; font-size: 9.5px; font-weight: 700; }
+  .rating-row input { width: 100%; accent-color: var(--blue); }
+  .rating-value { color: #1e40af; font-size: 9.5px; font-weight: 800; text-align: right; }
+
+  .source-list {
+    margin-top: 12px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+  }
+
+  .source-list-header {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--line);
+    background: #f8fafc;
+  }
+
+  .source-list-header strong { display: block; font-size: 11px; }
+  .source-list-header span { display: block; color: var(--muted); font-size: 9px; }
+
+  .source-item {
+    padding: 9px 10px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: start;
+    gap: 8px;
+    border-bottom: 1px solid #edf2f7;
+  }
+
+  .source-item:last-child { border-bottom: 0; }
+  .source-item input { margin-top: 3px; accent-color: var(--blue); }
+  .source-item strong, .source-item span { display: block; }
+  .source-item strong { font-size: 10px; }
+  .source-item span { color: var(--muted); font-size: 8.8px; }
+
+  .new-badge {
+    width: fit-content;
+    padding: 2px 5px;
+    border-radius: 999px;
+    color: #92400e;
+    background: #fef3c7;
+    font-size: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .microcopy {
+    margin: 10px 2px 0;
+    color: #94a3b8;
+    font-size: 8.8px;
+    text-align: center;
+  }
+
+  .toast {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 50;
+    max-width: 340px;
+    padding: 10px 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 8px;
+    color: white;
+    background: #0f172a;
+    box-shadow: var(--shadow);
+    font-size: 11px;
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition: opacity .2s, transform .2s;
+  }
+
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  .portal-shell {
+    min-height: calc(100vh - 52px);
+    background: #f8fafc;
+  }
+
+  .portal-nav {
+    height: 58px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    border-bottom: 1px solid #e2e8f0;
+    background: white;
+  }
+
+  .portal-brand { display: flex; align-items: center; gap: 9px; font-weight: 800; }
+  .portal-links { display: flex; align-items: center; gap: 18px; color: #475569; font-size: 12px; }
+  .portal-links .active { color: #1d4ed8; font-weight: 750; }
+
+  .portal-main {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  .portal-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .portal-heading h1 { margin: 0; font-size: 22px; }
+  .portal-heading p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+
+  .portal-grid {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .card {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .03);
+  }
+
+  .section-list { padding: 8px; }
+
+  .section-row {
+    width: 100%;
+    min-height: 42px;
+    padding: 7px 8px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 8px;
+    border: 0;
+    border-radius: 7px;
+    color: #334155;
+    background: transparent;
+    text-align: left;
+    font-size: 11px;
+  }
+
+  .section-row:hover { background: #f8fafc; }
+  .section-row.active { color: #1d4ed8; background: #eff6ff; font-weight: 750; }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #cbd5e1;
+  }
+
+  .status-dot.done { background: #22c55e; }
+  .status-dot.progress { background: #f59e0b; }
+
+  .owner-initials {
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: #475569;
+    background: #e2e8f0;
+    font-size: 8px;
+    font-weight: 800;
+  }
+
+  .portal-content { overflow: hidden; }
+
+  .portal-content-header {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .portal-content-header strong { font-size: 14px; }
+  .portal-content-header span { display: block; color: var(--muted); font-size: 10px; }
+
+  .live-doc-banner {
+    margin: 16px;
+    padding: 13px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    border: 1px solid #bfdbfe;
+    border-radius: 9px;
+    background: #eff6ff;
+  }
+
+  .live-doc-banner strong, .live-doc-banner span { display: block; }
+  .live-doc-banner strong { color: #1e3a8a; font-size: 11px; }
+  .live-doc-banner span { color: #3b82f6; font-size: 9.5px; }
+
+  .portal-form { padding: 0 16px 18px; }
+
+  .portal-form h3 { margin: 2px 0 12px; font-size: 13px; }
+
+  .portal-form-row {
+    min-height: 36px;
+    display: grid;
+    grid-template-columns: 150px minmax(0, 360px);
+    align-items: center;
+    gap: 12px;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .portal-form-row label { color: #475569; font-size: 10.5px; font-weight: 650; }
+
+  .compact-select {
+    width: 220px;
+    height: 30px;
+    padding: 0 28px 0 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    color: #334155;
+    background: white;
+    font-size: 10.5px;
+  }
+
+  .portal-slider-wrap {
+    display: grid;
+    grid-template-columns: 1fr 24px;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .portal-slider-wrap input { width: 100%; accent-color: var(--blue); }
+
+  .portal-actions {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .portal-actions span { color: var(--muted); font-size: 9.5px; }
+
+  .notes-screen {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+  }
+
+  .notes-screen h1 { margin: 0 0 5px; font-size: 22px; }
+  .notes-screen > p { margin: 0 0 18px; color: var(--muted); font-size: 12px; }
+
+  .flow-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .flow-card {
+    padding: 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: white;
+  }
+
+  .flow-number {
+    width: 25px;
+    height: 25px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 10px;
+    border-radius: 7px;
+    color: white;
+    background: #2563eb;
+    font-size: 10px;
+    font-weight: 800;
+  }
+
+  .flow-card h2 { margin: 0 0 4px; font-size: 13px; }
+  .flow-card p { margin: 0; color: var(--muted); font-size: 10.5px; }
+
+  .principles {
+    margin-top: 14px;
+    padding: 16px;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    background: #eff6ff;
+  }
+
+  .principles h2 { margin: 0 0 8px; color: #1e3a8a; font-size: 14px; }
+  .principles ul { margin: 0; padding-left: 18px; color: #334155; font-size: 10.5px; }
+  .principles li + li { margin-top: 4px; }
+
+  .mobile-fallback { display: none; }
+
+  @media (max-width: 900px) {
+    .prototype-bar { align-items: flex-start; flex-direction: column; }
+    .view-switcher { width: 100%; overflow: auto; }
+    .view-button { flex: 0 0 auto; }
+    .docs-app { display: none; }
+    .mobile-fallback {
+      min-height: calc(100vh - 96px);
+      padding: 24px 16px;
+      display: grid;
+      place-items: center;
+      background: #f8fafc;
+    }
+    .mobile-card {
+      width: min(100%, 460px);
+      padding: 20px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, .08);
+    }
+    .mobile-card h1 { margin: 12px 0 6px; font-size: 18px; }
+    .mobile-card p { margin: 0 0 14px; color: var(--muted); font-size: 11px; }
+    .portal-grid { grid-template-columns: 1fr; }
+    .section-list { display: grid; grid-template-columns: 1fr 1fr; }
+    .portal-heading, .live-doc-banner, .portal-actions { align-items: stretch; flex-direction: column; }
+    .portal-form-row { grid-template-columns: 1fr; gap: 4px; padding: 8px 0; }
+    .flow-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 560px) {
+    .prototype-title span, .portal-links { display: none; }
+    .portal-nav { padding: 0 14px; }
+    .portal-main { padding: 16px 10px; }
+    .section-list { grid-template-columns: 1fr; }
+    .compact-select { width: 100%; }
+  }
+</style>
+</head>
+<body>
+  <header class="prototype-bar">
+    <div class="prototype-title">
+      <div class="e8-mark">E8</div>
+      <div>
+        <strong>Google Docs-Native Diligence Reports</strong>
+        <span>Interactive concept mockup</span>
+      </div>
+    </div>
+    <nav class="view-switcher" aria-label="Mockup views">
+      <button class="view-button active" type="button" data-view="docs">Google Doc + E8 sidebar</button>
+      <button class="view-button" type="button" data-view="portal">Portal report workspace</button>
+      <button class="view-button" type="button" data-view="notes">Behavior overview</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="screen active" id="docsScreen" aria-label="Google Docs mockup">
+      <div class="docs-app">
+        <div class="docs-titlebar">
+          <div class="docs-icon">▤</div>
+          <div class="doc-title-block">
+            <div class="doc-title-row">
+              <div class="doc-title">Beyond Silicon Diligence Report — 2026</div>
+              <div class="saved-state"><span class="cloud-check">✓</span> Saved to Drive</div>
+            </div>
+            <div class="docs-menu" aria-hidden="true">
+              <span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Format</span><span>Tools</span><span>Extensions</span><span>Help</span>
+            </div>
+          </div>
+          <div class="title-actions">
+            <button class="icon-button" type="button" aria-label="Comments">☷</button>
+            <button class="icon-button" type="button" aria-label="Video call">▣</button>
+            <button class="share-button" type="button">Share</button>
+            <div class="avatar" aria-label="Jordan Schwartz">JS</div>
+          </div>
+        </div>
+
+        <div class="docs-toolbar" aria-label="Document formatting toolbar">
+          <button class="toolbar-button" type="button" aria-label="Undo">↶</button>
+          <button class="toolbar-button" type="button" aria-label="Redo">↷</button>
+          <span class="toolbar-divider"></span>
+          <select class="toolbar-select" aria-label="Zoom"><option>100%</option></select>
+          <span class="toolbar-divider"></span>
+          <select class="toolbar-select" aria-label="Paragraph style"><option>Normal text</option></select>
+          <select class="toolbar-select" aria-label="Font"><option>Arial</option></select>
+          <span class="toolbar-divider"></span>
+          <button class="toolbar-button" type="button" aria-label="Bold"><strong>B</strong></button>
+          <button class="toolbar-button" type="button" aria-label="Italic"><em>I</em></button>
+          <button class="toolbar-button" type="button" aria-label="Underline"><u>U</u></button>
+          <span class="toolbar-divider"></span>
+          <button class="toolbar-button" type="button" aria-label="Link">🔗</button>
+          <button class="toolbar-button" type="button" aria-label="Comment">＋</button>
+        </div>
+
+        <div class="workspace">
+          <div class="document-stage">
+            <article class="document-page" aria-label="Beyond Silicon diligence report">
+              <div class="report-kicker">Element 8 Diligence</div>
+              <h1>Beyond Silicon</h1>
+              <div class="report-meta">Diligence report · July 2026 · Draft</div>
+
+              <section class="section-anchor" data-section="Summary">
+                <h2>Executive Summary</h2>
+                <p>Beyond Silicon is developing perovskite-silicon tandem solar cells intended to increase module efficiency while fitting into established photovoltaic manufacturing processes.</p>
+              </section>
+
+              <section class="section-anchor" data-section="Product" id="productSection">
+                <h2>Product</h2>
+                <h3>Technology and value proposition</h3>
+                <p class="editable-paragraph" id="selectableParagraph" tabindex="0">The company adds a solution-processed perovskite layer to conventional silicon cells. Management expects the architecture to increase panel efficiency from roughly 22% to more than 28%, creating a differentiated premium product for domestic module manufacturers.</p>
+                <p>The approach is designed as a drop-in extension to existing cell manufacturing. The team has received a U.S. patent covering its tandem device architecture and is developing additional process and material intellectual property.</p>
+                <h3>Technical validation</h3>
+                <p>The current development plan targets full-size cells above 25% efficiency, followed by IEC 61215 testing and customer pilots. Durability, repeatability at scale, and manufacturing yield remain the central technical diligence questions.</p>
+              </section>
+
+              <section class="section-anchor" data-section="Commercial">
+                <h2>Commercialization</h2>
+                <p>Initial market entry is expected through applications that value high efficiency and can tolerate shorter product lifetimes. The company reports letters of intent spanning a niche one-megawatt opportunity and a larger residential-module opportunity.</p>
+              </section>
+
+              <section class="section-anchor" data-section="Team">
+                <h2>Team</h2>
+                <div class="empty-range">This section has not been drafted yet.</div>
+              </section>
+            </article>
+          </div>
+
+          <aside class="addon-sidebar" aria-label="E8 Diligence Assistant">
+            <div class="addon-header">
+              <div class="addon-brand">
+                <div class="brand-name"><span class="brand-logo">E8</span> Diligence Assistant</div>
+                <span class="connection-dot">Connected</span>
+              </div>
+              <div class="context-row">
+                <div class="company-context">
+                  <strong>Beyond Silicon</strong>
+                  <span>2025 application · Investment Ready</span>
+                </div>
+                <span class="section-pill" id="activeSectionPill">Product</span>
+              </div>
+            </div>
+
+            <div class="addon-body">
+              <div class="source-alert" id="sourceAlert">
+                <div class="source-alert-icon">✦</div>
+                <div><strong>3 updates since review</strong><span>2 documents · 1 transcript</span></div>
+                <button class="link-button" type="button" id="reviewSourcesButton">Review</button>
+              </div>
+
+              <div class="action-tabs" role="tablist" aria-label="AI actions">
+                <button class="action-tab active" type="button" role="tab" aria-selected="true" data-panel="edit">Improve selection</button>
+                <button class="action-tab" type="button" role="tab" aria-selected="false" data-panel="draft">Draft section</button>
+              </div>
+
+              <section class="panel active" id="editPanel">
+                <div class="selection-state" id="selectionState">
+                  <div class="selection-label"><span>Selected in document</span><span id="selectionCount">39 words</span></div>
+                  <div class="selection-preview" id="selectionPreview">The company adds a solution-processed perovskite layer to conventional silicon cells…</div>
+                </div>
+                <div class="empty-selection" id="emptySelection" hidden>Click a paragraph in the document to simulate selecting text.</div>
+
+                <label class="field-label" for="guidanceInput">What should change?</label>
+                <textarea class="guidance" id="guidanceInput" autocomplete="off" data-lpignore="true" data-form-type="other" placeholder="Make this tighter and explain why it matters to customers.">Make this tighter and explain why the efficiency gain matters to U.S. module manufacturers.</textarea>
+
+                <div class="button-row" id="editActionRow">
+                  <button class="button" type="button" id="clearSelectionButton">Clear</button>
+                  <button class="button primary" type="button" id="previewButton">Preview change</button>
+                </div>
+
+                <div class="proposal" id="proposalCard" hidden>
+                  <div class="proposal-header"><strong>Proposed replacement</strong><span>GPT-5.5 · 3 sources</span></div>
+                  <div class="diff-block before"><span class="diff-label">Current</span><span id="beforeText">The company adds a solution-processed perovskite layer to conventional silicon cells. Management expects the architecture to increase panel efficiency from roughly 22% to more than 28%, creating a differentiated premium product for domestic module manufacturers.</span></div>
+                  <div class="diff-block after"><span class="diff-label">Proposed</span><span id="afterText">Beyond Silicon adds a solution-processed perovskite layer to conventional silicon cells, targeting an efficiency increase from roughly 22% to more than 28%. For U.S. module manufacturers, that gain could support a differentiated premium product without requiring an entirely new production platform.</span></div>
+                  <div class="proposal-sources">Sources: Application · Pitch deck · Technical diligence transcript</div>
+                  <div class="button-row">
+                    <button class="button" type="button" id="discardButton">Discard</button>
+                    <button class="button success" type="button" id="applyButton">Apply to document</button>
+                  </div>
+                </div>
+
+                <p class="microcopy">Nothing changes in the document until you choose Apply.</p>
+              </section>
+
+              <section class="panel" id="draftPanel">
+                <div class="rating-card">
+                  <h3>Draft the Product section</h3>
+                  <p>These ratings steer E8's existing section prompt.</p>
+                  <div class="rating-row"><label for="differentiationRating">Differentiation</label><input id="differentiationRating" type="range" min="0" max="10" value="8"><span class="rating-value">8</span></div>
+                  <div class="rating-row"><label for="readinessRating">Readiness</label><input id="readinessRating" type="range" min="0" max="10" value="5"><span class="rating-value">5</span></div>
+                  <div class="rating-row"><label for="riskRating">Technical risk</label><input id="riskRating" type="range" min="0" max="10" value="7"><span class="rating-value">7</span></div>
+                </div>
+                <label class="field-label" for="draftGuidance">Optional guidance</label>
+                <textarea class="guidance" id="draftGuidance" autocomplete="off" data-lpignore="true" data-form-type="other" placeholder="Add any emphasis or instructions for this section."></textarea>
+                <div class="button-row">
+                  <button class="button" type="button" id="compareButton">Compare models</button>
+                  <button class="button primary" type="button" id="draftButton">Generate preview</button>
+                </div>
+                <p class="microcopy">A generated section is previewed before it replaces the named range.</p>
+              </section>
+
+              <section class="panel" id="sourcesPanel">
+                <div class="source-list">
+                  <div class="source-list-header"><strong>New evidence</strong><span>Choose what E8 should consider for the Product section.</span></div>
+                  <label class="source-item"><input type="checkbox" checked><span><strong>Technical validation memo</strong><span>Added today · Supporting document</span></span><span class="new-badge">New</span></label>
+                  <label class="source-item"><input type="checkbox" checked><span><strong>Customer reference notes</strong><span>Added yesterday · Google Doc</span></span><span class="new-badge">New</span></label>
+                  <label class="source-item"><input type="checkbox" checked><span><strong>July diligence call</strong><span>Transcript processed 2h ago</span></span><span class="new-badge">New</span></label>
+                </div>
+                <div class="button-row">
+                  <button class="button" type="button" id="cancelSourcesButton">Cancel</button>
+                  <button class="button primary" type="button" id="sourceUpdateButton">Propose focused update</button>
+                </div>
+                <p class="microcopy">E8 records the source IDs used in every proposal.</p>
+              </section>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <div class="mobile-fallback">
+        <div class="mobile-card">
+          <div class="brand-logo">E8</div>
+          <h1>Continue editing in Google Docs</h1>
+          <p>Google Docs add-ons are available on desktop. On mobile, collaborators can edit the report normally and use the portal for whole-section AI drafting.</p>
+          <button class="button primary full" type="button" data-view-shortcut="portal">Open portal report workspace</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="portalScreen" aria-label="Portal report workspace mockup">
+      <div class="portal-shell">
+        <header class="portal-nav">
+          <div class="portal-brand"><span class="e8-mark">E8</span> E8 Portal</div>
+          <div class="portal-links"><span>Home</span><span class="active">Pipeline</span><span>Calendar</span><span>Recordings</span><span>Committees</span><span>Manage</span></div>
+          <div class="avatar">JS</div>
+        </header>
+
+        <div class="portal-main">
+          <div class="portal-heading">
+            <div><h1>Beyond Silicon · Diligence Report</h1><p>The Google Doc is the live report. Use the portal to coordinate sections, sources, and AI drafting.</p></div>
+            <button class="button primary" type="button" data-view-shortcut="docs">Open live Google Doc ↗</button>
+          </div>
+
+          <div class="portal-grid">
+            <aside class="card section-list" aria-label="Report sections">
+              <button class="section-row" type="button"><span class="status-dot done"></span><span>Executive Summary</span><span class="owner-initials">AC</span></button>
+              <button class="section-row active" type="button"><span class="status-dot progress"></span><span>Product</span><span class="owner-initials">JS</span></button>
+              <button class="section-row" type="button"><span class="status-dot done"></span><span>Commercialization</span><span class="owner-initials">KG</span></button>
+              <button class="section-row" type="button"><span class="status-dot"></span><span>Team</span><span class="owner-initials">—</span></button>
+              <button class="section-row" type="button"><span class="status-dot"></span><span>Finances &amp; Funding</span><span class="owner-initials">SW</span></button>
+              <button class="section-row" type="button"><span class="status-dot"></span><span>Environmental Impact</span><span class="owner-initials">—</span></button>
+              <button class="section-row" type="button"><span class="status-dot"></span><span>Sources</span><span class="owner-initials">—</span></button>
+            </aside>
+
+            <section class="card portal-content">
+              <div class="portal-content-header">
+                <div><strong>Product</strong><span>Owner: Jordan Schwartz · Updated in Google Docs 18 minutes ago</span></div>
+                <button class="button" type="button">AI action history</button>
+              </div>
+
+              <div class="live-doc-banner">
+                <div><strong>This section lives in the Google Doc</strong><span>Portal generation writes directly to the Product named range. Manual edits stay in Docs.</span></div>
+                <button class="button" type="button" data-view-shortcut="docs">View section in Docs ↗</button>
+              </div>
+
+              <div class="portal-form">
+                <h3>Draft or redraft this section</h3>
+                <div class="portal-form-row"><label for="portalModel">Model</label><select class="compact-select" id="portalModel"><option>GPT-5.5</option><option>Compare models…</option></select></div>
+                <div class="portal-form-row"><label for="portalDifferentiation">Differentiation</label><div class="portal-slider-wrap"><input id="portalDifferentiation" type="range" min="0" max="10" value="8"><span class="rating-value">8</span></div></div>
+                <div class="portal-form-row"><label for="portalReadiness">Readiness</label><div class="portal-slider-wrap"><input id="portalReadiness" type="range" min="0" max="10" value="5"><span class="rating-value">5</span></div></div>
+                <div class="portal-form-row"><label for="portalRisk">Technical risk</label><div class="portal-slider-wrap"><input id="portalRisk" type="range" min="0" max="10" value="7"><span class="rating-value">7</span></div></div>
+                <div class="portal-actions"><span>3 new sources will be considered. Existing content will be previewed before replacement.</span><button class="button primary" type="button" id="portalDraftButton">Generate section preview</button></div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="notesScreen" aria-label="Behavior overview">
+      <div class="notes-screen">
+        <h1>How the experience fits together</h1>
+        <p>The report has one home. The portal supplies data and coordination; Google Docs supplies the authoring surface.</p>
+        <div class="flow-grid">
+          <article class="flow-card"><div class="flow-number">1</div><h2>Provision once</h2><p>E8 creates the report template at the beginning of diligence and binds every section to a named range.</p></article>
+          <article class="flow-card"><div class="flow-number">2</div><h2>Draft from either surface</h2><p>Ratings and prompts remain in E8. Whole-section generation can start in the portal or the Docs sidebar.</p></article>
+          <article class="flow-card"><div class="flow-number">3</div><h2>Edit natively</h2><p>Collaborators use normal Google Docs formatting, comments, suggestions, and version history.</p></article>
+          <article class="flow-card"><div class="flow-number">4</div><h2>Improve a selection</h2><p>The add-on reads the active selection and asks E8 for a context-aware replacement. Nothing changes before approval.</p></article>
+          <article class="flow-card"><div class="flow-number">5</div><h2>Bring in new evidence</h2><p>E8 tracks new database facts, documents, and transcripts, then proposes a focused update with source IDs.</p></article>
+          <article class="flow-card"><div class="flow-number">6</div><h2>Protect collaborators</h2><p>Revision and content checks prevent stale AI proposals from overwriting edits made while the AI was working.</p></article>
+        </div>
+        <div class="principles">
+          <h2>Design principles</h2>
+          <ul>
+            <li>Google Docs is canonical; the portal does not maintain a competing editable copy.</li>
+            <li>AI proposes before it writes.</li>
+            <li>Fixed template headings eliminate generated-heading translation problems.</li>
+            <li>Source freshness is explicit and user-controlled.</li>
+            <li>People without the add-on can still collaborate and use portal whole-section drafting.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"><span>✓</span><span id="toastMessage">Change applied to the Product section.</span></div>
+
+<script>
+  const originalParagraph = 'The company adds a solution-processed perovskite layer to conventional silicon cells. Management expects the architecture to increase panel efficiency from roughly 22% to more than 28%, creating a differentiated premium product for domestic module manufacturers.';
+  const revisedParagraph = 'Beyond Silicon adds a solution-processed perovskite layer to conventional silicon cells, targeting an efficiency increase from roughly 22% to more than 28%. For U.S. module manufacturers, that gain could support a differentiated premium product without requiring an entirely new production platform.';
+
+  const screens = {
+    docs: document.getElementById('docsScreen'),
+    portal: document.getElementById('portalScreen'),
+    notes: document.getElementById('notesScreen')
+  };
+
+  const selectableParagraph = document.getElementById('selectableParagraph');
+  const selectionState = document.getElementById('selectionState');
+  const emptySelection = document.getElementById('emptySelection');
+  const selectionPreview = document.getElementById('selectionPreview');
+  const proposalCard = document.getElementById('proposalCard');
+  const editActionRow = document.getElementById('editActionRow');
+  const previewButton = document.getElementById('previewButton');
+  const toast = document.getElementById('toast');
+  const toastMessage = document.getElementById('toastMessage');
+  let toastTimer;
+
+  function setView(view) {
+    Object.entries(screens).forEach(([key, screen]) => screen.classList.toggle('active', key === view));
+    document.querySelectorAll('.view-button').forEach(button => {
+      const active = button.dataset.view === view;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-current', active ? 'page' : 'false');
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function showToast(message) {
+    toastMessage.textContent = message;
+    toast.classList.add('show');
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => toast.classList.remove('show'), 2600);
+  }
+
+  function setSelection(selected) {
+    selectableParagraph.classList.toggle('selected', selected);
+    selectionState.hidden = !selected;
+    emptySelection.hidden = selected;
+    previewButton.disabled = !selected;
+    if (selected) {
+      selectionPreview.textContent = selectableParagraph.textContent;
+    } else {
+      proposalCard.hidden = true;
+      editActionRow.hidden = false;
+    }
+  }
+
+  function setActionPanel(panelName) {
+    document.querySelectorAll('.action-tab').forEach(tab => {
+      const active = tab.dataset.panel === panelName;
+      tab.classList.toggle('active', active);
+      tab.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    document.querySelectorAll('.addon-body .panel').forEach(panel => panel.classList.remove('active'));
+    document.getElementById(panelName + 'Panel').classList.add('active');
+  }
+
+  function pendingButton(button, label) {
+    const previous = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner"></span>' + label;
+    return () => {
+      button.disabled = false;
+      button.innerHTML = previous;
+    };
+  }
+
+  document.querySelectorAll('.view-button').forEach(button => button.addEventListener('click', () => setView(button.dataset.view)));
+  document.querySelectorAll('[data-view-shortcut]').forEach(button => button.addEventListener('click', () => setView(button.dataset.viewShortcut)));
+
+  selectableParagraph.addEventListener('click', () => {
+    setSelection(true);
+    setActionPanel('edit');
+  });
+  selectableParagraph.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      setSelection(true);
+      setActionPanel('edit');
+    }
+  });
+
+  document.getElementById('clearSelectionButton').addEventListener('click', () => setSelection(false));
+
+  document.querySelectorAll('.action-tab').forEach(tab => tab.addEventListener('click', () => setActionPanel(tab.dataset.panel)));
+
+  previewButton.addEventListener('click', () => {
+    const restore = pendingButton(previewButton, 'Generating proposal…');
+    window.setTimeout(() => {
+      restore();
+      document.getElementById('beforeText').textContent = selectableParagraph.textContent;
+      proposalCard.hidden = false;
+      editActionRow.hidden = true;
+      proposalCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 800);
+  });
+
+  document.getElementById('discardButton').addEventListener('click', () => {
+    proposalCard.hidden = true;
+    editActionRow.hidden = false;
+    showToast('Proposal discarded. The document was not changed.');
+  });
+
+  document.getElementById('applyButton').addEventListener('click', event => {
+    const restore = pendingButton(event.currentTarget, 'Applying…');
+    window.setTimeout(() => {
+      restore();
+      selectableParagraph.textContent = revisedParagraph;
+      proposalCard.hidden = true;
+      editActionRow.hidden = false;
+      setSelection(false);
+      showToast('Change applied to the Product section.');
+    }, 650);
+  });
+
+  document.getElementById('reviewSourcesButton').addEventListener('click', () => {
+    document.querySelectorAll('.addon-body .panel').forEach(panel => panel.classList.remove('active'));
+    document.getElementById('sourcesPanel').classList.add('active');
+    document.querySelectorAll('.action-tab').forEach(tab => {
+      tab.classList.remove('active');
+      tab.setAttribute('aria-selected', 'false');
+    });
+  });
+
+  document.getElementById('cancelSourcesButton').addEventListener('click', () => setActionPanel('edit'));
+
+  document.getElementById('sourceUpdateButton').addEventListener('click', event => {
+    const button = event.currentTarget;
+    const restore = pendingButton(button, 'Reviewing evidence…');
+    window.setTimeout(() => {
+      restore();
+      setActionPanel('edit');
+      setSelection(true);
+      document.getElementById('guidanceInput').value = 'Update this paragraph only where the newly selected evidence materially changes the analysis.';
+      document.getElementById('sourceAlert').hidden = true;
+      showToast('New evidence loaded. Preview a focused update when ready.');
+    }, 900);
+  });
+
+  document.querySelectorAll('input[type="range"]').forEach(input => {
+    input.addEventListener('input', () => {
+      const value = input.parentElement.querySelector('.rating-value') || input.nextElementSibling;
+      if (value) value.textContent = input.value;
+    });
+  });
+
+  document.getElementById('draftButton').addEventListener('click', event => {
+    const restore = pendingButton(event.currentTarget, 'Generating preview…');
+    window.setTimeout(() => {
+      restore();
+      setActionPanel('edit');
+      setSelection(true);
+      document.getElementById('guidanceInput').value = 'Review the proposed whole-section draft before replacing the Product named range.';
+      showToast('Section preview generated. Existing document content is unchanged.');
+    }, 950);
+  });
+
+  document.getElementById('compareButton').addEventListener('click', event => {
+    const restore = pendingButton(event.currentTarget, 'Loading models…');
+    window.setTimeout(() => {
+      restore();
+      showToast('Three model drafts are ready for comparison.');
+    }, 850);
+  });
+
+  document.getElementById('portalDraftButton').addEventListener('click', event => {
+    const restore = pendingButton(event.currentTarget, 'Generating preview…');
+    window.setTimeout(() => {
+      restore();
+      showToast('Section preview generated. Open the Google Doc to review it.');
+    }, 950);
+  });
+
+  setSelection(true);
+</script>
+</body>
+</html>
