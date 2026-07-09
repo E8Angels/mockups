@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-07T04:21:16+00:00",
+  "generated": "2026-07-09T22:54:41+00:00",
   "plans": [
     {
       "slug": "Live-Chat-Codex",
@@ -182,6 +182,25 @@
       "has_plan": true,
       "has_changelog": true,
       "mockups": []
+    },
+    {
+      "slug": "google-docs-diligence-reports",
+      "title": "Google Docs-Native Diligence Reports",
+      "status": "draft",
+      "owner": "jordan",
+      "created": "2026-07-09",
+      "last_updated": "2026-07-09",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-07-09T15:54:31-07:00",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": [
+        {
+          "name": "mockup",
+          "path": "google-docs-diligence-reports/mockup.html",
+          "is_home": true
+        }
+      ]
     },
     {
       "slug": "meeting-live-chat",
