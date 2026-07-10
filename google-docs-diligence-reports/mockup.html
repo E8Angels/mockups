@@ -514,10 +514,9 @@
   .docs-toolbar button:hover, .docs-toolbar select:hover { background: rgba(60, 64, 67, .08); }
 
   .docs-workspace {
-    --assistant-width: 420px;
     min-height: 0;
     display: grid;
-    grid-template-columns: minmax(620px, 1fr) var(--assistant-width);
+    grid-template-columns: minmax(620px, 1fr) 300px;
     border-top: 1px solid #e1e5ea;
   }
 
@@ -565,37 +564,12 @@
 
   .assistant-sidebar {
     position: relative;
-    min-width: 0;
+    width: 300px;
     overflow: auto;
     border-left: 1px solid #d7dde6;
     background: white;
     box-shadow: -3px 0 10px rgba(15, 23, 42, .03);
   }
-
-  .sidebar-resize-handle {
-    position: absolute;
-    z-index: 5;
-    top: 0;
-    bottom: 0;
-    left: -5px;
-    width: 10px;
-    cursor: col-resize;
-  }
-
-  .sidebar-resize-handle::after {
-    position: absolute;
-    top: 50%;
-    left: 4px;
-    width: 2px;
-    height: 44px;
-    border-radius: 999px;
-    background: #cbd5e1;
-    content: "";
-    transform: translateY(-50%);
-  }
-
-  .sidebar-resize-handle:hover::after, body.resizing-sidebar .sidebar-resize-handle::after { background: #2563eb; }
-  body.resizing-sidebar { cursor: col-resize; user-select: none; }
 
   .assistant-header { padding: 10px 12px; border-bottom: 1px solid var(--line); }
 
@@ -617,32 +591,7 @@
   }
 
   .launch-label { margin-top: 4px; color: #64748b; font-size: 8.5px; text-align: right; }
-  .resize-hint { margin-top: 7px; color: #94a3b8; font-size: 8px; }
-
   .assistant-body { padding: 8px 12px 14px; }
-
-  .workspace-switch {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3px;
-    padding: 3px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #f1f5f9;
-  }
-
-  .workspace-switch-button {
-    min-height: 28px;
-    padding: 0 8px;
-    border: 0;
-    border-radius: 5px;
-    color: #64748b;
-    background: transparent;
-    font-size: 9.5px;
-    font-weight: 760;
-  }
-
-  .workspace-switch-button.active { color: #1d4ed8; background: white; box-shadow: 0 1px 2px rgba(15, 23, 42, .09); }
 
   .mode-tabs {
     margin-top: 8px;
@@ -853,7 +802,7 @@
   .chat-message strong { display: block; margin-bottom: 3px; font-size: 8.5px; }
   .citation-line { margin-top: 7px; display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #64748b; font-size: 8px; }
 
-  .materials-workspace { margin-top: 8px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: white; }
+  .materials-workspace { overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: white; }
   .materials-workspace details + details { border-top: 1px solid var(--line); }
   .materials-workspace summary { padding: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #334155; background: #f8fafc; cursor: pointer; font-size: 10px; font-weight: 760; list-style: none; }
   .materials-workspace summary::-webkit-details-marker { display: none; }
@@ -866,6 +815,30 @@
   .material-item strong, .material-item span { display: block; }
   .material-item span { margin-top: 2px; color: #64748b; font-size: 8.5px; }
   .materials-footer { padding: 8px; display: flex; justify-content: flex-end; border-top: 1px solid var(--line); }
+
+  .external-evidence-card { margin-top: 10px; padding: 9px; border: 1px solid #bfdbfe; border-radius: 8px; color: #334155; background: #eff6ff; font-size: 9px; line-height: 1.45; }
+  .external-evidence-card strong, .external-evidence-card span { display: block; }
+  .external-evidence-card span { margin: 3px 0 8px; color: #64748b; }
+  .external-evidence-card .small-button { width: 100%; color: #1d4ed8; border-color: #93c5fd; }
+
+  .evidence-screen { min-height: calc(100vh - 48px); padding: 22px; background: #f8fafc; }
+  .evidence-shell { width: min(1180px, 100%); margin: 0 auto; }
+  .evidence-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 16px; }
+  .evidence-header h1 { margin: 2px 0 4px; font-size: 22px; }
+  .evidence-header p { margin: 0; color: #64748b; font-size: 11px; }
+  .evidence-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 14px; align-items: start; }
+  .evidence-column { display: grid; gap: 12px; }
+  .evidence-card { padding: 15px; border: 1px solid var(--line); border-radius: 10px; background: white; box-shadow: 0 5px 18px rgba(15, 23, 42, .04); }
+  .evidence-card h2 { margin: 0 0 10px; font-size: 14px; }
+  .evidence-card p { color: #475569; font-size: 10px; line-height: 1.5; }
+  .evidence-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+  .evidence-metric { padding: 9px; border-radius: 7px; background: #f1f5f9; color: #64748b; font-size: 9px; }
+  .evidence-metric strong { display: block; color: #0f172a; font-size: 16px; }
+  .evidence-excerpt { padding: 10px 0; border-top: 1px solid #edf2f7; }
+  .evidence-excerpt strong, .evidence-excerpt span { display: block; }
+  .evidence-excerpt span { margin-top: 2px; color: #64748b; font-size: 9px; }
+  .ledger-row { padding: 9px 0; display: grid; grid-template-columns: 82px 1fr; gap: 8px; border-top: 1px solid #edf2f7; font-size: 9.5px; }
+  @media (max-width: 900px) { .evidence-grid { grid-template-columns: 1fr; } .evidence-metrics { grid-template-columns: repeat(2, 1fr); } }
 
   .dialog-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 20px; background: rgba(15, 23, 42, .42); }
   .dialog-backdrop[hidden] { display: none; }
@@ -935,6 +908,7 @@
       <button class="scenario-button active" type="button" data-scenario="first">First editor · Product</button>
       <button class="scenario-button" type="button" data-scenario="later">Later editor · Team</button>
       <button class="scenario-button" type="button" data-scenario="docs">Google Docs + sidebar</button>
+      <button class="scenario-button" type="button" data-scenario="evidence">Evidence &amp; materials</button>
     </nav>
   </header>
 
@@ -1068,21 +1042,14 @@
           </div>
 
           <aside class="assistant-sidebar" aria-label="E8 diligence report tools">
-            <div class="sidebar-resize-handle" id="sidebarResizeHandle" role="separator" aria-orientation="vertical" aria-label="Resize diligence panel" title="Drag to resize the diligence panel"></div>
             <div class="assistant-header">
               <div class="assistant-context">
                 <div><strong>Beyond Silicon</strong><span>2026 application · Diligence</span></div>
                 <div><select class="section-select" id="activeSectionSelect" aria-label="Active report section"><option>Executive Summary</option><option selected>Product</option><option>Commercialization</option><option>Team</option><option>Finances &amp; Funding</option><option>Environmental Impact</option></select><div class="launch-label" id="launchLabel">Opened from Product in portal</div></div>
               </div>
-              <div class="resize-hint">Drag the panel edge to widen it for source review.</div>
             </div>
 
             <div class="assistant-body">
-              <div class="workspace-switch" role="tablist" aria-label="Diligence panel view">
-                <button class="workspace-switch-button active" type="button" role="tab" aria-selected="true" data-workspace="ai">AI tools</button>
-                <button class="workspace-switch-button" type="button" role="tab" aria-selected="false" data-workspace="materials">Diligence materials</button>
-              </div>
-
               <div id="aiWorkspace">
                 <div class="mode-tabs" role="tablist" aria-label="AI modes">
                   <button class="mode-tab active" type="button" role="tab" aria-selected="true" data-mode="draft">Draft Section</button>
@@ -1106,15 +1073,7 @@
                   <div class="action-row"><button class="small-button primary" type="button" id="generateDraftButton">Generate draft</button></div>
                   <div class="draft-write-note">Writes directly to the section · Undo in Google Docs</div>
                   <div class="run-summary" id="directWriteSummary" hidden><strong id="directWriteTitle">Product added to the document</strong><span id="directWriteDetails">4 Findings incorporated · 3 supporting sources · No Findings omitted</span></div>
-                  <details class="coverage-details" id="coverageDetails" hidden>
-                    <summary>View Findings coverage</summary>
-                    <div class="coverage-meta" id="coverageMeta">4 Findings accounted for · 3 supporting sources · 1 held for Commercialization</div>
-                    <div class="coverage-row"><span class="coverage-status included" id="coverageStatusOne">Included</span><div><strong>Drop-in manufacturing compatibility</strong><span>Product differentiation</span></div></div>
-                    <div class="coverage-row"><span class="coverage-status included" id="coverageStatusTwo">Included</span><div><strong>Full-size-cell validation remains incomplete</strong><span>Technical readiness</span></div></div>
-                    <div class="coverage-row"><span class="coverage-status included" id="coverageStatusThree">Included</span><div><strong>Patent position versus tandem alternatives</strong><span>Competitive positioning</span></div></div>
-                    <div class="coverage-row"><span class="coverage-status held" id="coverageStatusFour">Held</span><div><strong>Customer pilot timing</strong><span>Held for Commercialization rather than silently dropped</span></div></div>
-                    <div class="coverage-footer">The agent records every Finding disposition. Ask it to include a held Finding if it belongs in this section.</div>
-                  </details>
+                  <button class="small-button" type="button" id="coverageDetails" hidden>Open Findings coverage ↗</button>
                 </section>
 
                 <section class="mode-panel" id="selectionPanel">
@@ -1135,22 +1094,27 @@
                 </section>
               </div>
 
-              <section id="materialsWorkspace" hidden>
-                <div class="materials-workspace">
-                  <details open><summary>Findings</summary><div class="materials-list"><button class="material-item" type="button"><strong>Validate full-size cell efficiency</strong><span>Product Finding</span></button><button class="material-item" type="button"><strong>Confirm manufacturing integration requirements</strong><span>Product Finding</span></button><button class="material-item" type="button"><strong>Review durability, yield, and customer pilots</strong><span>Product Finding</span></button><button class="material-item" type="button"><strong>Compare the patent position</strong><span>Product Finding</span></button></div></details>
-                  <details><summary>Reference Information</summary><div class="materials-list"><button class="material-item" type="button"><strong>Diligence process and contacts</strong><span>Portal reference</span></button><button class="material-item" type="button"><strong>Deal terms and investment offer</strong><span>Portal reference</span></button></div></details>
-                  <details><summary>Supporting Documents</summary><div class="materials-list"><button class="material-item" type="button"><strong>Tandem Cell Validation Memo</strong><span>Technical report · Jul 3</span></button><button class="material-item" type="button"><strong>Manufacturing Integration Review</strong><span>Presentation · Jun 24</span></button><button class="material-item" type="button"><strong>Patent Landscape Summary</strong><span>Reference · Jun 20</span></button></div></details>
-                  <details><summary>Transcripts &amp; Recordings</summary><div class="materials-list"><button class="material-item" type="button"><strong>Interview with Gary Peterson</strong><span>Transcript · Jul 7</span></button><button class="material-item" type="button"><strong>Customer reference call</strong><span>Transcript · Jun 28</span></button></div></details>
-                  <details><summary>Team Meeting Minutes</summary><div class="materials-list"><button class="material-item" type="button"><strong>July 6 team meeting</strong><span>Decisions and follow-ups</span></button><button class="material-item" type="button"><strong>June 22 team meeting</strong><span>Research assignments</span></button></div></details>
-                  <div class="materials-footer"><button class="small-button open-portal-link" type="button">Open diligence in portal</button></div>
-                </div>
-              </section>
+              <section class="external-evidence-card"><strong>Sources</strong><span>60 ready · 0 processing · Evidence and Findings coverage open in a full-width E8 view.</span><button class="small-button" type="button" id="openEvidenceButton">Open evidence &amp; materials ↗</button></section>
             </div>
           </aside>
         </div>
       </div>
 
       <div class="mobile-docs-fallback"><article class="mobile-card"><h1>Edit the report in Google Docs</h1><p>The E8 Google Docs sidebar is available on desktop. On mobile, collaborators can edit the shared document normally and continue using the existing portal for Findings and diligence materials.</p><button class="primary-button" type="button" id="returnPortalButton">Return to diligence</button></article></div>
+    </section>
+
+    <section class="view evidence-screen" id="evidenceView" aria-label="E8 diligence evidence and materials">
+      <div class="evidence-shell">
+        <header class="evidence-header"><div><span class="eyebrow">Diligence evidence</span><h1>Beyond Silicon · Product</h1><p>Run gdrun_product_07 · 60 sources indexed · opened from the Google Docs sidebar</p></div><div class="action-row"><button class="small-button" type="button" id="returnDocsButton">Return to Google Docs</button><button class="small-button primary open-portal-link" type="button">Open diligence in portal</button></div></header>
+        <div class="evidence-metrics"><div class="evidence-metric"><strong>60</strong>Ready sources</div><div class="evidence-metric"><strong>9</strong>Retrieved excerpts</div><div class="evidence-metric"><strong>6</strong>Cited sources</div><div class="evidence-metric"><strong>4/4</strong>Findings accounted for</div></div>
+        <div class="evidence-grid">
+          <div class="evidence-column">
+            <article class="evidence-card"><h2>Evidence dossier</h2><p>Required dimensions: differentiation, technical readiness, competitive position, and manufacturing integration. Conflicting or unsupported claims remain visible and cannot be written silently.</p><div class="evidence-excerpt"><strong>Tandem Cell Validation Memo · page 8</strong><span>Full-size cell testing supports the efficiency target while durability validation remains in progress.</span></div><div class="evidence-excerpt"><strong>Interview with Gary Peterson · 00:14:22</strong><span>The existing coating sequence can accept the tandem layer without replacing the full production line.</span></div><div class="evidence-excerpt"><strong>Patent Landscape Summary · page 4</strong><span>The pending claims focus on interface materials and process integration, with adjacent tandem architectures creating overlap risk.</span></div></article>
+            <article class="evidence-card"><h2>Findings ledger</h2><div class="ledger-row"><span class="coverage-status included">Included</span><span>Drop-in manufacturing compatibility → Product differentiation</span></div><div class="ledger-row"><span class="coverage-status included">Included</span><span>Full-size-cell validation remains incomplete → Technical readiness</span></div><div class="ledger-row"><span class="coverage-status combined">Combined</span><span>Patent position versus tandem alternatives → Competitive positioning</span></div><div class="ledger-row"><span class="coverage-status held">Held</span><span>Customer pilot timing → held for Commercialization with reason recorded</span></div></article>
+          </div>
+          <aside class="evidence-column"><article class="evidence-card"><h2>Diligence materials</h2><div class="materials-workspace"><details open><summary>Findings</summary><div class="materials-list"><button class="material-item" type="button"><strong>Validate full-size cell efficiency</strong><span>Product Finding</span></button><button class="material-item" type="button"><strong>Confirm manufacturing integration requirements</strong><span>Product Finding</span></button></div></details><details><summary>Reference Information</summary><div class="materials-list"><button class="material-item" type="button"><strong>Diligence process and contacts</strong><span>Portal reference</span></button></div></details><details><summary>Supporting Documents</summary><div class="materials-list"><button class="material-item" type="button"><strong>Tandem Cell Validation Memo</strong><span>Technical report · Jul 3</span></button><button class="material-item" type="button"><strong>Patent Landscape Summary</strong><span>Reference · Jun 20</span></button></div></details><details><summary>Transcripts &amp; Recordings</summary><div class="materials-list"><button class="material-item" type="button"><strong>Interview with Gary Peterson</strong><span>Transcript · Jul 7</span></button></div></details><details><summary>Team Meeting Minutes</summary><div class="materials-list"><button class="material-item" type="button"><strong>July 6 team meeting</strong><span>Decisions and follow-ups</span></button></div></details></div></article><article class="evidence-card"><h2>Authoring history</h2><p><strong>Draft Product</strong><br>Applied · 9 evidence excerpts · revision rev-42 → rev-43</p><p><strong>Ask the AI</strong><br>Answer only · 3 citations · no document write</p></article></aside>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -1169,7 +1133,7 @@
 
   const portalView = document.getElementById('portalView');
   const docsView = document.getElementById('docsView');
-  const docsWorkspace = document.querySelector('.docs-workspace');
+  const evidenceView = document.getElementById('evidenceView');
   const activeSectionSelect = document.getElementById('activeSectionSelect');
   const toast = document.getElementById('toast');
   const dialogBackdrop = document.getElementById('dialogBackdrop');
@@ -1207,11 +1171,11 @@
   }
 
   function setView(viewName) {
-    const docsActive = viewName === 'docs';
-    portalView.classList.toggle('active', !docsActive);
-    docsView.classList.toggle('active', docsActive);
+    portalView.classList.toggle('active', viewName === 'portal');
+    docsView.classList.toggle('active', viewName === 'docs');
+    evidenceView.classList.toggle('active', viewName === 'evidence');
     document.querySelectorAll('.scenario-button').forEach(button => {
-      const active = button.dataset.scenario === (docsActive ? 'docs' : scenario);
+      const active = button.dataset.scenario === (viewName === 'portal' ? scenario : viewName);
       button.classList.toggle('active', active);
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1294,7 +1258,6 @@
     document.getElementById('coverageDetails').open = false;
     document.getElementById('selectionProposal').hidden = true;
     clearSelection();
-    setWorkspace('ai');
     setMode('draft');
     const target = document.querySelector(`[data-paper-section="${section}"]`);
     if (target) document.querySelector('.document-stage').scrollTo({ top: Math.max(0, target.offsetTop - 80), behavior: 'smooth' });
@@ -1323,16 +1286,6 @@
     });
     document.querySelectorAll('.mode-panel').forEach(panel => panel.classList.remove('active'));
     document.getElementById(`${mode}Panel`).classList.add('active');
-  }
-
-  function setWorkspace(workspace) {
-    document.querySelectorAll('.workspace-switch-button').forEach(button => {
-      const active = button.dataset.workspace === workspace;
-      button.classList.toggle('active', active);
-      button.setAttribute('aria-selected', active ? 'true' : 'false');
-    });
-    document.getElementById('aiWorkspace').hidden = workspace !== 'ai';
-    document.getElementById('materialsWorkspace').hidden = workspace !== 'materials';
   }
 
   function clearSelection() {
@@ -1364,6 +1317,8 @@
     if (button.dataset.scenario === 'docs') {
       setView('docs');
       updateDocsContext(portalSection, 'portal');
+    } else if (button.dataset.scenario === 'evidence') {
+      setView('evidence');
     } else {
       updatePortalScenario(button.dataset.scenario);
     }
@@ -1388,26 +1343,11 @@
 
   document.querySelectorAll('.mode-tab').forEach(button => button.addEventListener('click', () => setMode(button.dataset.mode)));
 
-  document.querySelectorAll('.workspace-switch-button').forEach(button => button.addEventListener('click', () => setWorkspace(button.dataset.workspace)));
   document.querySelectorAll('.open-portal-link').forEach(button => button.addEventListener('click', () => showToast(`Opening the ${activeSection} diligence workspace in the portal.`)));
   document.querySelectorAll('.material-item').forEach(button => button.addEventListener('click', () => showToast(`Opening ${button.querySelector('strong').textContent}.`)));
 
-  document.getElementById('sidebarResizeHandle').addEventListener('pointerdown', event => {
-    event.preventDefault();
-    document.body.classList.add('resizing-sidebar');
-    const resize = moveEvent => {
-      const width = Math.max(360, Math.min(560, window.innerWidth - moveEvent.clientX));
-      docsWorkspace.style.setProperty('--assistant-width', `${width}px`);
-    };
-    const stop = () => {
-      document.body.classList.remove('resizing-sidebar');
-      window.removeEventListener('pointermove', resize);
-      window.removeEventListener('pointerup', stop);
-      showToast('Panel width updated for this session.');
-    };
-    window.addEventListener('pointermove', resize);
-    window.addEventListener('pointerup', stop);
-  });
+  document.getElementById('openEvidenceButton').addEventListener('click', () => setView('evidence'));
+  document.getElementById('returnDocsButton').addEventListener('click', () => setView('docs'));
 
   activeSectionSelect.addEventListener('change', () => updateDocsContext(activeSectionSelect.value, 'manual'));
 
@@ -1475,7 +1415,6 @@
       document.getElementById('directWriteDetails').textContent = treatment === 'Preserve all substantive points'
         ? '4 Findings accounted for · 3 supporting sources · 1 held for Commercialization'
         : '3 Findings incorporated · 1 combined as duplicative · 1 held for Commercialization · 3 supporting sources';
-      updateCoverageLedger(treatment);
       document.getElementById('directWriteSummary').hidden = false;
       document.getElementById('coverageDetails').hidden = false;
       showToast(`${activeSection} was written directly to the document. Use Undo to revert.`);
@@ -1499,11 +1438,12 @@
   });
 
   document.getElementById('useAnswerButton').addEventListener('click', () => {
-    setWorkspace('ai');
     setMode('selection');
     document.getElementById('selectionGuidance').value = 'Insert the cited efficiency evidence while clearly separating validated results from management targets.';
     showToast('Select text to replace, or place the cursor where this evidence should be inserted.');
   });
+
+  document.getElementById('coverageDetails').addEventListener('click', () => setView('evidence'));
 
   document.getElementById('dialogCancel').addEventListener('click', closeDialog);
   dialogConfirm.addEventListener('click', () => { const action = dialogAction; closeDialog(); if (action) action(); });

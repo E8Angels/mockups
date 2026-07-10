@@ -4,3 +4,4 @@
 - 2026-07-09 — Jordan Schwartz — Added first-use report creation, section-specific portal launch, owner and cursor safeguards, Ask the AI, evidence links, and structured template-slot guidance.
 - 2026-07-09 — Jordan Schwartz — Rebuilt the mockup around the existing diligence workspace, clarified first- and later-editor behavior, and moved drafting, materials, and Ask the AI into the Google Docs sidebar.
 - 2026-07-09 — Jordan Schwartz — Added direct first and replacement section writes, a resizable authoring panel, flexible tool orchestration, concrete evidence-dossier planning, and an interactive Findings coverage ledger.
+- 2026-07-09 — Jordan Schwartz — Accepted the native fixed 300-pixel sidebar and moved evidence, Findings coverage, audit history, and diligence materials into a separate authenticated E8 view.

@@ -17,11 +17,11 @@ Change only report authoring:
 - Replace the TipTap report editor in each section's existing **Report** subtab with an **Edit [Section] in Google Docs** entry point.
 - Create one shared report document on the first use of any section-level entry point.
 - Open that same document at the requested section for every later editor.
-- Put whole-section drafting, flexible AI editing, Ask the AI, ratings, and diligence-material access in an E8 panel inside Google Docs.
+- Put whole-section drafting, flexible AI editing, Ask the AI, and ratings in the fixed E8 Google Docs sidebar. Open evidence, Findings coverage, and diligence materials in a separate authenticated E8 view.
 
 Build this as a complete parallel beta. The legacy TipTap authoring path, its prompts, and its generated-report workflow remain operational and unchanged while selected diligence teams use the new experience. Each diligence has exactly one active report-authoring mode; the two systems never write to the same report.
 
-The beta uses a resizable right-side authoring surface as a hard interaction requirement. A fixed-width 300-pixel sidebar is not an equivalent fallback: source inspection, coverage review, and citation work need more room than the native sidebar provides.
+The beta uses the native fixed-width 300-pixel Google Docs Editor add-on sidebar. Source inspection, Findings coverage, citations, audit history, and the diligence-materials accordion open in a separate full-width authenticated E8 view because Google Workspace does not provide a supported docked, drag-resizable add-on surface.
 
 Google Docs becomes the report source of truth from the first report-writing action onward. The portal remains the diligence research and coordination workspace.
 
@@ -35,7 +35,7 @@ The design is grounded in the current diligence implementation and live workspac
 - `SectionReportPane.jsx` currently contains Draft with AI, ratings, TipTap editing, AI Edit Assistance, version history, and a hidden provider-comparison control.
 - The header's existing **Report** button manages the final-report document.
 
-The proposal does not introduce a separate portal report page, section list, evidence page, or drafting form. The existing layout, density, and navigation remain the visual and interaction baseline.
+The proposal adds one focused evidence/materials view launched from the sidebar. It does not introduce a separate report editor, section list, or drafting form. The existing diligence layout, density, and navigation remain the visual and interaction baseline.
 
 The hidden model-comparison feature is explicitly out of scope for the beta. The beta uses one configured provider and model. Provider bakeoffs remain in the separate bakeoff feature and do not appear in this interface or request path.
 
@@ -89,12 +89,7 @@ The portal entry point looks and behaves the same for every user. Document creat
 
 The sidebar opens with the company and portal-launch section already resolved. The section selector is visible, but the launch section is authoritative until the user deliberately switches.
 
-The panel has one top-level switch:
-
-1. **AI tools** — Draft Section, Edit Selection, and Ask the AI.
-2. **Diligence materials** — the familiar portal accordion for Findings, Reference Information, Supporting Documents, Transcripts & Recordings, and Team Meeting Minutes.
-
-Within AI tools, the primary mode tabs are:
+The sidebar's primary mode tabs are:
 
 1. **Draft Section** — create or replace the whole active section directly in the document.
 2. **Edit Selection** — interpret an arbitrary instruction, use whatever read-only diligence tools are relevant, and propose a change to highlighted Google Docs text.
@@ -115,7 +110,7 @@ There is no separate **Revise Section** or **Improve Section** mode. Whole-secti
 - Shows Findings treatment as **Preserve all substantive points** or **Synthesize and prioritize**, with the former as the default.
 - After the write, shows a compact Findings coverage result only when something was combined, held out, contradicted, or left unverified.
 
-The coverage result is actionable but intentionally compact. It opens a ledger in the panel, not a draft preview. Each Finding is marked **Included**, **Combined**, **Held for verification**, or **Not used**, with a short reason and the section/source destination. The user can then ask the agent to include a held-out item or continue reading in the document. The generated prose remains in Google Docs, where it is easier to read, edit, and undo.
+The coverage result is actionable but intentionally compact. The sidebar shows a summary and opens the full ledger in the separate evidence/materials view, not a draft preview. Each Finding is marked **Included**, **Combined**, **Held for verification**, or **Not used**, with a short reason and the section/source destination. The user can then ask the agent to include a held-out item or continue reading in the document. The generated prose remains in Google Docs, where it is easier to read, edit, and undo.
 
 #### Edit Selection
 
@@ -131,9 +126,9 @@ The coverage result is actionable but intentionally compact. It opens a ledger i
 - Includes citations to portal data and documents.
 - **Use in report** transfers the answer into a reviewable Edit Selection proposal or asks where to insert it; it never rewrites a whole section silently from the Ask mode.
 
-### 5. Diligence materials inside the panel
+### 5. Separate evidence and diligence-materials view
 
-The **Diligence materials** view reuses the portal right rail's information architecture instead of presenting six equal buttons. It contains one accordion with:
+The fixed sidebar includes one **Open evidence & materials** action. It launches a separate authenticated E8 view for the active report, section, and authoring run. That view combines the evidence dossier, citations, Findings ledger, source-processing state, and authoring history with the portal right rail's familiar diligence-materials accordion:
 
 - Findings
 - Reference Information
@@ -141,15 +136,13 @@ The **Diligence materials** view reuses the portal right rail's information arch
 - Transcripts & Recordings
 - Team Meeting Minutes
 
-Each accordion panel supports search, source opening, and **Open in portal**. A single **Open diligence in portal** link sits at the bottom rather than competing with source categories.
+Each accordion panel supports search, source opening, and **Open in portal**. A single **Open diligence in portal** action is available in the view header. Google Drive assets still open through authenticated E8 proxy routes rather than raw Drive URLs.
 
 There is no ambient “updates since review” card.
 
-### 6. Panel width
+### 6. Sidebar width and platform constraint
 
-The beta uses a right-side panel with a drag handle that expands for source and coverage review and collapses to return document width. The prototype demonstrates widths from approximately 360 to 560 pixels and preserves the chosen width for the session.
-
-This is a platform constraint, not a CSS detail: native Google Editor add-on sidebars are fixed at 300 pixels. The implementation therefore needs a modeless HTML-service companion surface, or an equivalent docked Google Workspace surface that supports the same resize behavior, and must be validated in both Chrome and Safari before beta users are enabled. The interaction contract is **resizable panel**, even if the underlying Google surface is not technically a native sidebar.
+Native Google Editor add-on sidebars are fixed at 300 pixels. The accepted beta architecture uses that supported surface for compact authoring controls and does not simulate resizing. Evidence and materials move to the separate E8 view so source review has normal browser width. The fixed sidebar, external view launch, and return-to-document flow must be validated in both Chrome and Safari before beta users are enabled.
 
 ### 7. Section context and ownership
 
@@ -191,7 +184,7 @@ Add a bookmark at every major section for portal deep links.
 
 1. **Existing portal diligence UI** — unchanged research workspace, with a simplified Report subtab handoff.
 2. **E8 authoring service** — identity, authorization, flexible task planning, read-only tool orchestration, beta prompt versions, evidence assembly, validation, and audit.
-3. **Google Docs integration** — panel UI, cursor/selection reads, materials accordion, and revision-safe Docs operations.
+3. **Google Docs integration** — fixed sidebar UI, cursor/selection reads, external evidence/materials launch, and revision-safe Docs operations.
 4. **Google Drive/Docs APIs** — template copy, bookmarks, named ranges, structured writes, sharing, and revision control.
 
 ### One flexible authoring agent
@@ -232,7 +225,7 @@ The agent is not asked to “search everything” and hope that a few nearest-ne
 6. **Resolve gaps and conflicts.** Mark dimensions as supported, partially supported, conflicting, or missing. The agent may ask for another bounded retrieval pass, but it must expose the gap rather than manufacture a holistic conclusion.
 7. **Write and validate.** The writer receives the section specification, Findings coverage ledger, evidence dossier, ratings, and current report context. A validator checks that required dimensions and Findings dispositions are reflected and that material claims map to evidence.
 
-This is an ambitious system, and the beta should be explicit about its limits. AI may be able to assemble a useful go-to-market picture from many sources, but it cannot guarantee that the picture is complete or correct. The user sees the evidence and unresolved dimensions in the panel; the generated prose remains in Google Docs for normal human review and editing.
+This is an ambitious system, and the beta should be explicit about its limits. AI may be able to assemble a useful go-to-market picture from many sources, but it cannot guarantee that the picture is complete or correct. The user sees the evidence and unresolved dimensions in the separate E8 view; the generated prose remains in Google Docs for normal human review and editing.
 
 ### Findings coverage contract
 
@@ -267,7 +260,7 @@ The endpoint must be idempotent and concurrency-safe. A unique application-to-cu
 ### Proposed add-on API surface
 
 - `GET /diligence/api/docs-addon/context?document_id=...`
-- `GET /diligence/api/docs-addon/materials?document_id=...&section_token=...&type=...`
+- `GET /diligence/api/google-docs/evidence?document_id=...&section_token=...&run_id=...`
 - `POST /diligence/api/docs-addon/draft-section`
 - `POST /diligence/api/docs-addon/revise-selection`
 - `POST /diligence/api/docs-addon/ask`
@@ -361,7 +354,7 @@ During evaluation:
 - Findings tests for rough-draft prose, brain-dump notes, duplicate items, out-of-scope items, conflicts, and post-write coverage validation.
 - Add-on tests for empty section, populated section, direct section replacement, Undo recovery, no selection, partial paragraph, multi-paragraph selection, cross-section selection, read-only document, and expired E8 auth.
 - Browser smoke tests for the unchanged portal layout and section-level entry point.
-- Chrome and Safari tests for the add-on, inline materials browser, and first/later editor flows.
+- Chrome and Safari tests for the fixed add-on sidebar, separate evidence/materials view, and first/later editor flows.
 
 ## Decisions captured
 
@@ -376,9 +369,9 @@ During evaluation:
 - Give the beta independent versioned prompts.
 - Use one configured provider/model with no comparison UI.
 - Write initial and replacement whole-section drafts directly into Google Docs; preview only smaller selection and insertion edits.
-- Use a drag-resizable right-side authoring surface; a fixed 300-pixel native sidebar is not an acceptable beta experience.
+- Use the supported fixed 300-pixel native sidebar for compact authoring controls.
 - Use one flexible authoring agent that chooses read-only tools based on the user's request.
-- Show portal materials through the familiar accordion inside a separate Diligence materials view.
+- Open evidence, Findings coverage, audit history, source status, and the familiar diligence-materials accordion in a separate authenticated E8 view.
 - Track a Findings coverage contract so points cannot disappear silently.
 - Allow non-owner AI use after a warning.
 - Do not show an “updates since review” card.
@@ -389,5 +382,4 @@ During evaluation:
 - Which Reference Information items may be exposed inside the add-on versus linked back to the portal because of permissions or sensitivity?
 - Should applied proposals add a native Google Docs comment linking to the E8 audit record?
 - How long should E8 retain full before/after proposal text?
-- Which modeless Google surface provides the most reliable docked, resizable behavior across Chrome and Safari?
 - Should Findings treatment remember the user's last choice globally, per diligence, or per section?
