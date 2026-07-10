@@ -17,7 +17,11 @@ Change only report authoring:
 - Replace the TipTap report editor in each section's existing **Report** subtab with an **Edit [Section] in Google Docs** entry point.
 - Create one shared report document on the first use of any section-level entry point.
 - Open that same document at the requested section for every later editor.
-- Put whole-section drafting, selection-level editing, Ask the AI, model comparison, ratings, and source access in an E8 sidebar inside Google Docs.
+- Put whole-section drafting, flexible AI editing, Ask the AI, ratings, and diligence-material access in an E8 panel inside Google Docs.
+
+Build this as a complete parallel beta. The legacy TipTap authoring path, its prompts, and its generated-report workflow remain operational and unchanged while selected diligence teams use the new experience. Each diligence has exactly one active report-authoring mode; the two systems never write to the same report.
+
+The beta uses a resizable right-side authoring surface as a hard interaction requirement. A fixed-width 300-pixel sidebar is not an equivalent fallback: source inspection, coverage review, and citation work need more room than the native sidebar provides.
 
 Google Docs becomes the report source of truth from the first report-writing action onward. The portal remains the diligence research and coordination workspace.
 
@@ -28,10 +32,12 @@ The design is grounded in the current diligence implementation and live workspac
 - `DiligenceTab.jsx` renders the existing section list and persistent right rail.
 - `SectionRow.jsx` owns each section's **Instructions / Findings / Report** subtabs, owner pills, approvals, and section notes.
 - `RightRail.jsx` preserves the resizable accordion for **Reference Information**, **Supporting Documents**, **Transcripts and Recordings**, and **Team Mtg Minutes**.
-- `SectionReportPane.jsx` currently contains Draft with AI, ratings, model comparison, TipTap editing, AI Edit Assistance, and version history.
+- `SectionReportPane.jsx` currently contains Draft with AI, ratings, TipTap editing, AI Edit Assistance, version history, and a hidden provider-comparison control.
 - The header's existing **Report** button manages the final-report document.
 
 The proposal does not introduce a separate portal report page, section list, evidence page, or drafting form. The existing layout, density, and navigation remain the visual and interaction baseline.
+
+The hidden model-comparison feature is explicitly out of scope for the beta. The beta uses one configured provider and model. Provider bakeoffs remain in the separate bakeoff feature and do not appear in this interface or request path.
 
 ## User experience
 
@@ -83,27 +89,39 @@ The portal entry point looks and behaves the same for every user. Document creat
 
 The sidebar opens with the company and portal-launch section already resolved. The section selector is visible, but the launch section is authoritative until the user deliberately switches.
 
-The primary mode tabs are:
+The panel has one top-level switch:
 
-1. **Draft Section** — create or replace the whole active section. When the section already has content, the primary action label becomes **Redraft section** and the replacement requires preview.
-2. **Edit Selection** — edit only highlighted Google Docs text using user guidance, section context, and portal data.
-3. **Ask the AI** — answer questions about the application, findings, documents, transcripts, meetings, ratings, and other report sections with citations.
+1. **AI tools** — Draft Section, Edit Selection, and Ask the AI.
+2. **Diligence materials** — the familiar portal accordion for Findings, Reference Information, Supporting Documents, Transcripts & Recordings, and Team Meeting Minutes.
+
+Within AI tools, the primary mode tabs are:
+
+1. **Draft Section** — create or replace the whole active section directly in the document.
+2. **Edit Selection** — interpret an arbitrary instruction, use whatever read-only diligence tools are relevant, and propose a change to highlighted Google Docs text.
+3. **Ask the AI** — answer questions about the application, Findings, documents, transcripts, meetings, ratings, and other report sections with citations.
 
 There is no separate **Revise Section** or **Improve Section** mode. Whole-section work lives in Draft Section; selection-level work lives in Edit Selection.
 
 #### Draft Section
 
 - Requires no document selection.
-- Retains the existing section-specific ratings, prompts, model choice, and model comparison.
-- Uses the latest Findings and eligible supporting sources from the portal.
+- Retains the existing section-specific ratings while using beta-specific versioned prompts initialized from the current prompts.
+- Uses the latest Findings and whichever eligible portal sources the authoring agent determines are relevant.
 - For an empty section, the action is **Generate draft**.
-- For a populated section, the action is **Redraft section**.
-- Always shows a proposal before replacing registered section slots.
+- For a populated section, the action is **Replace section draft**.
+- Writes the generated section directly into the registered section slots. A full-section preview is deliberately omitted because the document is the appropriate reading surface.
+- The placeholder tokens prove whether this is the first draft. Generating replaces those tokens; replacing a populated section overwrites only that section's registered slots.
+- Google Docs Undo and version history are the recovery mechanisms. E8 also stores the before/after run record for audit and support.
+- Shows Findings treatment as **Preserve all substantive points** or **Synthesize and prioritize**, with the former as the default.
+- After the write, shows a compact Findings coverage result only when something was combined, held out, contradicted, or left unverified.
+
+The coverage result is actionable but intentionally compact. It opens a ledger in the panel, not a draft preview. Each Finding is marked **Included**, **Combined**, **Held for verification**, or **Not used**, with a short reason and the section/source destination. The user can then ask the agent to include a held-out item or continue reading in the document. The generated prose remains in Google Docs, where it is easier to read, edit, and undo.
 
 #### Edit Selection
 
 - Becomes actionable when selected text is inside the active section.
-- Sends selected text, surrounding context, section identity, user instruction, and eligible portal sources to E8.
+- Sends selected text, surrounding context, section identity, and the user's open-ended instruction to the authoring agent.
+- The agent decides whether the request is a local rewrite, an evidence search, a citation task, a named-source request, or a verification question and selects the relevant read-only tools.
 - Shows current and proposed text before Apply.
 - Rejects stale proposals if the document changed during generation.
 
@@ -111,24 +129,29 @@ There is no separate **Revise Section** or **Improve Section** mode. Whole-secti
 
 - Uses the existing E8 question-answering/RAG capabilities and custom prompts.
 - Includes citations to portal data and documents.
-- **Use in report** transfers the answer into a reviewable Draft Section or Edit Selection proposal; it never inserts text silently.
+- **Use in report** transfers the answer into a reviewable Edit Selection proposal or asks where to insert it; it never rewrites a whole section silently from the Ask mode.
 
-### 5. Portal materials inside the sidebar
+### 5. Diligence materials inside the panel
 
-The sidebar includes a compact materials toolbar:
+The **Diligence materials** view reuses the portal right rail's information architecture instead of presenting six equal buttons. It contains one accordion with:
 
 - Findings
-- Supporting Documents
 - Reference Information
+- Supporting Documents
 - Transcripts & Recordings
 - Team Meeting Minutes
-- Diligence Home
 
-The first five open an inline materials browser inside the sidebar so the user can inspect information without leaving Google Docs. Each view can also include **Open in portal** for the complete portal experience. Diligence Home opens the existing diligence page for the same application.
+Each accordion panel supports search, source opening, and **Open in portal**. A single **Open diligence in portal** link sits at the bottom rather than competing with source categories.
 
 There is no ambient “updates since review” card.
 
-### 6. Section context and ownership
+### 6. Panel width
+
+The beta uses a right-side panel with a drag handle that expands for source and coverage review and collapses to return document width. The prototype demonstrates widths from approximately 360 to 560 pixels and preserves the chosen width for the session.
+
+This is a platform constraint, not a CSS detail: native Google Editor add-on sidebars are fixed at 300 pixels. The implementation therefore needs a modeless HTML-service companion surface, or an equivalent docked Google Workspace surface that supports the same resize behavior, and must be validated in both Chrome and Safari before beta users are enabled. The interaction contract is **resizable panel**, even if the underlying Google surface is not technically a native sidebar.
+
+### 7. Section context and ownership
 
 The portal passes the application ID and section token when opening the document. E8 resolves that token to the section bookmark and sidebar context.
 
@@ -142,7 +165,7 @@ Ownership is advisory. Users may use AI in sections they do not own, but the fir
 
 Opening or manually editing the section does not trigger that warning.
 
-## Template adaptation
+## Template adaptation and direct section writes
 
 The existing **Diligence Report Style Template** remains the source template. It already provides one Report tab, E8 branding, section-bar tables, Heading 1/Heading 2 structure, and the correct report order.
 
@@ -158,7 +181,7 @@ Adapt the existing placeholders into stable registered content slots:
 
 For example, Product uses `e8.product.differentiation` and `e8.product.competitive_positioning`. Keep section bars and fixed subheadings outside replaceable ranges. Add missing fixed subheadings so the model does not invent document structure.
 
-Whole-section generation returns structured content keyed by slot token rather than Markdown headings. This removes the current heading-parser translation risk.
+Whole-section generation returns structured content keyed by slot token rather than Markdown headings. This removes the current heading-parser translation risk. On first generation, E8 atomically replaces the section's placeholder tokens. On replacement, it atomically replaces the same registered slots without touching fixed headings or adjacent sections.
 
 Add a bookmark at every major section for portal deep links.
 
@@ -167,9 +190,61 @@ Add a bookmark at every major section for portal deep links.
 ### Components
 
 1. **Existing portal diligence UI** — unchanged research workspace, with a simplified Report subtab handoff.
-2. **E8 backend** — idempotent document creation, identity and authorization, prompt assembly, RAG, proposals, audit, and revision-safe Docs writes.
-3. **Google Docs Editor add-on** — sidebar UI, cursor/selection reads, inline materials browser, and E8 API client.
+2. **E8 authoring service** — identity, authorization, flexible task planning, read-only tool orchestration, beta prompt versions, evidence assembly, validation, and audit.
+3. **Google Docs integration** — panel UI, cursor/selection reads, materials accordion, and revision-safe Docs operations.
 4. **Google Drive/Docs APIs** — template copy, bookmarks, named ranges, structured writes, sharing, and revision control.
+
+### One flexible authoring agent
+
+Draft Section, Edit Selection, and Ask the AI use one underlying agent with different write boundaries, not separate hard-coded command handlers.
+
+The agent receives:
+
+- task mode: draft section, edit selection, or answer only
+- application, document, section, selection, and user identity
+- permitted write boundary
+- user instruction, ratings, and Findings treatment
+- beta prompt version
+- a read-only tool catalog
+
+Core tools include:
+
+- read selection, section, report outline, and relevant report sections
+- read Findings and ratings
+- search diligence sources across the application
+- locate a document, interview, transcript, recording, or meeting by name
+- read a source excerpt with page or timestamp provenance
+- read structured application and reference fields
+
+The model may make zero or several tool calls according to the request. “Make this shorter” should normally use only document context. “Add citations,” “include the Gary Peterson interview,” or “is this true?” should retrieve and inspect supporting evidence. Tools remain read-only; E8 owns every Docs mutation.
+
+The agent returns a typed result: answer only, replace selection, insert at cursor, draft section, or replace section. The result includes evidence IDs, citations, warnings, and a Findings coverage record when applicable.
+
+### Concrete authoring pipeline
+
+The agent is not asked to “search everything” and hope that a few nearest-neighbor passages describe the company. Every authoring run produces an inspectable dossier before prose is written:
+
+1. **Classify the request.** Determine whether it is a local rewrite, a citation/evidence request, a named-source request, a verification question, a whole-section draft, or a whole-section replacement. This controls the write boundary and whether source retrieval is needed.
+2. **Inventory the available record.** Read source metadata and source-level summaries for the application, Findings, supporting documents, transcripts, recordings, meetings, and structured application fields. This is the breadth pass across potentially dozens of materials.
+3. **Build a coverage map.** For an initial draft, derive the required dimensions from the section specification. For Commercialization, the map includes customer and buyer, buying process, pricing and economics, current alternatives, market evidence, go-to-market motion, pipeline, and unresolved risks. For an edit, the map is derived from the selected claims and the user's instruction.
+4. **Shortlist sources per dimension.** Use metadata, lexical search, and semantic retrieval together. The agent can expand a dimension when the evidence is thin, conflicting, or too generic; it does not stop after a fixed two-chunk result.
+5. **Read exact excerpts.** Fetch page-, paragraph-, or timestamp-level passages from shortlisted sources and attach provenance. A source summary is not enough to support a material claim.
+6. **Resolve gaps and conflicts.** Mark dimensions as supported, partially supported, conflicting, or missing. The agent may ask for another bounded retrieval pass, but it must expose the gap rather than manufacture a holistic conclusion.
+7. **Write and validate.** The writer receives the section specification, Findings coverage ledger, evidence dossier, ratings, and current report context. A validator checks that required dimensions and Findings dispositions are reflected and that material claims map to evidence.
+
+This is an ambitious system, and the beta should be explicit about its limits. AI may be able to assemble a useful go-to-market picture from many sources, but it cannot guarantee that the picture is complete or correct. The user sees the evidence and unresolved dimensions in the panel; the generated prose remains in Google Docs for normal human review and editing.
+
+### Findings coverage contract
+
+Before writing, the agent decomposes Findings into atomic items and assigns each one a disposition:
+
+- include directly
+- combine with another Finding
+- include after qualification or verification
+- hold because sources conflict
+- omit as duplicative or outside the section
+
+In **Preserve all substantive points** mode, every substantive conclusion and example must be mapped into the draft unless it is contradictory or impossible to support. In **Synthesize and prioritize** mode, the agent may omit tangential or duplicative material, but every omission remains visible in the coverage record. A post-write validator prevents “include” items from disappearing silently.
 
 ### Ensure-and-open endpoint
 
@@ -195,20 +270,21 @@ The endpoint must be idempotent and concurrency-safe. A unique application-to-cu
 - `GET /diligence/api/docs-addon/materials?document_id=...&section_token=...&type=...`
 - `POST /diligence/api/docs-addon/draft-section`
 - `POST /diligence/api/docs-addon/revise-selection`
-- `POST /diligence/api/docs-addon/compare-models`
 - `POST /diligence/api/docs-addon/ask`
 - `POST /diligence/api/docs-addon/apply-proposal`
+- `POST /diligence/api/docs-addon/write-section`
 - `GET /diligence/api/docs-addon/actions?document_id=...`
 
 The backend retains prompts, source eligibility, retrieval, AI keys, authorization, and audit logic. Apps Script never receives portal cookies, service-account credentials, or model keys.
 
 ### Concurrency and safety
 
-- Read the document revision before proposal generation.
+- Read the document revision before every AI task.
 - Fingerprint the selected text or registered section content and limited surrounding context.
 - Use Google Docs revision controls when applying.
 - If the source changed, require proposal refresh.
-- Apply whole-section output only to registered content slots; never replace fixed headings or adjacent sections.
+- Apply selection and insertion proposals only after review.
+- Apply initial and replacement whole-section output directly to registered content slots after generation; never replace fixed headings or adjacent sections.
 - Google Docs version history remains canonical for human edits.
 
 ### Audit record
@@ -216,8 +292,10 @@ The backend retains prompts, source eligibility, retrieval, AI keys, authorizati
 Store:
 
 - user, application, document, section, and timestamp
-- mode: draft section, edit selection, or Ask the AI transfer
-- model and user guidance
+- mode: draft section, replace section, edit selection, Ask the AI, or Ask transfer
+- configured model, beta prompt version, user guidance, and Findings treatment
+- tool calls, retrieval queries, source catalog version, and evidence IDs
+- Findings item dispositions and post-write coverage validation
 - source IDs and source snapshot hash
 - before/after hashes and proposed text
 - document revision before and after
@@ -243,34 +321,23 @@ Store:
 - Preserve the existing portal's semantic tabs, buttons, focus states, and compact density.
 - Async actions show immediate progress and prevent duplicate clicks.
 - Selection and section context are communicated in text, not color alone.
-- All AI writes require an explicit preview and Apply.
+- Selection replacements and insertions require preview and Apply. Initial and replacement whole-section drafts write directly into the document and rely on Google Docs Undo/version history plus the E8 audit record.
 - Google Docs Editor add-ons are desktop-only. Mobile users retain the existing portal Findings and materials experience plus normal Google Docs editing; selection-aware E8 assistance is unavailable on mobile.
 
-## Rollout
+## Parallel beta and evaluation
 
-### Phase 1 — Technical spike
+Build the complete beta behind an application-level report-experience flag. Internal engineering milestones may be incremental, but no diligence team receives a partial workflow.
 
-- Replace one section's Report subtab with the Google Docs entry state.
-- Ensure/create one shared report document idempotently.
-- Deep-link from Product to the Product bookmark.
-- Open the sidebar scoped to Product.
-- Generate an empty Product section into registered slots.
-- Read, preview, and replace a plain-text selection.
-- Test Chrome and Safari with two collaborators.
+The beta is ready for a cohort only when it supports every report section, direct initial and replacement drafting, flexible selection edits, Ask the AI, citations, the materials accordion, Findings coverage, ownership warnings, document concurrency, source-processing states, audit, and Chrome/Safari validation.
 
-### Phase 2 — Internal pilot
+During evaluation:
 
-- All report sections and template slots.
-- Draft Section, Edit Selection, Ask the AI, ratings, and model comparison.
-- Inline Findings, Supporting Documents, Reference Information, Transcripts & Recordings, and Team Meeting Minutes.
-- Ownership warning and AI action audit.
-
-### Phase 3 — Migration
-
-- Use Docs-native reports for new diligences.
-- Import existing TipTap drafts once for diligences already underway.
-- Keep finalized reports unchanged.
-- Retire portal TipTap report editing after pilot success criteria are met.
+- Legacy authoring, prompts, storage, and final-document generation remain unchanged.
+- A diligence is assigned either `legacy` or `google_docs_beta`; never both.
+- The beta creates and owns a separate report-document binding and separate versioned prompt set.
+- One or two complete diligence teams may use the beta while all others continue with legacy.
+- There is no automatic dual-write, merge, or synchronization between the two authoring systems.
+- Retirement of TipTap is a later decision based on completed-report quality, factual accuracy, Findings fidelity, time-to-completion, and user preference.
 
 ## Success measures
 
@@ -280,7 +347,9 @@ Store:
 - Most launches require no manual section correction.
 - Fixed headings and template formatting survive every AI action.
 - AI never overwrites concurrently edited text.
-- Users can inspect the evidence behind an answer or proposal while staying in Google Docs.
+- Users can inspect the evidence behind an answer, selection proposal, or generated section while staying in Google Docs.
+- No substantive Finding disappears silently; every Finding has a recorded disposition.
+- Users can complete arbitrary rewrite, citation, named-source, and verification requests through one instruction interface.
 - “Which version is current?” support incidents decline materially.
 
 ## Validation plan
@@ -288,7 +357,9 @@ Store:
 - Unit tests for ensure-and-open idempotency, bookmark resolution, slot validation, fingerprints, and structured output.
 - Route tests for first creation, later open, concurrent creation, permission rejection, invalid mapping, and stale revision rejection.
 - Google Docs integration tests for named ranges, bookmarks, paragraph/list/table rendering, and concurrent edits.
-- Add-on tests for empty section, populated section, no selection, partial paragraph, multi-paragraph selection, cross-section selection, read-only document, and expired E8 auth.
+- Agent tests for local rewrites with no retrieval, citation requests, named-source requests, verification questions, contradictory evidence, large source sets, and tool-budget exhaustion.
+- Findings tests for rough-draft prose, brain-dump notes, duplicate items, out-of-scope items, conflicts, and post-write coverage validation.
+- Add-on tests for empty section, populated section, direct section replacement, Undo recovery, no selection, partial paragraph, multi-paragraph selection, cross-section selection, read-only document, and expired E8 auth.
 - Browser smoke tests for the unchanged portal layout and section-level entry point.
 - Chrome and Safari tests for the add-on, inline materials browser, and first/later editor flows.
 
@@ -300,7 +371,15 @@ Store:
 - Use **Draft Section**, **Edit Selection**, and **Ask the AI**.
 - Create the document on the first report-editing action, not team provisioning.
 - Use one idempotent entry point for first and later editors.
-- Show portal materials inline in the sidebar, with optional links back to the portal.
+- Build a complete parallel beta; do not incrementally replace the legacy authoring workflow.
+- Never allow legacy and beta to author the same report.
+- Give the beta independent versioned prompts.
+- Use one configured provider/model with no comparison UI.
+- Write initial and replacement whole-section drafts directly into Google Docs; preview only smaller selection and insertion edits.
+- Use a drag-resizable right-side authoring surface; a fixed 300-pixel native sidebar is not an acceptable beta experience.
+- Use one flexible authoring agent that chooses read-only tools based on the user's request.
+- Show portal materials through the familiar accordion inside a separate Diligence materials view.
+- Track a Findings coverage contract so points cannot disappear silently.
 - Allow non-owner AI use after a warning.
 - Do not show an “updates since review” card.
 
@@ -310,3 +389,5 @@ Store:
 - Which Reference Information items may be exposed inside the add-on versus linked back to the portal because of permissions or sensitivity?
 - Should applied proposals add a native Google Docs comment linking to the E8 audit record?
 - How long should E8 retain full before/after proposal text?
+- Which modeless Google surface provides the most reliable docked, resizable behavior across Chrome and Safari?
+- Should Findings treatment remember the user's last choice globally, per diligence, or per section?

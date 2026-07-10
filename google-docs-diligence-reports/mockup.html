@@ -514,9 +514,10 @@
   .docs-toolbar button:hover, .docs-toolbar select:hover { background: rgba(60, 64, 67, .08); }
 
   .docs-workspace {
+    --assistant-width: 420px;
     min-height: 0;
     display: grid;
-    grid-template-columns: minmax(620px, 1fr) 380px;
+    grid-template-columns: minmax(620px, 1fr) var(--assistant-width);
     border-top: 1px solid #e1e5ea;
   }
 
@@ -563,6 +564,7 @@
   .selectable-copy.selected { background: #dbeafe; box-shadow: inset 0 0 0 1px #93c5fd; }
 
   .assistant-sidebar {
+    position: relative;
     min-width: 0;
     overflow: auto;
     border-left: 1px solid #d7dde6;
@@ -570,12 +572,34 @@
     box-shadow: -3px 0 10px rgba(15, 23, 42, .03);
   }
 
-  .assistant-header { padding: 13px 14px 11px; border-bottom: 1px solid var(--line); }
-  .assistant-title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .assistant-title { font-size: 13px; font-weight: 800; }
-  .connected { color: var(--green); font-size: 9px; font-weight: 760; }
+  .sidebar-resize-handle {
+    position: absolute;
+    z-index: 5;
+    top: 0;
+    bottom: 0;
+    left: -5px;
+    width: 10px;
+    cursor: col-resize;
+  }
 
-  .assistant-context { margin-top: 10px; display: grid; grid-template-columns: minmax(0, 1fr) 148px; align-items: start; gap: 10px; }
+  .sidebar-resize-handle::after {
+    position: absolute;
+    top: 50%;
+    left: 4px;
+    width: 2px;
+    height: 44px;
+    border-radius: 999px;
+    background: #cbd5e1;
+    content: "";
+    transform: translateY(-50%);
+  }
+
+  .sidebar-resize-handle:hover::after, body.resizing-sidebar .sidebar-resize-handle::after { background: #2563eb; }
+  body.resizing-sidebar { cursor: col-resize; user-select: none; }
+
+  .assistant-header { padding: 10px 12px; border-bottom: 1px solid var(--line); }
+
+  .assistant-context { display: grid; grid-template-columns: minmax(0, 1fr) 156px; align-items: start; gap: 10px; }
   .assistant-context strong, .assistant-context span { display: block; }
   .assistant-context strong { font-size: 11.5px; }
   .assistant-context span { color: #64748b; font-size: 9px; }
@@ -593,27 +617,32 @@
   }
 
   .launch-label { margin-top: 4px; color: #64748b; font-size: 8.5px; text-align: right; }
+  .resize-hint { margin-top: 7px; color: #94a3b8; font-size: 8px; }
 
-  .assistant-body { padding: 9px 12px 14px; }
+  .assistant-body { padding: 8px 12px 14px; }
 
-  .materials-toolbar {
+  .workspace-switch {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #f1f5f9;
   }
 
-  .material-button {
+  .workspace-switch-button {
     min-height: 28px;
-    padding: 0 5px;
-    border: 1px solid #dbe3ee;
-    border-radius: 6px;
-    color: #475569;
-    background: white;
-    font-size: 8.8px;
-    font-weight: 680;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 5px;
+    color: #64748b;
+    background: transparent;
+    font-size: 9.5px;
+    font-weight: 760;
   }
 
-  .material-button:hover, .material-button.active { color: #1d4ed8; border-color: #bfdbfe; background: #eff6ff; }
+  .workspace-switch-button.active { color: #1d4ed8; background: white; box-shadow: 0 1px 2px rgba(15, 23, 42, .09); }
 
   .mode-tabs {
     margin-top: 8px;
@@ -724,6 +753,57 @@
   .small-button.success { color: white; border-color: #16865a; background: #16865a; }
   .small-button:disabled { cursor: not-allowed; opacity: .55; }
 
+  .draft-write-note { margin-top: 7px; color: #64748b; font-size: 8.5px; text-align: right; }
+  .agent-plan-note { margin-top: 6px; color: #64748b; font-size: 8.5px; line-height: 1.4; }
+
+  .run-summary {
+    margin-top: 9px;
+    padding: 9px;
+    border: 1px solid #bbf7d0;
+    border-radius: 7px;
+    color: #166534;
+    background: #f0fdf4;
+    font-size: 9px;
+    line-height: 1.45;
+  }
+
+  .run-summary strong, .run-summary span { display: block; }
+  .run-summary span { margin-top: 3px; color: #3f6212; }
+
+  .coverage-details {
+    margin-top: 8px;
+    overflow: hidden;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: white;
+    font-size: 9px;
+  }
+
+  .coverage-details summary {
+    padding: 8px 9px;
+    color: #1d4ed8;
+    background: #eff6ff;
+    cursor: pointer;
+    font-weight: 760;
+    list-style: none;
+  }
+
+  .coverage-details summary::-webkit-details-marker { display: none; }
+  .coverage-details summary::after { float: right; color: #64748b; content: "+"; font-size: 12px; font-weight: 500; }
+  .coverage-details[open] summary::after { content: "−"; }
+  .coverage-meta { padding: 7px 9px; color: #64748b; border-bottom: 1px solid var(--line); }
+  .coverage-row { min-height: 38px; padding: 6px 9px; display: grid; grid-template-columns: 74px minmax(0, 1fr); align-items: start; gap: 7px; border-bottom: 1px solid #edf2f7; }
+  .coverage-row:last-child { border-bottom: 0; }
+  .coverage-row strong, .coverage-row span { display: block; }
+  .coverage-row strong { color: #334155; font-size: 9px; font-weight: 720; }
+  .coverage-row span:last-child { margin-top: 2px; color: #64748b; font-size: 8px; }
+  .coverage-status { width: fit-content; padding: 2px 5px; border-radius: 999px; font-size: 7.5px; font-weight: 800; text-transform: uppercase; }
+  .coverage-status.included { color: #166534; background: #dcfce7; }
+  .coverage-status.combined { color: #1e40af; background: #dbeafe; }
+  .coverage-status.held { color: #92400e; background: #fef3c7; }
+  .coverage-status.unused { color: #64748b; background: #e2e8f0; }
+  .coverage-footer { padding: 7px 9px; color: #64748b; background: #f8fafc; font-size: 8px; }
+
   .selection-box {
     margin-top: 10px;
     padding: 9px;
@@ -773,14 +853,19 @@
   .chat-message strong { display: block; margin-bottom: 3px; font-size: 8.5px; }
   .citation-line { margin-top: 7px; display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #64748b; font-size: 8px; }
 
-  .materials-browser { margin-top: 10px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: white; }
-  .materials-browser-header { padding: 9px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--line); background: #f8fafc; }
-  .materials-browser-header strong { font-size: 10.5px; }
-  .materials-list { max-height: 360px; overflow: auto; padding: 5px; }
+  .materials-workspace { margin-top: 8px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: white; }
+  .materials-workspace details + details { border-top: 1px solid var(--line); }
+  .materials-workspace summary { padding: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #334155; background: #f8fafc; cursor: pointer; font-size: 10px; font-weight: 760; list-style: none; }
+  .materials-workspace summary::-webkit-details-marker { display: none; }
+  .materials-workspace summary::after { color: #64748b; content: "+"; font-size: 13px; font-weight: 500; }
+  .materials-workspace details[open] summary::after { content: "−"; }
+  .materials-workspace details[open] summary { color: #1d4ed8; background: #eff6ff; }
+  .materials-list { max-height: 260px; overflow: auto; padding: 5px; }
   .material-item { width: 100%; padding: 8px; display: block; border: 0; border-radius: 5px; color: #334155; background: transparent; text-align: left; font-size: 9.5px; }
   .material-item:hover { background: #f1f5f9; }
   .material-item strong, .material-item span { display: block; }
   .material-item span { margin-top: 2px; color: #64748b; font-size: 8.5px; }
+  .materials-footer { padding: 8px; display: flex; justify-content: flex-end; border-top: 1px solid var(--line); }
 
   .dialog-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 20px; background: rgba(15, 23, 42, .42); }
   .dialog-backdrop[hidden] { display: none; }
@@ -982,23 +1067,20 @@
             </article>
           </div>
 
-          <aside class="assistant-sidebar" aria-label="E8 Diligence Assistant">
+          <aside class="assistant-sidebar" aria-label="E8 diligence report tools">
+            <div class="sidebar-resize-handle" id="sidebarResizeHandle" role="separator" aria-orientation="vertical" aria-label="Resize diligence panel" title="Drag to resize the diligence panel"></div>
             <div class="assistant-header">
-              <div class="assistant-title-row"><div class="assistant-title">E8 Diligence Assistant</div><div class="connected">Connected</div></div>
               <div class="assistant-context">
                 <div><strong>Beyond Silicon</strong><span>2026 application · Diligence</span></div>
                 <div><select class="section-select" id="activeSectionSelect" aria-label="Active report section"><option>Executive Summary</option><option selected>Product</option><option>Commercialization</option><option>Team</option><option>Finances &amp; Funding</option><option>Environmental Impact</option></select><div class="launch-label" id="launchLabel">Opened from Product in portal</div></div>
               </div>
+              <div class="resize-hint">Drag the panel edge to widen it for source review.</div>
             </div>
 
             <div class="assistant-body">
-              <div class="materials-toolbar" aria-label="Portal materials">
-                <button class="material-button" type="button" data-material="findings">Findings</button>
-                <button class="material-button" type="button" data-material="documents">Documents</button>
-                <button class="material-button" type="button" data-material="reference">Reference</button>
-                <button class="material-button" type="button" data-material="calls">Calls</button>
-                <button class="material-button" type="button" data-material="minutes">Minutes</button>
-                <button class="material-button" type="button" data-material="portal">Diligence Home</button>
+              <div class="workspace-switch" role="tablist" aria-label="Diligence panel view">
+                <button class="workspace-switch-button active" type="button" role="tab" aria-selected="true" data-workspace="ai">AI tools</button>
+                <button class="workspace-switch-button" type="button" role="tab" aria-selected="false" data-workspace="materials">Diligence materials</button>
               </div>
 
               <div id="aiWorkspace">
@@ -1011,9 +1093,9 @@
                 <section class="mode-panel active" id="draftPanel">
                   <div class="panel-card">
                     <h3 id="draftPanelTitle">Draft Product</h3>
-                    <p id="draftPanelDescription">Generate the whole section from Product findings, ratings, and eligible portal sources.</p>
+                    <p id="draftPanelDescription">Generate Product directly in this document from Findings, ratings, and relevant E8 sources.</p>
                     <div class="status-chip" id="sectionContentStatus">Empty section</div>
-                    <div class="form-row first"><label for="modelSelect">Model</label><select class="compact-select" id="modelSelect"><option>GPT-5.5</option><option>Claude Sonnet 4.5</option><option>Gemini 2.5 Pro</option></select></div>
+                    <div class="form-row first"><label for="findingsTreatment">Use Findings as</label><select class="compact-select" id="findingsTreatment"><option>Preserve all substantive points</option><option>Synthesize and prioritize</option></select></div>
                     <div class="form-row"><label for="ratingOne">Differentiation</label><div class="rating-control"><input id="ratingOne" type="range" min="0" max="10" value="8" autocomplete="off" data-lpignore="true" data-form-type="other"><span class="rating-value">8</span></div></div>
                     <div class="form-row"><label for="ratingTwo">Readiness</label><div class="rating-control"><input id="ratingTwo" type="range" min="0" max="10" value="5" autocomplete="off" data-lpignore="true" data-form-type="other"><span class="rating-value">5</span></div></div>
                     <div class="form-row"><label for="ratingThree">Technical risk</label><div class="rating-control"><input id="ratingThree" type="range" min="0" max="10" value="7" autocomplete="off" data-lpignore="true" data-form-type="other"><span class="rating-value">7</span></div></div>
@@ -1021,17 +1103,28 @@
                   <div class="owner-warning" id="ownerWarning" hidden>You are not the owner of this section. E8 will ask before applying an AI draft or edit.</div>
                   <label class="field-label" for="draftGuidance">Optional guidance</label>
                   <textarea class="guidance-input" id="draftGuidance" placeholder="Add emphasis or instructions for this section." autocomplete="off" data-lpignore="true" data-form-type="other"></textarea>
-                  <div class="action-row"><button class="small-button" type="button" id="compareModelsButton">Compare models</button><button class="small-button primary" type="button" id="generateDraftButton">Generate draft</button></div>
-                  <div class="proposal-card" id="draftProposal" hidden><div class="proposal-header"><strong id="draftProposalTitle">Proposed Product draft</strong><span>GPT-5.5 · full section</span></div><div class="diff before"><span class="diff-label">Current section</span><span id="draftBefore">This section is empty.</span></div><div class="diff after"><span class="diff-label">Proposed section</span><span id="draftAfter">A structured Product draft will populate Product Differentiation and Competitive Positioning without changing the fixed headings.</span></div><div class="proposal-sources">Sources: Product Findings · Application · Technical validation memo · Diligence transcript</div><div class="action-row"><button class="small-button" type="button" id="discardDraftButton">Discard</button><button class="small-button success" type="button" id="applyDraftButton">Apply section</button></div></div>
+                  <div class="action-row"><button class="small-button primary" type="button" id="generateDraftButton">Generate draft</button></div>
+                  <div class="draft-write-note">Writes directly to the section · Undo in Google Docs</div>
+                  <div class="run-summary" id="directWriteSummary" hidden><strong id="directWriteTitle">Product added to the document</strong><span id="directWriteDetails">4 Findings incorporated · 3 supporting sources · No Findings omitted</span></div>
+                  <details class="coverage-details" id="coverageDetails" hidden>
+                    <summary>View Findings coverage</summary>
+                    <div class="coverage-meta" id="coverageMeta">4 Findings accounted for · 3 supporting sources · 1 held for Commercialization</div>
+                    <div class="coverage-row"><span class="coverage-status included" id="coverageStatusOne">Included</span><div><strong>Drop-in manufacturing compatibility</strong><span>Product differentiation</span></div></div>
+                    <div class="coverage-row"><span class="coverage-status included" id="coverageStatusTwo">Included</span><div><strong>Full-size-cell validation remains incomplete</strong><span>Technical readiness</span></div></div>
+                    <div class="coverage-row"><span class="coverage-status included" id="coverageStatusThree">Included</span><div><strong>Patent position versus tandem alternatives</strong><span>Competitive positioning</span></div></div>
+                    <div class="coverage-row"><span class="coverage-status held" id="coverageStatusFour">Held</span><div><strong>Customer pilot timing</strong><span>Held for Commercialization rather than silently dropped</span></div></div>
+                    <div class="coverage-footer">The agent records every Finding disposition. Ask it to include a held Finding if it belongs in this section.</div>
+                  </details>
                 </section>
 
                 <section class="mode-panel" id="selectionPanel">
                   <div class="empty-selection" id="emptySelection">Select text inside Product to edit it with the AI.</div>
                   <div class="selection-box" id="selectionBox" hidden><strong>Selected in Product</strong><div id="selectionText">Selected document text</div></div>
                   <label class="field-label" for="selectionGuidance">What should change?</label>
-                  <textarea class="guidance-input" id="selectionGuidance" placeholder="Make this clearer, shorter, or better supported." autocomplete="off" data-lpignore="true" data-form-type="other"></textarea>
+                  <textarea class="guidance-input" id="selectionGuidance" placeholder="Make this shorter, add citations, use the Gary Peterson interview, or verify this claim." autocomplete="off" data-lpignore="true" data-form-type="other"></textarea>
+                  <div class="agent-plan-note">The assistant decides whether this request needs only document context or a search across E8 materials.</div>
                   <div class="action-row"><button class="small-button primary" type="button" id="previewSelectionButton" disabled>Preview edit</button></div>
-                  <div class="proposal-card" id="selectionProposal" hidden><div class="proposal-header"><strong>Proposed replacement</strong><span>GPT-5.5 · selection</span></div><div class="diff before"><span class="diff-label">Current</span><span id="selectionBefore"></span></div><div class="diff after"><span class="diff-label">Proposed</span><span id="selectionAfter">Beyond Silicon plans to sell premium tandem cells to domestic module manufacturers, offering higher module output without requiring a complete production-line replacement.</span></div><div class="proposal-sources">Sources: Selected text · Product Findings · Application</div><div class="action-row"><button class="small-button" type="button" id="discardSelectionButton">Discard</button><button class="small-button success" type="button" id="applySelectionButton">Apply selection</button></div></div>
+                  <div class="proposal-card" id="selectionProposal" hidden><div class="proposal-header"><strong>Proposed replacement</strong><span>Selection only</span></div><div class="diff before"><span class="diff-label">Current</span><span id="selectionBefore"></span></div><div class="diff after"><span class="diff-label">Proposed</span><span id="selectionAfter">Beyond Silicon plans to sell premium tandem cells to domestic module manufacturers, offering higher module output without requiring a complete production-line replacement.</span></div><div class="proposal-sources">Agent plan: evidence-assisted edit · 3 source excerpts · citations available.</div><div class="action-row"><button class="small-button" type="button" id="discardSelectionButton">Discard</button><button class="small-button success" type="button" id="applySelectionButton">Apply selection</button></div></div>
                 </section>
 
                 <section class="mode-panel" id="askPanel">
@@ -1042,10 +1135,15 @@
                 </section>
               </div>
 
-              <section class="materials-browser" id="materialsBrowser" hidden>
-                <div class="materials-browser-header"><strong id="materialsTitle">Product Findings</strong><button class="small-button" type="button" id="closeMaterialsButton">Back to AI</button></div>
-                <div class="materials-list" id="materialsList"></div>
-                <div class="action-row"><button class="small-button" type="button" id="openPortalMaterialButton">Open in portal</button></div>
+              <section id="materialsWorkspace" hidden>
+                <div class="materials-workspace">
+                  <details open><summary>Findings</summary><div class="materials-list"><button class="material-item" type="button"><strong>Validate full-size cell efficiency</strong><span>Product Finding</span></button><button class="material-item" type="button"><strong>Confirm manufacturing integration requirements</strong><span>Product Finding</span></button><button class="material-item" type="button"><strong>Review durability, yield, and customer pilots</strong><span>Product Finding</span></button><button class="material-item" type="button"><strong>Compare the patent position</strong><span>Product Finding</span></button></div></details>
+                  <details><summary>Reference Information</summary><div class="materials-list"><button class="material-item" type="button"><strong>Diligence process and contacts</strong><span>Portal reference</span></button><button class="material-item" type="button"><strong>Deal terms and investment offer</strong><span>Portal reference</span></button></div></details>
+                  <details><summary>Supporting Documents</summary><div class="materials-list"><button class="material-item" type="button"><strong>Tandem Cell Validation Memo</strong><span>Technical report · Jul 3</span></button><button class="material-item" type="button"><strong>Manufacturing Integration Review</strong><span>Presentation · Jun 24</span></button><button class="material-item" type="button"><strong>Patent Landscape Summary</strong><span>Reference · Jun 20</span></button></div></details>
+                  <details><summary>Transcripts &amp; Recordings</summary><div class="materials-list"><button class="material-item" type="button"><strong>Interview with Gary Peterson</strong><span>Transcript · Jul 7</span></button><button class="material-item" type="button"><strong>Customer reference call</strong><span>Transcript · Jun 28</span></button></div></details>
+                  <details><summary>Team Meeting Minutes</summary><div class="materials-list"><button class="material-item" type="button"><strong>July 6 team meeting</strong><span>Decisions and follow-ups</span></button><button class="material-item" type="button"><strong>June 22 team meeting</strong><span>Research assignments</span></button></div></details>
+                  <div class="materials-footer"><button class="small-button open-portal-link" type="button">Open diligence in portal</button></div>
+                </div>
               </section>
             </div>
           </aside>
@@ -1069,52 +1167,9 @@
     'Environmental Impact': 'Paulina Echeverria'
   };
 
-  const materialContent = {
-    findings: {
-      title: 'Product Findings',
-      items: [
-        ['Validate full-size cell efficiency', 'Finding · Product'],
-        ['Confirm manufacturing integration requirements', 'Finding · Product'],
-        ['Review durability, yield, and customer pilots', 'Finding · Product'],
-        ['Compare the patent position', 'Finding · Product']
-      ]
-    },
-    documents: {
-      title: 'Supporting Documents',
-      items: [
-        ['Tandem Cell Validation Memo', 'Technical report · Jul 3'],
-        ['Customer Pilot Interview Notes', 'Interview notes · Jun 28'],
-        ['Manufacturing Integration Review', 'Presentation · Jun 24'],
-        ['Patent Landscape Summary', 'Reference · Jun 20']
-      ]
-    },
-    reference: {
-      title: 'Reference Information',
-      items: [
-        ['Diligence process and contacts', 'Portal reference'],
-        ['Company-provided reference list', 'Portal reference'],
-        ['Deal terms and investment offer', 'Portal reference']
-      ]
-    },
-    calls: {
-      title: 'Transcripts & Recordings',
-      items: [
-        ['Technical diligence call', 'Transcript and recording · Jul 7'],
-        ['Customer reference call', 'Transcript · Jun 28'],
-        ['Manufacturing advisor interview', 'Transcript · Jun 24']
-      ]
-    },
-    minutes: {
-      title: 'Team Meeting Minutes',
-      items: [
-        ['July 6 team meeting', 'Decisions and follow-ups'],
-        ['June 22 team meeting', 'Research assignments']
-      ]
-    }
-  };
-
   const portalView = document.getElementById('portalView');
   const docsView = document.getElementById('docsView');
+  const docsWorkspace = document.querySelector('.docs-workspace');
   const activeSectionSelect = document.getElementById('activeSectionSelect');
   const toast = document.getElementById('toast');
   const dialogBackdrop = document.getElementById('dialogBackdrop');
@@ -1207,21 +1262,39 @@
     return sectionOwners[section] === currentUser;
   }
 
+  function updateCoverageLedger(treatment) {
+    const preserve = treatment === 'Preserve all substantive points';
+    document.getElementById('coverageMeta').textContent = preserve
+      ? '4 Findings accounted for · 3 supporting sources · 1 held for Commercialization'
+      : '3 Findings incorporated · 1 combined as duplicative · 1 held for Commercialization · 3 supporting sources';
+    document.getElementById('coverageStatusOne').textContent = 'Included';
+    document.getElementById('coverageStatusOne').className = 'coverage-status included';
+    document.getElementById('coverageStatusTwo').textContent = 'Included';
+    document.getElementById('coverageStatusTwo').className = 'coverage-status included';
+    document.getElementById('coverageStatusThree').textContent = preserve ? 'Included' : 'Combined';
+    document.getElementById('coverageStatusThree').className = `coverage-status ${preserve ? 'included' : 'combined'}`;
+    document.getElementById('coverageStatusFour').textContent = preserve ? 'Held' : 'Not used';
+    document.getElementById('coverageStatusFour').className = `coverage-status ${preserve ? 'held' : 'unused'}`;
+  }
+
   function updateDocsContext(section, source) {
     activeSection = section;
     activeSectionSelect.value = section;
-    document.getElementById('launchLabel').textContent = source === 'portal' ? `Opened from ${section} in portal` : `Assistant switched to ${section}`;
+    document.getElementById('launchLabel').textContent = source === 'portal' ? `Opened from ${section} in portal` : `Switched to ${section}`;
     const hasContent = sectionHasContent(section);
-    document.getElementById('draftPanelTitle').textContent = hasContent ? `Redraft ${section}` : `Draft ${section}`;
+    document.getElementById('draftPanelTitle').textContent = hasContent ? `Replace ${section} draft` : `Draft ${section}`;
     document.getElementById('draftPanelDescription').textContent = hasContent
-      ? `Replace the whole ${section} section using its findings, ratings, and eligible portal sources.`
-      : `Generate the whole section from ${section} findings, ratings, and eligible portal sources.`;
+      ? `Generate a new ${section} section and write it directly over the current draft.`
+      : `Generate ${section} directly in this document from Findings, ratings, and relevant E8 sources.`;
     document.getElementById('sectionContentStatus').textContent = hasContent ? 'Section drafted' : 'Empty section';
-    document.getElementById('generateDraftButton').textContent = hasContent ? 'Redraft section' : 'Generate draft';
+    document.getElementById('generateDraftButton').textContent = hasContent ? 'Replace section draft' : 'Generate draft';
     document.getElementById('ownerWarning').hidden = currentUserOwns(section);
-    document.getElementById('draftProposal').hidden = true;
+    document.getElementById('directWriteSummary').hidden = true;
+    document.getElementById('coverageDetails').hidden = true;
+    document.getElementById('coverageDetails').open = false;
     document.getElementById('selectionProposal').hidden = true;
     clearSelection();
+    setWorkspace('ai');
     setMode('draft');
     const target = document.querySelector(`[data-paper-section="${section}"]`);
     if (target) document.querySelector('.document-stage').scrollTo({ top: Math.max(0, target.offsetTop - 80), behavior: 'smooth' });
@@ -1252,6 +1325,16 @@
     document.getElementById(`${mode}Panel`).classList.add('active');
   }
 
+  function setWorkspace(workspace) {
+    document.querySelectorAll('.workspace-switch-button').forEach(button => {
+      const active = button.dataset.workspace === workspace;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    document.getElementById('aiWorkspace').hidden = workspace !== 'ai';
+    document.getElementById('materialsWorkspace').hidden = workspace !== 'materials';
+  }
+
   function clearSelection() {
     document.querySelectorAll('.selectable-copy').forEach(node => node.classList.remove('selected'));
     document.getElementById('selectionBox').hidden = true;
@@ -1267,19 +1350,6 @@
     document.getElementById('emptySelection').hidden = true;
     document.getElementById('previewSelectionButton').disabled = false;
     setMode('selection');
-  }
-
-  function showMaterial(type) {
-    if (type === 'portal') {
-      showToast(`Opening the ${activeSection} diligence workspace in the portal.`);
-      return;
-    }
-    const content = materialContent[type];
-    document.querySelectorAll('.material-button').forEach(button => button.classList.toggle('active', button.dataset.material === type));
-    document.getElementById('materialsTitle').textContent = content.title;
-    document.getElementById('materialsList').innerHTML = content.items.map(item => `<button class="material-item" type="button"><strong>${item[0]}</strong><span>${item[1]}</span></button>`).join('');
-    document.getElementById('aiWorkspace').hidden = true;
-    document.getElementById('materialsBrowser').hidden = false;
   }
 
   function confirmOwnerIfNeeded(action) {
@@ -1318,15 +1388,26 @@
 
   document.querySelectorAll('.mode-tab').forEach(button => button.addEventListener('click', () => setMode(button.dataset.mode)));
 
-  document.querySelectorAll('.material-button').forEach(button => button.addEventListener('click', () => showMaterial(button.dataset.material)));
+  document.querySelectorAll('.workspace-switch-button').forEach(button => button.addEventListener('click', () => setWorkspace(button.dataset.workspace)));
+  document.querySelectorAll('.open-portal-link').forEach(button => button.addEventListener('click', () => showToast(`Opening the ${activeSection} diligence workspace in the portal.`)));
+  document.querySelectorAll('.material-item').forEach(button => button.addEventListener('click', () => showToast(`Opening ${button.querySelector('strong').textContent}.`)));
 
-  document.getElementById('closeMaterialsButton').addEventListener('click', () => {
-    document.getElementById('materialsBrowser').hidden = true;
-    document.getElementById('aiWorkspace').hidden = false;
-    document.querySelectorAll('.material-button').forEach(button => button.classList.remove('active'));
+  document.getElementById('sidebarResizeHandle').addEventListener('pointerdown', event => {
+    event.preventDefault();
+    document.body.classList.add('resizing-sidebar');
+    const resize = moveEvent => {
+      const width = Math.max(360, Math.min(560, window.innerWidth - moveEvent.clientX));
+      docsWorkspace.style.setProperty('--assistant-width', `${width}px`);
+    };
+    const stop = () => {
+      document.body.classList.remove('resizing-sidebar');
+      window.removeEventListener('pointermove', resize);
+      window.removeEventListener('pointerup', stop);
+      showToast('Panel width updated for this session.');
+    };
+    window.addEventListener('pointermove', resize);
+    window.addEventListener('pointerup', stop);
   });
-
-  document.getElementById('openPortalMaterialButton').addEventListener('click', () => showToast(`Opening this material in the ${activeSection} diligence workspace.`));
 
   activeSectionSelect.addEventListener('change', () => updateDocsContext(activeSectionSelect.value, 'manual'));
 
@@ -1348,45 +1429,57 @@
 
   document.querySelectorAll('input[type="range"]').forEach(input => input.addEventListener('input', () => { input.nextElementSibling.textContent = input.value; }));
 
-  document.getElementById('generateDraftButton').addEventListener('click', () => confirmOwnerIfNeeded(() => {
-    const button = document.getElementById('generateDraftButton');
-    const previous = button.textContent;
-    button.disabled = true;
-    button.textContent = 'Generating preview…';
-    window.setTimeout(() => {
-      button.disabled = false;
-      button.textContent = previous;
-      const hasContent = sectionHasContent(activeSection);
-      document.getElementById('draftProposalTitle').textContent = `Proposed ${activeSection} ${hasContent ? 'replacement' : 'draft'}`;
-      document.getElementById('draftBefore').textContent = hasContent ? `Existing ${activeSection} content.` : 'This section is empty.';
-      document.getElementById('draftAfter').textContent = `A structured ${activeSection} draft will populate the registered content slots without changing fixed headings.`;
-      document.getElementById('draftProposal').hidden = false;
-      showToast('Whole-section preview ready. The document is unchanged.');
-    }, 800);
-  }));
-
-  document.getElementById('compareModelsButton').addEventListener('click', () => showToast('Three whole-section drafts are ready to compare.'));
-  document.getElementById('discardDraftButton').addEventListener('click', () => { document.getElementById('draftProposal').hidden = true; showToast('Draft proposal discarded.'); });
-
-  document.getElementById('applyDraftButton').addEventListener('click', () => confirmOwnerIfNeeded(() => {
-    const section = document.querySelector(`[data-paper-section="${activeSection}"]`);
-    const placeholders = section ? section.querySelectorAll('.document-placeholder') : [];
+  function writeSectionDraft(sectionName) {
+    const section = document.querySelector(`[data-paper-section="${sectionName}"]`);
+    if (!section) return false;
+    const draftParagraphs = [
+      `Beyond Silicon combines a solution-processed perovskite layer with conventional silicon cells, targeting higher module efficiency without requiring an entirely new manufacturing platform. The team's Findings identify drop-in compatibility as the clearest differentiator.`,
+      `The approach is differentiated by compatibility with established production infrastructure, while durability, yield, and full-size-cell validation remain the principal technical risks. Independent validation remains incomplete, so management's efficiency targets should not yet be treated as demonstrated production performance.`
+    ];
+    const placeholders = section.querySelectorAll('.document-placeholder');
     if (placeholders.length > 0) {
       placeholders.forEach((placeholder, index) => {
         const paragraph = document.createElement('p');
         paragraph.className = 'selectable-copy';
-        paragraph.dataset.selectableSection = activeSection;
+        paragraph.dataset.selectableSection = sectionName;
         paragraph.tabIndex = 0;
-        paragraph.textContent = index === 0
-          ? `Beyond Silicon combines a solution-processed perovskite layer with conventional silicon cells, targeting higher module efficiency without requiring an entirely new manufacturing platform.`
-          : `The approach is differentiated by compatibility with established production infrastructure, while durability, yield, and full-size-cell validation remain the principal technical risks.`;
+        paragraph.textContent = draftParagraphs[index] || draftParagraphs[0];
         placeholder.replaceWith(paragraph);
         paragraph.addEventListener('click', () => selectText(paragraph));
       });
+    } else {
+      section.querySelectorAll('p').forEach((paragraph, index) => {
+        paragraph.classList.add('selectable-copy');
+        paragraph.dataset.selectableSection = sectionName;
+        paragraph.tabIndex = 0;
+        paragraph.textContent = draftParagraphs[index % draftParagraphs.length];
+      });
     }
-    document.getElementById('draftProposal').hidden = true;
-    updateDocsContext(activeSection, 'manual');
-    showToast(`${activeSection} was added to the shared Google Doc.`);
+    return true;
+  }
+
+  document.getElementById('generateDraftButton').addEventListener('click', () => confirmOwnerIfNeeded(() => {
+    const button = document.getElementById('generateDraftButton');
+    const replacing = sectionHasContent(activeSection);
+    button.disabled = true;
+    button.textContent = replacing ? 'Replacing section…' : 'Drafting in document…';
+    window.setTimeout(() => {
+      writeSectionDraft(activeSection);
+      button.disabled = false;
+      button.textContent = 'Replace section draft';
+      document.getElementById('draftPanelTitle').textContent = `Replace ${activeSection} draft`;
+      document.getElementById('draftPanelDescription').textContent = `Generate a new ${activeSection} section and write it directly over the current draft.`;
+      document.getElementById('sectionContentStatus').textContent = 'Section drafted';
+      document.getElementById('directWriteTitle').textContent = replacing ? `${activeSection} draft replaced` : `${activeSection} added to the document`;
+      const treatment = document.getElementById('findingsTreatment').value;
+      document.getElementById('directWriteDetails').textContent = treatment === 'Preserve all substantive points'
+        ? '4 Findings accounted for · 3 supporting sources · 1 held for Commercialization'
+        : '3 Findings incorporated · 1 combined as duplicative · 1 held for Commercialization · 3 supporting sources';
+      updateCoverageLedger(treatment);
+      document.getElementById('directWriteSummary').hidden = false;
+      document.getElementById('coverageDetails').hidden = false;
+      showToast(`${activeSection} was written directly to the document. Use Undo to revert.`);
+    }, 900);
   }));
 
   document.getElementById('previewSelectionButton').addEventListener('click', () => confirmOwnerIfNeeded(() => {
@@ -1405,7 +1498,12 @@
     window.setTimeout(() => { button.disabled = false; button.textContent = 'Ask the AI'; showToast('Answer ready with cited sources.'); }, 700);
   });
 
-  document.getElementById('useAnswerButton').addEventListener('click', () => { setMode('draft'); document.getElementById('draftGuidance').value = 'Use the cited efficiency evidence while clearly separating validated results from management targets.'; showToast('Answer added as guidance for a reviewable section draft.'); });
+  document.getElementById('useAnswerButton').addEventListener('click', () => {
+    setWorkspace('ai');
+    setMode('selection');
+    document.getElementById('selectionGuidance').value = 'Insert the cited efficiency evidence while clearly separating validated results from management targets.';
+    showToast('Select text to replace, or place the cursor where this evidence should be inserted.');
+  });
 
   document.getElementById('dialogCancel').addEventListener('click', closeDialog);
   dialogConfirm.addEventListener('click', () => { const action = dialogAction; closeDialog(); if (action) action(); });
