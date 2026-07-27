@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-27 (third pass)
+
+- Sample donor names fictionalized for the public site; giving structure, tiers, asks, and mechanisms retained from the real pipeline.
+
+## 2026-07-27 (second pass)
+
+- Grid grouping redesigned for clarity: full-width colored stage bands (all five stages in pipeline order, Prospect → Declined; only In Conversation expanded in the mockup) and tier sub-groups rendered as colored left-rail sections with tinted headers, donor names aligned under their tier label; chevron-dot clutter removed; Recoverable checkboxes centered. Sample data replaced with real In Conversation people/tiers/asks/mechanisms from Karin's spreadsheet; flyout example is now Brian Arbogast.
+
 ## 2026-07-27
 
 - First publish for Karin's review.

@@ -50,13 +50,29 @@
   .grid-row:hover { background:#f8fafc; }
   .grid-head { display:grid; grid-template-columns: minmax(150px,1.1fr) 48px 85px 88px 150px 90px 85px 62px 44px 76px 92px 105px 95px minmax(200px,1.5fr) 24px; gap:12px; padding:8px 16px; }
 
-  .group-head { display:flex; align-items:center; gap:8px; padding:7px 16px; background:#f8fafc; border-top:1px solid #e2e8f0; cursor:pointer; user-select:none; }
-  .group-head:hover { background:#f1f5f9; }
-  .group-chev { color:#94a3b8; font-size:11px; width:12px; }
-  .subgroup-head { display:flex; align-items:center; gap:8px; padding:5px 16px 5px 36px; background:#fcfdff; border-top:1px solid #f1f5f9; cursor:pointer; user-select:none; }
-  .subgroup-head:hover { background:#f8fafc; }
+  .stage-band { display:flex; align-items:center; gap:10px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer; user-select:none; }
+  .stage-band .caret { font-size:11px; opacity:.7; }
+  .stage-band .band-note { font-weight:600; opacity:.75; font-size:12px; }
+  .band-conversation { background:#dbeafe; color:#1e3a8a; }
+  .band-prospect     { background:#e2e8f0; color:#334155; }
+  .band-committed    { background:#1d4ed8; color:#ffffff; }
+  .band-received     { background:#059669; color:#ffffff; }
+  .band-declined     { background:#fee2e2; color:#991b1b; }
+
+  .tier-section { border-left:4px solid; }
+  .tier-section-1 { border-color:#f59e0b; }
+  .tier-section-2 { border-color:#6366f1; }
+  .tier-section-3 { border-color:#10b981; }
+  .tier-band { display:flex; align-items:center; gap:8px; padding:6px 16px 6px 20px; font-size:12px; font-weight:700; }
+  .tier-band-1 { background:#fffbeb; color:#92400e; }
+  .tier-band-2 { background:#eef2ff; color:#3730a3; }
+  .tier-band-3 { background:#ecfdf5; color:#065f46; }
+  .tier-band .band-note { font-weight:600; opacity:.7; }
+  .tier-section .grid-row { padding-left:20px; }
+  .tier-section + .stage-band, .tier-section + .tier-section { border-top:1px solid #e2e8f0; }
 
   .cb { accent-color:#1d4ed8; width:15px; height:15px; }
+  .grid-head > span:nth-child(4), .grid-row > span:nth-child(4) { text-align:center; }
 
   .stage-select { font-weight:600; }
   .stage-select.stage-prospect     { border-color:#cbd5e1; }
@@ -142,29 +158,29 @@
   <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
     <div class="card p-3">
       <div class="label">Committed</div>
-      <div class="text-2xl font-bold text-blue-700 mt-1">$120,000</div>
-      <div class="text-xs text-slate-500 mt-0.5">4 donors</div>
+      <div class="text-2xl font-bold text-blue-700 mt-1">$252,500</div>
+      <div class="text-xs text-slate-500 mt-0.5">9 donors</div>
     </div>
     <div class="card p-3">
       <div class="label">Received</div>
-      <div class="text-2xl font-bold text-emerald-600 mt-1">$65,000</div>
-      <div class="text-xs text-slate-500 mt-0.5">3 donors</div>
+      <div class="text-2xl font-bold text-emerald-600 mt-1">$23,280</div>
+      <div class="text-xs text-slate-500 mt-0.5">1 donor</div>
     </div>
     <div class="card p-3">
       <div class="label">In Play</div>
-      <div class="text-2xl font-bold text-slate-900 mt-1">$92,500</div>
-      <div class="text-xs text-slate-500 mt-0.5">9 prospects &amp; conversations</div>
+      <div class="text-2xl font-bold text-slate-900 mt-1">$181,750</div>
+      <div class="text-xs text-slate-500 mt-0.5">10 in conversation</div>
     </div>
     <div class="card p-3">
       <div class="label">Pipeline</div>
       <div class="flex items-center gap-2 mt-2 text-xs font-semibold">
-        <span class="chip stage-prospect">6 Prospect</span>
-        <span class="chip stage-conversation">3 In Conversation</span>
+        <span class="chip stage-prospect">13 Prospect</span>
+        <span class="chip stage-conversation">10 In Conversation</span>
       </div>
       <div class="flex items-center gap-2 mt-1.5 text-xs font-semibold">
-        <span class="chip stage-committed">4 Committed</span>
-        <span class="chip stage-received">3 Received</span>
-        <span class="chip stage-declined">2 Declined</span>
+        <span class="chip stage-committed">9 Committed</span>
+        <span class="chip stage-received">1 Received</span>
+        <span class="chip stage-declined">7 Declined</span>
       </div>
     </div>
   </div>
@@ -202,292 +218,221 @@
       <span></span>
     </div>
 
-    <!-- In Conversation group -->
-    <div class="group-head">
-      <span class="group-chev">▾</span>
-      <span class="chip stage-conversation">In Conversation</span><span class="text-xs text-slate-500">3 · $92,500 in asks</span>
+    <div class="stage-band band-prospect">
+      <span class="caret">▸</span>
+      <span>Prospect</span>
+      <span class="band-note">13 people</span>
     </div>
-
-    <div class="subgroup-head">
-      <span class="group-chev">▾</span>
-      <span class="tier tier-1">1</span><span class="text-xs font-semibold text-slate-600">Tier 1</span><span class="text-xs text-slate-400">2 · $75,000 in asks</span>
+    <div class="stage-band band-conversation">
+      <span class="caret">▾</span>
+      <span>In Conversation</span>
+      <span class="band-note">10 people · $181,750 in asks</span>
+    </div>
+    <div class="tier-section tier-section-1">
+    <div class="tier-band tier-band-1">
+      <span class="tier tier-1">1</span>
+      <span>Tier 1</span>
+      <span class="band-note">5 · $145,000 in asks</span>
     </div>
     <div class="grid-row" onclick="openFlyout()">
-      <span class="font-semibold text-slate-900">Miguel Serrano</span>
+      <span class="font-semibold text-slate-900">Anon. (Marta Ellingsen)</span>
+      <span><span class="tier tier-1">1</span></span>
+      <span class="text-right font-semibold">$20,000</span>
+      <span><input type="checkbox" class="cb" checked onclick="event.stopPropagation()"></span>
+      <span class="text-slate-600 truncate">ImpactAssets</span>
+      <span class="text-right text-slate-600">$214,000</span>
+      <span class="text-right text-slate-600">$40,000</span>
+      <span><span class="yr yr-1">2025</span></span>
+      <span class="text-right text-slate-600">6</span>
+      <span><span class="streak streak-all">All 6</span></span>
+      <span><span class="text-slate-400">—</span></span>
+      <span><span class="chip chip-due">Mon, Jul 27</span></span>
+      <span class="text-slate-600">Jun 17</span>
+      <span class="text-slate-500 truncate">Six-year loyal donor; wants to see the 2026 slate before renewing</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Paul Vandermeer</span>
       <span><span class="tier tier-1">1</span></span>
       <span class="text-right font-semibold">$50,000</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-600 truncate">Direct</span>
+      <span class="text-right text-slate-600">$150,000</span>
+      <span class="text-right text-slate-600">$50,000</span>
+      <span><span class="yr yr-1">2025</span></span>
+      <span class="text-right text-slate-600">2</span>
+      <span><span class="streak streak-ret">Returned</span></span>
+      <span><span class="text-slate-400">—</span></span>
+      <span><span class="text-slate-700">Mon, Aug 10</span></span>
+      <span class="text-slate-600">Jun 17</span>
+      <span class="text-slate-500 truncate">Gap giver ($100k ’22, $50k ’25); traveling until August, then wants to talk</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Raj Chandran</span>
+      <span><span class="tier tier-1">1</span></span>
+      <span class="text-right font-semibold">$35,000</span>
       <span><input type="checkbox" class="cb" checked onclick="event.stopPropagation()"></span>
-      <span class="text-slate-400">—</span>
-      <span class="text-right text-slate-600">$75,000</span>
+      <span class="text-slate-600 truncate">Vanguard Charitable</span>
+      <span class="text-right text-slate-600">$130,000</span>
+      <span class="text-right text-slate-600">$35,000</span>
+      <span><span class="yr yr-2">2024</span></span>
+      <span class="text-right text-slate-600">4</span>
+      <span><span class="streak streak-run">×4</span></span>
+      <span><span class="text-slate-400">—</span></span>
+      <span><span class="chip chip-due">Fri, Jul 24</span></span>
+      <span class="text-slate-600">Jun 17</span>
+      <span class="text-slate-500 truncate">Gave 2021–2024, skipped 2025; warm reply, thinking about $35k</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Halvorsen Family</span>
+      <span><span class="tier tier-1">1</span></span>
+      <span class="text-right font-semibold">$30,000</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-600 truncate">Maine Community Foundation</span>
+      <span class="text-right text-slate-600">$90,000</span>
       <span class="text-right text-slate-600">$30,000</span>
       <span><span class="yr yr-1">2025</span></span>
       <span class="text-right text-slate-600">3</span>
-      <span><span class="streak streak-ret">Returned</span></span>
-      <span class="text-slate-400">—</span>
-      <span><span class="chip chip-due">Mon, Jul 27</span></span>
-      <span class="text-slate-600">Jul 13</span>
-      <span class="text-slate-500 truncate">Wants portfolio numbers before committing ~$50k</span>
-      <span class="text-slate-300">›</span>
-    </div>
-    <div class="grid-row" onclick="openFlyout()">
-      <span class="font-semibold text-slate-900">Dana Whitfield</span>
-      <span><span class="tier tier-1">1</span></span>
-      <span class="text-right font-semibold">$25,000</span>
-      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
-      <span class="text-slate-600 truncate">Fidelity Charitable</span>
-      <span class="text-right text-slate-600">$40,000</span>
-      <span class="text-right text-slate-600">$25,000</span>
-      <span><span class="yr yr-3">2023</span></span>
-      <span class="text-right text-slate-600">2</span>
-      <span><span class="streak streak-alt">Alt</span></span>
-      <span><span class="chip chip-team">Screening</span></span>
-      <span class="text-slate-700">Mon, Aug 3</span>
-      <span class="text-slate-600">Jul 21</span>
-      <span class="text-slate-500 truncate">Leaning yes at $25k; deciding with partner by early Aug</span>
-      <span class="text-slate-300">›</span>
-    </div>
-    <div class="subgroup-head">
-      <span class="group-chev">▾</span>
-      <span class="tier tier-2">2</span><span class="text-xs font-semibold text-slate-600">Tier 2</span><span class="text-xs text-slate-400">1 · $17,500 in asks</span>
-    </div>
-    <div class="grid-row" onclick="openFlyout()">
-      <span class="font-semibold text-slate-900">Priya Raman</span>
-      <span><span class="tier tier-2">2</span></span>
-      <span class="text-right font-semibold">$17,500</span>
-      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
-      <span class="text-slate-600 truncate">Seattle Foundation</span>
-      <span class="text-right text-slate-600">$17,500</span>
-      <span class="text-right text-slate-600">$17,500</span>
-      <span><span class="yr yr-3">2023</span></span>
-      <span class="text-right text-slate-600">1</span>
-      <span><span class="streak streak-alt">—</span></span>
-      <span><span class="chip chip-team">Judge</span></span>
-      <span><span class="chip chip-due">Fri, Jul 17</span></span>
-      <span class="text-slate-600">Jun 26</span>
-      <span class="text-slate-500 truncate">No reply to Karin's June check-in; nudge again</span>
-      <span class="text-slate-300">›</span>
-    </div>
-
-    <!-- Committed group -->
-    <div class="group-head">
-      <span class="group-chev">▾</span>
-      <span class="chip stage-committed">Committed</span><span class="text-xs text-slate-500">4 · $120,000 committed</span>
-    </div>
-
-    <div class="subgroup-head">
-      <span class="group-chev">▾</span>
-      <span class="tier tier-1">1</span><span class="text-xs font-semibold text-slate-600">Tier 1</span><span class="text-xs text-slate-400">1 · $60,000</span>
-    </div>
-    <div class="grid-row" onclick="openFlyout()">
-      <span class="font-semibold text-slate-900">Rob &amp; Ellen Castellano</span>
-      <span><span class="tier tier-1">1</span></span>
-      <span class="text-right font-semibold">$60,000</span>
-      <span><input type="checkbox" class="cb" checked onclick="event.stopPropagation()"></span>
-      <span class="text-slate-600 truncate">Fidelity Charitable</span>
-      <span class="text-right text-slate-600">$150,000</span>
-      <span class="text-right text-slate-600">$50,000</span>
-      <span><span class="yr yr-1">2025</span></span>
-      <span class="text-right text-slate-600">3</span>
       <span><span class="streak streak-run">×3</span></span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-700">Fri, Aug 14</span>
-      <span class="text-slate-600">Jul 22</span>
-      <span class="text-slate-500 truncate">$60k confirmed via Fidelity; grant letter due this month</span>
-      <span class="text-slate-300">›</span>
-    </div>
-    <div class="subgroup-head">
-      <span class="group-chev">▾</span>
-      <span class="tier tier-2">2</span><span class="text-xs font-semibold text-slate-600">Tier 2</span><span class="text-xs text-slate-400">2 · $40,000</span>
-    </div>
-    <div class="grid-row" onclick="openFlyout()">
-      <span class="font-semibold text-slate-900">Janet Okafor</span>
-      <span><span class="tier tier-2">2</span></span>
-      <span class="text-right font-semibold">$25,000</span>
-      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
-      <span class="text-slate-400">—</span>
-      <span class="text-right text-slate-600">$50,000</span>
-      <span class="text-right text-slate-600">$25,000</span>
-      <span><span class="yr yr-2">2024</span></span>
-      <span class="text-right text-slate-600">2</span>
-      <span><span class="streak streak-run">×2</span></span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-700">Tue, Sep 1</span>
-      <span class="text-slate-600">Jul 16</span>
-      <span class="text-slate-500 truncate">$25k committed; wiring after her fund distribution in Sept</span>
+      <span><span class="text-slate-400">—</span></span>
+      <span><span class="text-slate-400">—</span></span>
+      <span class="text-slate-600">Jun 24</span>
+      <span class="text-slate-500 truncate">Three-year streak via Maine CF; asked for the portfolio one-pager</span>
       <span class="text-slate-300">›</span>
     </div>
     <div class="grid-row" onclick="openFlyout()">
-      <span class="font-semibold text-slate-900">Wei Chen</span>
-      <span><span class="tier tier-2">2</span></span>
-      <span class="text-right font-semibold">$15,000</span>
-      <span><input type="checkbox" class="cb" checked onclick="event.stopPropagation()"></span>
-      <span class="text-slate-600 truncate">Schwab Charitable</span>
-      <span class="text-right text-slate-600">$15,000</span>
-      <span class="text-right text-slate-600">$15,000</span>
-      <span><span class="yr yr-1">2025</span></span>
-      <span class="text-right text-slate-600">1</span>
-      <span><span class="streak streak-new">New</span></span>
-      <span><span class="chip chip-team">Screening</span></span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-600">Jul 2</span>
-      <span class="text-slate-500 truncate">Committed $15k through Schwab Charitable</span>
-      <span class="text-slate-300">›</span>
-    </div>
-    <div class="subgroup-head">
-      <span class="group-chev">▾</span>
-      <span class="tier tier-3">3</span><span class="text-xs font-semibold text-slate-600">Tier 3</span><span class="text-xs text-slate-400">1 · $20,000</span>
-    </div>
-    <div class="grid-row" onclick="openFlyout()">
-      <span class="font-semibold text-slate-900">Hank &amp; Rosa Delgado</span>
-      <span><span class="tier tier-3">3</span></span>
-      <span class="text-right font-semibold">$20,000</span>
-      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
-      <span class="text-slate-600 truncate">Direct</span>
-      <span class="text-right text-slate-600">$72,000</span>
-      <span class="text-right text-slate-600">$20,000</span>
-      <span><span class="yr yr-1">2025</span></span>
-      <span class="text-right text-slate-600">4</span>
-      <span><span class="streak streak-run">×4</span></span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-600">Jul 9</span>
-      <span class="text-slate-500 truncate">Renewed at $20k, check going in the mail</span>
-      <span class="text-slate-300">›</span>
-    </div>
-
-    <!-- Prospect group -->
-    <div class="group-head">
-      <span class="group-chev">▾</span>
-      <span class="chip stage-prospect">Prospect</span><span class="text-xs text-slate-500">6</span>
-    </div>
-
-    <div class="subgroup-head">
-      <span class="group-chev">▾</span>
-      <span class="tier tier-1">1</span><span class="text-xs font-semibold text-slate-600">Tier 1</span><span class="text-xs text-slate-400">1</span>
-    </div>
-    <div class="grid-row" onclick="openFlyout()">
-      <span class="font-semibold text-slate-900">Simone Devereaux</span>
+      <span class="font-semibold text-slate-900">Owen Merrick</span>
       <span><span class="tier tier-1">1</span></span>
-      <span class="text-right text-slate-400">—</span>
-      <span><input type="checkbox" class="cb" checked onclick="event.stopPropagation()"></span>
-      <span class="text-slate-600 truncate">Vanguard Charitable</span>
-      <span class="text-right text-slate-600">$150,000</span>
-      <span class="text-right text-slate-600">$35,000</span>
+      <span class="text-right font-semibold">$10,000</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-600 truncate">Direct (E8 Member)</span>
+      <span class="text-right text-slate-600">$42,414</span>
+      <span class="text-right text-slate-600">$10,000</span>
       <span><span class="yr yr-1">2025</span></span>
       <span class="text-right text-slate-600">5</span>
-      <span><span class="streak streak-all">All 5</span></span>
+      <span><span class="streak streak-run">×4</span></span>
       <span><span class="chip chip-team">Screening</span></span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
+      <span><span class="text-slate-400">—</span></span>
+      <span class="text-slate-600">Jun 29</span>
+      <span class="text-slate-500 truncate">Core team; gives annually as a member — renewal expected</span>
       <span class="text-slate-300">›</span>
     </div>
-    <div class="subgroup-head">
-      <span class="group-chev">▾</span>
-      <span class="tier tier-2">2</span><span class="text-xs font-semibold text-slate-600">Tier 2</span><span class="text-xs text-slate-400">2</span>
+    </div>
+    <div class="tier-section tier-section-2">
+    <div class="tier-band tier-band-2">
+      <span class="tier tier-2">2</span>
+      <span>Tier 2</span>
+      <span class="band-note">3 · $35,000 in asks</span>
     </div>
     <div class="grid-row" onclick="openFlyout()">
-      <span class="font-semibold text-slate-900">Nate Okonkwo</span>
+      <span class="font-semibold text-slate-900">Celia Marchetti</span>
       <span><span class="tier tier-2">2</span></span>
-      <span class="text-right text-slate-400">—</span>
-      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
-      <span class="text-slate-400">—</span>
-      <span class="text-right text-slate-600">$15,000</span>
-      <span class="text-right text-slate-600">$8,000</span>
-      <span><span class="yr yr-2">2024</span></span>
-      <span class="text-right text-slate-600">2</span>
-      <span><span class="streak streak-run">×2</span></span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-300">›</span>
-    </div>
-    <div class="grid-row" onclick="openFlyout()">
-      <span class="font-semibold text-slate-900">Lily Tran</span>
-      <span><span class="tier tier-2">2</span></span>
-      <span class="text-right text-slate-400">—</span>
-      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
-      <span class="text-slate-600 truncate">Maine Community Foundation</span>
-      <span class="text-right text-slate-600">$36,000</span>
-      <span class="text-right text-slate-600">$15,000</span>
-      <span><span class="yr yr-2">2024</span></span>
-      <span class="text-right text-slate-600">3</span>
-      <span><span class="streak streak-run">×3</span></span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-300">›</span>
-    </div>
-    <div class="subgroup-head">
-      <span class="group-chev">▾</span>
-      <span class="tier tier-3">3</span><span class="text-xs font-semibold text-slate-600">Tier 3</span><span class="text-xs text-slate-400">2</span>
-    </div>
-    <div class="grid-row" onclick="openFlyout()">
-      <span class="font-semibold text-slate-900">Tom Brandvold</span>
-      <span><span class="tier tier-3">3</span></span>
-      <span class="text-right text-slate-400">—</span>
-      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
-      <span class="text-slate-400">—</span>
-      <span class="text-right text-slate-600">$20,000</span>
-      <span class="text-right text-slate-600">$12,000</span>
-      <span><span class="yr yr-3">2023</span></span>
-      <span class="text-right text-slate-600">2</span>
-      <span><span class="streak streak-run">×2</span></span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-300">›</span>
-    </div>
-    <div class="grid-row" onclick="openFlyout()">
-      <span class="font-semibold text-slate-900">Grace Liu</span>
-      <span><span class="tier tier-3">3</span></span>
-      <span class="text-right text-slate-400">—</span>
-      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
-      <span class="text-slate-400">—</span>
-      <span class="text-right text-slate-600">$10,000</span>
-      <span class="text-right text-slate-600">$10,000</span>
-      <span><span class="yr yr-3">2023</span></span>
-      <span class="text-right text-slate-600">1</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-300">›</span>
-    </div>
-    <div class="subgroup-head">
-      <span class="group-chev">▾</span>
-      <span class="text-xs font-semibold text-slate-500">No tier</span><span class="text-xs text-slate-400">1</span>
-    </div>
-    <div class="grid-row" onclick="openFlyout()">
-      <span class="font-semibold text-slate-900">Aaron Fisk</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-right text-slate-400">—</span>
+      <span class="text-right font-semibold">$15,000</span>
       <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
       <span class="text-slate-600 truncate">Schwab Charitable</span>
       <span class="text-right text-slate-600">$10,000</span>
-      <span class="text-right text-slate-600">$5,000</span>
-      <span><span class="yr yr-4">2022</span></span>
-      <span class="text-right text-slate-600">2</span>
-      <span><span class="streak streak-run">×2</span></span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
-      <span class="text-slate-400">—</span>
+      <span class="text-right text-slate-600">$10,000</span>
+      <span><span class="yr yr-2">2024</span></span>
+      <span class="text-right text-slate-600">1</span>
+      <span><span class="text-slate-400">—</span></span>
+      <span><span class="text-slate-400">—</span></span>
+      <span><span class="text-slate-700">Fri, Jul 31</span></span>
+      <span class="text-slate-600">Jun 29</span>
+      <span class="text-slate-500 truncate">First gift 2024; re-engaging after missing 2025</span>
       <span class="text-slate-300">›</span>
     </div>
-
-    <!-- Collapsed groups -->
-    <div class="group-head">
-      <span class="group-chev">▸</span>
-      <span class="chip stage-received">Received</span><span class="text-xs text-slate-500">3 · $65,000</span>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Marcus Bell</span>
+      <span><span class="tier tier-2">2</span></span>
+      <span class="text-right font-semibold">$10,000</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-600 truncate">Fidelity Charitable</span>
+      <span class="text-right text-slate-600">$5,000</span>
+      <span class="text-right text-slate-600">$5,000</span>
+      <span><span class="yr yr-2">2024</span></span>
+      <span class="text-right text-slate-600">1</span>
+      <span><span class="text-slate-400">—</span></span>
+      <span><span class="text-slate-400">—</span></span>
+      <span><span class="text-slate-400">—</span></span>
+      <span class="text-slate-600">Jun 29</span>
+      <span class="text-slate-500 truncate">Fidelity DAF; said he’d revisit after summer</span>
+      <span class="text-slate-300">›</span>
     </div>
-    <div class="group-head" style="border-bottom-left-radius:8px;border-bottom-right-radius:8px;">
-      <span class="group-chev">▸</span>
-      <span class="chip stage-declined">Declined</span><span class="text-xs text-slate-500">2</span>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Ingrid Fossum</span>
+      <span><span class="tier tier-2">2</span></span>
+      <span class="text-right font-semibold">$10,000</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-right text-slate-600">$10,000</span>
+      <span class="text-right text-slate-600">$10,000</span>
+      <span><span class="yr yr-4">2022</span></span>
+      <span class="text-right text-slate-600">1</span>
+      <span><span class="text-slate-400">—</span></span>
+      <span><span class="text-slate-400">—</span></span>
+      <span><span class="text-slate-400">—</span></span>
+      <span class="text-slate-600">Jun 29</span>
+      <span class="text-slate-500 truncate">Gave 2022; reconnecting — no reply yet</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    </div>
+    <div class="tier-section tier-section-3">
+    <div class="tier-band tier-band-3">
+      <span class="tier tier-3">3</span>
+      <span>Tier 3</span>
+      <span class="band-note">2 · $1,750 in asks</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Walter Nakagawa</span>
+      <span><span class="tier tier-3">3</span></span>
+      <span class="text-right font-semibold">$1,250</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-right text-slate-600">$1,250</span>
+      <span class="text-right text-slate-600">$250</span>
+      <span><span class="yr yr-2">2024</span></span>
+      <span class="text-right text-slate-600">5</span>
+      <span><span class="streak streak-run">×5</span></span>
+      <span><span class="text-slate-400">—</span></span>
+      <span><span class="text-slate-400">—</span></span>
+      <span class="text-slate-600">Jul 9</span>
+      <span class="text-slate-500 truncate">Five small gifts 2020–24; loyal, will renew</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Renee Caldwell</span>
+      <span><span class="tier tier-3">3</span></span>
+      <span class="text-right font-semibold">$500</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-right text-slate-600">$500</span>
+      <span class="text-right text-slate-600">$500</span>
+      <span><span class="yr yr-4">2022</span></span>
+      <span class="text-right text-slate-600">1</span>
+      <span><span class="text-slate-400">—</span></span>
+      <span><span class="text-slate-400">—</span></span>
+      <span><span class="text-slate-400">—</span></span>
+      <span class="text-slate-600">Jul 9</span>
+      <span class="text-slate-500 truncate">One-time 2022 donor; soft re-intro sent</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    </div>
+    <div class="stage-band band-committed">
+      <span class="caret">▸</span>
+      <span>Committed</span>
+      <span class="band-note">9 · $252,500</span>
+    </div>
+    <div class="stage-band band-received">
+      <span class="caret">▸</span>
+      <span>Received</span>
+      <span class="band-note">1 · $23,280</span>
+    </div>
+    <div class="stage-band band-declined">
+      <span class="caret">▸</span>
+      <span>Declined</span>
+      <span class="band-note">7</span>
     </div>
     </div>
     </div>
@@ -498,13 +443,12 @@
 <div class="overlay" id="overlay" onclick="closeFlyout()"></div>
 <div class="flyout" id="flyout">
   <div class="px-5 py-4 border-b border-slate-200 flex items-start gap-3">
-    <div class="avatar" style="width:38px;height:38px;font-size:14px;">DW</div>
+    <div class="avatar" style="width:38px;height:38px;font-size:14px;">PV</div>
     <div class="flex-1 min-w-0">
       <div class="flex items-center gap-2">
-        <div class="font-bold text-slate-900 text-lg leading-tight">Dana Whitfield</div>
-        <span class="chip chip-team">D8 Screening ’26</span>
+        <div class="font-bold text-slate-900 text-lg leading-tight">Paul Vandermeer</div>
       </div>
-      <a class="text-sm text-slate-500 hover:text-blue-700 hover:underline cursor-pointer" href="mailto:Dana%20Whitfield%20%3Cdana.whitfield@example.com%3E" target="_blank" rel="noopener">dana.whitfield@example.com</a>
+      <a class="text-sm text-slate-500 hover:text-blue-700 hover:underline cursor-pointer" href="mailto:Paul%20Vandermeer%20%3Cpaul.vandermeer@example.com%3E" target="_blank" rel="noopener">paul.vandermeer@example.com</a>
     </div>
     <button class="text-slate-400 hover:text-slate-700 text-xl leading-none ml-1" onclick="closeFlyout()">×</button>
   </div>
@@ -535,13 +479,13 @@
           </div>
           <div>
             <div class="label">Ask</div>
-            <input value="$25,000" class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm font-semibold" />
+            <input value="$50,000" class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm font-semibold" />
           </div>
         </div>
         <div class="grid grid-cols-3 gap-3 mt-3">
           <div class="col-span-2">
             <div class="label">DAF / Mechanism</div>
-            <input value="Fidelity Charitable" list="mechanisms" class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" />
+            <input value="Direct" list="mechanisms" class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" />
             <datalist id="mechanisms">
               <option>Fidelity Charitable</option>
               <option>Schwab Charitable</option>
@@ -561,11 +505,11 @@
             <div class="label">Status</div>
             <div class="text-xs text-slate-400 flex items-center gap-1.5"><span class="chip chip-ai">AI</span> updated Tue, Jul 21</div>
           </div>
-          <textarea rows="3" class="mt-1 w-full border border-slate-300 rounded-md px-2.5 py-1.5 text-sm leading-snug resize-none">Leaning yes at $25,000 via her Fidelity DAF. Wants to talk it over with her partner first; planning to decide by early August.</textarea>
+          <textarea rows="3" class="mt-1 w-full border border-slate-300 rounded-md px-2.5 py-1.5 text-sm leading-snug resize-none">Gap giver — $100,000 in 2022 and $50,000 in 2025. Open to renewing at $50k but traveling until August; wants to talk when he's back.</textarea>
         </div>
         <div class="mt-3 w-48">
           <div class="label">Follow up on</div>
-          <input value="Mon, Aug 3, 2026" class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" />
+          <input value="Mon, Aug 10, 2026" class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" />
         </div>
       </div>
 
@@ -574,24 +518,24 @@
         <div class="grid grid-cols-4 gap-2 mb-3">
           <div class="bg-slate-50 rounded-md px-2.5 py-2">
             <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">Lifetime</div>
-            <div class="text-sm font-bold text-slate-900">$40,000</div>
+            <div class="text-sm font-bold text-slate-900">$150,000</div>
           </div>
           <div class="bg-slate-50 rounded-md px-2.5 py-2">
             <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">Average</div>
-            <div class="text-sm font-bold text-slate-900">$20,000</div>
+            <div class="text-sm font-bold text-slate-900">$75,000</div>
           </div>
           <div class="bg-slate-50 rounded-md px-2.5 py-2">
             <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">Most recent</div>
-            <div class="text-sm font-bold text-slate-900">$25,000 <span class="text-xs font-medium text-slate-400">2023</span></div>
+            <div class="text-sm font-bold text-slate-900">$50,000 <span class="text-xs font-medium text-slate-400">2025</span></div>
           </div>
           <div class="bg-slate-50 rounded-md px-2.5 py-2">
             <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">Prior</div>
-            <div class="text-sm font-bold text-slate-900">$15,000 <span class="text-xs font-medium text-slate-400">2021</span></div>
+            <div class="text-sm font-bold text-slate-900">$100,000 <span class="text-xs font-medium text-slate-400">2022</span></div>
           </div>
         </div>
         <div class="text-sm space-y-1.5">
-          <div class="flex items-center justify-between"><span class="text-slate-600">Decarbon8 2023</span><span class="flex items-center gap-2"><span class="chip chip-recoverable">Recoverable</span><span class="font-semibold">$25,000</span></span></div>
-          <div class="flex items-center justify-between"><span class="text-slate-600">Decarbon8 2021</span><span class="font-semibold">$15,000</span></div>
+          <div class="flex items-center justify-between"><span class="text-slate-600">Decarbon8 2025</span><span class="flex items-center gap-2"><span class="chip chip-recoverable">Recoverable</span><span class="font-semibold">$50,000</span></span></div>
+          <div class="flex items-center justify-between"><span class="text-slate-600">Decarbon8 2022</span><span class="font-semibold">$100,000</span></div>
         </div>
       </div>
     </div>
@@ -608,14 +552,14 @@
           <div class="flex gap-3">
             <div class="tl-dot tl-ai"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.7L19.6 9l-5.7 1.9L12 16.6l-1.9-5.7L4.4 9l5.7-1.3L12 2zM19 14l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z"/></svg></div>
             <div class="flex-1 min-w-0">
-              <div class="text-sm text-slate-800">Set ask to <b>$25,000</b> and follow-up to <b>Mon, Aug 3</b></div>
+              <div class="text-sm text-slate-800">Set ask to <b>$50,000</b> and follow-up to <b>Mon, Aug 10</b></div>
               <div class="text-xs text-slate-400 mt-0.5 flex items-center gap-2">Tue, Jul 21 · <span class="chip chip-ai">AI</span></div>
             </div>
           </div>
           <div class="flex gap-3">
             <div class="tl-dot tl-in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg></div>
             <div class="flex-1 min-w-0">
-              <div class="text-sm text-slate-800">Replied that she's thinking about $25k through her Fidelity DAF; wants to decide by early August
+              <div class="text-sm text-slate-800">Replied that he's open to $50k again but traveling until August; asked to reconnect then
                 <a class="gmail-link ml-1" href="#" title="Open in Gmail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg><svg class="ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
               </div>
               <div class="text-xs text-slate-400 mt-0.5">Tue, Jul 21</div>
@@ -624,7 +568,7 @@
           <div class="flex gap-3">
             <div class="tl-dot tl-out"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.7 3.3c-.6-.3-1.2.3-1 .9l2.4 6.9c.1.4.5.7.9.7l8 .2-8 .2c-.4 0-.8.3-.9.7l-2.4 6.9c-.2.6.4 1.2 1 .9l18-8.1c.6-.3.6-1.1 0-1.4l-18-8z"/></svg></div>
             <div class="flex-1 min-w-0">
-              <div class="text-sm text-slate-800">Karin invited her to renew for 2026 and shared the impact summary
+              <div class="text-sm text-slate-800">Karin invited him to renew for 2026 and shared the impact summary
                 <a class="gmail-link ml-1" href="#" title="Open in Gmail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg><svg class="ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
               </div>
               <div class="text-xs text-slate-400 mt-0.5">Fri, Jul 17</div>
@@ -640,7 +584,7 @@
           <div class="flex gap-3">
             <div class="tl-dot tl-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
             <div class="flex-1 min-w-0">
-              <div class="text-sm text-slate-800">Chatted at the June showcase — very interested in the storage companies this year</div>
+              <div class="text-sm text-slate-800">Chatted at the June showcase — asked how the 2022 cohort companies are doing</div>
               <div class="text-xs text-slate-400 mt-0.5">Thu, Jun 11 · Karin</div>
             </div>
           </div>
