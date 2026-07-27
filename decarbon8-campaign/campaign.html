@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Decarbon8 — Campaign</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; background:#f8fafc; }
+  .card { background:#fff; border:1px solid #e2e8f0; border-radius:8px; }
+  .label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#64748b; }
+
+  .stage-prospect     { background:#f1f5f9; color:#475569; }
+  .stage-conversation { background:#dbeafe; color:#1e3a8a; }
+  .stage-committed    { background:#1d4ed8; color:#ffffff; }
+  .stage-received     { background:#059669; color:#ffffff; }
+  .stage-declined     { background:#fee2e2; color:#991b1b; }
+
+  .chip { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; border-radius:999px; padding:2px 9px; white-space:nowrap; }
+  .chip-ai { background:#faf5ff; color:#6b21a8; border:1px solid #e9d5ff; }
+  .chip-due { background:#fff7ed; color:#9a3412; border:1px solid #fed7aa; }
+  .chip-recoverable { background:#f0fdfa; color:#115e59; border:1px solid #99f6e4; }
+  .chip-team { background:#eef2ff; color:#3730a3; border:1px solid #c7d2fe; }
+
+  .tier { display:inline-flex; align-items:center; justify-content:center; width:26px; height:20px; border-radius:6px; font-size:11px; font-weight:700; }
+  .tier-1 { background:#fef3c7; color:#92400e; border:1px solid #fde68a; }
+  .tier-2 { background:#e0e7ff; color:#3730a3; border:1px solid #c7d2fe; }
+  .tier-3 { background:#d1fae5; color:#065f46; border:1px solid #a7f3d0; }
+
+  .streak { font-size:11px; font-weight:700; border-radius:5px; padding:1px 7px; white-space:nowrap; }
+  .streak-all { background:#059669; color:#fff; }
+  .streak-run { background:#d1fae5; color:#065f46; border:1px solid #a7f3d0; }
+  .streak-ret { background:#fef3c7; color:#92400e; border:1px solid #fde68a; }
+  .streak-alt { background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; }
+  .streak-new { background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; }
+
+  .yr { font-size:11px; font-weight:700; border-radius:5px; padding:1px 6px; }
+  .yr-1 { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; }
+  .yr-2 { background:#f7fee7; color:#3f6212; border:1px solid #d9f99d; }
+  .yr-3 { background:#fefce8; color:#854d0e; border:1px solid #fde68a; }
+  .yr-4 { background:#fff7ed; color:#9a3412; border:1px solid #fed7aa; }
+  .yr-5 { background:#fef2f2; color:#991b1b; border:1px solid #fecaca; }
+
+  .avatar { width:24px; height:24px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; border:1px solid #cbd5e1; background:#fff; color:#334155; font-size:10px; font-weight:700; flex-shrink:0; }
+
+  .grid-scroll { overflow-x:auto; }
+  .grid-inner { min-width:1660px; }
+  .grid-row  { display:grid; grid-template-columns: minmax(150px,1.1fr) 48px 85px 88px 150px 90px 85px 62px 44px 76px 92px 105px 95px minmax(200px,1.5fr) 24px; gap:12px; align-items:center; padding:9px 16px; border-top:1px solid #f1f5f9; font-size:13px; cursor:pointer; }
+  .grid-row:hover { background:#f8fafc; }
+  .grid-head { display:grid; grid-template-columns: minmax(150px,1.1fr) 48px 85px 88px 150px 90px 85px 62px 44px 76px 92px 105px 95px minmax(200px,1.5fr) 24px; gap:12px; padding:8px 16px; }
+
+  .group-head { display:flex; align-items:center; gap:8px; padding:7px 16px; background:#f8fafc; border-top:1px solid #e2e8f0; cursor:pointer; user-select:none; }
+  .group-head:hover { background:#f1f5f9; }
+  .group-chev { color:#94a3b8; font-size:11px; width:12px; }
+  .subgroup-head { display:flex; align-items:center; gap:8px; padding:5px 16px 5px 36px; background:#fcfdff; border-top:1px solid #f1f5f9; cursor:pointer; user-select:none; }
+  .subgroup-head:hover { background:#f8fafc; }
+
+  .cb { accent-color:#1d4ed8; width:15px; height:15px; }
+
+  .stage-select { font-weight:600; }
+  .stage-select.stage-prospect     { border-color:#cbd5e1; }
+  .stage-select.stage-conversation { border-color:#93c5fd; }
+  .stage-select.stage-committed    { border-color:#1d4ed8; }
+  .stage-select.stage-received     { border-color:#059669; }
+  .stage-select.stage-declined     { border-color:#fca5a5; }
+  .stage-select option { background:#fff; color:#0f172a; font-weight:500; }
+
+  /* Toggle switch */
+  .switch { position:relative; width:36px; height:20px; border-radius:999px; background:#059669; cursor:pointer; flex-shrink:0; }
+  .switch::after { content:''; position:absolute; top:2px; left:18px; width:16px; height:16px; border-radius:999px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.25); }
+
+  .flyout { position:fixed; top:0; right:-1080px; width:1040px; max-width:96vw; height:100vh; background:#fff; border-left:1px solid #e2e8f0; box-shadow:-8px 0 30px rgba(15,23,42,.12); transition:right .25s ease; z-index:40; display:flex; flex-direction:column; }
+  .flyout.open { right:0; }
+  .overlay { position:fixed; inset:0; background:rgba(15,23,42,.25); opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:30; }
+  .overlay.open { opacity:1; pointer-events:auto; }
+
+  .flyout-body { flex:1; display:grid; grid-template-columns:1fr 1fr; min-height:0; }
+  .flyout-col { overflow-y:auto; min-height:0; }
+  .flyout-col + .flyout-col { border-left:1px solid #e2e8f0; }
+  @media (max-width: 900px) { .flyout-body { grid-template-columns:1fr; overflow-y:auto; } .flyout-col { overflow:visible; } .flyout-col + .flyout-col { border-left:none; border-top:1px solid #e2e8f0; } }
+
+  .tl-dot { width:28px; height:28px; border-radius:999px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .tl-in  { background:#dbeafe; color:#1d4ed8; }
+  .tl-out { background:#f1f5f9; color:#475569; }
+  .tl-ai  { background:#faf5ff; color:#7c3aed; }
+  .tl-note{ background:#fef9c3; color:#854d0e; }
+  .tl-dot svg { width:14px; height:14px; }
+
+  .gmail-link { display:inline-flex; align-items:center; gap:2px; color:#64748b; vertical-align:-2px; }
+  .gmail-link:hover { color:#1d4ed8; }
+  .gmail-link svg { width:13px; height:13px; }
+  .gmail-link .ext { width:9px; height:9px; }
+
+  .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:60; }
+  .modal.open { display:flex; }
+  .modal-card { background:#fff; border-radius:10px; box-shadow:0 20px 60px rgba(15,23,42,.3); width:440px; max-width:92vw; }
+</style>
+</head>
+<body>
+
+<!-- Top nav (simplified portal chrome) -->
+<div class="bg-slate-900 text-white">
+  <div class="max-w-7xl mx-auto px-4 h-12 flex items-center gap-6 text-sm">
+    <span class="font-bold tracking-tight">E8 Tools</span>
+    <span class="text-slate-400">Members</span>
+    <span class="text-slate-400">Companies</span>
+    <span class="text-white font-semibold border-b-2 border-emerald-400 h-12 flex items-center">Decarbon8</span>
+    <span class="text-slate-400">Annual Fund</span>
+    <span class="text-slate-400">Development</span>
+  </div>
+</div>
+<div class="bg-white border-b border-slate-200">
+  <div class="max-w-7xl mx-auto px-4 flex items-center gap-1 text-sm">
+    <span class="px-3 py-2.5 text-slate-500">Pipeline</span>
+    <span class="px-3 py-2.5 text-slate-500">Portfolio</span>
+    <span class="px-3 py-2.5 text-slate-500">Donors</span>
+    <span class="px-3 py-2.5 font-semibold text-slate-900 border-b-2 border-blue-600">Campaign</span>
+    <span class="px-3 py-2.5 text-slate-500">Settings</span>
+  </div>
+</div>
+
+<div class="max-w-[1700px] mx-auto px-4 py-5">
+
+  <!-- Header row -->
+  <div class="flex flex-wrap items-center gap-3 mb-4">
+    <h1 class="text-xl font-bold text-slate-900">Donor Campaign</h1>
+    <select class="border border-slate-300 rounded-md text-sm px-2 py-1.5 bg-white">
+      <option>2026</option><option>2023</option><option>2022</option><option>2021</option><option>2020</option>
+    </select>
+    <div class="flex items-center gap-2 pl-1">
+      <span class="switch"></span>
+      <span class="text-sm font-medium text-emerald-700">Active</span>
+    </div>
+    <div class="flex-1"></div>
+    <button class="text-sm px-3 py-1.5 rounded-md border border-slate-300 bg-white text-slate-700 hover:bg-slate-50">Start 2027 Campaign</button>
+    <button class="text-sm px-3 py-1.5 rounded-md border border-slate-300 bg-white text-slate-700 hover:bg-slate-50">+ Add Prospect</button>
+    <button class="text-sm px-3 py-1.5 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700">Contact…</button>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+    <div class="card p-3">
+      <div class="label">Committed</div>
+      <div class="text-2xl font-bold text-blue-700 mt-1">$120,000</div>
+      <div class="text-xs text-slate-500 mt-0.5">4 donors</div>
+    </div>
+    <div class="card p-3">
+      <div class="label">Received</div>
+      <div class="text-2xl font-bold text-emerald-600 mt-1">$65,000</div>
+      <div class="text-xs text-slate-500 mt-0.5">3 donors</div>
+    </div>
+    <div class="card p-3">
+      <div class="label">In Play</div>
+      <div class="text-2xl font-bold text-slate-900 mt-1">$92,500</div>
+      <div class="text-xs text-slate-500 mt-0.5">9 prospects &amp; conversations</div>
+    </div>
+    <div class="card p-3">
+      <div class="label">Pipeline</div>
+      <div class="flex items-center gap-2 mt-2 text-xs font-semibold">
+        <span class="chip stage-prospect">6 Prospect</span>
+        <span class="chip stage-conversation">3 In Conversation</span>
+      </div>
+      <div class="flex items-center gap-2 mt-1.5 text-xs font-semibold">
+        <span class="chip stage-committed">4 Committed</span>
+        <span class="chip stage-received">3 Received</span>
+        <span class="chip stage-declined">2 Declined</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div class="card">
+    <div class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-slate-200">
+      <select class="border border-slate-300 rounded-md text-sm px-2 py-1.5 bg-white font-medium">
+        <option>View: All prospects</option>
+        <option>View: Ready for follow-up</option>
+        <option>View: Needs attention</option>
+        <option>View: Committed, not received</option>
+      </select>
+      <div class="flex-1"></div>
+      <input placeholder="Search…" class="border border-slate-300 rounded-md text-sm px-2.5 py-1.5 w-44" />
+    </div>
+
+    <div class="grid-scroll">
+    <div class="grid-inner">
+    <div class="grid-head label">
+      <span>Donor</span>
+      <span>Tier</span>
+      <span class="text-right">Ask</span>
+      <span>Recoverable</span>
+      <span>DAF / Mechanism</span>
+      <span class="text-right">Lifetime</span>
+      <span class="text-right">Last Gift</span>
+      <span>Last Yr</span>
+      <span class="text-right">Yrs</span>
+      <span>Streak</span>
+      <span>D8 Team</span>
+      <span>Follow-up</span>
+      <span>Last Contact</span>
+      <span>Status</span>
+      <span></span>
+    </div>
+
+    <!-- In Conversation group -->
+    <div class="group-head">
+      <span class="group-chev">▾</span>
+      <span class="chip stage-conversation">In Conversation</span><span class="text-xs text-slate-500">3 · $92,500 in asks</span>
+    </div>
+
+    <div class="subgroup-head">
+      <span class="group-chev">▾</span>
+      <span class="tier tier-1">1</span><span class="text-xs font-semibold text-slate-600">Tier 1</span><span class="text-xs text-slate-400">2 · $75,000 in asks</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Miguel Serrano</span>
+      <span><span class="tier tier-1">1</span></span>
+      <span class="text-right font-semibold">$50,000</span>
+      <span><input type="checkbox" class="cb" checked onclick="event.stopPropagation()"></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-right text-slate-600">$75,000</span>
+      <span class="text-right text-slate-600">$30,000</span>
+      <span><span class="yr yr-1">2025</span></span>
+      <span class="text-right text-slate-600">3</span>
+      <span><span class="streak streak-ret">Returned</span></span>
+      <span class="text-slate-400">—</span>
+      <span><span class="chip chip-due">Mon, Jul 27</span></span>
+      <span class="text-slate-600">Jul 13</span>
+      <span class="text-slate-500 truncate">Wants portfolio numbers before committing ~$50k</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Dana Whitfield</span>
+      <span><span class="tier tier-1">1</span></span>
+      <span class="text-right font-semibold">$25,000</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-600 truncate">Fidelity Charitable</span>
+      <span class="text-right text-slate-600">$40,000</span>
+      <span class="text-right text-slate-600">$25,000</span>
+      <span><span class="yr yr-3">2023</span></span>
+      <span class="text-right text-slate-600">2</span>
+      <span><span class="streak streak-alt">Alt</span></span>
+      <span><span class="chip chip-team">Screening</span></span>
+      <span class="text-slate-700">Mon, Aug 3</span>
+      <span class="text-slate-600">Jul 21</span>
+      <span class="text-slate-500 truncate">Leaning yes at $25k; deciding with partner by early Aug</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    <div class="subgroup-head">
+      <span class="group-chev">▾</span>
+      <span class="tier tier-2">2</span><span class="text-xs font-semibold text-slate-600">Tier 2</span><span class="text-xs text-slate-400">1 · $17,500 in asks</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Priya Raman</span>
+      <span><span class="tier tier-2">2</span></span>
+      <span class="text-right font-semibold">$17,500</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-600 truncate">Seattle Foundation</span>
+      <span class="text-right text-slate-600">$17,500</span>
+      <span class="text-right text-slate-600">$17,500</span>
+      <span><span class="yr yr-3">2023</span></span>
+      <span class="text-right text-slate-600">1</span>
+      <span><span class="streak streak-alt">—</span></span>
+      <span><span class="chip chip-team">Judge</span></span>
+      <span><span class="chip chip-due">Fri, Jul 17</span></span>
+      <span class="text-slate-600">Jun 26</span>
+      <span class="text-slate-500 truncate">No reply to Karin's June check-in; nudge again</span>
+      <span class="text-slate-300">›</span>
+    </div>
+
+    <!-- Committed group -->
+    <div class="group-head">
+      <span class="group-chev">▾</span>
+      <span class="chip stage-committed">Committed</span><span class="text-xs text-slate-500">4 · $120,000 committed</span>
+    </div>
+
+    <div class="subgroup-head">
+      <span class="group-chev">▾</span>
+      <span class="tier tier-1">1</span><span class="text-xs font-semibold text-slate-600">Tier 1</span><span class="text-xs text-slate-400">1 · $60,000</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Rob &amp; Ellen Castellano</span>
+      <span><span class="tier tier-1">1</span></span>
+      <span class="text-right font-semibold">$60,000</span>
+      <span><input type="checkbox" class="cb" checked onclick="event.stopPropagation()"></span>
+      <span class="text-slate-600 truncate">Fidelity Charitable</span>
+      <span class="text-right text-slate-600">$150,000</span>
+      <span class="text-right text-slate-600">$50,000</span>
+      <span><span class="yr yr-1">2025</span></span>
+      <span class="text-right text-slate-600">3</span>
+      <span><span class="streak streak-run">×3</span></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-700">Fri, Aug 14</span>
+      <span class="text-slate-600">Jul 22</span>
+      <span class="text-slate-500 truncate">$60k confirmed via Fidelity; grant letter due this month</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    <div class="subgroup-head">
+      <span class="group-chev">▾</span>
+      <span class="tier tier-2">2</span><span class="text-xs font-semibold text-slate-600">Tier 2</span><span class="text-xs text-slate-400">2 · $40,000</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Janet Okafor</span>
+      <span><span class="tier tier-2">2</span></span>
+      <span class="text-right font-semibold">$25,000</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-right text-slate-600">$50,000</span>
+      <span class="text-right text-slate-600">$25,000</span>
+      <span><span class="yr yr-2">2024</span></span>
+      <span class="text-right text-slate-600">2</span>
+      <span><span class="streak streak-run">×2</span></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-700">Tue, Sep 1</span>
+      <span class="text-slate-600">Jul 16</span>
+      <span class="text-slate-500 truncate">$25k committed; wiring after her fund distribution in Sept</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Wei Chen</span>
+      <span><span class="tier tier-2">2</span></span>
+      <span class="text-right font-semibold">$15,000</span>
+      <span><input type="checkbox" class="cb" checked onclick="event.stopPropagation()"></span>
+      <span class="text-slate-600 truncate">Schwab Charitable</span>
+      <span class="text-right text-slate-600">$15,000</span>
+      <span class="text-right text-slate-600">$15,000</span>
+      <span><span class="yr yr-1">2025</span></span>
+      <span class="text-right text-slate-600">1</span>
+      <span><span class="streak streak-new">New</span></span>
+      <span><span class="chip chip-team">Screening</span></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-600">Jul 2</span>
+      <span class="text-slate-500 truncate">Committed $15k through Schwab Charitable</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    <div class="subgroup-head">
+      <span class="group-chev">▾</span>
+      <span class="tier tier-3">3</span><span class="text-xs font-semibold text-slate-600">Tier 3</span><span class="text-xs text-slate-400">1 · $20,000</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Hank &amp; Rosa Delgado</span>
+      <span><span class="tier tier-3">3</span></span>
+      <span class="text-right font-semibold">$20,000</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-600 truncate">Direct</span>
+      <span class="text-right text-slate-600">$72,000</span>
+      <span class="text-right text-slate-600">$20,000</span>
+      <span><span class="yr yr-1">2025</span></span>
+      <span class="text-right text-slate-600">4</span>
+      <span><span class="streak streak-run">×4</span></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-600">Jul 9</span>
+      <span class="text-slate-500 truncate">Renewed at $20k, check going in the mail</span>
+      <span class="text-slate-300">›</span>
+    </div>
+
+    <!-- Prospect group -->
+    <div class="group-head">
+      <span class="group-chev">▾</span>
+      <span class="chip stage-prospect">Prospect</span><span class="text-xs text-slate-500">6</span>
+    </div>
+
+    <div class="subgroup-head">
+      <span class="group-chev">▾</span>
+      <span class="tier tier-1">1</span><span class="text-xs font-semibold text-slate-600">Tier 1</span><span class="text-xs text-slate-400">1</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Simone Devereaux</span>
+      <span><span class="tier tier-1">1</span></span>
+      <span class="text-right text-slate-400">—</span>
+      <span><input type="checkbox" class="cb" checked onclick="event.stopPropagation()"></span>
+      <span class="text-slate-600 truncate">Vanguard Charitable</span>
+      <span class="text-right text-slate-600">$150,000</span>
+      <span class="text-right text-slate-600">$35,000</span>
+      <span><span class="yr yr-1">2025</span></span>
+      <span class="text-right text-slate-600">5</span>
+      <span><span class="streak streak-all">All 5</span></span>
+      <span><span class="chip chip-team">Screening</span></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    <div class="subgroup-head">
+      <span class="group-chev">▾</span>
+      <span class="tier tier-2">2</span><span class="text-xs font-semibold text-slate-600">Tier 2</span><span class="text-xs text-slate-400">2</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Nate Okonkwo</span>
+      <span><span class="tier tier-2">2</span></span>
+      <span class="text-right text-slate-400">—</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-right text-slate-600">$15,000</span>
+      <span class="text-right text-slate-600">$8,000</span>
+      <span><span class="yr yr-2">2024</span></span>
+      <span class="text-right text-slate-600">2</span>
+      <span><span class="streak streak-run">×2</span></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Lily Tran</span>
+      <span><span class="tier tier-2">2</span></span>
+      <span class="text-right text-slate-400">—</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-600 truncate">Maine Community Foundation</span>
+      <span class="text-right text-slate-600">$36,000</span>
+      <span class="text-right text-slate-600">$15,000</span>
+      <span><span class="yr yr-2">2024</span></span>
+      <span class="text-right text-slate-600">3</span>
+      <span><span class="streak streak-run">×3</span></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    <div class="subgroup-head">
+      <span class="group-chev">▾</span>
+      <span class="tier tier-3">3</span><span class="text-xs font-semibold text-slate-600">Tier 3</span><span class="text-xs text-slate-400">2</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Tom Brandvold</span>
+      <span><span class="tier tier-3">3</span></span>
+      <span class="text-right text-slate-400">—</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-right text-slate-600">$20,000</span>
+      <span class="text-right text-slate-600">$12,000</span>
+      <span><span class="yr yr-3">2023</span></span>
+      <span class="text-right text-slate-600">2</span>
+      <span><span class="streak streak-run">×2</span></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Grace Liu</span>
+      <span><span class="tier tier-3">3</span></span>
+      <span class="text-right text-slate-400">—</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-right text-slate-600">$10,000</span>
+      <span class="text-right text-slate-600">$10,000</span>
+      <span><span class="yr yr-3">2023</span></span>
+      <span class="text-right text-slate-600">1</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-300">›</span>
+    </div>
+    <div class="subgroup-head">
+      <span class="group-chev">▾</span>
+      <span class="text-xs font-semibold text-slate-500">No tier</span><span class="text-xs text-slate-400">1</span>
+    </div>
+    <div class="grid-row" onclick="openFlyout()">
+      <span class="font-semibold text-slate-900">Aaron Fisk</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-right text-slate-400">—</span>
+      <span><input type="checkbox" class="cb" onclick="event.stopPropagation()"></span>
+      <span class="text-slate-600 truncate">Schwab Charitable</span>
+      <span class="text-right text-slate-600">$10,000</span>
+      <span class="text-right text-slate-600">$5,000</span>
+      <span><span class="yr yr-4">2022</span></span>
+      <span class="text-right text-slate-600">2</span>
+      <span><span class="streak streak-run">×2</span></span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-400">—</span>
+      <span class="text-slate-300">›</span>
+    </div>
+
+    <!-- Collapsed groups -->
+    <div class="group-head">
+      <span class="group-chev">▸</span>
+      <span class="chip stage-received">Received</span><span class="text-xs text-slate-500">3 · $65,000</span>
+    </div>
+    <div class="group-head" style="border-bottom-left-radius:8px;border-bottom-right-radius:8px;">
+      <span class="group-chev">▸</span>
+      <span class="chip stage-declined">Declined</span><span class="text-xs text-slate-500">2</span>
+    </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+<!-- Flyout -->
+<div class="overlay" id="overlay" onclick="closeFlyout()"></div>
+<div class="flyout" id="flyout">
+  <div class="px-5 py-4 border-b border-slate-200 flex items-start gap-3">
+    <div class="avatar" style="width:38px;height:38px;font-size:14px;">DW</div>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2">
+        <div class="font-bold text-slate-900 text-lg leading-tight">Dana Whitfield</div>
+        <span class="chip chip-team">D8 Screening ’26</span>
+      </div>
+      <a class="text-sm text-slate-500 hover:text-blue-700 hover:underline cursor-pointer" href="mailto:Dana%20Whitfield%20%3Cdana.whitfield@example.com%3E" target="_blank" rel="noopener">dana.whitfield@example.com</a>
+    </div>
+    <button class="text-slate-400 hover:text-slate-700 text-xl leading-none ml-1" onclick="closeFlyout()">×</button>
+  </div>
+
+  <div class="flyout-body">
+    <!-- Left column: details -->
+    <div class="flyout-col">
+      <div class="px-5 py-4 border-b border-slate-100">
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <div class="label">Stage</div>
+            <select class="stage-select stage-conversation mt-1 w-full border rounded-md px-2 py-1.5 text-sm" onchange="recolorStage(this)">
+              <option>Prospect</option>
+              <option selected>In Conversation</option>
+              <option>Committed</option>
+              <option>Received</option>
+              <option>Declined</option>
+            </select>
+          </div>
+          <div>
+            <div class="label">Tier</div>
+            <select class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm bg-white font-medium">
+              <option selected>Tier 1</option>
+              <option>Tier 2</option>
+              <option>Tier 3</option>
+              <option></option>
+            </select>
+          </div>
+          <div>
+            <div class="label">Ask</div>
+            <input value="$25,000" class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm font-semibold" />
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-3 mt-3">
+          <div class="col-span-2">
+            <div class="label">DAF / Mechanism</div>
+            <input value="Fidelity Charitable" list="mechanisms" class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" />
+            <datalist id="mechanisms">
+              <option>Fidelity Charitable</option>
+              <option>Schwab Charitable</option>
+              <option>Vanguard Charitable</option>
+              <option>Seattle Foundation</option>
+              <option>Maine Community Foundation</option>
+              <option>Direct</option>
+            </datalist>
+          </div>
+          <div>
+            <div class="label">Recoverable</div>
+            <div class="mt-2.5 flex items-center"><input type="checkbox" class="cb"></div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <div class="flex items-center justify-between">
+            <div class="label">Status</div>
+            <div class="text-xs text-slate-400 flex items-center gap-1.5"><span class="chip chip-ai">AI</span> updated Tue, Jul 21</div>
+          </div>
+          <textarea rows="3" class="mt-1 w-full border border-slate-300 rounded-md px-2.5 py-1.5 text-sm leading-snug resize-none">Leaning yes at $25,000 via her Fidelity DAF. Wants to talk it over with her partner first; planning to decide by early August.</textarea>
+        </div>
+        <div class="mt-3 w-48">
+          <div class="label">Follow up on</div>
+          <input value="Mon, Aug 3, 2026" class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" />
+        </div>
+      </div>
+
+      <div class="px-5 py-4">
+        <div class="label mb-2">Giving history</div>
+        <div class="grid grid-cols-4 gap-2 mb-3">
+          <div class="bg-slate-50 rounded-md px-2.5 py-2">
+            <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">Lifetime</div>
+            <div class="text-sm font-bold text-slate-900">$40,000</div>
+          </div>
+          <div class="bg-slate-50 rounded-md px-2.5 py-2">
+            <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">Average</div>
+            <div class="text-sm font-bold text-slate-900">$20,000</div>
+          </div>
+          <div class="bg-slate-50 rounded-md px-2.5 py-2">
+            <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">Most recent</div>
+            <div class="text-sm font-bold text-slate-900">$25,000 <span class="text-xs font-medium text-slate-400">2023</span></div>
+          </div>
+          <div class="bg-slate-50 rounded-md px-2.5 py-2">
+            <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">Prior</div>
+            <div class="text-sm font-bold text-slate-900">$15,000 <span class="text-xs font-medium text-slate-400">2021</span></div>
+          </div>
+        </div>
+        <div class="text-sm space-y-1.5">
+          <div class="flex items-center justify-between"><span class="text-slate-600">Decarbon8 2023</span><span class="flex items-center gap-2"><span class="chip chip-recoverable">Recoverable</span><span class="font-semibold">$25,000</span></span></div>
+          <div class="flex items-center justify-between"><span class="text-slate-600">Decarbon8 2021</span><span class="font-semibold">$15,000</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column: touchpoints -->
+    <div class="flyout-col">
+      <div class="px-5 py-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="label">Touchpoints</div>
+          <button class="text-sm px-3 py-1 rounded-md border border-slate-300 bg-white text-slate-700 hover:bg-slate-50" onclick="openNoteModal()">Add note</button>
+        </div>
+
+        <div class="space-y-4">
+          <div class="flex gap-3">
+            <div class="tl-dot tl-ai"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.7L19.6 9l-5.7 1.9L12 16.6l-1.9-5.7L4.4 9l5.7-1.3L12 2zM19 14l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z"/></svg></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm text-slate-800">Set ask to <b>$25,000</b> and follow-up to <b>Mon, Aug 3</b></div>
+              <div class="text-xs text-slate-400 mt-0.5 flex items-center gap-2">Tue, Jul 21 · <span class="chip chip-ai">AI</span></div>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <div class="tl-dot tl-in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm text-slate-800">Replied that she's thinking about $25k through her Fidelity DAF; wants to decide by early August
+                <a class="gmail-link ml-1" href="#" title="Open in Gmail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg><svg class="ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+              </div>
+              <div class="text-xs text-slate-400 mt-0.5">Tue, Jul 21</div>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <div class="tl-dot tl-out"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.7 3.3c-.6-.3-1.2.3-1 .9l2.4 6.9c.1.4.5.7.9.7l8 .2-8 .2c-.4 0-.8.3-.9.7l-2.4 6.9c-.2.6.4 1.2 1 .9l18-8.1c.6-.3.6-1.1 0-1.4l-18-8z"/></svg></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm text-slate-800">Karin invited her to renew for 2026 and shared the impact summary
+                <a class="gmail-link ml-1" href="#" title="Open in Gmail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg><svg class="ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+              </div>
+              <div class="text-xs text-slate-400 mt-0.5">Fri, Jul 17</div>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <div class="tl-dot tl-ai"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.7L19.6 9l-5.7 1.9L12 16.6l-1.9-5.7L4.4 9l5.7-1.3L12 2zM19 14l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z"/></svg></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm text-slate-800">Moved to <b>In Conversation</b> after Karin's outreach</div>
+              <div class="text-xs text-slate-400 mt-0.5 flex items-center gap-2">Fri, Jul 17 · <span class="chip chip-ai">AI</span></div>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <div class="tl-dot tl-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm text-slate-800">Chatted at the June showcase — very interested in the storage companies this year</div>
+              <div class="text-xs text-slate-400 mt-0.5">Thu, Jun 11 · Karin</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Note modal -->
+<div class="modal" id="noteModal">
+  <div class="absolute inset-0 bg-slate-900/40" onclick="closeNoteModal()"></div>
+  <div class="modal-card relative">
+    <div class="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
+      <div class="font-semibold text-slate-900">Log a note</div>
+      <button class="text-slate-400 hover:text-slate-700 text-xl leading-none" onclick="closeNoteModal()">×</button>
+    </div>
+    <div class="px-5 py-4">
+      <textarea rows="5" class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm leading-snug" placeholder="Call, conversation, or anything worth remembering…"></textarea>
+      <div class="mt-2 w-44">
+        <div class="label">Date</div>
+        <input value="Fri, Jul 24, 2026" class="mt-1 w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm" />
+      </div>
+    </div>
+    <div class="px-5 py-3.5 border-t border-slate-200 flex justify-end gap-2">
+      <button class="text-sm px-3 py-1.5 rounded-md border border-slate-300 bg-white text-slate-700 hover:bg-slate-50" onclick="closeNoteModal()">Cancel</button>
+      <button class="text-sm px-4 py-1.5 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700" onclick="closeNoteModal()">Save note</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openFlyout(){ document.getElementById('flyout').classList.add('open'); document.getElementById('overlay').classList.add('open'); }
+  function closeFlyout(){ document.getElementById('flyout').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
+  function openNoteModal(){ document.getElementById('noteModal').classList.add('open'); }
+  function closeNoteModal(){ document.getElementById('noteModal').classList.remove('open'); }
+  const STAGE_CLASSES = { 'Prospect':'stage-prospect', 'In Conversation':'stage-conversation', 'Committed':'stage-committed', 'Received':'stage-received', 'Declined':'stage-declined' };
+  function recolorStage(sel){
+    Object.values(STAGE_CLASSES).forEach(c => sel.classList.remove(c));
+    sel.classList.add(STAGE_CLASSES[sel.value]);
+  }
+</script>
+</body>
+</html>
