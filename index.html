@@ -139,7 +139,6 @@
   <div class="footer" id="footer"></div>
 
 <script>
-const STATUS_ORDER = ['building', 'in-review', 'accepted', 'draft', 'shipped', 'unknown'];
 const REPO_BLOB = 'https://github.com/E8Angels/mockups/blob/main';
 
 function fmtDate(iso) {
@@ -183,12 +182,9 @@ function docLinks(plan) {
 
 function sortPlans(plans) {
   return plans.slice().sort((a, b) => {
-    const ai = STATUS_ORDER.indexOf(a.status);
-    const bi = STATUS_ORDER.indexOf(b.status);
-    const aRank = ai === -1 ? STATUS_ORDER.length : ai;
-    const bRank = bi === -1 ? STATUS_ORDER.length : bi;
-    if (aRank !== bRank) return aRank - bRank;
-    return a.title.localeCompare(b.title);
+    const ad = new Date(a.last_changed_at || a.last_updated || 0);
+    const bd = new Date(b.last_changed_at || b.last_updated || 0);
+    return bd - ad;
   });
 }
 
