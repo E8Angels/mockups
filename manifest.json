@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-10T05:30:53+00:00",
+  "generated": "2026-07-27T19:19:07+00:00",
   "plans": [
     {
       "slug": "Live-Chat-Codex",
@@ -84,6 +84,30 @@
         {
           "name": "view-builder",
           "path": "companies-admin-redesign/view-builder.html",
+          "is_home": false
+        }
+      ]
+    },
+    {
+      "slug": "decarbon8-campaign",
+      "title": "Decarbon8 Campaign \u2014 Lightweight Donor CRM",
+      "status": "draft",
+      "owner": "jordan",
+      "created": "2026-07-24",
+      "last_updated": "2026-07-27",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-07-27T12:18:51-07:00",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": [
+        {
+          "name": "campaign",
+          "path": "decarbon8-campaign/campaign.html",
+          "is_home": true
+        },
+        {
+          "name": "digest",
+          "path": "decarbon8-campaign/digest.html",
           "is_home": false
         }
       ]
