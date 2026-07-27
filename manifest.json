@@ -1,25 +1,6 @@
 {
-  "generated": "2026-07-27T19:19:07+00:00",
+  "generated": "2026-07-27T19:36:43+00:00",
   "plans": [
-    {
-      "slug": "Live-Chat-Codex",
-      "title": "Live Chat Codex",
-      "status": "draft",
-      "owner": "jordan",
-      "created": "2026-05-31",
-      "last_updated": "2026-05-31",
-      "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-31T10:26:46-07:00",
-      "has_plan": true,
-      "has_changelog": true,
-      "mockups": [
-        {
-          "name": "mockup",
-          "path": "Live-Chat-Codex/mockup.html",
-          "is_home": true
-        }
-      ]
-    },
     {
       "slug": "audience-questions-claude",
       "title": "Audience Questions (Live Meeting Q&A)",
@@ -45,45 +26,6 @@
         {
           "name": "variant-c-console",
           "path": "audience-questions-claude/variant-c-console.html",
-          "is_home": false
-        }
-      ]
-    },
-    {
-      "slug": "companies-admin-redesign",
-      "title": "Companies Admin Redesign",
-      "status": "draft",
-      "owner": "jordan",
-      "created": "2026-05-23",
-      "last_updated": "2026-05-24",
-      "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-26T19:18:02-07:00",
-      "has_plan": true,
-      "has_changelog": true,
-      "mockups": [
-        {
-          "name": "detail",
-          "path": "companies-admin-redesign/detail.html",
-          "is_home": false
-        },
-        {
-          "name": "detail-edit",
-          "path": "companies-admin-redesign/detail-edit.html",
-          "is_home": false
-        },
-        {
-          "name": "variant-a-groupby",
-          "path": "companies-admin-redesign/variant-a-groupby.html",
-          "is_home": false
-        },
-        {
-          "name": "variant-a-list",
-          "path": "companies-admin-redesign/variant-a-list.html",
-          "is_home": true
-        },
-        {
-          "name": "view-builder",
-          "path": "companies-admin-redesign/view-builder.html",
           "is_home": false
         }
       ]
@@ -176,38 +118,6 @@
       ]
     },
     {
-      "slug": "dynamic-rollups-ai-assist",
-      "title": "Dynamic Rollups and AI View Assist",
-      "status": "draft",
-      "owner": "jordan",
-      "created": "2026-05-24",
-      "last_updated": "2026-05-25",
-      "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-26T19:18:02-07:00",
-      "has_plan": true,
-      "has_changelog": true,
-      "mockups": [
-        {
-          "name": "mockup",
-          "path": "dynamic-rollups-ai-assist/mockup.html",
-          "is_home": true
-        }
-      ]
-    },
-    {
-      "slug": "fly-to-vercel-migration",
-      "title": "Fly.io/Turso \u2192 Vercel/Supabase Migration",
-      "status": "draft",
-      "owner": "jordan",
-      "created": "2026-05-16",
-      "last_updated": "2026-05-16",
-      "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38Z",
-      "has_plan": true,
-      "has_changelog": true,
-      "mockups": []
-    },
-    {
       "slug": "google-docs-diligence-reports",
       "title": "Google Docs-Native Diligence Reports",
       "status": "draft",
@@ -222,112 +132,6 @@
         {
           "name": "mockup",
           "path": "google-docs-diligence-reports/mockup.html",
-          "is_home": true
-        }
-      ]
-    },
-    {
-      "slug": "meeting-live-chat",
-      "title": "Live Meeting Chat",
-      "status": "draft",
-      "owner": "jordan",
-      "created": "2026-05-30",
-      "last_updated": "2026-05-30",
-      "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-31T10:26:46-07:00",
-      "has_plan": true,
-      "has_changelog": false,
-      "mockups": [
-        {
-          "name": "mockup",
-          "path": "meeting-live-chat/mockup.html",
-          "is_home": true
-        }
-      ]
-    },
-    {
-      "slug": "meeting-polling",
-      "title": "Meeting Polling",
-      "status": "building",
-      "owner": "jordan",
-      "created": "2026-06-08",
-      "last_updated": "2026-06-09",
-      "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-06-11T20:45:13-07:00",
-      "has_plan": true,
-      "has_changelog": true,
-      "mockups": [
-        {
-          "name": "index",
-          "path": "meeting-polling/index.html",
-          "is_home": true
-        },
-        {
-          "name": "live-poll-modal",
-          "path": "meeting-polling/live-poll-modal.html",
-          "is_home": false
-        },
-        {
-          "name": "meeting-admin-tab",
-          "path": "meeting-polling/meeting-admin-tab.html",
-          "is_home": false
-        },
-        {
-          "name": "pipeline-committee",
-          "path": "meeting-polling/pipeline-committee.html",
-          "is_home": false
-        },
-        {
-          "name": "poll-admin",
-          "path": "meeting-polling/poll-admin.html",
-          "is_home": false
-        },
-        {
-          "name": "poll-results-detail",
-          "path": "meeting-polling/poll-results-detail.html",
-          "is_home": false
-        },
-        {
-          "name": "question-types",
-          "path": "meeting-polling/question-types.html",
-          "is_home": false
-        }
-      ]
-    },
-    {
-      "slug": "meeting-private-messages",
-      "title": "Private Messages in Meeting Chat",
-      "status": "draft",
-      "owner": "jordan",
-      "created": "2026-06-02",
-      "last_updated": "2026-06-02",
-      "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-06-11T20:45:13-07:00",
-      "has_plan": true,
-      "has_changelog": false,
-      "mockups": [
-        {
-          "name": "mockup",
-          "path": "meeting-private-messages/mockup.html",
-          "is_home": true
-        }
-      ]
-    },
-    {
-      "slug": "meeting-questions-codex",
-      "title": "Meeting Questions Codex",
-      "status": "draft",
-      "owner": "jordan",
-      "created": "2026-05-31",
-      "last_updated": "2026-05-31",
-      "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-31T10:26:46-07:00",
-      "has_plan": true,
-      "has_changelog": true,
-      "mockups": [
-        {
-          "name": "rail-queue",
-          "path": "meeting-questions-codex/rail-queue.html",
           "is_home": true
         }
       ]
@@ -352,48 +156,6 @@
       ]
     },
     {
-      "slug": "membership-dashboard-meetings-cleanup",
-      "title": "Membership Dashboard",
-      "status": "building",
-      "owner": "jordan",
-      "created": "2026-05-16",
-      "last_updated": "2026-05-19",
-      "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-21T04:36:12Z",
-      "has_plan": true,
-      "has_changelog": true,
-      "mockups": []
-    },
-    {
-      "slug": "per-company-investor-groups",
-      "title": "Company Discussion Groups",
-      "status": "draft",
-      "owner": "jordan",
-      "created": "2026-05-16",
-      "last_updated": "2026-06-09",
-      "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-06-09T10:32:45-07:00",
-      "has_plan": true,
-      "has_changelog": true,
-      "mockups": [
-        {
-          "name": "admin-console",
-          "path": "per-company-investor-groups/admin-console.html",
-          "is_home": false
-        },
-        {
-          "name": "member-experience",
-          "path": "per-company-investor-groups/member-experience.html",
-          "is_home": true
-        },
-        {
-          "name": "mockup",
-          "path": "per-company-investor-groups/mockup.html",
-          "is_home": false
-        }
-      ]
-    },
-    {
       "slug": "pipeline-portfolio",
       "title": "Pipeline & Portfolio \u2014 internal view",
       "status": "draft",
@@ -408,25 +170,6 @@
         {
           "name": "mockup",
           "path": "pipeline-portfolio/mockup.html",
-          "is_home": true
-        }
-      ]
-    },
-    {
-      "slug": "pipeline-snapshot",
-      "title": "Home Page Pipeline Snapshot",
-      "status": "draft",
-      "owner": "jordan",
-      "created": "2026-06-11",
-      "last_updated": "2026-06-11",
-      "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-06-12T03:44:50Z",
-      "has_plan": true,
-      "has_changelog": true,
-      "mockups": [
-        {
-          "name": "mockup",
-          "path": "pipeline-snapshot/mockup.html",
           "is_home": true
         }
       ]
@@ -477,7 +220,7 @@
       "created": "2026-05-16",
       "last_updated": "2026-05-16",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-05-16T20:40:38Z",
+      "last_changed_at": "2026-05-16T20:40:38+00:00",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
