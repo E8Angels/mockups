@@ -3,9 +3,19 @@ title: "Sourcing Committee Metrics"
 status: draft
 owner: sarah
 created: 2026-05-26
-last_updated: 2026-07-06
-home: mockup
+last_updated: 2026-08-10
+home: mockup-conservative
 ---
+
+## Variants (August 2026)
+
+Two v2 variants sit alongside the original `mockup.html`, both incorporating July 2026 committee feedback (time dimension, big-question grouping, reworked Lead Investor tile, Events section, tooltips, cadence tags, YoY toggles):
+
+- **`mockup-lean.html`** — aggressive prune per Kevin/Jordan ("less is more"). ~10 tiles across 4 sections. Cuts diversity, proactive-vs-reactive (pending), $-into-proactive, follow-on, top-channel-by-volume. Keeps the reworked Lead Investor tile.
+- **`mockup-conservative.html`** — same structure and feedback applied, but retains diversity, both attribution/proactive tiles (as visible "pending" reminders), follow-on activity, in-activation-pipeline and partners-with-owner. ~20 tiles across 5 sections.
+
+Both use real E8 data (May 26 pull) and mark YoY comparisons as illustrative pending a scheduled data refresh.
+
 
 # Sourcing Committee Metrics
 
@@ -63,46 +73,6 @@ and the committee's actual Drive documents.
 - Partners: 276 orgs; pipeline — Operational 20, Initiated 30, Priority to Initiate 6, Not Started 138; 114 have an E8 owner.
 - Referrals in (2026): 60. Top referrers: Greentown Labs 17, Keiretsu Forum 6, Third Derivative 4, SV Social Venture Fund 4.
 - Founder diversity (2026 applicants): 124 of 246 underrepresented = 50%.
-
-## V3 — decision-support upgrade (2026-07-06)
-
-V3 closes the gap between "report" and "decision tool", per the committee's goals
-(prioritize channels/partners by outcomes, front-door vs side-door, PitchBook
-overlay, data discipline toward a Q4 2026 baseline):
-
-- **Decide & act this quarter** — action cards (Pursue / Re-engage / Fix / Review)
-  drafted from rules over the data; committee accepts or dismisses each. Illustrative.
-- **Data discipline** — capture-rate tiles (attribution coverage, "How did you hear"
-  fill rate, referral→partner linkage, outcome freshness) with targets and a Q4 2026
-  baseline snapshot date. Data quality is the dashboard's first KPI.
-- **Front door vs side door** — inbound applications vs vetted referrals, same funnel
-  side by side (pitch rate, investment rate, $). Quantifies the case for referral focus.
-- **Partner table** — added Since (vintage) and Effort h/yr columns; n<5 low-sample
-  flags; caveat notes on vintage bias. Effort illustrative until owner time is captured.
-- **External benchmark (PitchBook)** — cleantech exits per investor vs referrals sent
-  to E8, colored by relationship status; mapped table with suggested actions; co-investor
-  "future relationship radar". Illustrative pending PitchBook integration.
-- **Report card** — added returns tiles (capital returned, MOIC, median follow-on size,
-  placeholders) and a units note reconciling instruments vs companies.
-- Footer now states that production will filter, never scale, time-bounded figures.
-
-Feedback round 1 (Sarah, 2026-07-06): Applications tile links to the portal instead
-of a sample; Companies-invested / $-invested drawers show first & latest investment
-dates, per-member investments with dates, lead investor, and a 2025-comparable line;
-company-level dollars are no longer timeframe-scaled (fixes Algafilm showing ~$58K
-instead of $125K); InventWood corrected to Investment stage; Decide & act cards are
-editable (status, notes, tasks) and open their rationale; Data-discipline tiles click
-through to source data and the referral-linked tile has no target by design; PitchBook
-benchmark moved directly under Dealflow by channel and now lists all current partners
-("pending" where unmatched) plus an Other bucket; drill-downs added to front/side door,
-source→investment, funnel stages (incl. the 42→15 chart), round-committed amounts,
-lead-investor names, and diversity pipeline stages.
-
-V4 (2026-07-06): split per Sarah's review. Decide & act, Data discipline,
-PitchBook-assessed success and Source→investment outcomes moved to the internal
-**pipeline-portfolio** mockup (Sarah's view). Future-relationship radar now sits
-inside Dealflow by channel. Front/side-door kept (one sentence trimmed). At a
-glance, Timeframe, activation pipeline and all other sections unchanged.
 
 ## Open questions
 
