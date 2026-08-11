@@ -4,17 +4,21 @@ status: draft
 owner: sarah
 created: 2026-05-26
 last_updated: 2026-08-10
-home: mockup-conservative
+home: mockup-lean
 ---
 
-## Variants (August 2026)
+## Working version (August 2026)
 
-Two v2 variants sit alongside the original `mockup.html`, both incorporating July 2026 committee feedback (time dimension, big-question grouping, reworked Lead Investor tile, Events section, tooltips, cadence tags, YoY toggles):
+The Lean view — `mockup-lean.html` — is the working version alongside the original `mockup.html`. Structure:
 
-- **`mockup-lean.html`** — aggressive prune per Kevin/Jordan ("less is more"). ~10 tiles across 4 sections. Cuts diversity, proactive-vs-reactive (pending), $-into-proactive, follow-on, top-channel-by-volume. Keeps the reworked Lead Investor tile.
-- **`mockup-conservative.html`** — same structure and feedback applied, but retains diversity, both attribution/proactive tiles (as visible "pending" reminders), follow-on activity, in-activation-pipeline and partners-with-owner. ~20 tiles across 5 sections.
-
-Both use real E8 data (May 26 pull) and mark YoY comparisons as illustrative pending a scheduled data refresh.
+- Four big-question sections: Deal Quality / Where deals come from / Partner Network / Events.
+- Every tile carries a review cadence (M / Q / A) and a tooltip.
+- Top-of-page toggle switches all tiles between "2026 YTD vs 2025 YTD" and "Trailing 12 months."
+- Each drill-in drawer offers YTD and per-month views.
+- Channel mix uses 14 categories reflecting the planned "How did you hear about E8?" application field.
+- Partner Network → activation status → partners in status → single-partner performance (referrals → pitched → invested → exits → closed) with a referred-company list.
+- Referrals tile drills into Referrals In / Referrals Out with the same partner-detail flow.
+- Applications drill shows founder diversity, application funnel by furthest stage, and recent funded companies with their source.
 
 
 # Sourcing Committee Metrics
