@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-10T22:33:43+00:00",
+  "generated": "2026-08-11T08:57:34+00:00",
   "plans": [
     {
       "slug": "audience-questions-claude",
@@ -239,7 +239,7 @@
       "created": "2026-05-26",
       "last_updated": "2026-08-10",
       "last_changed_by": "sarah",
-      "last_changed_at": "2026-08-10T15:33:31-07:00",
+      "last_changed_at": "2026-08-11T01:57:24-07:00",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
@@ -249,14 +249,9 @@
           "is_home": false
         },
         {
-          "name": "mockup-conservative",
-          "path": "sourcing-committee/mockup-conservative.html",
-          "is_home": true
-        },
-        {
           "name": "mockup-lean",
           "path": "sourcing-committee/mockup-lean.html",
-          "is_home": false
+          "is_home": true
         }
       ]
     }
