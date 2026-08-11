@@ -195,9 +195,9 @@
             </button>
             <button class="stat-tile" data-drawer="lead">
               <span class="cadence">M</span><span class="rag amber"></span>
-              <span class="t-label">Lead Investor Present <i class="tt" title="% of deals with an institutional or angel-group lead investor present, segmented by pipeline stage and investment stage. Individuals excluded.">i</i></span>
-              <span class="t-value" style="font-size:20px;">Series A: <b style="color:var(--danger)">40%</b> &middot; Seed: 22%</span>
-              <span class="t-sub">Pre-seed excluded</span>
+              <span class="t-label">Lead Investor Present <i class="tt" title="% of applications with an institutional or angel-group lead investor present, segmented by pipeline stage and investment stage. Individuals excluded.">i</i></span>
+              <span class="t-value" style="font-size:20px;">Series A: <b style="color:var(--ok)">90%</b> &middot; Seed: 50%</span>
+              <span class="t-sub">29 of 68 applications with a lead (YTD)</span>
               <span class="target-chip">Target Series A &ge; 80%</span>
             </button>
             <button class="stat-tile" data-drawer="source">
@@ -489,12 +489,12 @@ const PARTNERS_BY_STATUS = {
   "Priority to Initiate": {
     rag:"amber", label:"Priority to Initiate",
     items: [
-      { n:"Breakthrough Energy Ventures",    t:"VC",          refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Lowercarbon Capital",             t:"VC",          refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Y Combinator (Climate)",          t:"Accelerator", refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Activate",                        t:"Incubator",   refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Cleantech Open",                  t:"Accelerator", refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"E14 Fund",                        t:"VC",          refs:0, pitched:0, invested:0, exits:0, closed:0 }
+      { n:"Breakthrough Energy Ventures",    t:"VC",          lead:"Scott Pinizzotto", refs:0, pitched:0, invested:0, exits:0, closed:0 },
+      { n:"Lowercarbon Capital",             t:"VC",          lead:"Kevin Schwartz",   refs:0, pitched:0, invested:0, exits:0, closed:0 },
+      { n:"Y Combinator (Climate)",          t:"Accelerator", lead:"Bina Shukla",      refs:0, pitched:0, invested:0, exits:0, closed:0 },
+      { n:"Activate",                        t:"Incubator",   lead:"Karin Kidder",     refs:0, pitched:0, invested:0, exits:0, closed:0 },
+      { n:"Cleantech Open",                  t:"Accelerator", lead:"Sarah Bell",       refs:0, pitched:0, invested:0, exits:0, closed:0 },
+      { n:"E14 Fund",                        t:"VC",          lead:"Bina Shukla",      refs:0, pitched:0, invested:0, exits:0, closed:0 }
     ]
   },
   "Not Started": {
@@ -612,7 +612,7 @@ function ytdT12MTabs(ytdHtml, monthlyHtml){
   return `<div data-viewset><div class="drawer-toggle-row">
     <span class="tlab" style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">View:</span>
     <button class="toggle-btn active" data-view="ytd">YTD</button>
-    <button class="toggle-btn" data-view="month">Per month</button>
+    <button class="toggle-btn" data-view="month">Per month (T12M)</button>
   </div>
   <div data-viewpane="ytd">${ytdHtml}</div>
   <div data-viewpane="month" style="display:none">${monthlyHtml}</div>
@@ -622,28 +622,46 @@ function monthlyBars(labels, values){
   const max = Math.max(...values, 1);
   return values.map((v,i)=>`<div class="month-bars"><div class="mb-lbl">${labels[i]}</div><div class="mb-track"><div class="mb-fill" style="width:${Math.round(v/max*100)}%"></div></div><div class="mb-val">${v}</div></div>`).join("");
 }
+/* Portal-Metrics-style table: Month | Value | MoM change (arrow) — optionally clickable */
+function monthlyMoMTable(labels, values, opts){
+  opts = opts || {};
+  const rows = values.map((v,i)=>{
+    let cell = v;
+    if(opts.drill) cell = `<button class="link-btn" data-drill="${opts.drill}" data-arg="${opts.argPrefix?opts.argPrefix+"|":""}${labels[i]}">${v}</button>`;
+    let arrow;
+    if(i===0){ arrow = `<span style="color:var(--text-subtle)">&mdash;</span>`; }
+    else {
+      const d = v - values[i-1];
+      const pct = values[i-1] ? Math.round(d/values[i-1]*100) : 0;
+      if(d>0) arrow = `<span style="color:var(--ok)">&#9650; +${d}${values[i-1]?` (${pct>0?'+':''}${pct}%)`:''}</span>`;
+      else if(d<0) arrow = `<span style="color:var(--danger)">&#9660; ${d}${values[i-1]?` (${pct}%)`:''}</span>`;
+      else arrow = `<span style="color:var(--text-subtle)">&mdash;</span>`;
+    }
+    return `<tr><td>${labels[i]}</td><td class="num">${cell}</td><td class="num">${arrow}</td></tr>`;
+  }).join("");
+  return `<table class="dtable"><thead><tr><th>Month</th><th class="num">${opts.valueLabel||"Value"}</th><th class="num">vs prev month</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
 
 /* Quality — Pre-Screening / Screening */
 function qualityDrawer(stage){
   const isPre = stage==="pre";
   const totalRated = isPre ? 757 : 199;
   const avgScore  = isPre ? "1.1" : "1.8";
-  const targetCell = isPre ? "&mdash;" : "&ge; 3.0";
-  const ytd = `<div class="kpi-strip">
+  const monthsYTD  = isPre ? [110,132,148,150,138,79] : [28,34,40,42,35,20];
+  const monthsT12M = isPre ? [95,102,118,124,120,105,110,132,148,150,138,79] : [22,25,28,30,32,26,28,34,40,42,35,20];
+  const kpiStrip = `<div class="kpi-strip">
       <div class="k"><div class="kv">${avgScore}</div><div class="kl">Avg Recommendation</div></div>
       <div class="k"><div class="kv"><button class="link-btn" data-drill="companyScores" data-arg="${stage}" style="font-size:20px;font-weight:700;padding:0;">${totalRated}</button></div><div class="kl">Deals rated (click)</div></div>
       ${isPre?"":`<div class="k"><div class="kv">&ge;3.0</div><div class="kl">Target</div></div>`}
-    </div>
-    <table class="dtable"><thead><tr><th>Stage</th><th class="num">Deals rated</th><th class="num">Avg Recommendation</th><th class="num">Target</th></tr></thead><tbody>
-    <tr><td>Pre-Screening</td><td class="num"><button class="link-btn" data-drill="companyScores" data-arg="pre">757</button></td><td class="num">1.1</td><td class="num">&mdash;</td></tr>
-    <tr><td>Screening</td><td class="num"><button class="link-btn" data-drill="companyScores" data-arg="scr">199</button></td><td class="num">1.8</td><td class="num">&ge; 3.0</td></tr>
-    <tr><td>To Member Meeting</td><td class="num">&mdash;</td><td class="num">&lt;1% &ge; 3.5</td><td class="num">100% &ge; 3.5</td></tr>
-    </tbody></table>
-    <div class="drawer-note">The single overall Recommendation vote (0=No Way, 4=Yes) is the headline. Click any "Deals rated" number to see the underlying companies and their scores.</div>`;
-  const monthlyCounts = isPre ? [110,132,148,150,138,79] : [28,34,40,42,35,20];
-  const month = `<div class="subhead">Deals rated at ${isPre?"Pre-Screening":"Screening"} &mdash; per month (click any month)</div>
-    ${monthlyCounts.map((v,i)=>`<div class="month-bars"><div class="mb-lbl">${MONTHS[i]}</div><div class="mb-track"><div class="mb-fill" style="width:${Math.round(v/Math.max(...monthlyCounts)*100)}%"></div></div><div class="mb-val"><button class="link-btn" data-drill="companyScoresMonth" data-arg="${stage}|${MONTHS[i]}">${v}</button></div></div>`).join("")}
-    <div class="drawer-note">Click any month to see the specific companies rated that month.</div>`;
+    </div>`;
+  const ytd = `${kpiStrip}
+    <div class="subhead">Deals rated &mdash; per month (click any count for companies)</div>
+    ${monthlyMoMTable(MONTHS, monthsYTD, {valueLabel:"Deals rated", drill:"companyScoresMonth", argPrefix:stage})}
+    <div class="drawer-note">The single overall Recommendation vote (0=No Way, 4=Yes) is the headline. Green/red arrows show month-over-month change.</div>`;
+  const month = `${kpiStrip}
+    <div class="subhead">Deals rated &mdash; trailing 12 months</div>
+    ${monthlyMoMTable(MONTHS_T12M, monthsT12M, {valueLabel:"Deals rated", drill:"companyScoresMonth", argPrefix:stage})}
+    <div class="drawer-note">Last 6 rows are 2026 YTD. Trailing 12 months provides a rolling view of workload rhythm.</div>`;
   return { title: `Recommendation &mdash; ${isPre?"Pre-Screening":"Screening"}`, sub:"0&ndash;4 scale &middot; single overall vote", html: ytdT12MTabs(ytd, month) };
 }
 
@@ -695,57 +713,130 @@ function companyScoresMonthDrawer(arg){
     html: `<table class="dtable"><thead><tr><th>Company</th><th class="num">Avg Recommendation</th><th>Rated</th></tr></thead><tbody>${rows}</tbody></table>` });
 }
 
-/* Lead Investor Present — matrix (pipeline stage × investment stage) */
+/* Lead Investor Present — matrix (pipeline stage × investment stage)
+   All numbers reflect ALL applications YTD 2026 (68 across the 3×3 matrix).
+   Pipeline totals match the Applications funnel: Pre-Screening=36, Screening=20, Member Meeting Pitch=12. */
 const LEAD_MATRIX = {
-  // key: "pipelineStage|investmentStage" -> { total, withLead, deals:[...] }
-  "pre|Pre-seed":     { total:15, withLead:1, deals:[{c:"Photon Marine", lead:"Prelude Ventures"}] },
-  "pre|Seed":         { total:12, withLead:3, deals:[{c:"Ateios Systems", lead:"Titletown Tech"},{c:"Hitt Power", lead:"Buoyant Ventures"},{c:"Algafilm", lead:"Congruent Ventures"}] },
-  "pre|Series A":     { total:9,  withLead:5, deals:[{c:"Enzinc", lead:"Anthropocene Ventures"},{c:"EELI Technology", lead:"Congruent Ventures"},{c:"Imperium Technologies", lead:"Prelude Ventures"},{c:"Electrum", lead:"At One Ventures"},{c:"NuCube", lead:"Starshot Capital"}] },
-  "scr|Pre-seed":     { total:5,  withLead:0, deals:[] },
-  "scr|Seed":         { total:9,  withLead:2, deals:[{c:"Ateios Systems", lead:"Titletown Tech"},{c:"Hitt Power", lead:"Buoyant Ventures"}] },
-  "scr|Series A":     { total:6,  withLead:3, deals:[{c:"Enzinc", lead:"Anthropocene Ventures"},{c:"EELI Technology", lead:"Congruent Ventures"},{c:"Imperium Technologies", lead:"Prelude Ventures"}] },
-  "mm|Pre-seed":      { total:2,  withLead:0, deals:[] },
-  "mm|Seed":          { total:6,  withLead:2, deals:[{c:"Ateios Systems", lead:"Titletown Tech"},{c:"Hitt Power", lead:"Buoyant Ventures"}] },
-  "mm|Series A":      { total:4,  withLead:2, deals:[{c:"Enzinc", lead:"Anthropocene Ventures"},{c:"EELI Technology", lead:"Congruent Ventures"}] }
+  "pre|Pre-seed":     { total:20, withLead:5, deals:[
+    {c:"agapyo", lead:"Anthropocene Ventures"}, {c:"Photon Marine", lead:"Prelude Ventures"},
+    {c:"NxLite", lead:"Buoyant Ventures"}, {c:"Symbium", lead:"At One Ventures"},
+    {c:"Cala", lead:"Alliance of Angels"}
+  ] },
+  "pre|Seed":         { total:12, withLead:5, deals:[
+    {c:"Ateios Systems", lead:"Titletown Tech"}, {c:"Hitt Power", lead:"Buoyant Ventures"},
+    {c:"Algafilm", lead:"Congruent Ventures"}, {c:"ZILA BioWorks", lead:"Prelude Ventures"},
+    {c:"Emerald Battery Labs", lead:"Starshot Capital"}
+  ] },
+  "pre|Series A":     { total:4,  withLead:3, deals:[
+    {c:"Enzinc", lead:"Anthropocene Ventures"}, {c:"EELI Technology", lead:"Congruent Ventures"},
+    {c:"Imperium Technologies", lead:"Prelude Ventures"}
+  ] },
+  "scr|Pre-seed":     { total:10, withLead:2, deals:[
+    {c:"NuCube", lead:"Starshot Capital"}, {c:"NxLite", lead:"Buoyant Ventures"}
+  ] },
+  "scr|Seed":         { total:7,  withLead:4, deals:[
+    {c:"Ateios Systems", lead:"Titletown Tech"}, {c:"Hitt Power", lead:"Buoyant Ventures"},
+    {c:"Algafilm", lead:"Congruent Ventures"}, {c:"Electrum", lead:"At One Ventures"}
+  ] },
+  "scr|Series A":     { total:3,  withLead:3, deals:[
+    {c:"Enzinc", lead:"Anthropocene Ventures"}, {c:"EELI Technology", lead:"Congruent Ventures"},
+    {c:"Imperium Technologies", lead:"Prelude Ventures"}
+  ] },
+  "mm|Pre-seed":      { total:4,  withLead:1, deals:[
+    {c:"agapyo", lead:"Anthropocene Ventures"}
+  ] },
+  "mm|Seed":          { total:5,  withLead:3, deals:[
+    {c:"Ateios Systems", lead:"Titletown Tech"}, {c:"Hitt Power", lead:"Buoyant Ventures"},
+    {c:"Algafilm", lead:"Congruent Ventures"}
+  ] },
+  "mm|Series A":      { total:3,  withLead:3, deals:[
+    {c:"Enzinc", lead:"Anthropocene Ventures"}, {c:"EELI Technology", lead:"Congruent Ventures"},
+    {c:"Imperium Technologies", lead:"Prelude Ventures"}
+  ] }
 };
-const LEAD_MONTHLY = { "Jan":1, "Feb":2, "Mar":3, "Apr":2, "May":1, "Jun":1 };
+/* Monthly deals-with-lead: YTD sums to 29 (matches matrix). T12M includes 6 prior months. */
+const LEAD_MONTHLY      = { Jan:3, Feb:4, Mar:6, Apr:7, May:5, Jun:4 };
+const LEAD_MONTHLY_T12M = { Jul:2, Aug:3, Sep:3, Oct:4, Nov:4, Dec:3, Jan:3, Feb:4, Mar:6, Apr:7, May:5, Jun:4 };
 const LEAD_BY_MONTH_DEALS = {
-  "Jan":[{c:"Photon Marine", stage:"Pre-Screening / Pre-seed", lead:"Prelude Ventures"}],
-  "Feb":[{c:"Ateios Systems", stage:"Screening / Seed", lead:"Titletown Tech"},{c:"Algafilm", stage:"Pre-Screening / Seed", lead:"Congruent Ventures"}],
-  "Mar":[{c:"Enzinc", stage:"Screening / Series A", lead:"Anthropocene Ventures"},{c:"Imperium Technologies", stage:"Screening / Series A", lead:"Prelude Ventures"},{c:"EELI Technology", stage:"Pre-Screening / Series A", lead:"Congruent Ventures"}],
-  "Apr":[{c:"Hitt Power", stage:"Screening / Seed", lead:"Buoyant Ventures"},{c:"Electrum", stage:"Pre-Screening / Series A", lead:"At One Ventures"}],
-  "May":[{c:"NuCube", stage:"Pre-Screening / Series A", lead:"Starshot Capital"}],
-  "Jun":[{c:"agapyo", stage:"Pre-Screening / Pre-seed", lead:"Anthropocene Ventures"}]
+  "Jan":[
+    {c:"Photon Marine", stage:"Pre-Screening / Pre-seed", lead:"Prelude Ventures"},
+    {c:"NxLite", stage:"Pre-Screening / Pre-seed", lead:"Buoyant Ventures"},
+    {c:"Cala", stage:"Pre-Screening / Pre-seed", lead:"Alliance of Angels"}
+  ],
+  "Feb":[
+    {c:"Ateios Systems", stage:"Pre-Screening / Seed", lead:"Titletown Tech"},
+    {c:"Algafilm", stage:"Pre-Screening / Seed", lead:"Congruent Ventures"},
+    {c:"Symbium", stage:"Pre-Screening / Pre-seed", lead:"At One Ventures"},
+    {c:"agapyo", stage:"Pre-Screening / Pre-seed", lead:"Anthropocene Ventures"}
+  ],
+  "Mar":[
+    {c:"Enzinc", stage:"Pre-Screening / Series A", lead:"Anthropocene Ventures"},
+    {c:"Imperium Technologies", stage:"Pre-Screening / Series A", lead:"Prelude Ventures"},
+    {c:"EELI Technology", stage:"Pre-Screening / Series A", lead:"Congruent Ventures"},
+    {c:"Hitt Power", stage:"Pre-Screening / Seed", lead:"Buoyant Ventures"},
+    {c:"ZILA BioWorks", stage:"Pre-Screening / Seed", lead:"Prelude Ventures"},
+    {c:"Emerald Battery Labs", stage:"Pre-Screening / Seed", lead:"Starshot Capital"}
+  ],
+  "Apr":[
+    {c:"Enzinc", stage:"Screening / Series A", lead:"Anthropocene Ventures"},
+    {c:"Ateios Systems", stage:"Screening / Seed", lead:"Titletown Tech"},
+    {c:"Hitt Power", stage:"Screening / Seed", lead:"Buoyant Ventures"},
+    {c:"Electrum", stage:"Screening / Seed", lead:"At One Ventures"},
+    {c:"NuCube", stage:"Screening / Pre-seed", lead:"Starshot Capital"},
+    {c:"NxLite", stage:"Screening / Pre-seed", lead:"Buoyant Ventures"},
+    {c:"Algafilm", stage:"Screening / Seed", lead:"Congruent Ventures"}
+  ],
+  "May":[
+    {c:"EELI Technology", stage:"Screening / Series A", lead:"Congruent Ventures"},
+    {c:"Imperium Technologies", stage:"Screening / Series A", lead:"Prelude Ventures"},
+    {c:"Enzinc", stage:"Member Meeting Pitch / Series A", lead:"Anthropocene Ventures"},
+    {c:"EELI Technology", stage:"Member Meeting Pitch / Series A", lead:"Congruent Ventures"},
+    {c:"Imperium Technologies", stage:"Member Meeting Pitch / Series A", lead:"Prelude Ventures"}
+  ],
+  "Jun":[
+    {c:"Ateios Systems", stage:"Member Meeting Pitch / Seed", lead:"Titletown Tech"},
+    {c:"Hitt Power", stage:"Member Meeting Pitch / Seed", lead:"Buoyant Ventures"},
+    {c:"Algafilm", stage:"Member Meeting Pitch / Seed", lead:"Congruent Ventures"},
+    {c:"agapyo", stage:"Member Meeting Pitch / Pre-seed", lead:"Anthropocene Ventures"}
+  ]
 };
 function leadDrawer(){
   const stages = ["pre","scr","mm"];
-  const stageLabel = {pre:"Pre-Screening", scr:"Screening", mm:"Member Meeting Pitch"};
   const invStages = ["Pre-seed","Seed","Series A"];
-  let total=0, withLead=0;
-  invStages.forEach(inv=>stages.forEach(st=>{const c=LEAD_MATRIX[`${st}|${inv}`];total+=c.total;withLead+=c.withLead;}));
+  let grandTotal=0, grandLead=0;
+  invStages.forEach(inv=>stages.forEach(st=>{const c=LEAD_MATRIX[`${st}|${inv}`];grandTotal+=c.total;grandLead+=c.withLead;}));
   const rows = invStages.map(inv=>{
     let row = `<tr><td><b>${inv}</b></td>`;
+    let invTot=0, invLead=0;
     stages.forEach(st=>{
-      const c = LEAD_MATRIX[`${st}|${inv}`];
+      const c = LEAD_MATRIX[`${st}|${inv}`]; invTot+=c.total; invLead+=c.withLead;
       const pct = c.total>0 ? Math.round(c.withLead/c.total*100) : 0;
       const cell = c.withLead>0 ? `<button class="link-btn" data-drill="leadDeals" data-arg="${st}|${inv}">${c.withLead}/${c.total}</button> <span style="color:var(--text-subtle)">(${pct}%)</span>` : `${c.withLead}/${c.total} <span style="color:var(--text-subtle)">(${pct}%)</span>`;
       row += `<td class="num">${cell}</td>`;
     });
+    const invPct = invTot>0 ? Math.round(invLead/invTot*100) : 0;
+    row += `<td class="num"><b>${invLead}/${invTot}</b> <span style="color:var(--text-subtle)">(${invPct}%)</span></td>`;
     return row + `</tr>`;
   }).join("");
-  const ytd = `<div class="kpi-strip">
-      <div class="k"><div class="kv">${withLead}/${total}</div><div class="kl">Deals with lead present</div></div>
-      <div class="k"><div class="kv">${Math.round(withLead/total*100)}%</div><div class="kl">Overall share</div></div>
+  const kpiStrip = `<div class="kpi-strip">
+      <div class="k"><div class="kv">${grandLead}/${grandTotal}</div><div class="kl">With lead present (YTD)</div></div>
+      <div class="k"><div class="kv">${Math.round(grandLead/grandTotal*100)}%</div><div class="kl">Overall share</div></div>
+      <div class="k"><div class="kv">&ge;80%</div><div class="kl">Target (Series A)</div></div>
+    </div>`;
+  const monthsYTD  = Object.keys(LEAD_MONTHLY).map(m=>LEAD_MONTHLY[m]);
+  const monthsT12M = Object.keys(LEAD_MONTHLY_T12M).map(m=>LEAD_MONTHLY_T12M[m]);
+  const ytd = `${kpiStrip}
+    <div class="subhead">Pipeline stage × investment stage &mdash; click any count for the deals</div>
+    <table class="dtable"><thead><tr><th>Investment stage</th><th class="num">Pre-Screening</th><th class="num">Screening</th><th class="num">Member Meeting Pitch</th><th class="num">Total</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="subhead">Deals with lead present &mdash; per month (click any count for deals)</div>
+    ${monthlyMoMTable(MONTHS, monthsYTD, {valueLabel:"With lead", drill:"leadDealsMonth"})}`;
+  const month = `<div class="kpi-strip">
+      <div class="k"><div class="kv">${monthsT12M.reduce((a,b)=>a+b,0)}</div><div class="kl">With lead (T12M)</div></div>
+      <div class="k"><div class="kv">${grandLead}</div><div class="kl">Of which 2026 YTD</div></div>
       <div class="k"><div class="kv">&ge;80%</div><div class="kl">Target (Series A)</div></div>
     </div>
-    <table class="dtable"><thead><tr><th>Investment stage</th><th class="num">Pre-Screening</th><th class="num">Screening</th><th class="num">Member Meeting Pitch</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="drawer-note">Rows = investment stage; columns = pipeline stage. Each cell shows deals-with-lead / total-deals (and share). Click any count to see the specific deals with a lead investor present.</div>`;
-  const monthKeys = Object.keys(LEAD_MONTHLY);
-  const monthCounts = monthKeys.map(m=>LEAD_MONTHLY[m]);
-  const monthMax = Math.max(...monthCounts,1);
-  const month = `<div class="subhead">Deals with lead investor present &mdash; per month (click any month)</div>
-    ${monthKeys.map((m,i)=>`<div class="month-bars"><div class="mb-lbl">${m}</div><div class="mb-track"><div class="mb-fill" style="width:${Math.round(monthCounts[i]/monthMax*100)}%"></div></div><div class="mb-val"><button class="link-btn" data-drill="leadDealsMonth" data-arg="${m}">${monthCounts[i]}</button></div></div>`).join("")}
-    <div class="drawer-note">Click any month to see the specific deals that had a lead investor present.</div>`;
+    <div class="subhead">Trailing 12 months &mdash; click any count for deals</div>
+    ${monthlyMoMTable(MONTHS_T12M, monthsT12M, {valueLabel:"With lead", drill:"leadDealsMonth"})}`;
   return { title: "Lead Investor Present", sub:"Pipeline stage × investment stage &middot; entity leads only", html: ytdT12MTabs(ytd, month) };
 }
 function leadDealsDrawer(arg){
@@ -821,30 +912,105 @@ function applicationsDrawer(){
   return { title:"Applications", sub:"Volume &middot; diversity &middot; progression &middot; funded", html: ytdT12MTabs(ytd, month) };
 }
 
-/* Channels drawer — 14 channels */
+/* Channels drawer — 14 channels; each row clickable for company list */
+const CHANNEL_COMPANIES = {
+  "VC": [
+    {c:"Enzinc", stage:"Invested"},{c:"EELI Technology", stage:"Invested"},
+    {c:"Imperium Technologies", stage:"Invested"},{c:"Electrum", stage:"Invested"},
+    {c:"NuCube", stage:"Diligence"},{c:"Emerald Battery Labs", stage:"Screening"},
+    {c:"Beyond Silicon", stage:"Pre-Screening"}
+  ],
+  "Accelerator": [
+    {c:"Ateios Systems", stage:"Invested"},{c:"Algafilm", stage:"Invested"},
+    {c:"Aquagga", stage:"Diligence"},{c:"Nature Coatings", stage:"Screening"},
+    {c:"Solidec", stage:"Pre-Screening"}
+  ],
+  "Incubator": [
+    {c:"Symbium", stage:"Watchlist"},{c:"Cala", stage:"Pre-Screening"},
+    {c:"Verde Nanomaterials", stage:"Watchlist"}
+  ],
+  "University": [
+    {c:"NxLite", stage:"Screening"},{c:"Alpha Grid", stage:"Watchlist"},
+    {c:"Photon Marine", stage:"Pre-Screening"}
+  ],
+  "Event – In-person (E8 hosted)": [
+    {c:"Hitt Power", stage:"Invested"},{c:"ZILA BioWorks", stage:"Screening"},
+    {c:"Paleblue", stage:"Watchlist"},{c:"Electrum", stage:"Invested"}
+  ],
+  "Event – In-person (met E8 rep at another event)": [
+    {c:"agapyo", stage:"Invested"},{c:"AquaPoro", stage:"Invested"},
+    {c:"Currents", stage:"Watchlist"},{c:"Sunspan", stage:"Screening"},
+    {c:"Tierra Climate", stage:"Diligence"}
+  ],
+  "Online webinar": [
+    {c:"Beyond Silicon", stage:"Pre-Screening"},{c:"Luminous Robotics", stage:"Watchlist"}
+  ],
+  "Member": [
+    {c:"Enzinc", stage:"Invested"},{c:"agapyo", stage:"Invested"},
+    {c:"Cecilia", stage:"Screening"},{c:"NuCube", stage:"Diligence"}
+  ],
+  "Portco referral": [
+    {c:"Nature Coatings", stage:"Diligence"},{c:"AquaPoro", stage:"Invested"},
+    {c:"Alpha Grid", stage:"Watchlist"}
+  ],
+  "Web Search": [
+    {c:"Photon Marine", stage:"Pre-Screening"},{c:"Symbium", stage:"Watchlist"}
+  ],
+  "LLM recommendation": [
+    {c:"Beyond Silicon", stage:"Pre-Screening"}
+  ],
+  "Social Media (LinkedIn)": [
+    {c:"Alpha Grid", stage:"Watchlist"},{c:"Currents", stage:"Watchlist"}
+  ],
+  "Newsletter": [
+    {c:"Luminous Robotics", stage:"Watchlist"}
+  ],
+  "Other": [
+    {c:"Symbium", stage:"Watchlist"},{c:"Paleblue", stage:"Watchlist"}
+  ]
+};
 function channelsDrawer(){
   const scale = MODE==='t12m' ? 2 : 1;
   const rowsC = CHANNELS.map(c=>{
     const nowV=Math.round(c.now*scale), prevV=Math.round(c.prev*scale);
     const d=nowV-prevV, pct = prevV>0 ? Math.round(d/prevV*100) : 0;
-    return `<tr><td>${c.name}</td><td class="num">${nowV}</td><td class="num">${prevV}</td><td class="num" style="color:${d>=0?'var(--ok)':'var(--danger)'}">${d>=0?'+':''}${pct}%</td></tr>`;
+    return `<tr class="clickable" data-drill="channelCompanies" data-arg="${encodeURIComponent(c.name)}"><td>${c.name}</td><td class="num">${nowV}</td><td class="num">${prevV}</td><td class="num" style="color:${d>=0?'var(--ok)':'var(--danger)'}">${d>=0?'+':''}${pct}%</td><td class="num">&rsaquo;</td></tr>`;
   }).join("");
-  const ytd = `<table class="dtable"><thead><tr><th>Channel</th><th class="num">Current period</th><th class="num">Prior period</th><th class="num">Change</th></tr></thead><tbody>${rowsC}</tbody></table>
-    <div class="drawer-note">Fourteen channels reflect the planned "How did you hear about E8?" application field. Counts for new channels (LLM, LinkedIn, Newsletter, Web Search, University) are illustrative until capture ramps.</div>`;
+  const ytd = `<table class="dtable"><thead><tr><th>Channel</th><th class="num">Current period</th><th class="num">Prior period</th><th class="num">Change</th><th class="num">&nbsp;</th></tr></thead><tbody>${rowsC}</tbody></table>
+    <div class="drawer-note">Click any channel to see the underlying applications (companies). Fourteen channels reflect the planned "How did you hear about E8?" application field.</div>`;
   const month = `<div class="subhead">Monthly volume &mdash; select channels</div>
-    ${CHANNELS.slice(0,6).map(ch=>`<div class="subhead" style="margin-top:12px;">${ch.name}</div>${monthlyBars(MONTHS, ch.months)}`).join("")}`;
-  return { title:"Channel mix &mdash; YoY", sub:"14 channels", html: ytdT12MTabs(ytd, month) };
+    ${CHANNELS.slice(0,6).map(ch=>`<div class="subhead" style="margin-top:12px;">${ch.name}</div>${monthlyMoMTable(MONTHS, ch.months, {valueLabel:"Apps"})}`).join("")}`;
+  return { title:"Channel mix &mdash; YoY", sub:"14 channels &middot; click a row for companies", html: ytdT12MTabs(ytd, month) };
+}
+function channelCompaniesDrawer(chEnc){
+  const channel = decodeURIComponent(chEnc);
+  const list = CHANNEL_COMPANIES[channel] || [];
+  const ch = CHANNELS.find(c=>c.name===channel);
+  const totalApps = ch ? ch.now : list.length;
+  const rows = list.map(x=>`<tr><td>${x.c}</td><td>${x.stage}</td></tr>`).join("") || `<tr><td colspan="2" style="color:var(--text-subtle)">No applications yet from this channel.</td></tr>`;
+  pushDrawer({ title:`Applications via ${channel}`, sub:`${totalApps} YTD &middot; showing top ${list.length}`,
+    html:`<table class="dtable"><thead><tr><th>Company</th><th>Furthest stage reached</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="drawer-note">Companies sourced through this channel. Full list of ${totalApps} applications is available in the portal (link-through pending).</div>` });
 }
 
-/* Attribution — clean note */
+/* Attribution — YTD and Per-month monthly coverage */
 function attributionDrawer(){
-  return { title:"Source attribution coverage", sub:"Gating metric for proactive-vs-reactive",
-    html:`<div class="kpi-strip">
-        <div class="k"><div class="kv">15%</div><div class="kl">Tagged (2026)</div></div>
-        <div class="k"><div class="kv">37</div><div class="kl">of 246 deals</div></div>
-        <div class="k"><div class="kv">100%</div><div class="kl">Target by Sep '26</div></div>
-      </div>
-      <div class="drawer-note">Share of applicant companies with a source-of-application tag. Until coverage improves, proactive-vs-reactive share and investment-into-proactive-deals cannot be reliably computed.</div>` };
+  const monthsYTD  = [8, 10, 12, 15, 17, 18]; // coverage % per month
+  const monthsT12M = [5, 6, 7, 7, 8, 9, 8, 10, 12, 15, 17, 18];
+  const kpiStrip = `<div class="kpi-strip">
+      <div class="k"><div class="kv">15%</div><div class="kl">Coverage (2026 YTD)</div></div>
+      <div class="k"><div class="kv">37</div><div class="kl">of 246 deals tagged</div></div>
+      <div class="k"><div class="kv">100%</div><div class="kl">Target by Sep '26</div></div>
+    </div>`;
+  const ytd = `${kpiStrip}
+    <div class="subhead">Attribution coverage &mdash; per month</div>
+    ${monthlyMoMTable(MONTHS, monthsYTD, {valueLabel:"Coverage %"})}
+    <div class="drawer-note">Share of applicant companies with a source-of-application tag. The trend line matters more than any single month &mdash; the target is 100% by Sep 2026.</div>`;
+  const month = `${kpiStrip}
+    <div class="subhead">Attribution coverage &mdash; trailing 12 months</div>
+    ${monthlyMoMTable(MONTHS_T12M, monthsT12M, {valueLabel:"Coverage %"})}
+    <div class="drawer-note">Rolling 12-month view. Rising trend since Nov 2025 as new capture practices ramp.</div>`;
+  return { title:"Source attribution coverage", sub:"Gating metric for proactive-vs-reactive", html: ytdT12MTabs(ytd, month) };
 }
 
 /* Partners — activation → members of a status → single partner performance */
@@ -862,15 +1028,22 @@ function partnersDrawer(){
 }
 function partnerStatusDrawer(statusKey){
   const grp = PARTNERS_BY_STATUS[statusKey];
-  const rows = grp.items.map(p=>`
-    <tr class="clickable" data-drill="partnerDetail" data-arg="${encodeURIComponent(p.n)}">
-      <td>${p.n}</td><td>${p.t}</td>
+  const showLead = statusKey === "Priority to Initiate";
+  const rows = grp.items.map(p=>{
+    const leadCell = showLead ? `<td>${p.lead||"&mdash;"}</td>` : "";
+    return `<tr class="clickable" data-drill="partnerDetail" data-arg="${encodeURIComponent(p.n)}">
+      <td>${p.n}</td><td>${p.t}</td>${leadCell}
       <td class="num">${p.refs}</td><td class="num">${p.pitched}</td><td class="num">${p.invested}</td>
       <td class="num">&rsaquo;</td>
-    </tr>`).join("");
+    </tr>`;
+  }).join("");
+  const leadHeader = showLead ? "<th>Lead</th>" : "";
+  const note = showLead
+    ? "Each priority partner has a nominated Sourcing-Committee lead. Click a partner to see full dealflow performance."
+    : "Click a partner to see full dealflow performance and referred-company list.";
   pushDrawer({ title:`Partners &mdash; ${grp.label}`, sub:`${grp.items.length} organizations`,
-    html: `<table class="dtable"><thead><tr><th>Partner</th><th>Type</th><th class="num">Referrals</th><th class="num">Pitched</th><th class="num">Invested</th><th class="num">&nbsp;</th></tr></thead><tbody>${rows}</tbody></table>
-      <div class="drawer-note">Click a partner to see full dealflow performance and referred-company list.</div>` });
+    html: `<table class="dtable"><thead><tr><th>Partner</th><th>Type</th>${leadHeader}<th class="num">Referrals</th><th class="num">Pitched</th><th class="num">Invested</th><th class="num">&nbsp;</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="drawer-note">${note}</div>` });
 }
 function partnerDetail(nameEnc){
   const name = decodeURIComponent(nameEnc);
@@ -982,7 +1155,8 @@ const DRILL = {
   companyScoresMonth: companyScoresMonthDrawer,
   leadDeals: leadDealsDrawer,
   leadDealsMonth: leadDealsMonthDrawer,
-  diversityMonth: diversityMonthDrawer
+  diversityMonth: diversityMonthDrawer,
+  channelCompanies: channelCompaniesDrawer
 };
 
 document.querySelectorAll(".stat-tile[data-drawer]").forEach(t=>t.addEventListener("click",()=>{
