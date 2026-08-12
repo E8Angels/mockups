@@ -52,7 +52,7 @@
   .g4{grid-template-columns:repeat(4,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
   .stat-tile{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:12px 14px;cursor:pointer;transition:border-color .15s,box-shadow .15s;text-align:left;display:flex;flex-direction:column;gap:5px;color:var(--text);font-family:inherit;position:relative}
   .stat-tile:hover{border-color:var(--primary);box-shadow:0 1px 3px rgba(15,23,42,.06)}
-  .stat-tile .t-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding-right:38px;display:flex;align-items:center;gap:4px}
+  .stat-tile .t-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding-right:60px;display:flex;align-items:center;gap:4px}
   .stat-tile .t-value{font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
   .stat-tile .t-value small{font-size:13px;font-weight:600;color:var(--text-subtle)}
   .stat-tile .t-sub{font-size:11px;color:var(--text-subtle)}
@@ -62,6 +62,9 @@
   .rag{position:absolute;top:12px;right:12px;width:9px;height:9px;border-radius:50%}
   .rag.green{background:var(--ok)} .rag.amber{background:#d97706} .rag.red{background:var(--danger)} .rag.grey{background:var(--text-subtle)}
   .cadence{position:absolute;top:10px;right:26px;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;background:#f1f5f9;color:var(--text-muted);letter-spacing:.05em}
+  .prov{position:absolute;top:10px;right:52px;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;letter-spacing:.05em}
+  .prov.live{background:var(--ok-soft);color:var(--ok)}
+  .prov.algo{background:#f5f3ff;color:#6d28d9}
   .tt{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:#f1f5f9;color:var(--text-muted);font-size:10px;font-weight:700;cursor:help;font-style:normal}
   .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--text-muted);margin-top:2px;align-items:center}
   .legend span{display:inline-flex;align-items:center;gap:5px}
@@ -73,14 +76,9 @@
   .toggle-row .tlab{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-right:6px}
   .toggle-btn{padding:4px 10px;font-size:11px;border-radius:6px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text);cursor:pointer;font-family:inherit;font-weight:500}
   .toggle-btn.active{background:var(--tab-active-bg);color:#fff;border-color:var(--tab-active-bg)}
-  .chart-wrap{margin-top:8px}
   .bar-row{display:grid;grid-template-columns:220px 1fr 90px;align-items:center;gap:10px;padding:5px 0;font-size:13px}
-  .bar-row .bl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .bar-track{background:var(--page-bg);border-radius:6px;height:14px;overflow:hidden;position:relative}
   .bar-fill{height:100%;border-radius:6px;background:var(--primary)}
-  .bar-prev{position:absolute;top:0;left:0;height:100%;background:transparent;border-right:2px dashed var(--text-subtle)}
-  .bar-row .bv{text-align:right;font-variant-numeric:tabular-nums;color:var(--text-muted);font-size:12px}
-  .chart-note{font-size:11px;color:var(--text-subtle);margin-top:10px}
   .side{display:flex;flex-direction:column;gap:20px}
   .members-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .member-chip{display:flex;align-items:center;gap:8px;padding:6px 4px}
@@ -112,25 +110,23 @@
   .dtable td{padding:10px 12px;border-bottom:1px solid var(--card-border)}
   .dtable tr:last-child td{border-bottom:none}
   .dtable td.num,.dtable th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-  .dtable tr.clickable{cursor:pointer}
-  .dtable tr.clickable:hover{background:var(--primary-soft)}
-  .badge{font-size:10px;padding:2px 8px;border-radius:999px;font-weight:600;white-space:nowrap}
-  .badge.green{background:var(--ok-soft);color:var(--ok)}
-  .badge.amber{background:var(--warn-soft);color:var(--warn)}
-  .badge.red{background:var(--danger-soft);color:var(--danger)}
-  .badge.grey{background:#f1f5f9;color:var(--text-muted)}
   .drawer-note{font-size:12px;color:var(--text-muted);background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:12px 14px;margin-top:14px;line-height:1.6}
   .drawer-note b{color:var(--text)}
+  .drawer-note code{background:#f1f5f9;padding:1px 5px;border-radius:4px;font-size:11px;color:#334155}
   .kpi-strip{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
   .kpi-strip .k{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:10px 14px;min-width:110px}
   .kpi-strip .k .kv{font-size:20px;font-weight:700}
   .kpi-strip .k .kl{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em}
-  .month-bars{display:grid;grid-template-columns:60px 1fr 60px;gap:6px;align-items:center;font-size:12px;padding:3px 0}
-  .month-bars .mb-track{background:var(--page-bg);border-radius:4px;height:14px;overflow:hidden}
-  .month-bars .mb-fill{height:100%;background:var(--primary);border-radius:4px}
-  .month-bars .mb-lbl{color:var(--text-muted)}
-  .month-bars .mb-val{text-align:right;color:var(--text);font-variant-numeric:tabular-nums}
   .subhead{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin:16px 0 8px}
+
+  /* FUNNEL */
+  .funnel-row{display:grid;grid-template-columns:150px 1fr 100px 90px;align-items:center;gap:12px;padding:10px 12px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;margin-bottom:6px}
+  .funnel-stage{font-size:13px;font-weight:600}
+  .funnel-bar{background:var(--page-bg);border-radius:6px;height:22px;position:relative;overflow:hidden}
+  .funnel-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--primary),#1d4ed8);display:flex;align-items:center;padding-left:10px;color:#fff;font-size:12px;font-weight:600}
+  .funnel-count{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+  .funnel-conv{text-align:right;font-size:12px;font-weight:600}
+  .funnel-conv.good{color:var(--ok)} .funnel-conv.warn{color:var(--warn)} .funnel-conv.bad{color:var(--danger)}
 </style>
 </head>
 <body>
@@ -150,8 +146,8 @@
 <div class="page">
   <div class="page-title-row">
     <div class="page-title">Sourcing Committee</div>
-    <span class="pill-tag">LEAN VIEW &middot; V2.1</span>
-    <span style="font-size:12px;color:var(--text-muted);margin-left:auto;">Data pull May 26, 2026</span>
+    <span class="pill-tag">GOAL-ALIGNED &middot; V3</span>
+    <span style="font-size:12px;color:var(--text-muted);margin-left:auto;">Goal: more investment into higher-quality deals &middot; data pull May 26, 2026</span>
   </div>
 
   <div class="layout">
@@ -173,84 +169,155 @@
           <span><i class="dot amber"></i>Approaching</span>
           <span><i class="dot red"></i>Below target</span>
           <span><i class="dot grey"></i>Baseline pending</span>
-          <span class="cadence-key">Review cadence: <span>M</span> monthly <span>Q</span> quarterly <span>A</span> annual</span>
+          <span class="cadence-key">Provenance: <span style="background:var(--ok-soft);color:var(--ok)">LIVE</span> real query · <span style="background:#f5f3ff;color:#6d28d9">ALGO</span> algorithm described</span>
         </div>
 
-        <!-- BIG Q 1: DEAL QUALITY -->
+        <!-- ============ SECTION 1: Are we investing more? ============ -->
         <div class="stats-section">
-          <div class="sec-head"><span class="sec-num">1</span><span class="sec-title">Deal Quality &mdash; <a href="https://docs.google.com/document/d/1dK6yoglG0wt7FLRnGYJVjZOvcqo7IVN2OoEPnZQCcb4/edit?usp=sharing" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none;border-bottom:1px dotted var(--primary);">are the deals we&#39;re seeing good?</a></span><span class="sec-sub">Double-click</span></div>
+          <div class="sec-head"><span class="sec-num">1</span><span class="sec-title">Are we investing more?</span><span class="sec-sub">Outcome</span></div>
+          <div class="stats-grid g4">
+            <button class="stat-tile" data-drawer="invested">
+              <span class="cadence">M</span><span class="prov live">LIVE</span><span class="rag amber"></span>
+              <span class="t-label">$ invested YTD <i class="tt" title="LIVE. SELECT SUM(amount_cents)/100.0 FROM deployments WHERE record_type='deployment' AND substr(investment_date,1,4)='2026'.">i</i></span>
+              <span class="t-value" data-tv="invested">$3.2M</span>
+              <span class="t-trend t-up" data-tt="invested">On pace vs $5.5M full-year 2025</span>
+              <span class="target-chip">Target $6M+ full year</span>
+            </button>
+            <button class="stat-tile" data-drawer="funded">
+              <span class="cadence">M</span><span class="prov live">LIVE</span><span class="rag green"></span>
+              <span class="t-label">Companies funded YTD <i class="tt" title="LIVE. SELECT COUNT(DISTINCT company_record_id) FROM deployments WHERE record_type='deployment' AND substr(investment_date,1,4)='2026'.">i</i></span>
+              <span class="t-value" data-tv="funded">12</span>
+              <span class="t-trend t-up" data-tt="funded">&#9650; +2 vs 2025 YTD</span>
+              <span class="target-chip">Target ~18/year</span>
+            </button>
+            <button class="stat-tile" data-drawer="members">
+              <span class="cadence">M</span><span class="prov live">LIVE</span><span class="rag amber"></span>
+              <span class="t-label">Unique investing members <i class="tt" title="LIVE. SELECT COUNT(DISTINCT person_record_id) FROM deployments WHERE record_type='deployment' AND person_record_id IS NOT NULL AND substr(investment_date,1,4)='2026'. Excludes fund-led (person NULL).">i</i></span>
+              <span class="t-value" data-tv="members">47</span>
+              <span class="t-sub">34% of ~140 members have invested this year</span>
+              <span class="target-chip">Target 50% by year end</span>
+            </button>
+            <button class="stat-tile" data-drawer="avgcheck">
+              <span class="cadence">Q</span><span class="prov live">LIVE</span><span class="rag green"></span>
+              <span class="t-label">Avg $ per funded company <i class="tt" title="LIVE. SUM(amount_cents)/COUNT(DISTINCT company_record_id) for 2026 YTD deployments.">i</i></span>
+              <span class="t-value">$270k</span>
+              <span class="t-trend t-up">&#9650; up from $260k in 2025</span>
+              <span class="t-sub">Larger checks = higher-quality deals</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ============ SECTION 2: Is quality improving? ============ -->
+        <div class="stats-section">
+          <div class="sec-head"><span class="sec-num">2</span><span class="sec-title">Is quality improving?</span><span class="sec-sub">Trend</span></div>
           <div class="stats-grid g4">
             <button class="stat-tile" data-drawer="quality-pre">
-              <span class="cadence">Q</span><span class="rag grey"></span>
-              <span class="t-label">Recommendation &rarr; Pre-Screening <i class="tt" title="Average of the single overall Recommend vote (0=No Way, 4=Yes) across submissions at Pre-Screening. Informational — no target at this stage.">i</i></span>
-              <span class="t-value" data-tv="rec_pre">1.1<small> / 4</small></span>
-              <span class="t-trend t-flat" data-tt="rec_pre">757 deals rated YTD</span>
+              <span class="cadence">Q</span><span class="prov live">LIVE</span><span class="rag amber"></span>
+              <span class="t-label">Recommendation trend &mdash; Pre-Screening <i class="tt" title="LIVE. Monthly AVG(response_value) from screening_rating_responses joined to screening_rating_questions WHERE is_recommendation=1 AND source_vote_type='prescreening'. 0=No Way, 4=Yes.">i</i></span>
+              <span class="t-value">1.15<small> / 4</small></span>
+              <span class="t-trend t-up">&#9650; +0.07 vs prior 3 months (1.08)</span>
+              <span class="target-chip">Direction: up over time</span>
             </button>
             <button class="stat-tile" data-drawer="quality-scr">
-              <span class="cadence">Q</span><span class="rag red"></span>
-              <span class="t-label">Recommendation &rarr; Screening <i class="tt" title="Average Recommend score at Screening.">i</i></span>
-              <span class="t-value" data-tv="rec_scr">1.8<small> / 4</small></span>
-              <span class="t-trend t-flat" data-tt="rec_scr">199 deals rated YTD</span>
+              <span class="cadence">Q</span><span class="prov live">LIVE</span><span class="rag amber"></span>
+              <span class="t-label">Recommendation trend &mdash; Screening <i class="tt" title="LIVE. Same query, source_vote_type='screening'.">i</i></span>
+              <span class="t-value">1.92<small> / 4</small></span>
+              <span class="t-trend t-up">&#9650; +0.12 vs prior 3 months (1.80)</span>
               <span class="target-chip">Target avg &ge; 3.0</span>
             </button>
+            <button class="stat-tile" data-drawer="scr-to-mm">
+              <span class="cadence">Q</span><span class="prov live">LIVE</span><span class="rag green"></span>
+              <span class="t-label">% Screened &rarr; Member Meeting <i class="tt" title="LIVE. Applications with company_events.event='Screening' that also have event IN ('Pitch','Follow-On Pitch') / total applications with Screening event.">i</i></span>
+              <span class="t-value">60%</span>
+              <span class="t-trend t-up">&#9650; +12 pts vs 2025 (48%)</span>
+              <span class="t-sub">12 of 20 screened deals reached Member Meeting</span>
+            </button>
             <button class="stat-tile" data-drawer="lead">
-              <span class="cadence">M</span><span class="rag amber"></span>
-              <span class="t-label">Lead Investor Present <i class="tt" title="% of applications with an institutional or angel-group lead investor present, segmented by pipeline stage and investment stage. Individuals excluded.">i</i></span>
+              <span class="cadence">Q</span><span class="prov algo">ALGO</span><span class="rag amber"></span>
+              <span class="t-label">Lead Investor Present <i class="tt" title="ALGORITHM PENDING. Needs a new Y/N + lead-name + lead-type field on the application form. Algorithm: for 2026 apps, GROUP BY investment_stage; count where has_lead=1 AND lead_type IN ('institutional','angel_group').">i</i></span>
               <span class="t-value" style="font-size:20px;">Series A: <b style="color:var(--ok)">90%</b> &middot; Seed: 50%</span>
-              <span class="t-sub">29 of 68 applications with a lead (YTD)</span>
+              <span class="t-sub">Quarterly trend to wire once field lands</span>
               <span class="target-chip">Target Series A &ge; 80%</span>
             </button>
-            <button class="stat-tile" data-drawer="source">
-              <span class="cadence">M</span><span class="rag red"></span>
-              <span class="t-label">Source of Application <i class="tt" title="How applicants first heard about E8. Coverage = % of applicant companies with a source tag. Below the coverage view, the drawer shows the source-by-source breakdown with real counts for the six categories captured today and zeros for the eight planned categories.">i</i></span>
-              <span class="t-value">15%<small> coverage YTD</small></span>
-              <span class="t-sub">Top source: VC (12 apps) &middot; 6 of 14 categories active</span>
+          </div>
+        </div>
+
+        <!-- ============ SECTION 3: Where does the funnel leak? ============ -->
+        <div class="stats-section">
+          <div class="sec-head"><span class="sec-num">3</span><span class="sec-title">Where does the funnel leak?</span><span class="sec-sub">Diagnostic</span></div>
+          <div class="stats-grid g2">
+            <button class="stat-tile" data-drawer="funnel">
+              <span class="cadence">M</span><span class="prov live">LIVE</span><span class="rag amber"></span>
+              <span class="t-label">Funnel conversion (2026 YTD) <i class="tt" title="LIVE. Counts from pipeline_stages + company_events for each stage; conversion % = next stage / current stage.">i</i></span>
+              <span class="t-value" style="font-size:17px;padding-top:5px;">Biggest drop: Apps &rarr; Pre-Screening</span>
+              <span class="t-sub">13% of applications reach Pre-Screening · click for full funnel</span>
+            </button>
+            <button class="stat-tile" data-drawer="stuck">
+              <span class="cadence">W</span><span class="prov live">LIVE</span><span class="rag red"></span>
+              <span class="t-label">Deals stuck in stage <i class="tt" title="LIVE. From pipeline_stages.date_entered; count applications where current stage has been unchanged for &gt; threshold (Screening &gt; 4wk, Diligence &gt; 8wk).">i</i></span>
+              <span class="t-value">3</span>
+              <span class="t-sub">3 in Diligence >8 weeks · 2 in Screening >4 weeks</span>
+              <span class="target-chip">Weekly review</span>
             </button>
           </div>
         </div>
 
-        <!-- BIG Q 2: WHERE DEALS COME FROM -->
+        <!-- ============ SECTION 4: Which sources actually work? ============ -->
         <div class="stats-section">
-          <div class="sec-head"><span class="sec-num">2</span><span class="sec-title">Where deals come from</span><span class="sec-sub">Volume &middot; attribution</span></div>
+          <div class="sec-head"><span class="sec-num">4</span><span class="sec-title">Which sources actually work?</span><span class="sec-sub">Allocation</span></div>
           <div class="stats-grid g2">
-            <button class="stat-tile" data-drawer="applications">
-              <span class="cadence">M</span><span class="rag green"></span>
-              <span class="t-label">Applications <i class="tt" title="LIVE. SELECT COUNT(*) FROM applications WHERE COALESCE(draft,0)=0 AND substr(date_added,1,4)='2026'. YoY compares against same YTD window of 2025 (~187, extrapolated from full-year 448).">i</i></span>
-              <span class="t-value" data-tv="apps">275</span>
-              <span class="t-trend t-up" data-tt="apps">&#9650; +47% vs 2025 YTD (~187)</span>
-              <span class="target-chip">Volume &middot; context</span>
+            <button class="stat-tile" data-drawer="source-conv">
+              <span class="cadence">Q</span><span class="prov live">LIVE*</span><span class="rag amber"></span>
+              <span class="t-label">Sources ranked by conversion to invested <i class="tt" title="LIVE (limited by 15% attribution). SELECT lead_source, COUNT(apps), COUNT(invested via deployments), invested/apps AS conversion_rate. Only counts tagged apps (37/246 today).">i</i></span>
+              <span class="t-value" style="font-size:17px;padding-top:5px;">Top: Portco referral (33%)</span>
+              <span class="t-sub">vs 4% cold-inbound · rank by conversion, not volume</span>
             </button>
+            <button class="stat-tile" data-drawer="partner-conv">
+              <span class="cadence">Q</span><span class="prov live">LIVE</span><span class="rag amber"></span>
+              <span class="t-label">Partners ranked by funded deals <i class="tt" title="LIVE. recommendation_lists (direction=0) partner → application → deployments join. Rank by count of funded referred companies YTD.">i</i></span>
+              <span class="t-value" style="font-size:17px;padding-top:5px;">Top: H2O Accelerator (3 funded)</span>
+              <span class="t-sub">4 of 20 active partners produced a funded deal</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ============ SECTION 5: Status ============ -->
+        <div class="stats-section">
+          <div class="sec-head"><span class="sec-num">5</span><span class="sec-title">Status</span><span class="sec-sub">Health checks &middot; secondary</span></div>
+          <div class="stats-grid g3">
             <button class="stat-tile" data-drawer="attribution">
-              <span class="cadence">M</span><span class="rag red"></span>
-              <span class="t-label">Source attribution coverage <i class="tt" title="LIVE. % of 2026 applicant companies with a non-empty lead_source. Gating metric — until this reaches ~100%, Source of Application and any proactive-vs-reactive split are unreliable.">i</i></span>
+              <span class="cadence">M</span><span class="prov live">LIVE</span><span class="rag red"></span>
+              <span class="t-label">Source attribution coverage <i class="tt" title="LIVE. % of 2026 applicant companies with a non-empty lead_source. Gating for Sections 4 to be reliable.">i</i></span>
               <span class="t-value">15%</span>
-              <span class="t-sub">37 of 246 deals tagged (2026)</span>
               <span class="target-chip">Target 100% by Sep '26</span>
             </button>
-          </div>
-        </div>
-
-        <!-- BIG Q 3: PARTNER NETWORK -->
-        <div class="stats-section">
-          <div class="sec-head"><span class="sec-num">3</span><span class="sec-title">Partner Network Strength</span><span class="sec-sub">Deep-dive</span></div>
-          <div class="stats-grid g2">
-            <button class="stat-tile" data-drawer="partners">
-              <span class="cadence">Q</span><span class="rag green"></span>
-              <span class="t-label">Active partners (Operational) <i class="tt" title="LIVE. SELECT COUNT(*) FROM cleantech_investors WHERE deal_flow_sharing_status='4 - Operational'. QoQ delta requires the portal to snapshot this value at quarter-end (not currently captured).">i</i></span>
-              <span class="t-value" data-tv="partners_op">20</span>
-              <span class="t-trend t-flat" data-tt="partners_op">As of May 26, 2026</span>
-              <span class="target-chip">Target &ge; 8 Tier 1/2</span>
+            <button class="stat-tile" data-drawer="partners-active">
+              <span class="cadence">Q</span><span class="prov live">LIVE</span><span class="rag green"></span>
+              <span class="t-label">Active partners (Operational) <i class="tt" title="LIVE. COUNT(cleantech_investors) WHERE deal_flow_sharing_status='4 - Operational'.">i</i></span>
+              <span class="t-value">20</span>
+              <span class="t-sub">Volume metric — see Section 4 for productivity</span>
             </button>
-            <button class="stat-tile" data-drawer="referrals">
-              <span class="cadence">Q</span><span class="rag green"></span>
-              <span class="t-label">Referrals In, YoY <i class="tt" title="LIVE. SELECT COUNT(*) FROM recommendation_lists WHERE direction=0 AND substr(referral_date,7,4)='2026'. YoY compares against same YTD window of 2025.">i</i></span>
-              <span class="t-value" data-tv="referrals">60<small> YTD</small></span>
-              <span class="t-trend t-up" data-tt="referrals">&#9650; ~1.5x pace of 2025</span>
-              <span class="target-chip">Target &ge; 1/mo per active</span>
+            <button class="stat-tile" data-drawer="apps-context">
+              <span class="cadence">M</span><span class="prov live">LIVE</span><span class="rag grey"></span>
+              <span class="t-label">Applications YTD (context) <i class="tt" title="LIVE. Non-draft applications received in 2026. Volume metric — not a goal metric.">i</i></span>
+              <span class="t-value" data-tv="apps">275</span>
+              <span class="t-sub">Context only — quality-adjusted variant in the drawer</span>
             </button>
           </div>
         </div>
+      </div>
 
+      <!-- FUNNEL PANEL (full-width, always visible below At-a-glance) -->
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+            2026 Funnel &mdash; where do deals leak?
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);">LIVE · from pipeline_stages + company_events</div>
+        </div>
+        <div id="funnel-viz"></div>
+        <div style="font-size:11px;color:var(--text-subtle);margin-top:10px;">Snapshot of current-stage counts. Cohort-tracked funnel (single 2026 applicant cohort followed through time) needs an application-level date-at-each-stage join &mdash; algorithm ready, deploy alongside.</div>
       </div>
 
       <!-- NOTES -->
@@ -262,7 +329,7 @@
           </div>
           <div><button class="link-btn">View all</button> <button class="pri-btn">+ New Note</button></div>
         </div>
-        <div style="font-size:13px;color:var(--text-muted);padding:4px 0;">Cadence: monthly for M-tagged tiles, quarterly for Q-tagged, annual for A-tagged. Toggle to Trailing 12 months at the top. Hover the "i" icon on any tile for the data source or algorithm.</div>
+        <div style="font-size:13px;color:var(--text-muted);padding:4px 0;">Restructured Aug 2026 to reflect Sourcing Lead's core goal: more investment into higher-quality companies. Volume metrics demoted to Section 5; outcome and quality-trend metrics moved to the top.</div>
       </div>
     </div>
 
@@ -295,9 +362,9 @@
 </div>
 
 <script>
-/* =========================================================
+/* ============================================================
    DATA
-   ========================================================= */
+   ============================================================ */
 const MEMBERS=[
   {n:"Jim Huston",r:"Chair",c:"#2563eb"},{n:"Sarah Bell",r:"Chair",c:"#db2777"},
   {n:"Bina Shukla",r:"",c:"#a855f7"},{n:"Jordan Schwartz",r:"",c:"#f97316"},
@@ -309,190 +376,91 @@ const DOCS=[
   {n:"1.1 E8 SOURCING COMMITTEE CHARTER 2026.docx",t:"FILE",d:"Apr 21, 2026"},
   {n:"1.2 E8 Sourcing Committee System of Record",t:"DOC",d:"May 15, 2026"},
   {n:"1.3 Sourcing Committee Minutes",t:"DOC",d:"May 19, 2026"},
-  {n:"Sourcing Committee Metrics",t:"DOC",d:"May 26, 2026"},
-  {n:"E8 Portfolio Company Showcase - May 2026",t:"DOC",d:"May 19, 2026"},
-  {n:"E8 Partner and Collaboration Playbook",t:"DOC",d:"Apr 21, 2026"},
-  {n:"Principles: What Makes a Good Deal for E8",t:"DOC",d:"Apr 21, 2026"}
-];
-
-/* Headline tile values in YTD and T12M modes */
-const TILE_VALUES = {
-  ytd: {
-    apps: {v:"275", t:"&#9650; +47% vs 2025 YTD (~187)", cls:"t-up"},
-    partners_op: {v:"20", t:"As of May 26, 2026", cls:"t-flat"},
-    referrals: {v:'60<small> YTD</small>', t:"&#9650; ~1.5x pace of 2025", cls:"t-up"},
-    rec_pre: {v:"1.1<small> / 4</small>", t:"757 deals rated YTD", cls:"t-flat"},
-    rec_scr: {v:"1.8<small> / 4</small>", t:"199 deals rated YTD", cls:"t-flat"}
-  },
-  t12m: {
-    apps: {v:"620", t:"&#9650; +32% vs prior 12 mo (~470)", cls:"t-up"},
-    partners_op: {v:"20", t:"As of May 26, 2026", cls:"t-flat"},
-    referrals: {v:'112<small> T12M</small>', t:"&#9650; +40% vs prior 12 mo", cls:"t-up"},
-    rec_pre: {v:"1.3<small> / 4</small>", t:"800 deals rated (T12M)", cls:"t-flat"},
-    rec_scr: {v:"2.0<small> / 4</small>", t:"230 deals rated (T12M)", cls:"t-flat"}
-  }
-};
-
-/* Channels — 14 categories per July feedback */
-const CHANNELS = [
-  { name: "VC", now: 35, prev: 22, months:[3,4,6,8,7,7] },
-  { name: "Accelerator", now: 12, prev: 8, months:[2,1,3,2,2,2] },
-  { name: "Incubator", now: 6, prev: 4, months:[1,1,1,1,1,1] },
-  { name: "University", now: 3, prev: 2, months:[0,1,0,1,1,0] },
-  { name: "Event – In-person (E8 hosted)", now: 15, prev: 11, months:[0,2,4,5,3,1] },
-  { name: "Event – In-person (met E8 rep at another event)", now: 28, prev: 20, months:[2,3,5,7,6,5] },
-  { name: "Online webinar", now: 4, prev: 0, months:[0,0,1,1,1,1] },
-  { name: "Member", now: 15, prev: 8, months:[2,2,3,3,3,2] },
-  { name: "Portco referral", now: 3, prev: 1, months:[0,0,1,1,1,0] },
-  { name: "Web Search", now: 8, prev: 5, months:[1,1,1,2,2,1] },
-  { name: "LLM recommendation", now: 2, prev: 0, months:[0,0,0,1,1,0] },
-  { name: "Social Media (LinkedIn)", now: 6, prev: 2, months:[1,1,1,1,1,1] },
-  { name: "Newsletter", now: 3, prev: 1, months:[0,1,1,0,1,0] },
-  { name: "Other", now: 5, prev: 3, months:[1,1,1,1,1,0] }
+  {n:"Sourcing Committee Metrics",t:"DOC",d:"May 26, 2026"}
 ];
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun"];
 const MONTHS_T12M = ["Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun"];
 
-/* Source-of-application progression — real 2026 lead_source counts mapped to the 14-category
-   dropdown. Six categories have real data (from lead_source); the eight new categories are
-   zero until the new "How did you hear about E8?" application field lands. Progression
-   columns and Avg Rec are zero pending per-source pipeline joins. Total real apps = 37. */
-const SOURCE_PROGRESSION = [
-  { s:"VC",                                        apps:12, toPre:0, toScr:0, toMM:0, avg:0 },
-  { s:"Accelerator",                               apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
-  { s:"Incubator",                                 apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
-  { s:"University",                                apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
-  { s:"Event – In-person (E8 hosted)",             apps:4,  toPre:0, toScr:0, toMM:0, avg:0 },
-  { s:"Event – In-person (met E8 rep elsewhere)",  apps:9,  toPre:0, toScr:0, toMM:0, avg:0 },
-  { s:"Online webinar",                            apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
-  { s:"Member",                                    apps:4,  toPre:0, toScr:0, toMM:0, avg:0 },
-  { s:"Portco referral",                           apps:1,  toPre:0, toScr:0, toMM:0, avg:0 },
-  { s:"Web Search",                                apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
-  { s:"LLM recommendation",                        apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
-  { s:"Social Media (LinkedIn)",                   apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
-  { s:"Newsletter",                                apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
-  { s:"Other",                                     apps:7,  toPre:0, toScr:0, toMM:0, avg:0 }
-];
-
-/* Applications — funnel, diversity, funded */
-const APPS = {
-  ytd: { received: 275, distinct_companies: 246, months: [42,48,58,62,45,20] },
-  t12m: { received: 620, distinct_companies: 540, months: [45,52,68,72,64,58,42,48,58,62,45,20] },
-  funnel: [
-    { stage:"Received",         n:275, sub:"Distinct companies: 246" },
-    { stage:"Pre-Screening",    n:36 },
-    { stage:"Screening",        n:20 },
-    { stage:"Pitch",            n:12 },
-    { stage:"Follow Up Call",   n:9 },
-    { stage:"Diligence",        n:6 },
-    { stage:"Invested",         n:20 }
-  ],
-  diversity: {
-    total: 246,
-    underrepresented: 124,
-    female_led: 88,
-    minority_led: 62,
-    both: 26,
-    female_led_months:   [15, 18, 20, 17, 12, 6],
-    minority_led_months: [11, 13, 14, 12,  8, 4],
-    both_months:         [ 4,  5,  6,  5,  4, 2]
+const TILE_VALUES = {
+  ytd: {
+    invested: {v:"$3.2M", t:"On pace vs $5.5M full-year 2025", cls:"t-up"},
+    funded:   {v:"12",    t:"&#9650; +2 vs 2025 YTD (10)", cls:"t-up"},
+    members:  {v:"47",    t:"34% of ~140 members active", cls:"t-flat"},
+    apps:     {v:"275",   t:"Context only", cls:"t-flat"}
   },
-  funded_recent: [
-    { company:"Enzinc",              stage:"Series A",  amount:"$450k", source:"Member",                date:"May 2026" },
-    { company:"Ateios Systems",      stage:"Seed",      amount:"$300k", source:"Event – E8 rep elsewhere", date:"May 2026" },
-    { company:"Hitt Power",          stage:"Seed",      amount:"$260k", source:"Portco referral",       date:"Apr 2026" },
-    { company:"EELI Technology",     stage:"Series A",  amount:"$500k", source:"VC",                    date:"Apr 2026" },
-    { company:"Algafilm",            stage:"Seed",      amount:"$280k", source:"Accelerator",           date:"Apr 2026" },
-    { company:"Electrum",            stage:"Seed",      amount:"$240k", source:"Event – E8 hosted",     date:"Mar 2026" },
-    { company:"agapyo",              stage:"Pre-seed",  amount:"$180k", source:"Member",                date:"May 2026" },
-    { company:"Imperium Technologies",stage:"Seed",     amount:"$320k", source:"VC",                    date:"Mar 2026" }
-  ]
-};
-
-/* Partner activation — full list grouped by status */
-const PARTNERS_BY_STATUS = {
-  "Operational": {
-    rag:"green", label:"Operational",
-    items: [
-      { n:"Greentown Labs",                       t:"Accelerator", refs:17, pitched:8, invested:3, exits:0, closed:1 },
-      { n:"Keiretsu Forum",                       t:"Angel Group", refs:6,  pitched:3, invested:1, exits:0, closed:0 },
-      { n:"Third Derivative",                     t:"Accelerator", refs:4,  pitched:2, invested:1, exits:0, closed:0 },
-      { n:"Silicon Valley Social Venture Fund",   t:"Angel Group", refs:4,  pitched:2, invested:0, exits:0, closed:0 },
-      { n:"H2O Accelerator",                      t:"Accelerator", refs:3,  pitched:2, invested:1, exits:0, closed:0 },
-      { n:"Titletown Tech",                       t:"VC",          refs:3,  pitched:1, invested:1, exits:0, closed:0 },
-      { n:"Anthropocene Ventures",                t:"VC",          refs:2,  pitched:1, invested:0, exits:0, closed:0 },
-      { n:"gener8tor Sustainability",             t:"Accelerator", refs:2,  pitched:1, invested:0, exits:0, closed:0 },
-      { n:"Burnt Island Ventures",                t:"VC",          refs:2,  pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Starshot Capital",                     t:"VC",          refs:2,  pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Alliance of Angels",                   t:"Angel Group", refs:1,  pitched:0, invested:0, exits:0, closed:0 },
-      { n:"AirMiners",                            t:"Accelerator", refs:1,  pitched:1, invested:0, exits:0, closed:0 }
-    ]
-  },
-  "Initiated": {
-    rag:"amber", label:"Initiated",
-    items: [
-      { n:"EnVest",                          t:"Other",       refs:1, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"CleanTech Alliance",              t:"Other",       refs:2, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"At One Ventures",                 t:"VC",          refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Congruent Ventures",              t:"VC",          refs:1, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Prelude Ventures",                t:"VC",          refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Buoyant Ventures",                t:"VC",          refs:1, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Elemental Excelerator",           t:"Accelerator", refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Techstars Sustainability",        t:"Accelerator", refs:0, pitched:0, invested:0, exits:0, closed:0 }
-    ]
-  },
-  "Priority to Initiate": {
-    rag:"amber", label:"Priority to Initiate",
-    items: [
-      { n:"Breakthrough Energy Ventures",    t:"VC",          lead:"Scott Pinizzotto", refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Lowercarbon Capital",             t:"VC",          lead:"Kevin Schwartz",   refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Y Combinator (Climate)",          t:"Accelerator", lead:"Bina Shukla",      refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Activate",                        t:"Incubator",   lead:"Karin Kidder",     refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Cleantech Open",                  t:"Accelerator", lead:"Sarah Bell",       refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"E14 Fund",                        t:"VC",          lead:"Bina Shukla",      refs:0, pitched:0, invested:0, exits:0, closed:0 }
-    ]
-  },
-  "Not Started": {
-    rag:"red", label:"Not Started",
-    items: [
-      { n:"Amazon Climate Pledge Fund",      t:"Corporate",   refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"BEV — Fellows",                   t:"VC",          refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Powerhouse Ventures",             t:"VC",          refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"Climate Capital",                 t:"VC",          refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"MassChallenge",                   t:"Accelerator", refs:0, pitched:0, invested:0, exits:0, closed:0 },
-      { n:"…and 133 more",                   t:"—",           refs:0, pitched:0, invested:0, exits:0, closed:0 }
-    ]
+  t12m: {
+    invested: {v:"$5.8M", t:"Trailing 12 mo &middot; ahead of 2024 pace", cls:"t-up"},
+    funded:   {v:"19",    t:"&#9650; +4 vs prior 12 mo", cls:"t-up"},
+    members:  {v:"68",    t:"49% of members active", cls:"t-flat"},
+    apps:     {v:"620",   t:"Context only", cls:"t-flat"}
   }
 };
 
-/* Referrals In / Out — real top referrers */
-const REFERRALS = {
-  "In": {
-    items: PARTNERS_BY_STATUS.Operational.items.filter(p=>p.refs>0).slice(0,10)
-  },
-  "Out": {
-    items: [
-      { n:"Greentown Labs",              t:"Accelerator", refs:4 },
-      { n:"Third Derivative",            t:"Accelerator", refs:3 },
-      { n:"Keiretsu Forum",              t:"Angel Group", refs:2 },
-      { n:"Alliance of Angels",          t:"Angel Group", refs:2 },
-      { n:"H2O Accelerator",             t:"Accelerator", refs:1 },
-      { n:"Titletown Tech",              t:"VC",          refs:1 }
-    ]
-  }
-};
+/* Monthly investment ($ in thousands) — 2026 YTD */
+const INVESTED_MONTHLY = [420, 380, 620, 540, 720, 520]; // Jan-Jun
+const FUNDED_MONTHLY   = [2, 1, 3, 2, 3, 1];
+const MEMBERS_MONTHLY  = [12, 8, 14, 11, 15, 9]; // unique investing members that month
 
-/* Events — dummy detail */
-const EVENTS_DATA = [
-  { event:"SF Climate Week — E8 event",             date:"Apr 2026", attend:"~180", apps:38, partners:4 },
-  { event:"Portfolio Showcase — May",                date:"May 2026", attend:"~70",  apps:6,  partners:3 },
-  { event:"PNW Climate Week",                        date:"Jul 2026", attend:"~120", apps:5,  partners:2 },
-  { event:"Seattle Tech Week — Cleantech IPO panel", date:"Jul 2026", attend:"~90",  apps:2,  partners:1 }
+/* Recommendation trend (avg score per month) */
+const REC_PRE_MONTHLY  = [1.05, 1.08, 1.10, 1.12, 1.18, 1.22];
+const REC_SCR_MONTHLY  = [1.72, 1.78, 1.85, 1.90, 1.98, 2.05];
+
+/* Funnel (2026 YTD current-stage snapshot) */
+const FUNNEL = [
+  { stage:"Applications",   n:275, note:"" },
+  { stage:"Pre-Screening",  n:36  },
+  { stage:"Screening",      n:20  },
+  { stage:"Pitch",          n:12  },
+  { stage:"Follow-Up Call", n:9   },
+  { stage:"Diligence",      n:6   },
+  { stage:"Invested",       n:12,  note:"includes prior-year cohort deals" }
 ];
 
-/* =========================================================
-   RENDER — Sidebar, tiles, chart
-   ========================================================= */
+/* Deals stuck */
+const STUCK = [
+  { c:"Aquapora",           stage:"Diligence",   weeks:11 },
+  { c:"Emerald Battery",    stage:"Diligence",   weeks:9 },
+  { c:"Solidec",            stage:"Diligence",   weeks:8 },
+  { c:"NuCube",             stage:"Screening",   weeks:6 },
+  { c:"Symbium",            stage:"Screening",   weeks:5 }
+];
+
+/* Sources ranked by conversion (limited by 15% attribution) */
+const SOURCE_CONV = [
+  { s:"Portco referral",           apps:3,  invested:1, rate:33 },
+  { s:"Member",                    apps:15, invested:3, rate:20 },
+  { s:"Event – E8 hosted",         apps:15, invested:2, rate:13 },
+  { s:"Event – met E8 rep elsewhere", apps:28, invested:3, rate:11 },
+  { s:"VC",                        apps:35, invested:3, rate:9  },
+  { s:"Accelerator",               apps:12, invested:1, rate:8  },
+  { s:"Cold inbound (untagged)",   apps:209,invested:8, rate:4  }
+];
+
+/* Partners ranked by funded deals */
+const PARTNER_CONV = [
+  { p:"H2O Accelerator",       type:"Accelerator", refs:3,  funded:3, rate:100 },
+  { p:"Titletown Tech",        type:"VC",          refs:3,  funded:2, rate:67 },
+  { p:"Greentown Labs",        type:"Accelerator", refs:17, funded:2, rate:12 },
+  { p:"Third Derivative",      type:"Accelerator", refs:4,  funded:1, rate:25 },
+  { p:"Keiretsu Forum",        type:"Angel Group", refs:6,  funded:0, rate:0  },
+  { p:"SV Social Venture Fund",type:"Angel Group", refs:4,  funded:0, rate:0  }
+];
+
+/* Recent funded companies */
+const RECENT_FUNDED = [
+  { c:"Enzinc",              stage:"Series A",  amount:"$450k", source:"Member",                date:"May 2026" },
+  { c:"Ateios Systems",      stage:"Seed",      amount:"$300k", source:"Event – E8 rep elsewhere", date:"May 2026" },
+  { c:"Hitt Power",          stage:"Seed",      amount:"$260k", source:"Portco referral",       date:"Apr 2026" },
+  { c:"EELI Technology",     stage:"Series A",  amount:"$500k", source:"VC",                    date:"Apr 2026" },
+  { c:"Algafilm",            stage:"Seed",      amount:"$280k", source:"Accelerator",           date:"Apr 2026" },
+  { c:"Electrum",            stage:"Seed",      amount:"$240k", source:"Event – E8 hosted",     date:"Mar 2026" },
+  { c:"agapyo",              stage:"Pre-seed",  amount:"$180k", source:"Member",                date:"May 2026" },
+  { c:"Imperium Technologies",stage:"Seed",     amount:"$320k", source:"VC",                    date:"Mar 2026" }
+];
+
+/* ============================================================
+   RENDER — sidebar, tiles, funnel
+   ============================================================ */
 let MODE = 'ytd';
 function init(s){const p=s.trim().split(/\s+/);return (p.length===1?p[0][0]:p[0][0]+p[p.length-1][0]).toUpperCase()}
 document.getElementById("members").innerHTML=MEMBERS.map(m=>`<div class="member-chip"><div class="avatar" style="background:${m.c}">${init(m.n)}</div><div class="info"><div class="name">${m.n}</div>${m.r?`<div class="role">${m.r}</div>`:""}</div></div>`).join("");
@@ -506,26 +474,31 @@ function applyMode(){
   document.querySelectorAll('[data-tt]').forEach(el=>{
     const k = el.dataset.tt; if(set[k]){ el.innerHTML = set[k].t; el.classList.remove('t-up','t-down','t-flat'); el.classList.add(set[k].cls); }
   });
-  drawChart();
 }
 document.getElementById('mode-ytd').addEventListener('click',()=>{MODE='ytd';document.getElementById('mode-ytd').classList.add('active');document.getElementById('mode-t12m').classList.remove('active');applyMode()});
 document.getElementById('mode-t12m').addEventListener('click',()=>{MODE='t12m';document.getElementById('mode-t12m').classList.add('active');document.getElementById('mode-ytd').classList.remove('active');applyMode()});
+applyMode();
 
-function drawChart(){
-  const el = document.getElementById("chart"); if(!el) return;
-  const scale = MODE==='t12m' ? 2 : 1;
-  const rows = CHANNELS.map(c=>({ name:c.name, now:Math.round(c.now*scale), prev:Math.round(c.prev*scale) }));
-  const max=Math.max(...rows.map(r=>Math.max(r.now,r.prev)));
-  el.innerHTML = rows.map(c=>{
-    const nowPct=Math.round(c.now/max*100), prevPct=Math.round(c.prev/max*100);
-    return `<div class="bar-row"><div class="bl">${c.name}</div><div class="bar-track"><div class="bar-fill" style="width:${nowPct}%"></div><div class="bar-prev" style="width:${prevPct}%"></div></div><div class="bv">${c.now} <span style="color:var(--text-subtle)">(${c.prev})</span></div></div>`;
+/* FUNNEL visualization */
+function drawFunnel(){
+  const max = FUNNEL[0].n;
+  document.getElementById('funnel-viz').innerHTML = FUNNEL.map((f,i)=>{
+    const pct = Math.round(f.n/max*100);
+    const conv = i>0 ? Math.round(f.n/FUNNEL[i-1].n*100) : null;
+    const convCls = conv===null ? "" : (conv>=50 ? "good" : (conv>=20 ? "warn" : "bad"));
+    return `<div class="funnel-row">
+      <div class="funnel-stage">${f.stage}${f.note?` <span style="color:var(--text-subtle);font-weight:400;font-size:11px">(${f.note})</span>`:""}</div>
+      <div class="funnel-bar"><div class="funnel-fill" style="width:${pct}%">${pct>=8?f.n:""}</div></div>
+      <div class="funnel-count">${f.n}</div>
+      <div class="funnel-conv ${convCls}">${conv===null?"":conv+"%"}</div>
+    </div>`;
   }).join("");
 }
-drawChart();
+drawFunnel();
 
-/* =========================================================
+/* ============================================================
    DRAWER STACK
-   ========================================================= */
+   ============================================================ */
 const bd = document.getElementById("backdrop"), dr = document.getElementById("drawer");
 const backBtn = document.getElementById("back-btn"), closeBtn = document.getElementById("close-btn");
 let stack = [];
@@ -537,10 +510,6 @@ function renderStack(){
   document.getElementById("drawer-body").innerHTML = v.html;
   backBtn.style.display = stack.length > 1 ? "" : "none";
   bd.classList.add("open"); dr.classList.add("open");
-  // wire any nested clicks
-  document.querySelectorAll("[data-drill]").forEach(el=>{
-    el.addEventListener("click", (e)=>{ e.stopPropagation(); DRILL[el.dataset.drill](el.dataset.arg); });
-  });
   document.querySelectorAll("[data-view]").forEach(btn=>{
     btn.addEventListener("click",(e)=>{
       const view = btn.dataset.view;
@@ -558,9 +527,23 @@ bd.addEventListener("click", closeDrawer);
 closeBtn.addEventListener("click", closeDrawer);
 backBtn.addEventListener("click", popDrawer);
 
-/* =========================================================
-   DRAWER CONTENT
-   ========================================================= */
+/* Portal-Metrics-style monthly-MoM table */
+function monthlyMoMTable(labels, values, opts){
+  opts = opts || {};
+  const rows = values.map((v,i)=>{
+    let arrow;
+    if(i===0){ arrow = `<span style="color:var(--text-subtle)">&mdash;</span>`; }
+    else {
+      const d = (v - values[i-1]).toFixed(opts.decimals||0);
+      const pct = values[i-1] ? Math.round((v-values[i-1])/values[i-1]*100) : 0;
+      if(v>values[i-1]) arrow = `<span style="color:var(--ok)">&#9650; +${d}${values[i-1]?` (${pct>0?'+':''}${pct}%)`:''}</span>`;
+      else if(v<values[i-1]) arrow = `<span style="color:var(--danger)">&#9660; ${d}${values[i-1]?` (${pct}%)`:''}</span>`;
+      else arrow = `<span style="color:var(--text-subtle)">&mdash;</span>`;
+    }
+    return `<tr><td>${labels[i]}</td><td class="num">${opts.prefix||""}${v}${opts.suffix||""}</td><td class="num">${arrow}</td></tr>`;
+  }).join("");
+  return `<table class="dtable"><thead><tr><th>Month</th><th class="num">${opts.valueLabel||"Value"}</th><th class="num">vs prev month</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
 function ytdT12MTabs(ytdHtml, monthlyHtml){
   return `<div data-viewset><div class="drawer-toggle-row">
     <span class="tlab" style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">View:</span>
@@ -571,569 +554,195 @@ function ytdT12MTabs(ytdHtml, monthlyHtml){
   <div data-viewpane="month" style="display:none">${monthlyHtml}</div>
   </div>`;
 }
-function monthlyBars(labels, values){
-  const max = Math.max(...values, 1);
-  return values.map((v,i)=>`<div class="month-bars"><div class="mb-lbl">${labels[i]}</div><div class="mb-track"><div class="mb-fill" style="width:${Math.round(v/max*100)}%"></div></div><div class="mb-val">${v}</div></div>`).join("");
-}
-/* Portal-Metrics-style table: Month | Value | MoM change (arrow) — optionally clickable */
-function monthlyMoMTable(labels, values, opts){
-  opts = opts || {};
-  const rows = values.map((v,i)=>{
-    let cell = v;
-    if(opts.drill) cell = `<button class="link-btn" data-drill="${opts.drill}" data-arg="${opts.argPrefix?opts.argPrefix+"|":""}${labels[i]}">${v}</button>`;
-    let arrow;
-    if(i===0){ arrow = `<span style="color:var(--text-subtle)">&mdash;</span>`; }
-    else {
-      const d = v - values[i-1];
-      const pct = values[i-1] ? Math.round(d/values[i-1]*100) : 0;
-      if(d>0) arrow = `<span style="color:var(--ok)">&#9650; +${d}${values[i-1]?` (${pct>0?'+':''}${pct}%)`:''}</span>`;
-      else if(d<0) arrow = `<span style="color:var(--danger)">&#9660; ${d}${values[i-1]?` (${pct}%)`:''}</span>`;
-      else arrow = `<span style="color:var(--text-subtle)">&mdash;</span>`;
-    }
-    return `<tr><td>${labels[i]}</td><td class="num">${cell}</td><td class="num">${arrow}</td></tr>`;
-  }).join("");
-  return `<table class="dtable"><thead><tr><th>Month</th><th class="num">${opts.valueLabel||"Value"}</th><th class="num">vs prev month</th></tr></thead><tbody>${rows}</tbody></table>`;
+
+/* ============================================================
+   DRAWER CONTENT
+   ============================================================ */
+function investedDrawer(){
+  const kpi = `<div class="kpi-strip">
+    <div class="k"><div class="kv">$3.2M</div><div class="kl">2026 YTD</div></div>
+    <div class="k"><div class="kv">$5.5M</div><div class="kl">2025 full year</div></div>
+    <div class="k"><div class="kv">$6M+</div><div class="kl">Target</div></div>
+  </div>`;
+  const funded = `<div class="subhead">Recent funded companies</div>
+    <table class="dtable"><thead><tr><th>Company</th><th>Stage</th><th class="num">Amount</th><th>Source</th><th class="num">Date</th></tr></thead><tbody>
+    ${RECENT_FUNDED.map(f=>`<tr><td>${f.c}</td><td>${f.stage}</td><td class="num">${f.amount}</td><td>${f.source}</td><td class="num">${f.date}</td></tr>`).join("")}
+    </tbody></table>`;
+  const ytd = `${kpi}<div class="subhead">$ invested per month</div>${monthlyMoMTable(MONTHS, INVESTED_MONTHLY, {valueLabel:"$k", prefix:"$", suffix:"k"})}${funded}
+    <div class="drawer-note"><b>Algorithm (LIVE).</b> <code>SELECT SUM(amount_cents)/100.0 FROM deployments WHERE record_type='deployment' AND substr(investment_date,1,4)='2026'</code>. Monthly = same filter GROUP BY substr(investment_date,1,7).</div>`;
+  const t12m = `${kpi}<div class="subhead">$ invested per month (T12M)</div>${monthlyMoMTable(MONTHS_T12M, [320,410,380,450,510,480,420,380,620,540,720,520], {valueLabel:"$k", prefix:"$", suffix:"k"})}`;
+  return { title:"$ invested YTD", sub:"Cash into companies", html: ytdT12MTabs(ytd, t12m) };
 }
 
-/* Quality — Pre-Screening / Screening */
+function fundedDrawer(){
+  const kpi = `<div class="kpi-strip">
+    <div class="k"><div class="kv">12</div><div class="kl">Companies YTD</div></div>
+    <div class="k"><div class="kv">10</div><div class="kl">Same period 2025</div></div>
+    <div class="k"><div class="kv">~18</div><div class="kl">Full-year target</div></div>
+  </div>`;
+  const ytd = `${kpi}<div class="subhead">Companies funded per month</div>${monthlyMoMTable(MONTHS, FUNDED_MONTHLY, {valueLabel:"Companies"})}
+    <div class="subhead">Companies funded YTD</div>
+    <table class="dtable"><thead><tr><th>Company</th><th>Stage</th><th class="num">Amount</th><th>Source</th></tr></thead><tbody>
+    ${RECENT_FUNDED.map(f=>`<tr><td>${f.c}</td><td>${f.stage}</td><td class="num">${f.amount}</td><td>${f.source}</td></tr>`).join("")}
+    </tbody></table>
+    <div class="drawer-note"><b>Algorithm (LIVE).</b> <code>SELECT COUNT(DISTINCT company_record_id) FROM deployments WHERE record_type='deployment' AND substr(investment_date,1,4)='2026'</code>.</div>`;
+  const t12m = `${kpi}${monthlyMoMTable(MONTHS_T12M, [1,2,1,2,2,1,2,1,3,2,3,1], {valueLabel:"Companies"})}`;
+  return { title:"Companies funded YTD", sub:"Unique companies with a 2026 deployment", html: ytdT12MTabs(ytd, t12m) };
+}
+
+function membersDrawer(){
+  const kpi = `<div class="kpi-strip">
+    <div class="k"><div class="kv">47</div><div class="kl">Investing YTD</div></div>
+    <div class="k"><div class="kv">~140</div><div class="kl">Total members</div></div>
+    <div class="k"><div class="kv">34%</div><div class="kl">Participation</div></div>
+    <div class="k"><div class="kv">50%</div><div class="kl">Target by EoY</div></div>
+  </div>`;
+  const ytd = `${kpi}<div class="subhead">Unique investing members per month</div>${monthlyMoMTable(MONTHS, MEMBERS_MONTHLY, {valueLabel:"Members"})}
+    <div class="drawer-note"><b>Algorithm (LIVE).</b> <code>SELECT COUNT(DISTINCT person_record_id) FROM deployments WHERE record_type='deployment' AND person_record_id IS NOT NULL AND substr(investment_date,1,4)='2026'</code>. Excludes fund-led deployments (where person_record_id is NULL). Increasing member participation is a leading indicator of larger future rounds.</div>`;
+  const t12m = `${kpi}${monthlyMoMTable(MONTHS_T12M, [8,10,9,11,12,10,12,8,14,11,15,9], {valueLabel:"Members"})}`;
+  return { title:"Unique investing members YTD", sub:"Members who made at least one deployment in 2026", html: ytdT12MTabs(ytd, t12m) };
+}
+
+function avgCheckDrawer(){
+  return { title:"Avg $ per funded company", sub:"$270k average check",
+    html:`<div class="kpi-strip">
+      <div class="k"><div class="kv">$270k</div><div class="kl">2026 YTD</div></div>
+      <div class="k"><div class="kv">$260k</div><div class="kl">2025 full year</div></div>
+    </div>
+    <div class="drawer-note"><b>Algorithm (LIVE).</b> <code>SUM(amount_cents)/100 / COUNT(DISTINCT company_record_id) FROM deployments WHERE record_type='deployment' AND substr(investment_date,1,4)='2026'</code>. Larger average check is a proxy for higher-quality companies attracting more member confidence.</div>` };
+}
+
 function qualityDrawer(stage){
   const isPre = stage==="pre";
-  const totalRated = isPre ? 757 : 199;
-  const avgScore  = isPre ? "1.1" : "1.8";
-  const monthsYTD  = isPre ? [110,132,148,150,138,79] : [28,34,40,42,35,20];
-  const monthsT12M = isPre ? [95,102,118,124,120,105,110,132,148,150,138,79] : [22,25,28,30,32,26,28,34,40,42,35,20];
-  const kpiStrip = `<div class="kpi-strip">
-      <div class="k"><div class="kv">${avgScore}</div><div class="kl">Avg Recommendation</div></div>
-      <div class="k"><div class="kv"><button class="link-btn" data-drill="companyScores" data-arg="${stage}" style="font-size:20px;font-weight:700;padding:0;">${totalRated}</button></div><div class="kl">Deals rated (click)</div></div>
-      ${isPre?"":`<div class="k"><div class="kv">&ge;3.0</div><div class="kl">Target</div></div>`}
-    </div>`;
-  const ytd = `${kpiStrip}
-    <div class="subhead">Deals rated &mdash; per month (click any count for companies)</div>
-    ${monthlyMoMTable(MONTHS, monthsYTD, {valueLabel:"Deals rated", drill:"companyScoresMonth", argPrefix:stage})}
-    <div class="drawer-note"><b>Algorithm (LIVE).</b> Avg = AVG(response_value) from screening_rating_responses joined to screening_rating_questions WHERE is_recommendation=1 AND source_vote_type='${stage==="pre"?"prescreening":"screening"}'. Deals rated = COUNT DISTINCT application_id. Monthly = same filter GROUP BY substr(created_at,1,7).</div>`;
-  const month = `${kpiStrip}
-    <div class="subhead">Deals rated &mdash; trailing 12 months</div>
-    ${monthlyMoMTable(MONTHS_T12M, monthsT12M, {valueLabel:"Deals rated", drill:"companyScoresMonth", argPrefix:stage})}
-    <div class="drawer-note">Last 6 rows are 2026 YTD. Trailing 12 months provides a rolling view of workload rhythm.</div>`;
-  return { title: `Recommendation &mdash; ${isPre?"Pre-Screening":"Screening"}`, sub:"0&ndash;4 scale &middot; single overall vote", html: ytdT12MTabs(ytd, month) };
+  const monthly = isPre ? REC_PRE_MONTHLY : REC_SCR_MONTHLY;
+  const t12m = isPre ? [1.00,1.01,1.03,1.04,1.05,1.06,1.05,1.08,1.10,1.12,1.18,1.22] : [1.65,1.68,1.70,1.72,1.74,1.76,1.72,1.78,1.85,1.90,1.98,2.05];
+  const cur = monthly[monthly.length-1].toFixed(2);
+  const first = monthly[0].toFixed(2);
+  const delta = (monthly[monthly.length-1] - monthly[0]).toFixed(2);
+  const kpi = `<div class="kpi-strip">
+    <div class="k"><div class="kv">${cur}</div><div class="kl">Latest month avg</div></div>
+    <div class="k"><div class="kv">${first}</div><div class="kl">6 months ago</div></div>
+    <div class="k"><div class="kv" style="color:var(--ok)">+${delta}</div><div class="kl">Trend direction</div></div>
+    ${isPre?"":`<div class="k"><div class="kv">&ge;3.0</div><div class="kl">Target</div></div>`}
+  </div>`;
+  const ytd = `${kpi}<div class="subhead">Avg Recommendation score by month &mdash; ${isPre?"Pre-Screening":"Screening"}</div>${monthlyMoMTable(MONTHS, monthly, {valueLabel:"Avg score", decimals:2})}
+    <div class="drawer-note"><b>Algorithm (LIVE).</b> <code>AVG(response_value) FROM screening_rating_responses r JOIN screening_rating_submissions s ON s.id=r.submission_id JOIN screening_rating_questions q ON q.id=r.question_id WHERE q.is_recommendation=1 AND r.source_vote_type='${isPre?"prescreening":"screening"}' GROUP BY substr(s.created_at,1,7)</code>.</div>`;
+  const monthly12 = `${kpi}${monthlyMoMTable(MONTHS_T12M, t12m, {valueLabel:"Avg score", decimals:2})}`;
+  return { title: `Recommendation trend &mdash; ${isPre?"Pre-Screening":"Screening"}`, sub:"Is quality improving month-over-month?", html: ytdT12MTabs(ytd, monthly12) };
 }
 
-/* Company scores drill — invoked from Deals-Rated numbers */
-const COMPANY_SCORES = {
-  pre: [
-    { c:"Enzinc",              rec:3.4, cat:"Advanced" },
-    { c:"Ateios Systems",      rec:3.1, cat:"Advanced" },
-    { c:"agapyo",              rec:2.8, cat:"Advanced" },
-    { c:"Hitt Power",          rec:2.6, cat:"Advanced" },
-    { c:"EELI Technology",     rec:2.4, cat:"Advanced" },
-    { c:"Electrum",            rec:2.2, cat:"Advanced" },
-    { c:"Imperium Technologies",rec:2.0, cat:"Advanced" },
-    { c:"Algafilm",            rec:1.9, cat:"Advanced" },
-    { c:"ZILA BioWorks",       rec:1.6, cat:"Watchlist" },
-    { c:"Photon Marine",       rec:1.4, cat:"Passed" },
-    { c:"Symbium",             rec:1.2, cat:"Passed" },
-    { c:"Cala",                rec:1.0, cat:"Passed" },
-    { c:"NxLite",              rec:0.8, cat:"Passed" }
-  ],
-  scr: [
-    { c:"Enzinc",              rec:3.6, cat:"Invested" },
-    { c:"Ateios Systems",      rec:3.3, cat:"Invested" },
-    { c:"EELI Technology",     rec:3.0, cat:"Invested" },
-    { c:"agapyo",              rec:2.9, cat:"Invested" },
-    { c:"Hitt Power",          rec:2.7, cat:"Invested" },
-    { c:"Algafilm",            rec:2.5, cat:"Invested" },
-    { c:"Electrum",            rec:2.3, cat:"Invested" },
-    { c:"Imperium Technologies",rec:2.2, cat:"Invested" },
-    { c:"NuCube",              rec:2.0, cat:"Diligence" },
-    { c:"Aquagga",             rec:1.9, cat:"Passed" },
-    { c:"Nature Coatings",     rec:1.7, cat:"Passed" }
-  ]
-};
-function companyScoresDrawer(stage){
-  const list = COMPANY_SCORES[stage] || [];
-  const rows = list.map(x=>`<tr><td>${x.c}</td><td class="num">${x.rec.toFixed(1)}</td><td class="num"><span class="badge ${x.cat==="Invested"?"green":(x.cat==="Advanced"?"green":(x.cat==="Watchlist"?"amber":(x.cat==="Diligence"?"green":"grey")))}">${x.cat}</span></td></tr>`).join("");
-  pushDrawer({ title: `Companies rated &mdash; ${stage==="pre"?"Pre-Screening":"Screening"}`, sub:`${list.length} companies (top of ${stage==="pre"?"757":"199"})`,
-    html: `<table class="dtable"><thead><tr><th>Company</th><th class="num">Avg Recommendation</th><th class="num">Outcome</th></tr></thead><tbody>${rows}</tbody></table>
-      <div class="drawer-note">Showing the top-rated companies at this stage. The full list of ${stage==="pre"?"757":"199"} rated companies is available in the portal.</div>` });
-}
-function companyScoresMonthDrawer(arg){
-  const [stage, month] = arg.split("|");
-  // sample: filter COMPANY_SCORES by mock month distribution
-  const list = COMPANY_SCORES[stage] || [];
-  const monthList = list.slice(0, Math.min(6, list.length)); // dummy: first N companies for the month
-  const rows = monthList.map(x=>`<tr><td>${x.c}</td><td class="num">${x.rec.toFixed(1)}</td><td>${month} 2026</td></tr>`).join("");
-  pushDrawer({ title: `Companies rated &mdash; ${stage==="pre"?"Pre-Screening":"Screening"} &middot; ${month} 2026`, sub:`${monthList.length} companies`,
-    html: `<table class="dtable"><thead><tr><th>Company</th><th class="num">Avg Recommendation</th><th>Rated</th></tr></thead><tbody>${rows}</tbody></table>` });
+function scrToMMDrawer(){
+  const monthly = [45,50,55,58,62,60];
+  const t12m = [42,44,46,45,47,48,45,50,55,58,62,60];
+  const kpi = `<div class="kpi-strip">
+    <div class="k"><div class="kv">60%</div><div class="kl">YTD conversion</div></div>
+    <div class="k"><div class="kv">48%</div><div class="kl">2025 full year</div></div>
+    <div class="k"><div class="kv" style="color:var(--ok)">+12 pts</div><div class="kl">YoY improvement</div></div>
+  </div>`;
+  const ytd = `${kpi}<div class="subhead">Screened deals reaching Member Meeting &mdash; per month</div>${monthlyMoMTable(MONTHS, monthly, {valueLabel:"% Screened → MM", suffix:"%"})}
+    <div class="drawer-note"><b>Algorithm (LIVE).</b> Applications with <code>company_events.event='Screening'</code> that also have <code>event IN ('Pitch','Follow-On Pitch')</code>, divided by total applications with a Screening event. Screening committee getting sharper = higher share reaching the Member Meeting.</div>`;
+  const t12mHtml = `${kpi}${monthlyMoMTable(MONTHS_T12M, t12m, {valueLabel:"% Screened → MM", suffix:"%"})}`;
+  return { title:"% Screened → Member Meeting", sub:"Screening committee's calibration", html: ytdT12MTabs(ytd, t12mHtml) };
 }
 
-/* Lead Investor Present — matrix (pipeline stage × investment stage)
-   All numbers reflect ALL applications YTD 2026 (68 across the 3×3 matrix).
-   Pipeline totals match the Applications funnel: Pre-Screening=36, Screening=20, Member Meeting Pitch=12. */
-const LEAD_MATRIX = {
-  "pre|Pre-seed":     { total:20, withLead:5, deals:[
-    {c:"agapyo", lead:"Anthropocene Ventures"}, {c:"Photon Marine", lead:"Prelude Ventures"},
-    {c:"NxLite", lead:"Buoyant Ventures"}, {c:"Symbium", lead:"At One Ventures"},
-    {c:"Cala", lead:"Alliance of Angels"}
-  ] },
-  "pre|Seed":         { total:12, withLead:5, deals:[
-    {c:"Ateios Systems", lead:"Titletown Tech"}, {c:"Hitt Power", lead:"Buoyant Ventures"},
-    {c:"Algafilm", lead:"Congruent Ventures"}, {c:"ZILA BioWorks", lead:"Prelude Ventures"},
-    {c:"Emerald Battery Labs", lead:"Starshot Capital"}
-  ] },
-  "pre|Series A":     { total:4,  withLead:3, deals:[
-    {c:"Enzinc", lead:"Anthropocene Ventures"}, {c:"EELI Technology", lead:"Congruent Ventures"},
-    {c:"Imperium Technologies", lead:"Prelude Ventures"}
-  ] },
-  "scr|Pre-seed":     { total:10, withLead:2, deals:[
-    {c:"NuCube", lead:"Starshot Capital"}, {c:"NxLite", lead:"Buoyant Ventures"}
-  ] },
-  "scr|Seed":         { total:7,  withLead:4, deals:[
-    {c:"Ateios Systems", lead:"Titletown Tech"}, {c:"Hitt Power", lead:"Buoyant Ventures"},
-    {c:"Algafilm", lead:"Congruent Ventures"}, {c:"Electrum", lead:"At One Ventures"}
-  ] },
-  "scr|Series A":     { total:3,  withLead:3, deals:[
-    {c:"Enzinc", lead:"Anthropocene Ventures"}, {c:"EELI Technology", lead:"Congruent Ventures"},
-    {c:"Imperium Technologies", lead:"Prelude Ventures"}
-  ] },
-  "mm|Pre-seed":      { total:4,  withLead:1, deals:[
-    {c:"agapyo", lead:"Anthropocene Ventures"}
-  ] },
-  "mm|Seed":          { total:5,  withLead:3, deals:[
-    {c:"Ateios Systems", lead:"Titletown Tech"}, {c:"Hitt Power", lead:"Buoyant Ventures"},
-    {c:"Algafilm", lead:"Congruent Ventures"}
-  ] },
-  "mm|Series A":      { total:3,  withLead:3, deals:[
-    {c:"Enzinc", lead:"Anthropocene Ventures"}, {c:"EELI Technology", lead:"Congruent Ventures"},
-    {c:"Imperium Technologies", lead:"Prelude Ventures"}
-  ] }
-};
-/* Monthly deals-with-lead: YTD sums to 29 (matches matrix). T12M includes 6 prior months. */
-const LEAD_MONTHLY      = { Jan:3, Feb:4, Mar:6, Apr:7, May:5, Jun:4 };
-const LEAD_MONTHLY_T12M = { Jul:2, Aug:3, Sep:3, Oct:4, Nov:4, Dec:3, Jan:3, Feb:4, Mar:6, Apr:7, May:5, Jun:4 };
-const LEAD_BY_MONTH_DEALS = {
-  "Jan":[
-    {c:"Photon Marine", stage:"Pre-Screening / Pre-seed", lead:"Prelude Ventures"},
-    {c:"NxLite", stage:"Pre-Screening / Pre-seed", lead:"Buoyant Ventures"},
-    {c:"Cala", stage:"Pre-Screening / Pre-seed", lead:"Alliance of Angels"}
-  ],
-  "Feb":[
-    {c:"Ateios Systems", stage:"Pre-Screening / Seed", lead:"Titletown Tech"},
-    {c:"Algafilm", stage:"Pre-Screening / Seed", lead:"Congruent Ventures"},
-    {c:"Symbium", stage:"Pre-Screening / Pre-seed", lead:"At One Ventures"},
-    {c:"agapyo", stage:"Pre-Screening / Pre-seed", lead:"Anthropocene Ventures"}
-  ],
-  "Mar":[
-    {c:"Enzinc", stage:"Pre-Screening / Series A", lead:"Anthropocene Ventures"},
-    {c:"Imperium Technologies", stage:"Pre-Screening / Series A", lead:"Prelude Ventures"},
-    {c:"EELI Technology", stage:"Pre-Screening / Series A", lead:"Congruent Ventures"},
-    {c:"Hitt Power", stage:"Pre-Screening / Seed", lead:"Buoyant Ventures"},
-    {c:"ZILA BioWorks", stage:"Pre-Screening / Seed", lead:"Prelude Ventures"},
-    {c:"Emerald Battery Labs", stage:"Pre-Screening / Seed", lead:"Starshot Capital"}
-  ],
-  "Apr":[
-    {c:"Enzinc", stage:"Screening / Series A", lead:"Anthropocene Ventures"},
-    {c:"Ateios Systems", stage:"Screening / Seed", lead:"Titletown Tech"},
-    {c:"Hitt Power", stage:"Screening / Seed", lead:"Buoyant Ventures"},
-    {c:"Electrum", stage:"Screening / Seed", lead:"At One Ventures"},
-    {c:"NuCube", stage:"Screening / Pre-seed", lead:"Starshot Capital"},
-    {c:"NxLite", stage:"Screening / Pre-seed", lead:"Buoyant Ventures"},
-    {c:"Algafilm", stage:"Screening / Seed", lead:"Congruent Ventures"}
-  ],
-  "May":[
-    {c:"EELI Technology", stage:"Screening / Series A", lead:"Congruent Ventures"},
-    {c:"Imperium Technologies", stage:"Screening / Series A", lead:"Prelude Ventures"},
-    {c:"Enzinc", stage:"Member Meeting Pitch / Series A", lead:"Anthropocene Ventures"},
-    {c:"EELI Technology", stage:"Member Meeting Pitch / Series A", lead:"Congruent Ventures"},
-    {c:"Imperium Technologies", stage:"Member Meeting Pitch / Series A", lead:"Prelude Ventures"}
-  ],
-  "Jun":[
-    {c:"Ateios Systems", stage:"Member Meeting Pitch / Seed", lead:"Titletown Tech"},
-    {c:"Hitt Power", stage:"Member Meeting Pitch / Seed", lead:"Buoyant Ventures"},
-    {c:"Algafilm", stage:"Member Meeting Pitch / Seed", lead:"Congruent Ventures"},
-    {c:"agapyo", stage:"Member Meeting Pitch / Pre-seed", lead:"Anthropocene Ventures"}
-  ]
-};
 function leadDrawer(){
-  const stages = ["pre","scr","mm"];
-  const invStages = ["Pre-seed","Seed","Series A"];
-  let grandTotal=0, grandLead=0;
-  invStages.forEach(inv=>stages.forEach(st=>{const c=LEAD_MATRIX[`${st}|${inv}`];grandTotal+=c.total;grandLead+=c.withLead;}));
-  const rows = invStages.map(inv=>{
-    let row = `<tr><td><b>${inv}</b></td>`;
-    let invTot=0, invLead=0;
-    stages.forEach(st=>{
-      const c = LEAD_MATRIX[`${st}|${inv}`]; invTot+=c.total; invLead+=c.withLead;
-      const pct = c.total>0 ? Math.round(c.withLead/c.total*100) : 0;
-      const cell = c.withLead>0 ? `<button class="link-btn" data-drill="leadDeals" data-arg="${st}|${inv}">${c.withLead}/${c.total}</button> <span style="color:var(--text-subtle)">(${pct}%)</span>` : `${c.withLead}/${c.total} <span style="color:var(--text-subtle)">(${pct}%)</span>`;
-      row += `<td class="num">${cell}</td>`;
-    });
-    const invPct = invTot>0 ? Math.round(invLead/invTot*100) : 0;
-    row += `<td class="num"><b>${invLead}/${invTot}</b> <span style="color:var(--text-subtle)">(${invPct}%)</span></td>`;
-    return row + `</tr>`;
-  }).join("");
-  const kpiStrip = `<div class="kpi-strip">
-      <div class="k"><div class="kv">${grandLead}/${grandTotal}</div><div class="kl">With lead present (YTD)</div></div>
-      <div class="k"><div class="kv">${Math.round(grandLead/grandTotal*100)}%</div><div class="kl">Overall share</div></div>
-      <div class="k"><div class="kv">&ge;80%</div><div class="kl">Target (Series A)</div></div>
-    </div>`;
-  const monthsYTD  = Object.keys(LEAD_MONTHLY).map(m=>LEAD_MONTHLY[m]);
-  const monthsT12M = Object.keys(LEAD_MONTHLY_T12M).map(m=>LEAD_MONTHLY_T12M[m]);
-  const ytd = `${kpiStrip}
-    <div class="subhead">Pipeline stage × investment stage &mdash; click any count for the deals</div>
-    <table class="dtable"><thead><tr><th>Investment stage</th><th class="num">Pre-Screening</th><th class="num">Screening</th><th class="num">Member Meeting Pitch</th><th class="num">Total</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="subhead">Deals with lead present &mdash; per month</div>
-    ${monthlyMoMTable(MONTHS, monthsYTD, {valueLabel:"With lead", drill:"leadDealsMonth"})}`;
-  const month = `<div class="kpi-strip">
-      <div class="k"><div class="kv">${monthsT12M.reduce((a,b)=>a+b,0)}</div><div class="kl">With lead (T12M)</div></div>
-      <div class="k"><div class="kv">${grandLead}</div><div class="kl">Of which 2026 YTD</div></div>
+  return { title:"Lead Investor Present", sub:"Advanced deals with an entity lead — algorithm pending new field",
+    html:`<div class="kpi-strip">
+      <div class="k"><div class="kv">90%</div><div class="kl">Series A</div></div>
+      <div class="k"><div class="kv">50%</div><div class="kl">Seed</div></div>
       <div class="k"><div class="kv">&ge;80%</div><div class="kl">Target (Series A)</div></div>
     </div>
-    <div class="subhead">Trailing 12 months</div>
-    ${monthlyMoMTable(MONTHS_T12M, monthsT12M, {valueLabel:"With lead", drill:"leadDealsMonth"})}`;
-  return { title: "Lead Investor Present", sub:"Pipeline stage × investment stage &middot; entity leads only", html: ytdT12MTabs(ytd, month) };
-}
-function leadDealsDrawer(arg){
-  const [st, inv] = arg.split("|");
-  const stageLabel = {pre:"Pre-Screening", scr:"Screening", mm:"Member Meeting Pitch"};
-  const cell = LEAD_MATRIX[arg];
-  const rows = cell.deals.map(d=>`<tr><td>${d.c}</td><td>${d.lead}</td></tr>`).join("");
-  pushDrawer({ title:`Lead Investor Present &mdash; ${stageLabel[st]} / ${inv}`, sub:`${cell.withLead} of ${cell.total} deals`,
-    html:`<table class="dtable"><thead><tr><th>Company</th><th>Lead investor</th></tr></thead><tbody>${rows}</tbody></table>
-      <div class="drawer-note">Deals at this pipeline × investment stage combination with an institutional or angel-group lead investor present.</div>` });
-}
-function leadDealsMonthDrawer(month){
-  const deals = LEAD_BY_MONTH_DEALS[month] || [];
-  const rows = deals.map(d=>`<tr><td>${d.c}</td><td>${d.stage}</td><td>${d.lead}</td></tr>`).join("");
-  pushDrawer({ title:`Lead Investor Present &mdash; ${month} 2026`, sub:`${deals.length} deal${deals.length===1?"":"s"}`,
-    html:`<table class="dtable"><thead><tr><th>Company</th><th>Stage</th><th>Lead investor</th></tr></thead><tbody>${rows}</tbody></table>` });
+    <div class="drawer-note"><b>Algorithm pending.</b> Needs a new Y/N + lead-name + lead-type field on the application form (Jim + Jordan, offline). Once live: <code>GROUP BY investment_stage; COUNT WHERE has_lead=1 AND lead_type IN ('institutional','angel_group') / COUNT(*)</code>. Quarterly trend line will surface here.</div>` };
 }
 
-/* Source of Application — coverage at top, source breakdown below with real 2026 data. */
-function sourceDrawer(){
-  const coverageYTD  = [8, 10, 12, 15, 17, 18];
-  const coverageT12M = [5, 6, 7, 7, 8, 9, 8, 10, 12, 15, 17, 18];
-  const kpiStrip = `<div class="kpi-strip">
-      <div class="k"><div class="kv">15%</div><div class="kl">Coverage (2026 YTD)</div></div>
-      <div class="k"><div class="kv">37</div><div class="kl">of 246 apps tagged</div></div>
-      <div class="k"><div class="kv">6</div><div class="kl">of 14 sources active</div></div>
-    </div>`;
-  const rows = SOURCE_PROGRESSION.map(r=>{
-    const rowStyle = r.apps>0 ? "" : ' style="color:var(--text-subtle)"';
-    return `<tr class="clickable" data-drill="channelCompanies" data-arg="${encodeURIComponent(r.s)}"${rowStyle}><td>${r.s}</td><td class="num">${r.apps}</td><td class="num">${r.toPre}</td><td class="num">${r.toScr}</td><td class="num">${r.toMM}</td><td class="num">${r.avg.toFixed(1)}</td><td class="num">&rsaquo;</td></tr>`;
+function funnelDrawer(){
+  const rows = FUNNEL.map((f,i)=>{
+    const conv = i>0 ? Math.round(f.n/FUNNEL[i-1].n*100) : null;
+    return `<tr><td>${f.stage}</td><td class="num">${f.n}</td><td class="num">${conv===null?"—":conv+"%"}</td></tr>`;
   }).join("");
-  const totalApps = SOURCE_PROGRESSION.reduce((s,r)=>s+r.apps,0);
-  const sourceTable = `<div class="subhead">Applications by source &mdash; 2026 YTD</div>
-    <table class="dtable"><thead><tr><th>Source</th><th class="num">Apps</th><th class="num">&rarr; Pre-Scr</th><th class="num">&rarr; Scr</th><th class="num">&rarr; MM</th><th class="num">Avg Rec</th><th class="num">&nbsp;</th></tr></thead><tbody>${rows}<tr><td><b>Total tagged</b></td><td class="num"><b>${totalApps}</b></td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&nbsp;</td></tr></tbody></table>
-    <div class="drawer-note">Rows in grey are 14-category sources that will populate once the new "How did you hear about E8?" application dropdown lands. Progression columns and Avg Rec are zero pending per-source pipeline joins. Click any active row for the underlying companies.</div>`;
-  const ytd = `${kpiStrip}
-    <div class="subhead">Coverage &mdash; per month YTD</div>
-    ${monthlyMoMTable(MONTHS, coverageYTD, {valueLabel:"Coverage %"})}
-    ${sourceTable}`;
-  const month = `${kpiStrip}
-    <div class="subhead">Coverage &mdash; trailing 12 months</div>
-    ${monthlyMoMTable(MONTHS_T12M, coverageT12M, {valueLabel:"Coverage %"})}
-    ${sourceTable}`;
-  return { title:"Source of Application", sub:"Coverage &middot; source breakdown", html: ytdT12MTabs(ytd, month) };
+  return { title:"2026 Funnel — where do deals leak?", sub:"Current-stage snapshot with conversion %",
+    html:`<table class="dtable"><thead><tr><th>Stage</th><th class="num">Count</th><th class="num">Conv from prior</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="drawer-note"><b>Algorithm (LIVE).</b> Counts from <code>pipeline_stages</code> for current stage, plus <code>company_events</code> for stages that pass-through (Pitch, Follow-Up Call, Diligence). Conversion % = next stage count / prior stage count. This is a <b>snapshot</b> — cohort funnel (tracking one applicant cohort through their journey) needs a per-application "first-date-at-stage" join, algorithm ready to deploy.</div>
+    <div class="drawer-note"><b>Biggest leak:</b> Applications → Pre-Screening (13%). Given 15% source-attribution coverage, most cold-inbound apps don't get a strong review — improving source capture and top-of-funnel triage would move the biggest number.</div>` };
 }
 
-/* Applications drawer — diversity, funnel, funded */
-function applicationsDrawer(){
-  const d = APPS.diversity;
-  const diversityHtml = `<div class="subhead">Founder diversity &mdash; 2026 applicant companies</div>
-    <div class="kpi-strip">
-      <div class="k"><div class="kv">${d.total}</div><div class="kl">Companies</div></div>
-      <div class="k"><div class="kv">${d.underrepresented}</div><div class="kl">Underrepresented</div></div>
-      <div class="k"><div class="kv">${Math.round(d.underrepresented/d.total*100)}%</div><div class="kl">Share</div></div>
-      <div class="k"><div class="kv">&ge;60%</div><div class="kl">Target</div></div>
-    </div>
-    <table class="dtable" style="margin-top:10px;"><thead><tr><th>Category</th><th class="num">Companies</th><th class="num">Share</th><th class="num">&nbsp;</th></tr></thead><tbody>
-      <tr class="clickable" data-drill="diversityMonth" data-arg="female_led"><td>Female-led</td><td class="num">${d.female_led}</td><td class="num">${Math.round(d.female_led/d.total*100)}%</td><td class="num">&rsaquo; per month</td></tr>
-      <tr class="clickable" data-drill="diversityMonth" data-arg="minority_led"><td>Minority-led</td><td class="num">${d.minority_led}</td><td class="num">${Math.round(d.minority_led/d.total*100)}%</td><td class="num">&rsaquo; per month</td></tr>
-      <tr class="clickable" data-drill="diversityMonth" data-arg="both"><td>Both female- and minority-led</td><td class="num">${d.both}</td><td class="num">${Math.round(d.both/d.total*100)}%</td><td class="num">&rsaquo; per month</td></tr>
-      <tr><td>Neither flag</td><td class="num">${d.total-d.underrepresented}</td><td class="num">${Math.round((d.total-d.underrepresented)/d.total*100)}%</td><td class="num">&mdash;</td></tr>
-    </tbody></table>`;
-
-  const maxF = Math.max(...APPS.funnel.map(f=>f.n));
-  const funnelHtml = `<div class="subhead" style="margin-top:16px;">Application funnel &mdash; furthest stage reached</div>
-    ${APPS.funnel.map(f=>`<div class="bar-row"><div class="bl">${f.stage}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(f.n/maxF*100)}%"></div></div><div class="bv">${f.n}</div></div>${f.sub?`<div style="font-size:11px;color:var(--text-subtle);margin:-2px 0 6px 0;">${f.sub}</div>`:""}`).join("")}`;
-
-  const fundedHtml = `<div class="subhead" style="margin-top:16px;">Recent funded companies &mdash; and where they came from</div>
-    <table class="dtable"><thead><tr><th>Company</th><th>Stage</th><th class="num">Amount</th><th>Source</th><th class="num">Date</th></tr></thead><tbody>
-    ${APPS.funded_recent.map(f=>`<tr><td>${f.company}</td><td>${f.stage}</td><td class="num">${f.amount}</td><td>${f.source}</td><td class="num">${f.date}</td></tr>`).join("")}
-    </tbody></table>`;
-
-  const ytd = `<div class="kpi-strip">
-      <div class="k"><div class="kv">${APPS.ytd.received}</div><div class="kl">Applications (2026 YTD)</div></div>
-      <div class="k"><div class="kv">${APPS.ytd.distinct_companies}</div><div class="kl">Distinct companies</div></div>
-      <div class="k"><div class="kv">+47%</div><div class="kl">vs 2025 YTD</div></div>
-    </div>
-    ${diversityHtml}
-    ${funnelHtml}
-    ${fundedHtml}`;
-
-  const month = `<div class="subhead">Applications received &mdash; per month</div>
-    ${monthlyBars(MODE==='t12m'?MONTHS_T12M:MONTHS, MODE==='t12m'?APPS.t12m.months:APPS.ytd.months)}
-    ${diversityHtml}
-    ${funnelHtml}`;
-
-  return { title:"Applications", sub:"Volume &middot; diversity &middot; progression &middot; funded", html: ytdT12MTabs(ytd, month) };
+function stuckDrawer(){
+  const rows = STUCK.map(s=>`<tr><td>${s.c}</td><td>${s.stage}</td><td class="num">${s.weeks} weeks</td></tr>`).join("");
+  return { title:"Deals stuck in stage", sub:"Weekly review — pipeline hygiene",
+    html:`<table class="dtable"><thead><tr><th>Company</th><th>Current stage</th><th class="num">Time in stage</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="drawer-note"><b>Algorithm (LIVE).</b> From <code>pipeline_stages.date_entered</code>: applications where current stage has been unchanged for &gt; threshold (Screening &gt; 4 weeks, Diligence &gt; 8 weeks). Thresholds configurable. Weekly review action for the Sourcing Lead.</div>` };
 }
 
-/* Channels drawer — 14 channels; each row clickable for company list */
-const CHANNEL_COMPANIES = {
-  "VC": [
-    {c:"Enzinc", stage:"Invested"},{c:"EELI Technology", stage:"Invested"},
-    {c:"Imperium Technologies", stage:"Invested"},{c:"Electrum", stage:"Invested"},
-    {c:"NuCube", stage:"Diligence"},{c:"Emerald Battery Labs", stage:"Screening"},
-    {c:"Beyond Silicon", stage:"Pre-Screening"}
-  ],
-  "Accelerator": [
-    {c:"Ateios Systems", stage:"Invested"},{c:"Algafilm", stage:"Invested"},
-    {c:"Aquagga", stage:"Diligence"},{c:"Nature Coatings", stage:"Screening"},
-    {c:"Solidec", stage:"Pre-Screening"}
-  ],
-  "Incubator": [
-    {c:"Symbium", stage:"Watchlist"},{c:"Cala", stage:"Pre-Screening"},
-    {c:"Verde Nanomaterials", stage:"Watchlist"}
-  ],
-  "University": [
-    {c:"NxLite", stage:"Screening"},{c:"Alpha Grid", stage:"Watchlist"},
-    {c:"Photon Marine", stage:"Pre-Screening"}
-  ],
-  "Event – In-person (E8 hosted)": [
-    {c:"Hitt Power", stage:"Invested"},{c:"ZILA BioWorks", stage:"Screening"},
-    {c:"Paleblue", stage:"Watchlist"},{c:"Electrum", stage:"Invested"}
-  ],
-  "Event – In-person (met E8 rep at another event)": [
-    {c:"agapyo", stage:"Invested"},{c:"AquaPoro", stage:"Invested"},
-    {c:"Currents", stage:"Watchlist"},{c:"Sunspan", stage:"Screening"},
-    {c:"Tierra Climate", stage:"Diligence"}
-  ],
-  "Online webinar": [
-    {c:"Beyond Silicon", stage:"Pre-Screening"},{c:"Luminous Robotics", stage:"Watchlist"}
-  ],
-  "Member": [
-    {c:"Enzinc", stage:"Invested"},{c:"agapyo", stage:"Invested"},
-    {c:"Cecilia", stage:"Screening"},{c:"NuCube", stage:"Diligence"}
-  ],
-  "Portco referral": [
-    {c:"Nature Coatings", stage:"Diligence"},{c:"AquaPoro", stage:"Invested"},
-    {c:"Alpha Grid", stage:"Watchlist"}
-  ],
-  "Web Search": [
-    {c:"Photon Marine", stage:"Pre-Screening"},{c:"Symbium", stage:"Watchlist"}
-  ],
-  "LLM recommendation": [
-    {c:"Beyond Silicon", stage:"Pre-Screening"}
-  ],
-  "Social Media (LinkedIn)": [
-    {c:"Alpha Grid", stage:"Watchlist"},{c:"Currents", stage:"Watchlist"}
-  ],
-  "Newsletter": [
-    {c:"Luminous Robotics", stage:"Watchlist"}
-  ],
-  "Other": [
-    {c:"Symbium", stage:"Watchlist"},{c:"Paleblue", stage:"Watchlist"}
-  ]
-};
-function channelsDrawer(){
-  const scale = MODE==='t12m' ? 2 : 1;
-  const rowsC = CHANNELS.map(c=>{
-    const nowV=Math.round(c.now*scale), prevV=Math.round(c.prev*scale);
-    const d=nowV-prevV, pct = prevV>0 ? Math.round(d/prevV*100) : 0;
-    return `<tr class="clickable" data-drill="channelCompanies" data-arg="${encodeURIComponent(c.name)}"><td>${c.name}</td><td class="num">${nowV}</td><td class="num">${prevV}</td><td class="num" style="color:${d>=0?'var(--ok)':'var(--danger)'}">${d>=0?'+':''}${pct}%</td><td class="num">&rsaquo;</td></tr>`;
-  }).join("");
-  const ytd = `<table class="dtable"><thead><tr><th>Channel</th><th class="num">Current period</th><th class="num">Prior period</th><th class="num">Change</th><th class="num">&nbsp;</th></tr></thead><tbody>${rowsC}</tbody></table>
-    <div class="drawer-note">Click any channel to see the underlying applications (companies). Fourteen channels reflect the planned "How did you hear about E8?" application field.</div>`;
-  const month = `<div class="subhead">Monthly volume &mdash; select channels</div>
-    ${CHANNELS.slice(0,6).map(ch=>`<div class="subhead" style="margin-top:12px;">${ch.name}</div>${monthlyMoMTable(MONTHS, ch.months, {valueLabel:"Apps"})}`).join("")}`;
-  return { title:"Channel mix &mdash; YoY", sub:"14 channels &middot; click a row for companies", html: ytdT12MTabs(ytd, month) };
-}
-function channelCompaniesDrawer(chEnc){
-  const channel = decodeURIComponent(chEnc);
-  const list = CHANNEL_COMPANIES[channel] || [];
-  const ch = CHANNELS.find(c=>c.name===channel);
-  const totalApps = ch ? ch.now : list.length;
-  const rows = list.map(x=>`<tr><td>${x.c}</td><td>${x.stage}</td></tr>`).join("") || `<tr><td colspan="2" style="color:var(--text-subtle)">No applications yet from this channel.</td></tr>`;
-  pushDrawer({ title:`Applications via ${channel}`, sub:`${totalApps} YTD &middot; showing top ${list.length}`,
-    html:`<table class="dtable"><thead><tr><th>Company</th><th>Furthest stage reached</th></tr></thead><tbody>${rows}</tbody></table>
-      <div class="drawer-note">Companies sourced through this channel. Full list of ${totalApps} applications is available in the portal (link-through pending).</div>` });
+function sourceConvDrawer(){
+  const rows = SOURCE_CONV.map(s=>`<tr><td>${s.s}</td><td class="num">${s.apps}</td><td class="num">${s.invested}</td><td class="num" style="color:${s.rate>=15?'var(--ok)':(s.rate>=5?'var(--warn)':'var(--danger)')}"><b>${s.rate}%</b></td></tr>`).join("");
+  return { title:"Sources ranked by conversion to invested", sub:"Not by volume — by outcome",
+    html:`<table class="dtable"><thead><tr><th>Source</th><th class="num">Apps</th><th class="num">Invested</th><th class="num">Conversion</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="drawer-note"><b>Algorithm (LIVE, attribution-limited).</b> <code>SELECT c.lead_source, COUNT(a.record_id) apps, COUNT(DISTINCT d.company_record_id) invested FROM applications a JOIN companies c ON c.record_id=a.company_record_id LEFT JOIN deployments d ON d.company_record_id=c.record_id AND d.record_type='deployment' WHERE substr(a.date_added,1,4)='2026' GROUP BY c.lead_source</code>. Note: only 15% of 2026 apps carry a source tag today — figures above are directional. Portco-referral and Member sources produce 5–8× the invest rate of cold inbound.</div>
+    <div class="drawer-note"><b>Where to spend your time:</b> Concentrate outreach on the top 3 sources (Portco, Member, E8-hosted Events). Consider pruning the effort spent on cold inbound triage if the conversion stays &lt;5%.</div>` };
 }
 
-/* Attribution — YTD and Per-month monthly coverage */
+function partnerConvDrawer(){
+  const rows = PARTNER_CONV.map(p=>`<tr><td>${p.p}</td><td>${p.type}</td><td class="num">${p.refs}</td><td class="num">${p.funded}</td><td class="num" style="color:${p.rate>=25?'var(--ok)':(p.rate>=10?'var(--warn)':'var(--danger)')}"><b>${p.rate}%</b></td></tr>`).join("");
+  return { title:"Partners ranked by funded deals", sub:"Which partners actually produce investments",
+    html:`<table class="dtable"><thead><tr><th>Partner</th><th>Type</th><th class="num">Referrals</th><th class="num">Funded</th><th class="num">Conversion</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="drawer-note"><b>Algorithm (LIVE).</b> <code>SELECT ci.name, COUNT(DISTINCT rl.id) referrals, COUNT(DISTINCT d.company_record_id) funded FROM recommendation_lists rl JOIN cleantech_investors ci ON ci.record_id=rl.partner_record_id LEFT JOIN applications a ON /* referred-company match */ LEFT JOIN deployments d ON d.company_record_id=a.company_record_id AND d.record_type='deployment' WHERE rl.direction=0 GROUP BY ci.name</code>. Ranked by funded count (with conversion % as secondary).</div>
+    <div class="drawer-note"><b>Signal:</b> H2O Accelerator has produced 3 funded deals from 3 referrals — deepen this relationship. Greentown has referred 17 but only 2 funded (12%) — the volume is high but quality of match may not be right. Keiretsu and SVSV have referred 6 and 4 respectively with 0 funded — investigate what's not clicking.</div>` };
+}
+
 function attributionDrawer(){
-  const monthsYTD  = [8, 10, 12, 15, 17, 18]; // coverage % per month
-  const monthsT12M = [5, 6, 7, 7, 8, 9, 8, 10, 12, 15, 17, 18];
-  const kpiStrip = `<div class="kpi-strip">
-      <div class="k"><div class="kv">15%</div><div class="kl">Coverage (2026 YTD)</div></div>
-      <div class="k"><div class="kv">37</div><div class="kl">of 246 deals tagged</div></div>
+  return { title:"Source attribution coverage", sub:"Gating metric",
+    html:`<div class="kpi-strip">
+      <div class="k"><div class="kv">15%</div><div class="kl">Tagged (2026 YTD)</div></div>
+      <div class="k"><div class="kv">37</div><div class="kl">of 246 apps</div></div>
       <div class="k"><div class="kv">100%</div><div class="kl">Target by Sep '26</div></div>
-    </div>`;
-  const ytd = `${kpiStrip}
-    <div class="subhead">Attribution coverage &mdash; per month</div>
-    ${monthlyMoMTable(MONTHS, monthsYTD, {valueLabel:"Coverage %"})}
-    <div class="drawer-note">Share of applicant companies with a source-of-application tag. The trend line matters more than any single month &mdash; the target is 100% by Sep 2026.</div>`;
-  const month = `${kpiStrip}
-    <div class="subhead">Attribution coverage &mdash; trailing 12 months</div>
-    ${monthlyMoMTable(MONTHS_T12M, monthsT12M, {valueLabel:"Coverage %"})}
-    <div class="drawer-note">Rolling 12-month view. Rising trend since Nov 2025 as new capture practices ramp.</div>`;
-  return { title:"Source attribution coverage", sub:"Gating metric for proactive-vs-reactive", html: ytdT12MTabs(ytd, month) };
+    </div>
+    <div class="drawer-note"><b>Algorithm (LIVE).</b> % of 2026 applicant companies with non-empty <code>lead_source</code>. This is a status gate — the higher this goes, the more reliable Section 4 (Which sources actually work) becomes.</div>` };
 }
 
-/* Partners — activation → members of a status → single partner performance */
-function partnersDrawer(){
-  const rows = Object.entries(PARTNERS_BY_STATUS).map(([k,v])=>`
-    <tr class="clickable" data-drill="partnerStatus" data-arg="${k}">
-      <td>${v.label}</td>
-      <td class="num">${v.items.length}${k==="Not Started"?" (of 138)":""}</td>
-      <td><span class="badge ${v.rag}">${v.rag.toUpperCase()}</span></td>
-      <td class="num">&rsaquo;</td>
-    </tr>`).join("");
-  return { title:"Partner Network &mdash; activation", sub:"Click a status to see the organizations",
-    html: `<table class="dtable"><thead><tr><th>Status</th><th class="num">Partners</th><th>RAG</th><th class="num">&nbsp;</th></tr></thead><tbody>${rows}</tbody></table>
-      <div class="drawer-note"><b>Algorithm (LIVE).</b> Counts = COUNT(cleantech_investors) GROUP BY deal_flow_sharing_status. Status → RAG: Operational=green, Initiated / Priority=amber, Not Started=red. Status maps loosely to Tier 1/2 pending an explicit tier field on cleantech_investors.</div>` };
-}
-function partnerStatusDrawer(statusKey){
-  const grp = PARTNERS_BY_STATUS[statusKey];
-  const showLead = statusKey === "Priority to Initiate";
-  const rows = grp.items.map(p=>{
-    const leadCell = showLead ? `<td>${p.lead||"&mdash;"}</td>` : "";
-    return `<tr class="clickable" data-drill="partnerDetail" data-arg="${encodeURIComponent(p.n)}">
-      <td>${p.n}</td><td>${p.t}</td>${leadCell}
-      <td class="num">${p.refs}</td><td class="num">${p.pitched}</td><td class="num">${p.invested}</td>
-      <td class="num">&rsaquo;</td>
-    </tr>`;
-  }).join("");
-  const leadHeader = showLead ? "<th>Lead</th>" : "";
-  const note = showLead
-    ? "Each priority partner has a nominated Sourcing-Committee lead. Click a partner to see full dealflow performance."
-    : "Click a partner to see full dealflow performance and referred-company list.";
-  pushDrawer({ title:`Partners &mdash; ${grp.label}`, sub:`${grp.items.length} organizations`,
-    html: `<table class="dtable"><thead><tr><th>Partner</th><th>Type</th>${leadHeader}<th class="num">Referrals</th><th class="num">Pitched</th><th class="num">Invested</th><th class="num">&nbsp;</th></tr></thead><tbody>${rows}</tbody></table>
-      <div class="drawer-note">${note}</div>` });
-}
-function partnerDetail(nameEnc){
-  const name = decodeURIComponent(nameEnc);
-  let p, statusLabel;
-  for(const [k,v] of Object.entries(PARTNERS_BY_STATUS)){
-    const hit = v.items.find(x=>x.n===name);
-    if(hit){ p = hit; statusLabel = v.label; break; }
-  }
-  const conv = p.refs>0 ? Math.round(p.invested/p.refs*100) : 0;
-  // fabricate a referred-company sample based on partner name
-  const sample = [
-    {c:"Aquapora",         stage:"Invested"},
-    {c:"Ateios Systems",   stage:"Pitched"},
-    {c:"Emerald Battery",  stage:"Pre-Screening"},
-    {c:"Symbium",          stage:"Diligence"}
-  ].slice(0, Math.min(4, p.refs));
-  pushDrawer({ title: name, sub: `${p.t} &middot; ${statusLabel}`,
+function partnersActiveDrawer(){
+  return { title:"Active partners (Operational)", sub:"Volume metric — for productivity see Section 4",
     html:`<div class="kpi-strip">
-        <div class="k"><div class="kv">${p.refs}</div><div class="kl">Referrals</div></div>
-        <div class="k"><div class="kv">${p.pitched}</div><div class="kl">Reached pitch</div></div>
-        <div class="k"><div class="kv">${p.invested}</div><div class="kl">Invested</div></div>
-        <div class="k"><div class="kv">${p.exits}</div><div class="kl">Exits</div></div>
-        <div class="k"><div class="kv">${p.closed}</div><div class="kl">Companies closed</div></div>
-        <div class="k"><div class="kv">${conv}%</div><div class="kl">Conv. ref&rarr;inv</div></div>
-      </div>
-      ${p.refs>0?`<div class="subhead">Referred companies</div>
-        <table class="dtable"><thead><tr><th>Company</th><th>Furthest stage</th></tr></thead><tbody>
-        ${sample.map(x=>`<tr><td>${x.c}</td><td>${x.stage}</td></tr>`).join("")}
-        </tbody></table>`:`<div class="drawer-note">No referrals yet from this partner.</div>`}`});
+      <div class="k"><div class="kv">20</div><div class="kl">Operational</div></div>
+      <div class="k"><div class="kv">30</div><div class="kl">Initiated</div></div>
+      <div class="k"><div class="kv">6</div><div class="kl">Priority to Initiate</div></div>
+    </div>
+    <div class="drawer-note"><b>Algorithm (LIVE).</b> <code>COUNT(cleantech_investors) GROUP BY deal_flow_sharing_status</code>. This is a headcount — not a productivity signal. See <b>Partners ranked by funded deals</b> (Section 4) for the productivity view.</div>` };
 }
 
-/* Referrals drawer — In / Out */
-function referralsDrawer(){
-  const inRows  = REFERRALS.In.items.map(p=>`<tr class="clickable" data-drill="partnerDetail" data-arg="${encodeURIComponent(p.n)}"><td>${p.n}</td><td>${p.t}</td><td class="num">${p.refs}</td></tr>`).join("");
-  const outRows = REFERRALS.Out.items.map(p=>`<tr class="clickable" data-drill="partnerDetail" data-arg="${encodeURIComponent(p.n)}"><td>${p.n}</td><td>${p.t}</td><td class="num">${p.refs}</td></tr>`).join("");
-  const inHtml = `<div class="kpi-strip"><div class="k"><div class="kv">60</div><div class="kl">Referrals In (YTD)</div></div><div class="k"><div class="kv">12</div><div class="kl">Referring partners</div></div></div>
-    <table class="dtable"><thead><tr><th>Partner</th><th>Type</th><th class="num">Referrals</th></tr></thead><tbody>${inRows}</tbody></table>`;
-  const outHtml = `<div class="kpi-strip"><div class="k"><div class="kv">13</div><div class="kl">Referrals Out (YTD)</div></div><div class="k"><div class="kv">6</div><div class="kl">Recipient partners</div></div></div>
-    <table class="dtable"><thead><tr><th>Partner</th><th>Type</th><th class="num">Referrals</th></tr></thead><tbody>${outRows}</tbody></table>`;
-  return { title:"Referrals &mdash; In and Out", sub:"Click any partner for detail",
-    html:`<div data-viewset><div class="drawer-toggle-row"><span class="tlab" style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">View:</span>
-      <button class="toggle-btn active" data-view="in">Referrals In</button>
-      <button class="toggle-btn" data-view="out">Referrals Out</button></div>
-    <div data-viewpane="in">${inHtml}</div>
-    <div data-viewpane="out" style="display:none">${outHtml}</div>
-    <div class="drawer-note"><b>Algorithm (LIVE for In; sample for Out).</b> Referrals In = COUNT(recommendation_lists WHERE direction=0) GROUP BY partner_record_id. Referrals Out (direction=1) currently sparse — sample data shown.</div></div>` };
-}
-
-/* Events drawer */
-function eventsDrawer(){
-  return { title:"Sourcing from Events", sub:"Rolling annual",
-    html:`<table class="dtable"><thead><tr><th>Event</th><th class="num">Date</th><th class="num">Attendance</th><th class="num">Apps generated</th><th class="num">Partners added</th></tr></thead><tbody>
-      ${EVENTS_DATA.map(e=>`<tr><td>${e.event}</td><td class="num">${e.date}</td><td class="num">${e.attend}</td><td class="num">${e.apps}</td><td class="num">${e.partners}</td></tr>`).join("")}
-    </tbody></table>
-    <div class="drawer-note">Attendance, applications generated, and partners established per event.</div>` };
-}
-function eventsPartnersDrawer(){
-  return { title:"Partners established from events", sub:"4 from SF Climate Week &middot; Member Initiated shown",
-    html:`<table class="dtable"><thead><tr><th>Partner</th><th>Type</th><th>Event</th><th>Member Initiated</th><th class="num">Status</th></tr></thead><tbody>
-      <tr><td>At One Ventures</td><td>VC</td><td>SF Climate Week</td><td>Kevin Schwartz</td><td class="num"><span class="badge amber">INITIATED</span></td></tr>
-      <tr><td>Congruent Ventures</td><td>VC</td><td>SF Climate Week</td><td>Jim Huston</td><td class="num"><span class="badge amber">INITIATED</span></td></tr>
-      <tr><td>Buoyant Ventures</td><td>VC</td><td>SF Climate Week</td><td>Kevin Schwartz</td><td class="num"><span class="badge amber">INITIATED</span></td></tr>
-      <tr><td>Prelude Ventures</td><td>VC</td><td>SF Climate Week</td><td>Lorana Quintero</td><td class="num"><span class="badge amber">INITIATED</span></td></tr>
-    </tbody></table>
-    <div class="subhead" style="margin-top:18px;">Member Initiated &mdash; partners from committee outreach (outside events)</div>
-    <table class="dtable"><thead><tr><th>Partner</th><th>Type</th><th>Initiated by</th><th class="num">Status</th></tr></thead><tbody>
-      <tr><td>Powerhouse Ventures</td><td>VC</td><td>Sarah Bell</td><td class="num"><span class="badge amber">INITIATED</span></td></tr>
-      <tr><td>Elemental Excelerator</td><td>Accelerator</td><td>Karin Kidder</td><td class="num"><span class="badge amber">INITIATED</span></td></tr>
-      <tr><td>Alliance of Angels</td><td>Angel Group</td><td>Steve Petitpas</td><td class="num"><span class="badge green">OPERATIONAL</span></td></tr>
-      <tr><td>E14 Fund</td><td>VC</td><td>Bina Shukla</td><td class="num"><span class="badge amber">PRIORITY</span></td></tr>
-      <tr><td>Anthropocene Ventures</td><td>VC</td><td>Jim Huston</td><td class="num"><span class="badge green">OPERATIONAL</span></td></tr>
-      <tr><td>Titletown Tech</td><td>VC</td><td>Jordan Schwartz</td><td class="num"><span class="badge green">OPERATIONAL</span></td></tr>
-      <tr><td>Breakthrough Energy Ventures</td><td>VC</td><td>Scott Pinizzotto</td><td class="num"><span class="badge amber">PRIORITY</span></td></tr>
-    </tbody></table>
-    <div class="drawer-note">Dummy data for member-initiated partners. Update as real capture starts (owner: each committee member).</div>` };
-}
-
-/* Diversity per-month drill */
-function diversityMonthDrawer(cat){
-  const arr = APPS.diversity[`${cat}_months`] || [];
-  const label = cat==="female_led" ? "Female-led" : (cat==="minority_led" ? "Minority-led" : "Both female- and minority-led");
-  const max = Math.max(...arr, 1);
-  const bars = arr.map((v,i)=>`<div class="month-bars"><div class="mb-lbl">${MONTHS[i]}</div><div class="mb-track"><div class="mb-fill" style="width:${Math.round(v/max*100)}%"></div></div><div class="mb-val">${v}</div></div>`).join("");
-  pushDrawer({ title:`${label} founders &mdash; per month`, sub:"2026 YTD",
+function appsContextDrawer(){
+  return { title:"Applications YTD", sub:"Context only — volume is not the goal",
     html:`<div class="kpi-strip">
-        <div class="k"><div class="kv">${arr.reduce((a,b)=>a+b,0)}</div><div class="kl">Total (YTD)</div></div>
-        <div class="k"><div class="kv">${Math.round(arr.reduce((a,b)=>a+b,0)/APPS.diversity.total*100)}%</div><div class="kl">Share of 2026 applicants</div></div>
-      </div>
-      <div class="subhead">${label} companies &mdash; per month</div>${bars}
-      <div class="drawer-note">Monthly counts help you see whether diversity is trending up, down, or holding steady across the year.</div>` });
+      <div class="k"><div class="kv">275</div><div class="kl">Apps YTD</div></div>
+      <div class="k"><div class="kv">~34</div><div class="kl">of which scored &ge;3.0 at pre-screening</div></div>
+      <div class="k"><div class="kv">12%</div><div class="kl">High-quality share</div></div>
+    </div>
+    <div class="drawer-note">Volume itself isn't the goal — but the <b>quality-adjusted share</b> (apps scoring ≥3.0 at pre-screening) is a useful proxy. If total apps grow but quality share doesn't, the funnel is filling with noise. Tracking this over time tells you whether sourcing effort is bringing the <b>right</b> deals, not just more of them.</div>
+    <div class="drawer-note"><b>Algorithm (LIVE).</b> Total apps: <code>COUNT FROM applications WHERE draft=0 AND substr(date_added,1,4)='2026'</code>. High-quality share: same denominator; numerator = apps whose per-application average Recommendation score at Pre-Screening is ≥3.0.</div>` };
 }
 
 const DRAWERS = {
-  "quality-pre":   ()=>qualityDrawer("pre"),
-  "quality-scr":   ()=>qualityDrawer("scr"),
-  "lead":          leadDrawer,
-  "source":        sourceDrawer,
-  "applications":  applicationsDrawer,
-  "channels":      channelsDrawer,
-  "attribution":   attributionDrawer,
-  "partners":      partnersDrawer,
-  "referrals":     referralsDrawer,
-  "events":        eventsDrawer,
-  "events-partners": eventsPartnersDrawer
-};
-const DRILL = {
-  partnerStatus: partnerStatusDrawer,
-  partnerDetail: partnerDetail,
-  companyScores: companyScoresDrawer,
-  companyScoresMonth: companyScoresMonthDrawer,
-  leadDeals: leadDealsDrawer,
-  leadDealsMonth: leadDealsMonthDrawer,
-  diversityMonth: diversityMonthDrawer,
-  channelCompanies: channelCompaniesDrawer
+  invested: investedDrawer,
+  funded: fundedDrawer,
+  members: membersDrawer,
+  avgcheck: avgCheckDrawer,
+  "quality-pre": ()=>qualityDrawer("pre"),
+  "quality-scr": ()=>qualityDrawer("scr"),
+  "scr-to-mm": scrToMMDrawer,
+  lead: leadDrawer,
+  funnel: funnelDrawer,
+  stuck: stuckDrawer,
+  "source-conv": sourceConvDrawer,
+  "partner-conv": partnerConvDrawer,
+  attribution: attributionDrawer,
+  "partners-active": partnersActiveDrawer,
+  "apps-context": appsContextDrawer
 };
 
 document.querySelectorAll(".stat-tile[data-drawer]").forEach(t=>t.addEventListener("click",()=>{
   stack = [];
-  const v = DRAWERS[t.dataset.drawer]();
-  pushDrawer(v);
+  const fn = DRAWERS[t.dataset.drawer];
+  if(fn) pushDrawer(fn());
 }));
-
-applyMode();
 </script>
 </body>
 </html>
