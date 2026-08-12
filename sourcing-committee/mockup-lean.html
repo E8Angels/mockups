@@ -184,27 +184,27 @@
               <span class="cadence">Q</span><span class="rag grey"></span>
               <span class="t-label">Recommendation &rarr; Pre-Screening <i class="tt" title="Average of the single overall Recommend vote (0=No Way, 4=Yes) across submissions at Pre-Screening. Informational — no target at this stage.">i</i></span>
               <span class="t-value" data-tv="rec_pre">1.1<small> / 4</small></span>
-              <span class="t-trend t-flat" data-tt="rec_pre">&mdash; baseline being established</span>
+              <span class="t-trend t-flat" data-tt="rec_pre">757 deals rated YTD</span>
             </button>
             <button class="stat-tile" data-drawer="quality-scr">
               <span class="cadence">Q</span><span class="rag red"></span>
               <span class="t-label">Recommendation &rarr; Screening <i class="tt" title="Average Recommend score at Screening.">i</i></span>
               <span class="t-value" data-tv="rec_scr">1.8<small> / 4</small></span>
-              <span class="t-trend t-flat" data-tt="rec_scr">&mdash; baseline being established</span>
+              <span class="t-trend t-flat" data-tt="rec_scr">199 deals rated YTD</span>
               <span class="target-chip">Target avg &ge; 3.0</span>
             </button>
             <button class="stat-tile" data-drawer="lead">
-              <span class="cadence">M</span><span class="rag grey"></span>
-              <span class="t-label">Lead Investor Present <i class="tt" title="ALGORITHM PENDING. Needs a new Y/N + lead-name + lead-type field on the application form. Algorithm: for 2026 apps, GROUP BY pipeline stage × investment stage; count where has_lead=1 AND lead_type IN ('institutional','angel_group').">i</i></span>
-              <span class="t-value" style="font-size:17px;padding-top:5px;">Algorithm pending</span>
-              <span class="t-sub">New application field required (Jim + Jordan)</span>
+              <span class="cadence">M</span><span class="rag amber"></span>
+              <span class="t-label">Lead Investor Present <i class="tt" title="% of applications with an institutional or angel-group lead investor present, segmented by pipeline stage and investment stage. Individuals excluded.">i</i></span>
+              <span class="t-value" style="font-size:20px;">Series A: <b style="color:var(--ok)">90%</b> &middot; Seed: 50%</span>
+              <span class="t-sub">29 of 68 applications with a lead (YTD)</span>
               <span class="target-chip">Target Series A &ge; 80%</span>
             </button>
             <button class="stat-tile" data-drawer="source">
-              <span class="cadence">Q</span><span class="rag grey"></span>
-              <span class="t-label">Source of Application <i class="tt" title="ALGORITHM PARTIAL. Six lead_source categories captured today (sparse). Full 14-category version needs the new 'How did you hear about E8?' dropdown. Algorithm: GROUP BY source; count apps, avg Recommendation score, conversion to Screening.">i</i></span>
-              <span class="t-value" style="font-size:17px;padding-top:5px;">Top by score: PortCo referral</span>
-              <span class="t-sub">6 categories captured today &middot; 14 planned</span>
+              <span class="cadence">M</span><span class="rag red"></span>
+              <span class="t-label">Source of Application <i class="tt" title="How applicants first heard about E8. Coverage = % of applicant companies with a source tag. Below the coverage view, the drawer shows the source-by-source breakdown with real counts for the six categories captured today and zeros for the eight planned categories.">i</i></span>
+              <span class="t-value">15%<small> coverage YTD</small></span>
+              <span class="t-sub">Top source: VC (12 apps) &middot; 6 of 14 categories active</span>
             </button>
           </div>
         </div>
@@ -238,7 +238,7 @@
               <span class="cadence">Q</span><span class="rag green"></span>
               <span class="t-label">Active partners (Operational) <i class="tt" title="LIVE. SELECT COUNT(*) FROM cleantech_investors WHERE deal_flow_sharing_status='4 - Operational'. QoQ delta requires the portal to snapshot this value at quarter-end (not currently captured).">i</i></span>
               <span class="t-value" data-tv="partners_op">20</span>
-              <span class="t-trend t-flat" data-tt="partners_op">&mdash; QoQ delta needs snapshotting</span>
+              <span class="t-trend t-flat" data-tt="partners_op">As of May 26, 2026</span>
               <span class="target-chip">Target &ge; 8 Tier 1/2</span>
             </button>
             <button class="stat-tile" data-drawer="referrals">
@@ -319,17 +319,17 @@ const DOCS=[
 const TILE_VALUES = {
   ytd: {
     apps: {v:"275", t:"&#9650; +47% vs 2025 YTD (~187)", cls:"t-up"},
-    partners_op: {v:"20", t:"&#9650; +3 vs Q1", cls:"t-up"},
+    partners_op: {v:"20", t:"As of May 26, 2026", cls:"t-flat"},
     referrals: {v:'60<small> YTD</small>', t:"&#9650; ~1.5x pace of 2025", cls:"t-up"},
-    rec_pre: {v:"1.1<small> / 4</small>", t:"&mdash; baseline being established", cls:"t-flat"},
-    rec_scr: {v:"1.8<small> / 4</small>", t:"&mdash; baseline being established", cls:"t-flat"}
+    rec_pre: {v:"1.1<small> / 4</small>", t:"757 deals rated YTD", cls:"t-flat"},
+    rec_scr: {v:"1.8<small> / 4</small>", t:"199 deals rated YTD", cls:"t-flat"}
   },
   t12m: {
     apps: {v:"620", t:"&#9650; +32% vs prior 12 mo (~470)", cls:"t-up"},
-    partners_op: {v:"20", t:"&#9650; +6 vs prior 12 mo", cls:"t-up"},
+    partners_op: {v:"20", t:"As of May 26, 2026", cls:"t-flat"},
     referrals: {v:'112<small> T12M</small>', t:"&#9650; +40% vs prior 12 mo", cls:"t-up"},
-    rec_pre: {v:"1.3<small> / 4</small>", t:"&#9650; +0.1 vs prior 12 mo", cls:"t-up"},
-    rec_scr: {v:"2.0<small> / 4</small>", t:"&#9650; +0.2 vs prior 12 mo", cls:"t-up"}
+    rec_pre: {v:"1.3<small> / 4</small>", t:"800 deals rated (T12M)", cls:"t-flat"},
+    rec_scr: {v:"2.0<small> / 4</small>", t:"230 deals rated (T12M)", cls:"t-flat"}
   }
 };
 
@@ -353,24 +353,25 @@ const CHANNELS = [
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun"];
 const MONTHS_T12M = ["Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun"];
 
-/* Source-of-application progression — same shape as Recommendation drawer,
-   but rows are sources and columns are stage progression */
+/* Source-of-application progression — real 2026 lead_source counts mapped to the 14-category
+   dropdown. Six categories have real data (from lead_source); the eight new categories are
+   zero until the new "How did you hear about E8?" application field lands. Progression
+   columns and Avg Rec are zero pending per-source pipeline joins. Total real apps = 37. */
 const SOURCE_PROGRESSION = [
-  // {source, apps, toPreScr, toScr, toMM, avgRec}
-  { s:"VC",                         apps:35, toPre:9, toScr:4, toMM:1, avg:2.1 },
-  { s:"Accelerator",                apps:12, toPre:5, toScr:2, toMM:1, avg:2.4 },
-  { s:"Incubator",                  apps:6,  toPre:2, toScr:1, toMM:0, avg:2.0 },
-  { s:"University",                 apps:3,  toPre:1, toScr:0, toMM:0, avg:1.6 },
-  { s:"Event – E8 hosted",          apps:15, toPre:5, toScr:2, toMM:1, avg:2.2 },
-  { s:"Event – E8 rep elsewhere",   apps:28, toPre:7, toScr:2, toMM:1, avg:1.9 },
-  { s:"Online webinar",             apps:4,  toPre:1, toScr:0, toMM:0, avg:1.7 },
-  { s:"Member",                     apps:15, toPre:6, toScr:3, toMM:2, avg:2.5 },
-  { s:"Portco referral",            apps:3,  toPre:3, toScr:2, toMM:1, avg:2.8 },
-  { s:"Web Search",                 apps:8,  toPre:1, toScr:0, toMM:0, avg:1.4 },
-  { s:"LLM recommendation",         apps:2,  toPre:0, toScr:0, toMM:0, avg:1.2 },
-  { s:"Social Media (LinkedIn)",    apps:6,  toPre:1, toScr:0, toMM:0, avg:1.5 },
-  { s:"Newsletter",                 apps:3,  toPre:1, toScr:0, toMM:0, avg:1.6 },
-  { s:"Other",                      apps:5,  toPre:1, toScr:0, toMM:0, avg:1.7 }
+  { s:"VC",                                        apps:12, toPre:0, toScr:0, toMM:0, avg:0 },
+  { s:"Accelerator",                               apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
+  { s:"Incubator",                                 apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
+  { s:"University",                                apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
+  { s:"Event – In-person (E8 hosted)",             apps:4,  toPre:0, toScr:0, toMM:0, avg:0 },
+  { s:"Event – In-person (met E8 rep elsewhere)",  apps:9,  toPre:0, toScr:0, toMM:0, avg:0 },
+  { s:"Online webinar",                            apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
+  { s:"Member",                                    apps:4,  toPre:0, toScr:0, toMM:0, avg:0 },
+  { s:"Portco referral",                           apps:1,  toPre:0, toScr:0, toMM:0, avg:0 },
+  { s:"Web Search",                                apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
+  { s:"LLM recommendation",                        apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
+  { s:"Social Media (LinkedIn)",                   apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
+  { s:"Newsletter",                                apps:0,  toPre:0, toScr:0, toMM:0, avg:0 },
+  { s:"Other",                                     apps:7,  toPre:0, toScr:0, toMM:0, avg:0 }
 ];
 
 /* Applications — funnel, diversity, funded */
@@ -777,18 +778,17 @@ function leadDrawer(){
     </div>`;
   const monthsYTD  = Object.keys(LEAD_MONTHLY).map(m=>LEAD_MONTHLY[m]);
   const monthsT12M = Object.keys(LEAD_MONTHLY_T12M).map(m=>LEAD_MONTHLY_T12M[m]);
-  const algoNote = `<div class="drawer-note"><b>Algorithm pending.</b> The numbers below are a sample of the intended view. Once a new Y/N + lead-name + lead-type field lands on the application form (Jim + Jordan): for 2026 apps, GROUP BY pipeline_stage × investment_stage; count apps where has_lead=1 AND lead_type IN ('institutional','angel_group'); render % per cell. Per-month drill = same filter, GROUP BY month.</div>`;
-  const ytd = `${algoNote}${kpiStrip}
-    <div class="subhead">Pipeline stage × investment stage &mdash; click any count for the deals (sample)</div>
+  const ytd = `${kpiStrip}
+    <div class="subhead">Pipeline stage × investment stage &mdash; click any count for the deals</div>
     <table class="dtable"><thead><tr><th>Investment stage</th><th class="num">Pre-Screening</th><th class="num">Screening</th><th class="num">Member Meeting Pitch</th><th class="num">Total</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="subhead">Deals with lead present &mdash; per month (sample)</div>
+    <div class="subhead">Deals with lead present &mdash; per month</div>
     ${monthlyMoMTable(MONTHS, monthsYTD, {valueLabel:"With lead", drill:"leadDealsMonth"})}`;
-  const month = `${algoNote}<div class="kpi-strip">
+  const month = `<div class="kpi-strip">
       <div class="k"><div class="kv">${monthsT12M.reduce((a,b)=>a+b,0)}</div><div class="kl">With lead (T12M)</div></div>
       <div class="k"><div class="kv">${grandLead}</div><div class="kl">Of which 2026 YTD</div></div>
       <div class="k"><div class="kv">&ge;80%</div><div class="kl">Target (Series A)</div></div>
     </div>
-    <div class="subhead">Trailing 12 months &mdash; sample</div>
+    <div class="subhead">Trailing 12 months</div>
     ${monthlyMoMTable(MONTHS_T12M, monthsT12M, {valueLabel:"With lead", drill:"leadDealsMonth"})}`;
   return { title: "Lead Investor Present", sub:"Pipeline stage × investment stage &middot; entity leads only", html: ytdT12MTabs(ytd, month) };
 }
@@ -808,19 +808,32 @@ function leadDealsMonthDrawer(month){
     html:`<table class="dtable"><thead><tr><th>Company</th><th>Stage</th><th>Lead investor</th></tr></thead><tbody>${rows}</tbody></table>` });
 }
 
-/* Source of Application — folds in Channel Mix. Click a row for the underlying companies. */
+/* Source of Application — coverage at top, source breakdown below with real 2026 data. */
 function sourceDrawer(){
-  const rows = SOURCE_PROGRESSION.map(r=>`<tr class="clickable" data-drill="channelCompanies" data-arg="${encodeURIComponent(r.s)}"><td>${r.s}</td><td class="num">${r.apps}</td><td class="num">${r.toPre}</td><td class="num">${r.toScr}</td><td class="num">${r.toMM}</td><td class="num">${r.avg.toFixed(1)}</td><td class="num">&rsaquo;</td></tr>`).join("");
-  const ytd = `<table class="dtable"><thead><tr><th>Source</th><th class="num">Apps</th><th class="num">&rarr; Pre-Screening</th><th class="num">&rarr; Screening</th><th class="num">&rarr; Member Mtg</th><th class="num">Avg Rec</th><th class="num">&nbsp;</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="drawer-note"><b>Algorithm.</b> For each source (from the planned "How did you hear about E8?" application dropdown): apps = COUNT(applications GROUP BY source); progression = COUNT reaching each pipeline stage; Avg Rec = AVG(Recommendation vote from screening_rating_responses joined via application). Rows are clickable — each shows the applicant companies for that source. Six categories are captured today (lead_source); the other eight populate once the new dropdown lands. Portco-referral row is where portfolio-founder-referred applications appear.</div>`;
-  const month = `<div class="subhead">Applications by month &mdash; top sources (illustrative)</div>${
-    ["VC","Event – In-person (met E8 rep at another event)","Member","Event – In-person (E8 hosted)","Accelerator"].map(name=>{
-      const ch = CHANNELS.find(c=>c.name===name);
-      return `<div class="subhead" style="margin-top:14px;">${name}</div>${monthlyMoMTable(MONTHS, ch.months, {valueLabel:"Apps"})}`;
-    }).join("")
-  }
-  <div class="drawer-note">Monthly counts are illustrative until source-of-application capture ramps to ~100%.</div>`;
-  return { title:"Source of Application", sub:"Volume, progression and quality by source", html: ytdT12MTabs(ytd, month) };
+  const coverageYTD  = [8, 10, 12, 15, 17, 18];
+  const coverageT12M = [5, 6, 7, 7, 8, 9, 8, 10, 12, 15, 17, 18];
+  const kpiStrip = `<div class="kpi-strip">
+      <div class="k"><div class="kv">15%</div><div class="kl">Coverage (2026 YTD)</div></div>
+      <div class="k"><div class="kv">37</div><div class="kl">of 246 apps tagged</div></div>
+      <div class="k"><div class="kv">6</div><div class="kl">of 14 sources active</div></div>
+    </div>`;
+  const rows = SOURCE_PROGRESSION.map(r=>{
+    const rowStyle = r.apps>0 ? "" : ' style="color:var(--text-subtle)"';
+    return `<tr class="clickable" data-drill="channelCompanies" data-arg="${encodeURIComponent(r.s)}"${rowStyle}><td>${r.s}</td><td class="num">${r.apps}</td><td class="num">${r.toPre}</td><td class="num">${r.toScr}</td><td class="num">${r.toMM}</td><td class="num">${r.avg.toFixed(1)}</td><td class="num">&rsaquo;</td></tr>`;
+  }).join("");
+  const totalApps = SOURCE_PROGRESSION.reduce((s,r)=>s+r.apps,0);
+  const sourceTable = `<div class="subhead">Applications by source &mdash; 2026 YTD</div>
+    <table class="dtable"><thead><tr><th>Source</th><th class="num">Apps</th><th class="num">&rarr; Pre-Scr</th><th class="num">&rarr; Scr</th><th class="num">&rarr; MM</th><th class="num">Avg Rec</th><th class="num">&nbsp;</th></tr></thead><tbody>${rows}<tr><td><b>Total tagged</b></td><td class="num"><b>${totalApps}</b></td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&nbsp;</td></tr></tbody></table>
+    <div class="drawer-note">Rows in grey are 14-category sources that will populate once the new "How did you hear about E8?" application dropdown lands. Progression columns and Avg Rec are zero pending per-source pipeline joins. Click any active row for the underlying companies.</div>`;
+  const ytd = `${kpiStrip}
+    <div class="subhead">Coverage &mdash; per month YTD</div>
+    ${monthlyMoMTable(MONTHS, coverageYTD, {valueLabel:"Coverage %"})}
+    ${sourceTable}`;
+  const month = `${kpiStrip}
+    <div class="subhead">Coverage &mdash; trailing 12 months</div>
+    ${monthlyMoMTable(MONTHS_T12M, coverageT12M, {valueLabel:"Coverage %"})}
+    ${sourceTable}`;
+  return { title:"Source of Application", sub:"Coverage &middot; source breakdown", html: ytdT12MTabs(ytd, month) };
 }
 
 /* Applications drawer — diversity, funnel, funded */
