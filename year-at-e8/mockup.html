@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Year at E8</title>
+<style>
+  :root {
+    --bg:#f6f7f9; --card:#ffffff; --border:#e5e7eb;
+    --text:#0f172a; --muted:#6b7280; --subtle:#9ca3af;
+    --brand:#0f766e; --brand-soft:#ccfbf1;
+    --rp:#d97706;    --rp-soft:#fef3c7;    /* Regular Programming — top */
+    --af:#2563eb;    --af-soft:#dbeafe;    /* Annual Fund */
+    --d8:#059669;    --d8-soft:#d1fae5;    /* Decarbon8 */
+    --ev:#e11d48;    --ev-soft:#ffe4e6;    /* Events — bottom */
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:14px;line-height:1.5}
+  .page{max-width:1200px;margin:0 auto;padding:32px 28px 80px}
+  .top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px}
+  h1{font-size:26px;font-weight:700;letter-spacing:-.01em;margin:0}
+  .sub{color:var(--muted);font-size:13px;margin-top:4px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 14px;font-size:12px}
+  .legend .chip{display:inline-flex;align-items:center;gap:6px}
+  .swatch{width:12px;height:12px;border-radius:4px;display:inline-block}
+  .sw-af{background:var(--af)} .sw-d8{background:var(--d8)} .sw-rp{background:var(--rp)} .sw-ev{background:var(--ev)}
+
+  .subway-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px 24px;box-shadow:0 1px 2px rgba(15,23,42,.03);margin-bottom:22px}
+  .subway-wrap{background:#fafbfc;border:1px solid var(--border);border-radius:14px;padding:14px}
+  .subway-svg{width:100%;height:auto;display:block}
+  .station{cursor:pointer;transition:transform .15s}
+  .station:hover{transform:scale(1.12);transform-origin:center}
+  .month-tab{cursor:pointer;transition:opacity .15s}
+  .month-tab:hover rect{stroke:#0f172a}
+  .month-tab.active rect{fill:#0f172a;stroke:#0f172a}
+  .month-tab.active text{fill:#ffffff}
+
+  /* Monthly pop-out detail card */
+  .detail-card{background:linear-gradient(180deg, #0f172a, #1e293b);color:#fff;border-radius:20px;padding:26px 30px;box-shadow:0 12px 30px rgba(15,23,42,.18);position:relative;overflow:hidden;transition:opacity .2s;margin-bottom:22px}
+  .detail-card::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg, var(--rp), var(--af), var(--d8), var(--ev))}
+
+  .dc-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+  .dc-h-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8}
+  .dc-h-month{font-size:32px;font-weight:700;letter-spacing:-.01em}
+  .dc-h-pills{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+  .dc-pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;letter-spacing:.03em}
+  .pill-inseason{background:var(--rp-soft);color:var(--rp)}
+  .pill-summer{background:#fef3c7;color:#a16207}
+  .pill-skip{background:#334155;color:#cbd5e1}
+  .pill-highlight{background:var(--brand-soft);color:var(--brand)}
+
+  .dc-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:20px}
+  @media (max-width:900px){ .dc-grid{grid-template-columns:1fr} }
+  .dc-col{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px}
+  .dc-col.side{background:rgba(255,255,255,.03)}
+  .dc-h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin:0 0 12px}
+
+  .rhythm-row{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:14px 0;border-top:1px solid rgba(255,255,255,.08)}
+  .rhythm-row:first-of-type{border-top:none;padding-top:0}
+  .rhythm-icon{width:34px;height:34px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:11px;letter-spacing:.03em;flex-shrink:0}
+  .r-icon-rp{background:var(--rp)} .r-icon-af{background:var(--af)} .r-icon-d8{background:var(--d8)} .r-icon-ev{background:var(--ev)}
+  .r-icon-dil{background:#7c3aed}
+  .rhythm-title{font-size:14px;font-weight:600;color:#fff}
+  .rhythm-when{font-size:12px;color:#a7b7cd;margin-top:2px}
+  .rhythm-desc{font-size:12px;color:#cbd5e1;margin-top:6px;line-height:1.55}
+  .rhythm-desc a{color:#60a5fa;text-decoration:underline}
+
+  /* CTA buttons inside pop-out */
+  .cta-btn{display:inline-flex;align-items:center;gap:6px;background:#2563eb;color:#ffffff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;margin-top:10px;transition:background .15s;letter-spacing:.02em}
+  .cta-btn:hover{background:#1d4ed8}
+  .cta-btn::after{content:"→";margin-left:2px}
+  .cta-btn.rp{background:var(--rp)} .cta-btn.rp:hover{background:#b45309}
+  .cta-btn.af{background:var(--af)} .cta-btn.af:hover{background:#1d4ed8}
+
+  .side-item{padding:12px 0;border-top:1px solid rgba(255,255,255,.08)}
+  .side-item:first-of-type{border-top:none;padding-top:0}
+  .side-item .si-label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;font-weight:700;display:inline-flex;align-items:center;gap:6px}
+  .si-dot{width:9px;height:9px;border-radius:50%}
+  .si-dot.rp{background:var(--rp)} .si-dot.af{background:var(--af)} .si-dot.d8{background:var(--d8)} .si-dot.ev{background:var(--ev)}
+  .side-item .si-body{margin-top:6px;font-size:13px;color:#e2e8f0;line-height:1.55}
+  .side-item .si-body a{color:#60a5fa}
+
+  .close-btn{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.08);border:none;color:#fff;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:14px}
+  .close-btn:hover{background:rgba(255,255,255,.15)}
+
+  .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
+  .footer{margin-top:22px;padding-top:18px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="top">
+    <div>
+      <h1>Year at E8</h1>
+      <div class="sub">A member's guide to the annual rhythm — click any month or station for what happens and how much time to expect.</div>
+    </div>
+    <div class="legend">
+      <span class="chip"><span class="swatch sw-rp"></span>Regular Programming</span>
+      <span class="chip"><span class="swatch sw-af"></span>Annual Fund</span>
+      <span class="chip"><span class="swatch sw-d8"></span>Decarbon8</span>
+      <span class="chip"><span class="swatch sw-ev"></span>Events</span>
+    </div>
+  </div>
+
+  <!-- SUBWAY MAP -->
+  <div class="subway-card">
+    <div class="subway-wrap">
+      <svg class="subway-svg" viewBox="0 0 1160 400" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="stshadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-opacity="0.18"/>
+          </filter>
+        </defs>
+
+        <!-- Month tabs — all white -->
+        <g id="month-tabs" font-family="Inter, sans-serif" font-size="11" font-weight="700" letter-spacing="1">
+          <g class="month-tab" data-m="0"><rect x="30" y="8" width="60" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/><text x="60" y="24" text-anchor="middle" fill="#0f172a">JAN</text></g>
+          <g class="month-tab" data-m="1"><rect x="120" y="8" width="60" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/><text x="150" y="24" text-anchor="middle" fill="#0f172a">FEB</text></g>
+          <g class="month-tab" data-m="2"><rect x="210" y="8" width="60" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/><text x="240" y="24" text-anchor="middle" fill="#0f172a">MAR</text></g>
+          <g class="month-tab" data-m="3"><rect x="300" y="8" width="60" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/><text x="330" y="24" text-anchor="middle" fill="#0f172a">APR</text></g>
+          <g class="month-tab" data-m="4"><rect x="390" y="8" width="60" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/><text x="420" y="24" text-anchor="middle" fill="#0f172a">MAY</text></g>
+          <g class="month-tab" data-m="5"><rect x="480" y="8" width="60" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/><text x="510" y="24" text-anchor="middle" fill="#0f172a">JUN</text></g>
+          <g class="month-tab" data-m="6"><rect x="570" y="8" width="60" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/><text x="600" y="24" text-anchor="middle" fill="#0f172a">JUL</text></g>
+          <g class="month-tab" data-m="7"><rect x="660" y="8" width="60" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/><text x="690" y="24" text-anchor="middle" fill="#0f172a">AUG</text></g>
+          <g class="month-tab" data-m="8"><rect x="750" y="8" width="60" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/><text x="780" y="24" text-anchor="middle" fill="#0f172a">SEP</text></g>
+          <g class="month-tab" data-m="9"><rect x="840" y="8" width="60" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/><text x="870" y="24" text-anchor="middle" fill="#0f172a">OCT</text></g>
+          <g class="month-tab" data-m="10"><rect x="930" y="8" width="60" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/><text x="960" y="24" text-anchor="middle" fill="#0f172a">NOV</text></g>
+          <g class="month-tab" data-m="11"><rect x="1020" y="8" width="60" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/><text x="1050" y="24" text-anchor="middle" fill="#0f172a">DEC</text></g>
+        </g>
+
+        <!-- Vertical guides -->
+        <g stroke="#eef1f4" stroke-width="1">
+          <line x1="60" y1="55" x2="60" y2="390"/><line x1="150" y1="55" x2="150" y2="390"/>
+          <line x1="240" y1="55" x2="240" y2="390"/><line x1="330" y1="55" x2="330" y2="390"/>
+          <line x1="420" y1="55" x2="420" y2="390"/><line x1="510" y1="55" x2="510" y2="390"/>
+          <line x1="600" y1="55" x2="600" y2="390"/><line x1="690" y1="55" x2="690" y2="390"/>
+          <line x1="780" y1="55" x2="780" y2="390"/><line x1="870" y1="55" x2="870" y2="390"/>
+          <line x1="960" y1="55" x2="960" y2="390"/><line x1="1050" y1="55" x2="1050" y2="390"/>
+        </g>
+
+        <!-- ============ LANE 1: REGULAR PROGRAMMING (y=100) ============ -->
+        <g>
+          <polyline points="30,100 420,100" fill="none" stroke="#d97706" stroke-width="8" stroke-linecap="round"/>
+          <polyline points="420,100 780,100" fill="none" stroke="#d97706" stroke-width="4" stroke-linecap="round" stroke-dasharray="4 6" opacity="0.55"/>
+          <polyline points="780,100 960,100" fill="none" stroke="#d97706" stroke-width="8" stroke-linecap="round"/>
+          <polyline points="960,100 1130,100" fill="none" stroke="#d97706" stroke-width="4" stroke-linecap="round" stroke-dasharray="4 6" opacity="0.55"/>
+          <text x="10" y="105" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#d97706">RP</text>
+        </g>
+        <g filter="url(#stshadow)">
+          <g class="station" data-info='rp-season-end'>
+            <circle cx="420" cy="100" r="9" fill="#d97706"/>
+            <text x="420" y="130" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#d97706">Season ends</text>
+          </g>
+          <g class="station" data-info='rp-season-start'>
+            <circle cx="780" cy="100" r="12" fill="#ffffff" stroke="#d97706" stroke-width="4"/>
+            <text x="780" y="78" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#0f172a">Season begins</text>
+          </g>
+          <g class="station" data-info='rp-annual'>
+            <circle cx="870" cy="100" r="14" fill="#d97706" stroke="#ffffff" stroke-width="3"/>
+            <text x="870" y="104" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#ffffff">★</text>
+            <text x="870" y="78" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#d97706">Annual Meeting</text>
+          </g>
+          <g class="station" data-info='rp-skip'>
+            <circle cx="1050" cy="100" r="7" fill="#ffffff" stroke="#d97706" stroke-width="3"/>
+            <text x="1050" y="130" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#d97706">No meeting</text>
+          </g>
+        </g>
+
+        <!-- ============ LANE 2: ANNUAL FUND (y=180) ============ -->
+        <g>
+          <polyline points="30,180 1130,180" fill="none" stroke="#2563eb" stroke-width="8" stroke-linecap="round"/>
+          <text x="10" y="185" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#2563eb">AF</text>
+        </g>
+        <g filter="url(#stshadow)">
+          <g class="station" data-info='af-jan'>
+            <circle cx="60" cy="180" r="12" fill="#ffffff" stroke="#2563eb" stroke-width="4"/>
+            <text x="60" y="158" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#0f172a">Sign-up opens</text>
+          </g>
+          <g class="station" data-info='af-vote'>
+            <circle cx="510" cy="180" r="8" fill="#2563eb"/>
+            <text x="510" y="210" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#2563eb">Rolling votes</text>
+          </g>
+          <g class="station" data-info='af-annual'>
+            <circle cx="870" cy="180" r="12" fill="#ffffff" stroke="#2563eb" stroke-width="4"/>
+            <text x="870" y="158" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#0f172a">Peak voting</text>
+          </g>
+        </g>
+
+        <!-- ============ LANE 3: DECARBON8 (y=260) ============ -->
+        <g>
+          <polyline points="30,260 330,260" fill="none" stroke="#059669" stroke-width="4" stroke-linecap="round" stroke-dasharray="4 6" opacity="0.4"/>
+          <polyline points="330,260 960,260" fill="none" stroke="#059669" stroke-width="8" stroke-linecap="round"/>
+          <polyline points="960,260 1130,260" fill="none" stroke="#059669" stroke-width="4" stroke-linecap="round" stroke-dasharray="4 6" opacity="0.4"/>
+          <text x="10" y="265" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#059669">D8</text>
+        </g>
+        <g filter="url(#stshadow)">
+          <g class="station" data-info='d8-apps'>
+            <circle cx="330" cy="260" r="12" fill="#ffffff" stroke="#059669" stroke-width="4"/>
+            <text x="330" y="238" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#0f172a">Applications open</text>
+          </g>
+          <g class="station" data-info='d8-close'>
+            <circle cx="510" cy="260" r="8" fill="#059669"/>
+            <text x="510" y="290" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#059669">Apps close</text>
+          </g>
+          <g class="station" data-info='d8-screen'>
+            <circle cx="600" cy="260" r="8" fill="#059669"/>
+            <text x="600" y="290" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#059669">Screening</text>
+          </g>
+          <g class="station" data-info='d8-dil'>
+            <circle cx="690" cy="260" r="10" fill="#ffffff" stroke="#059669" stroke-width="4"/>
+            <text x="690" y="238" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#0f172a">Diligence</text>
+          </g>
+          <g class="station" data-info='d8-winners'>
+            <circle cx="780" cy="260" r="14" fill="#059669" stroke="#ffffff" stroke-width="3"/>
+            <text x="780" y="264" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#ffffff">★</text>
+            <text x="780" y="290" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#059669">Winners</text>
+          </g>
+          <g class="station" data-info='d8-invest'>
+            <circle cx="960" cy="260" r="12" fill="#ffffff" stroke="#059669" stroke-width="4"/>
+            <text x="960" y="238" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#0f172a">Investment window</text>
+          </g>
+        </g>
+
+        <!-- ============ LANE 4: EVENTS (y=340) ============ -->
+        <g>
+          <polyline points="30,340 1130,340" fill="none" stroke="#e11d48" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 6" opacity="0.55"/>
+          <text x="10" y="345" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#e11d48">EV</text>
+        </g>
+        <g filter="url(#stshadow)">
+          <g class="station" data-info='ev-sf'>
+            <circle cx="330" cy="340" r="12" fill="#e11d48" stroke="#ffffff" stroke-width="3"/>
+            <text x="330" y="370" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#e11d48">SF Climate Week</text>
+          </g>
+          <g class="station" data-info='ev-pnw'>
+            <circle cx="600" cy="340" r="12" fill="#e11d48" stroke="#ffffff" stroke-width="3"/>
+            <text x="600" y="370" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#e11d48">PNW Climate Week</text>
+          </g>
+          <g class="station" data-info='ev-ny'>
+            <circle cx="780" cy="340" r="12" fill="#e11d48" stroke="#ffffff" stroke-width="3"/>
+            <text x="780" y="370" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#e11d48">NY Climate Week</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <div class="hint">Click any month tab (or station) to see what happens that month and how much time to expect.</div>
+  </div>
+
+  <!-- MONTHLY DETAIL POP-OUT -->
+  <div id="detail-container"></div>
+
+  <div class="footer">
+    Built from the E8 Member Handbook, Summer 2026. Solid lines = active periods · dashed = quieter periods · Events lane surfaces the three big climate-week gatherings · ★ = signature event.
+  </div>
+</div>
+
+<script>
+const MONTHS_FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+/* ---------- REAL 2026 CALENDAR DATES ---------- */
+/* Returns the nth occurrence of a weekday in year/month. weekday: 0=Sun..6=Sat, n:1..5 */
+function nthWeekday(year, month, weekday, n){
+  const first = new Date(year, month, 1);
+  const offset = (weekday - first.getDay() + 7) % 7;
+  const d = new Date(year, month, 1 + offset + (n-1)*7);
+  return d;
+}
+function fmt(d){ return d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' }); }
+function fmtShort(d){ return d.toLocaleDateString('en-US', { month:'short', day:'numeric' }); }
+function screeningDate(m){ return fmt(nthWeekday(2026, m, 2, 3)); }  /* 3rd Tue */
+function memberMtgDate(m){ return fmt(nthWeekday(2026, m, 4, 4)); }  /* 4th Thu */
+function followUpMon(m){ return fmtShort(nthWeekday(2026, m, 1, 1)); }/* 1st Mon */
+function followUpTue(m){ return fmtShort(nthWeekday(2026, m, 2, 1)); }/* 1st Tue */
+
+/* Portal links (placeholders — swap to real URLs when known) */
+const LINKS = {
+  memberMeeting:  "https://app.e8angels.com/events/next-member-meeting",
+  followUpCall:   "https://app.e8angels.com/events/next-follow-up",
+  investInterest: "https://app.e8angels.com/deals/investment-interest",
+  smallGroup:     "https://app.e8angels.com/fund/small-groups"
+};
+
+/* In-season rhythm for a given month, with real dates + CTAs */
+function rhythmFor(m){
+  return [
+    {
+      icon:"rp", title:"Screening Committee",
+      when:`${screeningDate(m)} · 9:00–11:00 am PT`,
+      desc:"Reviews the top 10–12 startup applications. All members welcome — expect 4–6 hours of pre-work reviewing applications and pitch videos.",
+      cta:null
+    },
+    {
+      icon:"rp", title:"Member Meeting",
+      when:`${memberMtgDate(m)} · 10:00 am – 12:30 pm PT`,
+      desc:"3 new companies and 2 returning companies pitch. Join live (recordings available). Come prepared to listen, ask questions, and share whether you'd like to see the company move to diligence — and take part if you have capacity.",
+      cta:{label:"Join Member Meeting", href:LINKS.memberMeeting, cls:"rp"}
+    },
+    {
+      icon:"rp", title:"Follow-Up Calls",
+      when:`Week of ${followUpMon(m)} / ${followUpTue(m)} · mornings`,
+      desc:"Kick-off calls for each company advancing to diligence. Held first Monday and Tuesday of the month to launch the next 4-week diligence cycle.",
+      cta:{label:"Join Follow Up Call", href:LINKS.followUpCall, cls:"rp"}
+    },
+    {
+      icon:"dil", title:"If you're on a diligence team",
+      when:"4-week window · ~4–8 hrs / week",
+      desc:"Weekly internal calls, customer and company conversations, and sharing findings at the E8 Diligence Wrap conversation.",
+      cta:null
+    },
+    {
+      icon:"af", title:"If you're a Fund Member",
+      when:"~25 votes per year · 1–3 hrs each",
+      desc:`For each vote, expect to read the diligence report and attend or listen to the wrap conversation. Small-group review sessions are available — <a href="${LINKS.smallGroup}">join a small group</a>.`,
+      cta:{label:"Add Investment Interest", href:LINKS.investInterest, cls:"af"}
+    }
+  ];
+}
+
+/* Per-month highlights — noteworthy items for each lane */
+const MONTHS = {
+  0: { tag:"in-season", highlights: [
+    { lane:"rp", txt:"Investing season is in full swing — Screening Committee, Member Meeting and Follow-Up Calls all run this month." },
+    { lane:"af", txt:"<b>Annual Fund sign-up opens.</b> Members and sponsors can join for the year — $25K minimum. Decisions collectively via Fund Member vote." },
+    { lane:"d8", txt:"Off-cycle. D8 kicks off again in April." }
+  ]},
+  1: { tag:"in-season", highlights: [
+    { lane:"rp", txt:"Screening Committee, Member Meeting and Follow-Up Calls run as usual." },
+    { lane:"af", txt:"Rolling Fund votes as new diligences complete." },
+    { lane:"d8", txt:"Off-cycle." }
+  ]},
+  2: { tag:"in-season", highlights: [
+    { lane:"rp", txt:"Screening Committee, Member Meeting and Follow-Up Calls run as usual." },
+    { lane:"af", txt:"Rolling Fund votes." },
+    { lane:"d8", txt:"Off-cycle." }
+  ]},
+  3: { tag:"in-season", special:"SF Climate Week", highlights: [
+    { lane:"rp", txt:"Screening Committee, Member Meeting and Follow-Up Calls run as usual." },
+    { lane:"af", txt:"Rolling Fund votes." },
+    { lane:"d8", txt:"<b>Decarbon8 applications open.</b> Interested in the screening committee? Reach out to staff." },
+    { lane:"ev", txt:"<b>San Francisco Climate Week.</b> E8 hosts a founder event and members join the broader ecosystem gathering — a strong sourcing and relationship-building week." }
+  ]},
+  4: { tag:"in-season", special:"Season ends", highlights: [
+    { lane:"rp", txt:"<b>Last Member Meeting of the season.</b> Portfolio Showcase in Seattle." },
+    { lane:"af", txt:"Rolling Fund votes." },
+    { lane:"d8", txt:"D8 applications window open." }
+  ]},
+  5: { tag:"summer", highlights: [
+    { lane:"rp", txt:"Summer break — no Member Meeting. Weekly newsletter continues; a Learning Lab may still run." },
+    { lane:"af", txt:"Portfolio review; no new votes." },
+    { lane:"d8", txt:"<b>Applications close mid-June.</b> Screening committee ramps up." }
+  ]},
+  6: { tag:"summer", special:"PNW Climate Week", highlights: [
+    { lane:"rp", txt:"Summer — weekly newsletter continues." },
+    { lane:"af", txt:"Off-season." },
+    { lane:"d8", txt:"<b>Member screening committee</b> reviews the D8 cohort and scores applications." },
+    { lane:"ev", txt:"<b>Pacific Northwest Climate Week.</b> E8's home turf — members gather locally and E8 participates in and hosts sessions." }
+  ]},
+  7: { tag:"summer", highlights: [
+    { lane:"rp", txt:"Prep for the new season. Weekly newsletter continues." },
+    { lane:"af", txt:"Off-season." },
+    { lane:"d8", txt:"<b>D8 diligence.</b> Diligence teams review the shortlisted D8 finalists ahead of the September announcement — expect a compressed 3–4 week diligence sprint." }
+  ]},
+  8: { tag:"in-season", special:"Season begins · NY Climate Week", highlights: [
+    { lane:"rp", txt:"<b>Member Meetings and Learning Labs resume.</b> Screening Committee, Member Meeting and Follow-Up Calls all restart." },
+    { lane:"af", txt:"New investing season — Fund votes reopen as new diligences complete." },
+    { lane:"d8", txt:"<b>Winners announced 🏆.</b> Co-invest window opens for members." },
+    { lane:"ev", txt:"<b>New York Climate Week.</b> Biggest global climate-tech gathering — E8 members attend, connect with VCs and founders, and events run under the E8 banner." }
+  ]},
+  9: { tag:"in-season", special:"Annual Meeting", highlights: [
+    { lane:"rp", txt:"Full-season cadence continues. <b>Annual Meeting 📊</b> takes place this Fall." },
+    { lane:"af", txt:"Peak voting month as the new-season pipeline hits full stride." },
+    { lane:"d8", txt:"D8 investment window open." }
+  ]},
+  10:{ tag:"in-season", highlights: [
+    { lane:"rp", txt:"Screening Committee, Member Meeting and Follow-Up Calls run as usual." },
+    { lane:"af", txt:"Voting continues." },
+    { lane:"d8", txt:"D8 investment window closes." }
+  ]},
+  11:{ tag:"skip", highlights: [
+    { lane:"rp", txt:"<b>No Member Meeting.</b> A Learning Lab may run. Weekly newsletter continues." },
+    { lane:"af", txt:"Year-end voting and wrap-up." },
+    { lane:"d8", txt:"Closed for the year." }
+  ]}
+};
+
+/* Station → month map */
+const STATION_TO_MONTH = {
+  'rp-season-end':4, 'rp-season-start':8, 'rp-annual':9, 'rp-skip':11,
+  'af-jan':0, 'af-vote':4, 'af-annual':9,
+  'd8-apps':3, 'd8-close':5, 'd8-screen':6, 'd8-dil':7, 'd8-winners':8, 'd8-invest':9,
+  'ev-sf':3, 'ev-pnw':6, 'ev-ny':8
+};
+
+function laneMeta(k){
+  return {
+    rp:{name:"Regular Programming", cls:"rp"},
+    af:{name:"Annual Fund", cls:"af"},
+    d8:{name:"Decarbon8", cls:"d8"},
+    ev:{name:"Events", cls:"ev"}
+  }[k];
+}
+
+function tagPill(tag){
+  if(tag==="summer") return `<span class="dc-pill pill-summer">Summer break</span>`;
+  if(tag==="skip") return `<span class="dc-pill pill-skip">No Member Meeting</span>`;
+  return `<span class="dc-pill pill-inseason">In season</span>`;
+}
+
+function ctaHtml(cta){
+  if(!cta) return "";
+  return `<a class="cta-btn ${cta.cls||''}" href="${cta.href}" target="_blank" rel="noopener">${cta.label}</a>`;
+}
+
+function renderMonth(m){
+  const cfg = MONTHS[m];
+  const container = document.getElementById('detail-container');
+  const highlightsHtml = cfg.highlights.map(h=>{
+    const meta = laneMeta(h.lane);
+    return `<div class="side-item"><div class="si-label"><span class="si-dot ${meta.cls}"></span>${meta.name}</div><div class="si-body">${h.txt}</div></div>`;
+  }).join('');
+  const rhythmHtml = cfg.tag==="in-season"
+    ? rhythmFor(m).map(r=>`
+        <div class="rhythm-row">
+          <div class="rhythm-icon r-icon-${r.icon}">${r.icon==="dil"?"DIL":r.icon.toUpperCase()}</div>
+          <div>
+            <div class="rhythm-title">${r.title}</div>
+            <div class="rhythm-when">${r.when}</div>
+            <div class="rhythm-desc">${r.desc}</div>
+            ${ctaHtml(r.cta)}
+          </div>
+        </div>`).join('')
+    : `<div style="font-size:13px;color:#cbd5e1;line-height:1.6">
+        ${cfg.tag==="summer"
+          ? "This is a quieter month for Regular Programming — Screening Committee, Member Meetings and Follow-Up Calls pause. Decarbon8 and the events lane stay busy through the summer."
+          : "The December Member Meeting is skipped. Fund votes and the newsletter continue; a Learning Lab may still run."}
+      </div>`;
+  const specialPill = cfg.special ? `<span class="dc-pill pill-highlight">${cfg.special}</span>` : '';
+  container.innerHTML = `
+    <div class="detail-card" id="detail">
+      <button class="close-btn" onclick="closeDetail()" title="Close">✕</button>
+      <div class="dc-head">
+        <div>
+          <div class="dc-h-label">You clicked</div>
+          <div class="dc-h-month">${MONTHS_FULL[m]}</div>
+        </div>
+        <div class="dc-h-pills">${tagPill(cfg.tag)}${specialPill}</div>
+      </div>
+      <div class="dc-grid">
+        <div class="dc-col">
+          <div class="dc-h3">Your monthly rhythm (${MONTHS_FULL[m]} 2026)</div>
+          ${rhythmHtml}
+        </div>
+        <div class="dc-col side">
+          <div class="dc-h3">What's happening in each program</div>
+          ${highlightsHtml}
+        </div>
+      </div>
+    </div>`;
+  document.querySelectorAll('.month-tab').forEach(el=>el.classList.toggle('active', +el.dataset.m===m));
+  setTimeout(()=>{
+    const el = document.getElementById('detail');
+    if(el) el.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }, 50);
+}
+
+function closeDetail(){
+  document.getElementById('detail-container').innerHTML = '';
+  document.querySelectorAll('.month-tab').forEach(el=>el.classList.remove('active'));
+}
+
+document.querySelectorAll('.month-tab').forEach(el=>{
+  el.addEventListener('click',()=>renderMonth(+el.dataset.m));
+});
+document.querySelectorAll('.station').forEach(el=>{
+  el.addEventListener('click',()=>{
+    const info = el.dataset.info;
+    const m = STATION_TO_MONTH[info];
+    if(m!==undefined) renderMonth(m);
+  });
+});
+
+/* Default view: September (start of season, D8 winners, NY Climate Week — richest month) */
+renderMonth(8);
+</script>
+</body>
+</html>
