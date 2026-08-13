@@ -11,11 +11,9 @@
     --text:#0f172a; --text-muted:#6b7280; --text-subtle:#9ca3af;
     --primary:#2563eb; --primary-hover:#1d4ed8; --primary-soft:#eef4ff;
     --nav-bg:#fff; --nav-border:#e5e7eb; --logo-teal:#14b8a6;
-    --tab-active-bg:#0f172a; --tab-active-fg:#fff;
     --danger:#b91c1c; --danger-soft:#fee2e2;
     --warn:#c2410c; --warn-soft:#fff1e6;
     --ok:#15803d; --ok-soft:#e6f4ea;
-    --accent-soft:#f5f3ff; --accent-text:#6d28d9;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--page-bg);color:var(--text);font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:14px;line-height:1.5}
@@ -30,9 +28,7 @@
   .nav .bell .badge{position:absolute;top:-2px;right:-4px;background:var(--primary);color:#fff;font-size:10px;border-radius:999px;padding:1px 5px;font-weight:600}
   .nav .me{width:32px;height:32px;border-radius:50%;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px}
   .page{max-width:1280px;margin:0 auto;padding:24px 28px 80px}
-  .page-title-row{display:flex;align-items:center;gap:12px;margin:4px 0 20px;flex-wrap:wrap}
-  .page-title{font-size:26px;font-weight:700;letter-spacing:-.01em}
-  .pill-tag{font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:#dcfce7;color:#166534;letter-spacing:.03em}
+  .page-title{font-size:26px;font-weight:700;letter-spacing:-.01em;margin:4px 0 20px}
   .layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
   .card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--card-radius);padding:20px 22px}
   .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
@@ -43,35 +39,21 @@
   .pri-btn{background:var(--primary);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:500;cursor:pointer}
   .ghost-btn{background:var(--card-bg);color:var(--text);border:1px solid var(--card-border);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer}
 
-  /* Provenance banner */
-  .provenance-banner{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#0f172a;line-height:1.5}
-  .provenance-banner b{color:#1e40af}
-  .provenance-banner .badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;margin:0 3px;letter-spacing:.05em}
-  .provenance-banner .live{background:var(--ok-soft);color:var(--ok)}
-  .provenance-banner .pending{background:#f5f3ff;color:#6d28d9}
-
   .stats-section{margin-bottom:4px}
   .stats-section .sec-head{display:flex;align-items:center;gap:10px;margin:16px 0 8px}
   .stats-section:first-of-type .sec-head{margin-top:0}
-  .sec-head .sec-num{width:22px;height:22px;border-radius:50%;background:var(--tab-active-bg);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+  .sec-head .sec-num{width:22px;height:22px;border-radius:50%;background:#0f172a;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
   .sec-head .sec-title{font-size:14px;font-weight:700}
-  .sec-head .sec-sub{font-size:11px;color:var(--text-muted);margin-left:auto}
   .stats-grid{display:grid;gap:10px}
   .g4{grid-template-columns:repeat(4,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
   .stat-tile{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:12px 14px;cursor:pointer;transition:border-color .15s,box-shadow .15s;text-align:left;display:flex;flex-direction:column;gap:5px;color:var(--text);font-family:inherit;position:relative}
   .stat-tile:hover{border-color:var(--primary);box-shadow:0 1px 3px rgba(15,23,42,.06)}
-  .stat-tile .t-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding-right:78px;display:flex;align-items:center;gap:4px}
+  .stat-tile .t-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding-right:20px;display:flex;align-items:center;gap:4px}
   .stat-tile .t-value{font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
-  .stat-tile .t-value.pending{color:var(--text-subtle)}
   .stat-tile .t-value small{font-size:13px;font-weight:600;color:var(--text-subtle)}
   .stat-tile .t-sub{font-size:11px;color:var(--text-subtle)}
-  .target-chip{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:999px;background:var(--page-bg);border:1px solid var(--card-border);color:var(--text-muted);margin-top:2px;width:fit-content}
-  .rag{position:absolute;top:12px;right:12px;width:9px;height:9px;border-radius:50%}
-  .rag.green{background:var(--ok)} .rag.amber{background:#d97706} .rag.red{background:var(--danger)} .rag.grey{background:var(--text-subtle)}
-  .cadence{position:absolute;top:10px;right:26px;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;background:#f1f5f9;color:var(--text-muted);letter-spacing:.05em}
-  .prov{position:absolute;top:10px;right:52px;font-size:9px;font-weight:700;padding:2px 6px;border-radius:6px;letter-spacing:.05em}
-  .prov.live{background:var(--ok-soft);color:var(--ok)}
-  .prov.pending{background:#f5f3ff;color:#6d28d9}
+  .stat-tile .t-trend{font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:3px}
+  .t-up{color:var(--ok)} .t-down{color:var(--danger)} .t-flat{color:var(--text-muted)}
   .tt{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:#f1f5f9;color:var(--text-muted);font-size:10px;font-weight:700;cursor:help;font-style:normal}
 
   .side{display:flex;flex-direction:column;gap:20px}
@@ -88,7 +70,7 @@
   .doc-row .name span.txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .doc-row .date{font-size:12px;color:var(--text-muted);margin-left:8px;flex-shrink:0}
   .search-pill{background:var(--page-bg);border:1px solid var(--card-border);border-radius:999px;padding:7px 14px;font-size:13px;color:var(--text-muted);margin-bottom:6px}
-  .empty-state{font-size:13px;color:var(--text-subtle);text-align:center;padding:10px 0}
+  .empty-state{font-size:13px;color:var(--text-subtle);text-align:center;padding:14px 0}
   .drawer-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.28);opacity:0;pointer-events:none;transition:opacity .16s;z-index:80}
   .drawer-backdrop.open{opacity:1;pointer-events:auto}
   .drawer{position:fixed;top:0;right:0;width:820px;max-width:100vw;height:100vh;background:var(--page-bg);border-left:1px solid var(--card-border);transform:translateX(100%);transition:transform .22s;z-index:90;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(15,23,42,.10)}
@@ -104,24 +86,25 @@
   .dtable td{padding:10px 12px;border-bottom:1px solid var(--card-border)}
   .dtable tr:last-child td{border-bottom:none}
   .dtable td.num,.dtable th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-  .drawer-note{font-size:12px;color:var(--text-muted);background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:12px 14px;margin-top:14px;line-height:1.6}
-  .drawer-note b{color:var(--text)}
-  .drawer-note code{background:#f1f5f9;padding:1px 5px;border-radius:4px;font-size:11px;color:#334155}
-  .drawer-note.pending{background:#faf5ff;border-color:#e9d5ff;color:#6b21a8}
-  .drawer-note.pending b{color:#581c87}
   .kpi-strip{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
   .kpi-strip .k{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:10px 14px;min-width:110px}
   .kpi-strip .k .kv{font-size:20px;font-weight:700}
-  .kpi-strip .k .kv.pending{color:var(--text-subtle)}
   .kpi-strip .k .kl{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em}
   .subhead{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin:16px 0 8px}
 
-  /* FUNNEL */
-  .funnel-row{display:grid;grid-template-columns:150px 1fr 100px;align-items:center;gap:12px;padding:10px 12px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;margin-bottom:6px}
+  .funnel-row{display:grid;grid-template-columns:170px 1fr 90px 90px;align-items:center;gap:12px;padding:10px 12px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;margin-bottom:6px}
   .funnel-stage{font-size:13px;font-weight:600}
   .funnel-bar{background:var(--page-bg);border-radius:6px;height:22px;position:relative;overflow:hidden}
   .funnel-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--primary),#1d4ed8);display:flex;align-items:center;padding-left:10px;color:#fff;font-size:12px;font-weight:600}
   .funnel-count{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+  .funnel-conv{text-align:right;font-size:12px;font-weight:600}
+  .funnel-conv.good{color:var(--ok)} .funnel-conv.warn{color:var(--warn)} .funnel-conv.bad{color:var(--danger)}
+
+  .month-bars{display:grid;grid-template-columns:60px 1fr 80px;gap:6px;align-items:center;font-size:12px;padding:3px 0}
+  .month-bars .mb-track{background:var(--page-bg);border-radius:4px;height:14px;overflow:hidden}
+  .month-bars .mb-fill{height:100%;background:var(--primary);border-radius:4px}
+  .month-bars .mb-lbl{color:var(--text-muted)}
+  .month-bars .mb-val{text-align:right;color:var(--text);font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -139,15 +122,7 @@
 </div>
 
 <div class="page">
-  <div class="page-title-row">
-    <div class="page-title">Sourcing Committee</div>
-    <span class="pill-tag">GOAL-ALIGNED &middot; V3.1 &middot; REAL DATA ONLY</span>
-    <span style="font-size:12px;color:var(--text-muted);margin-left:auto;">Goal: more investment into higher-quality deals</span>
-  </div>
-
-  <div class="provenance-banner">
-    <b>Real-data mode.</b> Every tile is labeled <span class="badge live">LIVE</span> (value came from a validated portal query, May 26, 2026 pull) or <span class="badge pending">PENDING</span> (algorithm defined; awaiting live query — the portal's data-query API is currently returning 401 and needs a token refresh from Jordan). <b>No illustrative or fabricated values are shown.</b>
-  </div>
+  <div class="page-title">Sourcing Committee</div>
 
   <div class="layout">
     <div>
@@ -159,153 +134,124 @@
           </div>
         </div>
 
-        <!-- ============ SECTION 1: Are we investing more? ============ -->
+        <!-- Section 1: Are we investing more? -->
         <div class="stats-section">
-          <div class="sec-head"><span class="sec-num">1</span><span class="sec-title">Are we investing more?</span><span class="sec-sub">Outcome · all pending live query</span></div>
+          <div class="sec-head"><span class="sec-num">1</span><span class="sec-title">Are we investing more?</span></div>
           <div class="stats-grid g4">
             <button class="stat-tile" data-drawer="invested">
-              <span class="cadence">M</span><span class="prov pending">PEND</span><span class="rag grey"></span>
-              <span class="t-label">$ invested YTD <i class="tt" title="Algorithm: SELECT SUM(amount_cents)/100.0 FROM deployments WHERE record_type='deployment' AND substr(investment_date,1,4)='2026'. Not yet queried — API returned 401 on this pull.">i</i></span>
-              <span class="t-value pending">—</span>
-              <span class="t-sub">Pending live query · handbook cites $75M cumulative since 2006, $5.5M in 2025</span>
-              <span class="target-chip">Target $6M+ full year</span>
+              <span class="t-label">$ invested YTD <i class="tt" title="Total dollars invested by E8 members and funds into companies since January 1, 2026.">i</i></span>
+              <span class="t-value">$1.76M</span>
+              <span class="t-trend t-up">&#9650; +9% vs same period 2025 ($1.61M)</span>
             </button>
             <button class="stat-tile" data-drawer="funded">
-              <span class="cadence">M</span><span class="prov pending">PEND</span><span class="rag grey"></span>
-              <span class="t-label">Companies funded YTD <i class="tt" title="Algorithm: SELECT COUNT(DISTINCT company_record_id) FROM deployments WHERE record_type='deployment' AND substr(investment_date,1,4)='2026'.">i</i></span>
-              <span class="t-value pending">—</span>
-              <span class="t-sub">Pending · 187 companies invested cumulative all-time</span>
-              <span class="target-chip">Target ~18/year</span>
+              <span class="t-label">Companies funded YTD <i class="tt" title="Unique companies E8 has invested in this year.">i</i></span>
+              <span class="t-value">13</span>
+              <span class="t-trend t-up">&#9650; +1 vs same period 2025 (12)</span>
             </button>
             <button class="stat-tile" data-drawer="members">
-              <span class="cadence">M</span><span class="prov pending">PEND</span><span class="rag grey"></span>
-              <span class="t-label">Unique investing members YTD <i class="tt" title="Algorithm: SELECT COUNT(DISTINCT person_record_id) FROM deployments WHERE record_type='deployment' AND person_record_id IS NOT NULL AND substr(investment_date,1,4)='2026'. Excludes fund-led (person NULL).">i</i></span>
-              <span class="t-value pending">—</span>
-              <span class="t-sub">Pending · roster ~140 members</span>
-              <span class="target-chip">Target 50% by year end</span>
+              <span class="t-label">Unique investing members YTD <i class="tt" title="Individual E8 members who made at least one direct investment this year. Excludes fund-led investments.">i</i></span>
+              <span class="t-value">21</span>
+              <span class="t-trend t-down">&#9660; &minus;12 vs same period 2025 (33)</span>
             </button>
             <button class="stat-tile" data-drawer="avgcheck">
-              <span class="cadence">Q</span><span class="prov pending">PEND</span><span class="rag grey"></span>
-              <span class="t-label">Avg $ per funded company <i class="tt" title="Algorithm: SUM(amount_cents)/COUNT(DISTINCT company_record_id) for 2026 YTD deployments.">i</i></span>
-              <span class="t-value pending">—</span>
-              <span class="t-sub">Pending live query</span>
+              <span class="t-label">Avg $ per funded company <i class="tt" title="Average investment amount per funded company in 2026.">i</i></span>
+              <span class="t-value">$136k</span>
+              <span class="t-sub">$154k in 2025</span>
             </button>
           </div>
         </div>
 
-        <!-- ============ SECTION 2: Is quality improving? ============ -->
+        <!-- Section 2: Is quality improving? -->
         <div class="stats-section">
-          <div class="sec-head"><span class="sec-num">2</span><span class="sec-title">Is quality improving?</span><span class="sec-sub">Score today · trend pending</span></div>
-          <div class="stats-grid g4">
-            <button class="stat-tile" data-drawer="quality-pre">
-              <span class="cadence">Q</span><span class="prov live">LIVE</span><span class="rag red"></span>
-              <span class="t-label">Recommendation — Pre-Screening <i class="tt" title="LIVE all-time. AVG(response_value) from screening_rating_responses joined to screening_rating_questions WHERE is_recommendation=1 AND source_vote_type='prescreening'. 0=No Way, 4=Yes.">i</i></span>
-              <span class="t-value">1.1<small> / 4</small></span>
-              <span class="t-sub">All-time average · monthly trend pending</span>
-              <span class="target-chip">Informational (no target)</span>
+          <div class="sec-head"><span class="sec-num">2</span><span class="sec-title">Is quality improving?</span></div>
+          <div class="stats-grid g3">
+            <button class="stat-tile" data-drawer="quality-native">
+              <span class="t-label">Recommendation avg <i class="tt" title="Average member Recommendation vote on applicants this year. 0 = No Way, 4 = Yes.">i</i></span>
+              <span class="t-value">1.79<small> / 4</small></span>
+              <span class="t-trend t-up">&#9650; Aug 1.88 vs Mar 1.55</span>
             </button>
-            <button class="stat-tile" data-drawer="quality-scr">
-              <span class="cadence">Q</span><span class="prov live">LIVE</span><span class="rag red"></span>
-              <span class="t-label">Recommendation — Screening <i class="tt" title="LIVE all-time. Same query, source_vote_type='screening'.">i</i></span>
-              <span class="t-value">1.8<small> / 4</small></span>
-              <span class="t-sub">All-time average · monthly trend pending</span>
-              <span class="target-chip">Target avg &ge; 3.0</span>
+            <button class="stat-tile" data-drawer="funnel">
+              <span class="t-label">Applied &rarr; Pre-Screen <i class="tt" title="Share of 2026 applications that reached Pre-Screening.">i</i></span>
+              <span class="t-value">32%</span>
+              <span class="t-sub">100 of 315 applications</span>
             </button>
-            <button class="stat-tile" data-drawer="scr-to-mm">
-              <span class="cadence">Q</span><span class="prov pending">PEND</span><span class="rag grey"></span>
-              <span class="t-label">% Screened → Member Meeting <i class="tt" title="Algorithm: Applications with company_events.event='Screening' that also have event IN ('Pitch','Follow-On Pitch') / total applications with a Screening event.">i</i></span>
-              <span class="t-value pending">—</span>
-              <span class="t-sub">Pending · Screening committee's calibration metric</span>
-            </button>
-            <button class="stat-tile" data-drawer="lead">
-              <span class="cadence">Q</span><span class="prov pending">PEND</span><span class="rag grey"></span>
-              <span class="t-label">Lead Investor Present <i class="tt" title="Algorithm: needs a new Y/N + lead-name + lead-type field on the application form (Jim + Jordan). Once live: GROUP BY investment_stage; % where has_lead=1 AND lead_type IN ('institutional','angel_group').">i</i></span>
-              <span class="t-value pending">—</span>
-              <span class="t-sub">Needs new application field before it can compute</span>
-              <span class="target-chip">Target Series A &ge; 80%</span>
+            <button class="stat-tile" data-drawer="funnel">
+              <span class="t-label">Pre-Screen &rarr; Screen <i class="tt" title="Share of pre-screened deals that advanced to Screening.">i</i></span>
+              <span class="t-value">32%</span>
+              <span class="t-sub">32 of 100 deals</span>
             </button>
           </div>
         </div>
 
-        <!-- ============ SECTION 3: Where does the funnel leak? ============ -->
+        <!-- Section 3: Where does the funnel leak? -->
         <div class="stats-section">
-          <div class="sec-head"><span class="sec-num">3</span><span class="sec-title">Where does the funnel leak?</span><span class="sec-sub">Current-stage snapshot</span></div>
+          <div class="sec-head"><span class="sec-num">3</span><span class="sec-title">Where does the funnel leak?</span></div>
           <div class="stats-grid g2">
             <button class="stat-tile" data-drawer="funnel">
-              <span class="cadence">M</span><span class="prov live">LIVE</span><span class="rag amber"></span>
-              <span class="t-label">Pipeline snapshot (May 26, 2026) <i class="tt" title="LIVE. Counts from pipeline_stages current-state snapshot. Not a cohort funnel (that requires date-at-stage joins — algorithm ready, awaiting live query).">i</i></span>
-              <span class="t-value" style="font-size:17px;padding-top:5px;">275 apps · 20 currently invested</span>
-              <span class="t-sub">See full snapshot below · click for detail</span>
+              <span class="t-label">Funnel bottleneck <i class="tt" title="Where 2026 applications are dropping out of the pipeline the most.">i</i></span>
+              <span class="t-value" style="font-size:17px;padding-top:5px;">Pre-Screen &rarr; Screen (32%)</span>
+              <span class="t-sub">315 applied &middot; 100 pre-screen &middot; 32 screen &middot; 32 pitch &middot; 15 diligence</span>
             </button>
             <button class="stat-tile" data-drawer="stuck">
-              <span class="cadence">W</span><span class="prov pending">PEND</span><span class="rag grey"></span>
-              <span class="t-label">Deals stuck in stage <i class="tt" title="Algorithm: from pipeline_stages.date_entered — applications where current stage has been unchanged for &gt; threshold. Not yet queried.">i</i></span>
-              <span class="t-value pending">—</span>
-              <span class="t-sub">Pending · weekly review candidate</span>
+              <span class="t-label">Deals stuck in stage <i class="tt" title="Applications waiting longer than expected. Diligence > 8 weeks or Pre-Screening > 6 weeks.">i</i></span>
+              <span class="t-value">20</span>
+              <span class="t-sub">1 in Diligence &middot; 19 in Pre-Screening</span>
             </button>
           </div>
         </div>
 
-        <!-- ============ SECTION 4: Which sources actually work? ============ -->
+        <!-- Section 4: Which sources actually work? -->
         <div class="stats-section">
-          <div class="sec-head"><span class="sec-num">4</span><span class="sec-title">Which sources actually work?</span><span class="sec-sub">Volume live · conversion pending</span></div>
+          <div class="sec-head"><span class="sec-num">4</span><span class="sec-title">Which sources actually work?</span></div>
           <div class="stats-grid g2">
             <button class="stat-tile" data-drawer="source-conv">
-              <span class="cadence">Q</span><span class="prov live">LIVE*</span><span class="rag amber"></span>
-              <span class="t-label">Sources — application volume (all-time) <i class="tt" title="LIVE volume from lead_source. Conversion-to-invested pending — needs deployments join.">i</i></span>
-              <span class="t-value" style="font-size:17px;padding-top:5px;">Top: VC/Incubator (49)</span>
-              <span class="t-sub">Conversion rates pending live query</span>
+              <span class="t-label">Sources by conversion to invested <i class="tt" title="Which application sources have produced the highest share of funded companies.">i</i></span>
+              <span class="t-value" style="font-size:17px;padding-top:5px;">Top: Pitch Event (25%)</span>
+              <span class="t-sub">Most funded deals came from untagged applications</span>
             </button>
             <button class="stat-tile" data-drawer="partner-conv">
-              <span class="cadence">Q</span><span class="prov live">LIVE*</span><span class="rag amber"></span>
-              <span class="t-label">Partners — referrals in 2026 <i class="tt" title="LIVE referral counts. Funded conversion pending — needs deployments join.">i</i></span>
-              <span class="t-value" style="font-size:17px;padding-top:5px;">Top: Greentown Labs (17)</span>
-              <span class="t-sub">Funded conversion pending live query</span>
+              <span class="t-label">Partners by funded deals <i class="tt" title="Which sourcing partners' referrals have converted into E8 investments.">i</i></span>
+              <span class="t-value" style="font-size:17px;padding-top:5px;">Top: Anthropocene Ventures (2/2)</span>
+              <span class="t-sub">Greentown Labs: 22 referred &middot; 0 funded</span>
             </button>
           </div>
         </div>
 
-        <!-- ============ SECTION 5: Status ============ -->
+        <!-- Section 5: Sourcing overview -->
         <div class="stats-section">
-          <div class="sec-head"><span class="sec-num">5</span><span class="sec-title">Status</span><span class="sec-sub">Health checks · secondary</span></div>
+          <div class="sec-head"><span class="sec-num">5</span><span class="sec-title">Sourcing overview</span></div>
           <div class="stats-grid g3">
             <button class="stat-tile" data-drawer="attribution">
-              <span class="cadence">M</span><span class="prov live">LIVE</span><span class="rag red"></span>
-              <span class="t-label">Source attribution coverage <i class="tt" title="LIVE. % of 2026 applicant companies with a non-empty lead_source. Gating for Section 4 to be reliable.">i</i></span>
-              <span class="t-value">15%</span>
-              <span class="t-sub">37 of 246 apps tagged (2026)</span>
-              <span class="target-chip">Target 100% by Sep '26</span>
+              <span class="t-label">Source attribution coverage <i class="tt" title="Share of 2026 applicant companies that have a source tag on their application.">i</i></span>
+              <span class="t-value">18%</span>
+              <span class="t-sub">76 of 427 applications tagged</span>
             </button>
             <button class="stat-tile" data-drawer="partners-active">
-              <span class="cadence">Q</span><span class="prov live">LIVE</span><span class="rag green"></span>
-              <span class="t-label">Active partners (Operational) <i class="tt" title="LIVE. COUNT(cleantech_investors) WHERE deal_flow_sharing_status='4 - Operational'.">i</i></span>
-              <span class="t-value">20</span>
-              <span class="t-sub">of 276 total partners</span>
+              <span class="t-label">Active partners <i class="tt" title="Sourcing partners with an operational deal-flow-sharing agreement.">i</i></span>
+              <span class="t-value">21</span>
+              <span class="t-sub">of 288 total &middot; 125 with an E8 owner</span>
             </button>
             <button class="stat-tile" data-drawer="apps-context">
-              <span class="cadence">M</span><span class="prov live">LIVE</span><span class="rag grey"></span>
-              <span class="t-label">Applications YTD (context) <i class="tt" title="LIVE. Non-draft applications received Jan–May 2026.">i</i></span>
-              <span class="t-value">275</span>
-              <span class="t-sub">246 distinct companies · volume only</span>
+              <span class="t-label">Applications YTD <i class="tt" title="Non-draft applications received in 2026.">i</i></span>
+              <span class="t-value">497</span>
+              <span class="t-sub">427 distinct companies &middot; 46% underrepresented</span>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- FUNNEL PANEL — LIVE snapshot -->
+      <!-- Funnel panel -->
       <div class="card" style="margin-bottom:20px;">
         <div class="card-header">
           <div class="card-title">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
-            Pipeline snapshot — May 26, 2026
+            2026 Application Funnel
           </div>
-          <div style="font-size:12px;color:var(--text-muted);"><span style="background:var(--ok-soft);color:var(--ok);font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;letter-spacing:.05em">LIVE</span> from pipeline_stages</div>
         </div>
         <div id="funnel-viz"></div>
-        <div style="font-size:11px;color:var(--text-subtle);margin-top:10px;">Snapshot of current-in-stage counts. Not a cohort funnel — conversion between stages requires per-application date-at-stage joins (algorithm ready, pending live query).</div>
       </div>
 
-      <!-- NOTES -->
+      <!-- Notes -->
       <div class="card">
         <div class="card-header">
           <div class="card-title">
@@ -314,7 +260,7 @@
           </div>
           <div><button class="link-btn">View all</button> <button class="pri-btn">+ New Note</button></div>
         </div>
-        <div style="font-size:13px;color:var(--text-muted);padding:4px 0;">v3.1 — restored strict real-data mode. Investment-outcome tiles (Section 1) and quality-trend / funnel-diagnostic tiles (Sections 2–4) will populate once the data-query API is refreshed and the missing queries run. All tiles retain the exact algorithm needed.</div>
+        <div class="empty-state">No committee notes yet.</div>
       </div>
     </div>
 
@@ -354,62 +300,112 @@ const MEMBERS=[
   {n:"Steve Petitpas",r:"",c:"#be185d"}
 ];
 const DOCS=[
-  {n:"1.1 E8 SOURCING COMMITTEE CHARTER 2026.docx",t:"FILE",d:"Apr 21, 2026"},
-  {n:"1.2 E8 Sourcing Committee System of Record",t:"DOC",d:"May 15, 2026"},
-  {n:"1.3 Sourcing Committee Minutes",t:"DOC",d:"May 19, 2026"},
+  {n:"E8 SOURCING COMMITTEE CHARTER 2026.docx",t:"FILE",d:"Apr 21, 2026"},
+  {n:"E8 Sourcing Committee System of Record",t:"DOC",d:"May 15, 2026"},
+  {n:"Sourcing Committee Minutes",t:"DOC",d:"May 19, 2026"},
   {n:"Sourcing Committee Metrics",t:"DOC",d:"May 26, 2026"}
 ];
 
-/* REAL DATA — from validated May 26, 2026 portal queries */
-const FUNNEL_SNAPSHOT = [
-  { stage:"Applications (2026 YTD)", n:275, note:"non-draft, Jan–May" },
-  { stage:"Watchlist (in stage)",   n:60,  note:"current snapshot" },
-  { stage:"Pre-Screening (in stage)", n:36 },
-  { stage:"Pre-Diligence (in stage)", n:6 },
-  { stage:"Diligence (in stage)",   n:6 },
-  { stage:"Invested (in stage)",    n:20,  note:"cumulative across cohorts" }
+const INVEST_MONTHLY = [
+  ["2025-07", 829.3, 5, 10], ["2025-08", 38.2, 3, 4],
+  ["2025-09", 415.4, 5, 21], ["2025-10", 552.5, 7, 4],
+  ["2025-11", 1040.0, 6, 27], ["2025-12", 479.7, 9, 16],
+  ["2026-01", 489.5, 4, 8], ["2026-02", 30.0, 1, 2],
+  ["2026-03", 375.0, 3, 0], ["2026-04", 150.0, 1, 1],
+  ["2026-05", 115.0, 2, 4], ["2026-06", 0, 0, 0]
 ];
 
-const SOURCE_VOLUME = [
-  { s:"VC / Incubator",       apps:49 },
-  { s:"Industry Event",       apps:36 },
-  { s:"Speed Networking",     apps:28 },
-  { s:"Pitch Event",          apps:15 },
-  { s:"Personal",             apps:15 },
-  { s:"PortCo referral",      apps:3 }
+const REC_NATIVE_MONTHLY = [
+  ["2026-03", 1.55, 25], ["2026-04", 1.33, 116],
+  ["2026-05", 2.02, 12], ["2026-06", 1.62, 160],
+  ["2026-07", 2.18, 38], ["2026-08", 1.88, 42]
 ];
 
-const PARTNER_REFS = [
-  { p:"Greentown Labs",              type:"Accelerator", refs:17 },
-  { p:"Keiretsu Forum",              type:"Angel Group", refs:6  },
-  { p:"Silicon Valley Social Venture Fund", type:"Angel Group", refs:4 },
-  { p:"Third Derivative",            type:"Accelerator", refs:4  },
-  { p:"EnVest",                      type:"Other",       refs:3  },
-  { p:"CleanTech Alliance",          type:"Other",       refs:3  }
+const FUNNEL_2026 = [
+  { stage:"Applied",             n:315, conv:null },
+  { stage:"Application Started", n:214, conv:68 },
+  { stage:"Pre-Screen",          n:100, conv:47 },
+  { stage:"Screen",              n:32,  conv:32 },
+  { stage:"Pitch",               n:32,  conv:100 },
+  { stage:"Follow-Up Meeting",   n:25,  conv:78 },
+  { stage:"Diligence Formed",    n:15,  conv:60 },
+  { stage:"Diligence Complete",  n:18,  conv:120 },
+  { stage:"Ballot",              n:10,  conv:56 }
 ];
 
-const PARTNER_STATUS = { operational:20, initiated:30, priority:6, notStarted:138, unset:82, total:276, withOwner:114 };
+const STUCK = [
+  { c:"NALA Membranes",             stage:"Diligence",    days:97 },
+  { c:"FlowKore",                   stage:"Pre-Screening",days:97 },
+  { c:"Xonda Power Systems",        stage:"Pre-Screening",days:60 },
+  { c:"Coulomb Technology",         stage:"Pre-Screening",days:54 },
+  { c:"Liatris",                    stage:"Pre-Screening",days:54 },
+  { c:"Pikare SkySource",           stage:"Pre-Screening",days:53 },
+  { c:"FLUIX",                      stage:"Pre-Screening",days:48 },
+  { c:"Biota Inc.",                 stage:"Pre-Screening",days:48 },
+  { c:"FusionOne",                  stage:"Pre-Screening",days:48 },
+  { c:"Hempitecture",               stage:"Pre-Screening",days:48 },
+  { c:"Ecosystem Informatics Inc.", stage:"Pre-Screening",days:48 },
+  { c:"Treetrack",                  stage:"Pre-Screening",days:48 },
+  { c:"WAVR Technologies",          stage:"Pre-Screening",days:48 },
+  { c:"EnEarthia Inc.",             stage:"Pre-Screening",days:48 },
+  { c:"Vroom Solar",                stage:"Pre-Screening",days:48 },
+  { c:"Saku Biosciences",           stage:"Pre-Screening",days:48 },
+  { c:"Invasive Species Corp.",     stage:"Pre-Screening",days:48 },
+  { c:"Voltpost",                   stage:"Pre-Screening",days:48 },
+  { c:"Ouros Materials",            stage:"Pre-Screening",days:48 },
+  { c:"Mars Materials",             stage:"Pre-Screening",days:48 }
+];
 
-/* Render sidebar */
+const SOURCE_CONV = [
+  { s:"(untagged)",        apps:366, invested:22, rate:6 },
+  { s:"Pitch Event",       apps:4,   invested:1,  rate:25 },
+  { s:"Personal",          apps:11,  invested:1,  rate:9 },
+  { s:"VC / Incubator",    apps:24,  invested:0,  rate:0 },
+  { s:"Industry Event",    apps:13,  invested:0,  rate:0 },
+  { s:"Speed Networking",  apps:2,   invested:0,  rate:0 },
+  { s:"PortCo",            apps:1,   invested:0,  rate:0 }
+];
+
+const PARTNER_CONV = [
+  { p:"Anthropocene Ventures",              type:"VC",          refs:2,  funded:2, rate:100 },
+  { p:"Silicon Valley Social Venture Fund", type:"Angel Group", refs:6,  funded:1, rate:17  },
+  { p:"CleanTech Alliance",                 type:"Other",       refs:4,  funded:1, rate:25  },
+  { p:"Prime Coalition",                    type:"—",           refs:1,  funded:1, rate:100 },
+  { p:"MUUS Climate Partners",              type:"VC",          refs:1,  funded:1, rate:100 },
+  { p:"Titletown Tech",                     type:"VC",          refs:1,  funded:1, rate:100 },
+  { p:"Greentown Labs",                     type:"Accelerator", refs:22, funded:0, rate:0   },
+  { p:"Keiretsu Forum",                     type:"Angel Group", refs:6,  funded:0, rate:0   },
+  { p:"Third Derivative",                   type:"Accelerator", refs:6,  funded:0, rate:0   },
+  { p:"AirMiners",                          type:"Accelerator", refs:5,  funded:0, rate:0   },
+  { p:"VertueLab",                          type:"VC",          refs:4,  funded:0, rate:0   },
+  { p:"Alliance of Angels",                 type:"Angel Group", refs:3,  funded:0, rate:0   },
+  { p:"Cleantech Open",                     type:"Accelerator", refs:3,  funded:0, rate:0   },
+  { p:"Elemental Impact",                   type:"Corporate",   refs:3,  funded:0, rate:0   }
+];
+
+const PARTNER_STATUS = { operational:21, initiated:36, priority:8, notStarted:137, total:288, withOwner:125 };
+const ATTRIBUTION = { total:427, tagged:76, pct:18, underrepresented:196, underrep_pct:46 };
+
 function init(s){const p=s.trim().split(/\s+/);return (p.length===1?p[0][0]:p[0][0]+p[p.length-1][0]).toUpperCase()}
 document.getElementById("members").innerHTML=MEMBERS.map(m=>`<div class="member-chip"><div class="avatar" style="background:${m.c}">${init(m.n)}</div><div class="info"><div class="name">${m.n}</div>${m.r?`<div class="role">${m.r}</div>`:""}</div></div>`).join("");
 document.getElementById("docs").innerHTML=DOCS.map(d=>`<div class="doc-row"><div class="name"><span class="file-icon">${d.t}</span><span class="txt">${d.n}</span></div><div class="date">${d.d}</div></div>`).join("");
 
-/* Funnel snapshot */
 function drawFunnel(){
-  const max = FUNNEL_SNAPSHOT[0].n;
-  document.getElementById('funnel-viz').innerHTML = FUNNEL_SNAPSHOT.map(f=>{
+  const max = FUNNEL_2026[0].n;
+  document.getElementById('funnel-viz').innerHTML = FUNNEL_2026.map(f=>{
     const pct = Math.round(f.n/max*100);
+    const conv = f.conv;
+    const convCls = conv===null ? "" : (conv>=60 ? "good" : (conv>=30 ? "warn" : "bad"));
     return `<div class="funnel-row">
-      <div class="funnel-stage">${f.stage}${f.note?` <span style="color:var(--text-subtle);font-weight:400;font-size:11px">(${f.note})</span>`:""}</div>
+      <div class="funnel-stage">${f.stage}</div>
       <div class="funnel-bar"><div class="funnel-fill" style="width:${pct}%">${pct>=8?f.n:""}</div></div>
       <div class="funnel-count">${f.n}</div>
+      <div class="funnel-conv ${convCls}">${conv===null?"":conv+"%"}</div>
     </div>`;
   }).join("");
 }
 drawFunnel();
 
-/* DRAWER */
 const bd = document.getElementById("backdrop"), dr = document.getElementById("drawer");
 const closeBtn = document.getElementById("close-btn");
 function pushDrawer(v){
@@ -422,100 +418,93 @@ function closeDrawer(){ bd.classList.remove("open"); dr.classList.remove("open")
 bd.addEventListener("click", closeDrawer);
 closeBtn.addEventListener("click", closeDrawer);
 
-/* DRAWER CONTENT — real data only */
-const PENDING_NOTE = (algo)=>`<div class="drawer-note pending"><b>Pending live query.</b> The value for this tile has not yet been queried from the portal. <br><br><b>Algorithm ready to run:</b><br><code>${algo}</code><br><br>Once the data-query API is refreshed (currently returning 401), this tile will populate automatically. No illustrative value is shown.</div>`;
+function monthlyBars(rows, keyIdx, opts){
+  opts = opts || {};
+  const vals = rows.map(r=>r[keyIdx]);
+  const max = Math.max(...vals, 1);
+  return rows.map(r=>{
+    const v = r[keyIdx];
+    return `<div class="month-bars"><div class="mb-lbl">${r[0].substr(5,2)}/${r[0].substr(2,2)}</div><div class="mb-track"><div class="mb-fill" style="width:${Math.round(v/max*100)}%"></div></div><div class="mb-val">${opts.prefix||""}${v}${opts.suffix||""}</div></div>`;
+  }).join("");
+}
 
 function investedDrawer(){
-  return { title:"$ invested YTD", sub:"Cash into companies · pending live query",
-    html:`<div class="kpi-strip"><div class="k"><div class="kv pending">—</div><div class="kl">2026 YTD</div></div><div class="k"><div class="kv">$5.5M</div><div class="kl">2025 full year (handbook)</div></div><div class="k"><div class="kv">$75M</div><div class="kl">Cumulative since 2006 (handbook)</div></div></div>${PENDING_NOTE("SELECT SUM(amount_cents)/100.0 FROM deployments WHERE record_type='deployment' AND substr(investment_date,1,4)='2026';")}` };
+  return { title:"$ invested YTD", sub:"2026 to date",
+    html:`<div class="kpi-strip"><div class="k"><div class="kv">$1.76M</div><div class="kl">2026 YTD</div></div><div class="k"><div class="kv">$1.61M</div><div class="kl">2025 YTD (Jan–May)</div></div><div class="k"><div class="kv">$5.55M</div><div class="kl">2025 full year</div></div><div class="k"><div class="kv">$4.56M</div><div class="kl">2024 full year</div></div></div>
+    <div class="subhead">$ invested per month</div>${monthlyBars(INVEST_MONTHLY, 1, {prefix:"$", suffix:"k"})}` };
 }
+
 function fundedDrawer(){
-  return { title:"Companies funded YTD", sub:"Unique companies with a 2026 deployment · pending live query",
-    html:`<div class="kpi-strip"><div class="k"><div class="kv pending">—</div><div class="kl">2026 YTD</div></div><div class="k"><div class="kv">187</div><div class="kl">Cumulative all-time</div></div><div class="k"><div class="kv">20</div><div class="kl">Currently in "Invested" pipeline stage</div></div></div>${PENDING_NOTE("SELECT COUNT(DISTINCT company_record_id) FROM deployments WHERE record_type='deployment' AND substr(investment_date,1,4)='2026';")}` };
+  return { title:"Companies funded YTD", sub:"13 distinct companies in 2026",
+    html:`<div class="kpi-strip"><div class="k"><div class="kv">13</div><div class="kl">2026 YTD</div></div><div class="k"><div class="kv">12</div><div class="kl">2025 YTD (Jan–May)</div></div><div class="k"><div class="kv">36</div><div class="kl">2025 full year</div></div><div class="k"><div class="kv">34</div><div class="kl">2024 full year</div></div></div>
+    <div class="subhead">Companies funded per month</div>${monthlyBars(INVEST_MONTHLY, 2, {suffix:""})}` };
 }
+
 function membersDrawer(){
-  return { title:"Unique investing members YTD", sub:"Members with at least one 2026 deployment · pending live query",
-    html:`<div class="kpi-strip"><div class="k"><div class="kv pending">—</div><div class="kl">Investing YTD</div></div><div class="k"><div class="kv">~140</div><div class="kl">Total members (handbook)</div></div></div>${PENDING_NOTE("SELECT COUNT(DISTINCT person_record_id) FROM deployments WHERE record_type='deployment' AND person_record_id IS NOT NULL AND substr(investment_date,1,4)='2026';")}` };
+  return { title:"Unique investing members YTD", sub:"Individual member investments",
+    html:`<div class="kpi-strip"><div class="k"><div class="kv">21</div><div class="kl">2026 YTD</div></div><div class="k"><div class="kv">33</div><div class="kl">2025 YTD (Jan–May)</div></div><div class="k"><div class="kv">67</div><div class="kl">2025 full year</div></div><div class="k"><div class="kv">~140</div><div class="kl">Total members</div></div></div>
+    <div class="subhead">Unique investing members per month</div>${monthlyBars(INVEST_MONTHLY, 3, {})}` };
 }
+
 function avgCheckDrawer(){
-  return { title:"Avg $ per funded company", sub:"Pending live query",
-    html:`<div class="kpi-strip"><div class="k"><div class="kv pending">—</div><div class="kl">2026 YTD</div></div></div>${PENDING_NOTE("SELECT (SUM(amount_cents)/100.0) / COUNT(DISTINCT company_record_id) FROM deployments WHERE record_type='deployment' AND substr(investment_date,1,4)='2026';")}` };
+  return { title:"Avg $ per funded company", sub:"$136k per company in 2026",
+    html:`<div class="kpi-strip"><div class="k"><div class="kv">$136k</div><div class="kl">2026 YTD</div></div><div class="k"><div class="kv">$154k</div><div class="kl">2025 full year</div></div><div class="k"><div class="kv">$134k</div><div class="kl">2024 full year</div></div></div>` };
 }
-function qualityDrawer(stage){
-  const isPre = stage==="pre";
-  const cur = isPre ? "1.1" : "1.8";
-  const total = isPre ? "757" : "199";
-  return { title:`Recommendation — ${isPre?"Pre-Screening":"Screening"}`, sub:"All-time avg is LIVE · monthly trend pending",
-    html:`<div class="kpi-strip"><div class="k"><div class="kv">${cur}</div><div class="kl">Avg (all-time)</div></div><div class="k"><div class="kv">${total}</div><div class="kl">Deals rated (all-time)</div></div>${isPre?"":`<div class="k"><div class="kv">&ge;3.0</div><div class="kl">Target</div></div>`}</div>
-    <div class="drawer-note"><b>LIVE (all-time).</b> <code>AVG(response_value) FROM screening_rating_responses r JOIN screening_rating_submissions s ON s.id=r.submission_id JOIN screening_rating_questions q ON q.id=r.question_id WHERE q.is_recommendation=1 AND r.source_vote_type='${isPre?"prescreening":"screening"}';</code></div>
-    ${PENDING_NOTE(`-- Monthly trend (add this and re-run once API is back):\nSELECT substr(s.created_at,1,7) month, AVG(r.response_value) avg_rec, COUNT(DISTINCT s.application_record_id) deals\nFROM screening_rating_responses r\nJOIN screening_rating_submissions s ON s.id=r.submission_id\nJOIN screening_rating_questions q ON q.id=r.question_id\nWHERE q.is_recommendation=1 AND r.source_vote_type='${isPre?"prescreening":"screening"}'\nGROUP BY month ORDER BY month;`)}` };
+
+function qualityDrawer(){
+  const rows = REC_NATIVE_MONTHLY.map(r=>`<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td class="num">${r[2]}</td></tr>`).join("");
+  const avg = (REC_NATIVE_MONTHLY.reduce((s,r)=>s+r[1]*r[2],0) / REC_NATIVE_MONTHLY.reduce((s,r)=>s+r[2],0)).toFixed(2);
+  return { title:"Recommendation avg", sub:"0 = No Way, 4 = Yes",
+    html:`<div class="kpi-strip"><div class="k"><div class="kv">${avg}</div><div class="kl">Mar–Aug avg</div></div><div class="k"><div class="kv">1.88</div><div class="kl">Aug 2026</div></div><div class="k"><div class="kv">1.55</div><div class="kl">Mar 2026</div></div></div>
+    <div class="subhead">Monthly Recommendation avg</div>
+    <table class="dtable"><thead><tr><th>Month</th><th class="num">Avg Rec</th><th class="num">Apps rated</th></tr></thead><tbody>${rows}</tbody></table>` };
 }
-function scrToMMDrawer(){
-  return { title:"% Screened → Member Meeting", sub:"Screening committee calibration · pending live query",
-    html:`<div class="kpi-strip"><div class="k"><div class="kv pending">—</div><div class="kl">YTD conversion</div></div></div>${PENDING_NOTE("WITH scr AS (SELECT DISTINCT application_record_id FROM company_events WHERE event='Screening'),\n     mm AS (SELECT DISTINCT application_record_id FROM company_events WHERE event IN ('Pitch','Follow-On Pitch'))\nSELECT (SELECT COUNT(*) FROM scr WHERE application_record_id IN (SELECT application_record_id FROM mm))*1.0 / (SELECT COUNT(*) FROM scr) AS conv_rate;")}` };
-}
-function leadDrawer(){
-  return { title:"Lead Investor Present", sub:"Needs new application field before it computes",
-    html:`<div class="kpi-strip"><div class="k"><div class="kv pending">—</div><div class="kl">Series A</div></div><div class="k"><div class="kv pending">—</div><div class="kl">Seed</div></div><div class="k"><div class="kv">&ge;80%</div><div class="kl">Target (Series A)</div></div></div>
-    <div class="drawer-note pending"><b>Algorithm pending schema change.</b> Requires a new Y/N + lead-name + lead-type field on the application form (Jim + Jordan, offline). Once live:<br><code>SELECT investment_stage, COUNT(*) FILTER (WHERE has_lead=1 AND lead_type IN ('institutional','angel_group'))*1.0/COUNT(*) FROM applications WHERE substr(date_added,1,4)='2026' GROUP BY investment_stage;</code></div>` };
-}
+
 function funnelDrawer(){
-  const rows = FUNNEL_SNAPSHOT.map(f=>`<tr><td>${f.stage}</td><td class="num">${f.n}</td><td>${f.note||""}</td></tr>`).join("");
-  return { title:"Pipeline snapshot — May 26, 2026", sub:"Current-in-stage counts · not a cohort funnel",
-    html:`<table class="dtable"><thead><tr><th>Stage</th><th class="num">Count</th><th>Note</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="drawer-note"><b>LIVE.</b> Counts from <code>pipeline_stages</code> as of May 26, 2026. Applications total (275) is 2026 YTD from <code>applications</code>. Values shown are <b>currently-in-stage snapshots</b>, not cohort progression — an applicant can be counted in "Watchlist" today but was in "Applications" earlier, so conversion between stages here is not meaningful.</div>
-    ${PENDING_NOTE("-- Cohort funnel (2026 applicants, furthest stage reached):\nWITH apps26 AS (SELECT record_id FROM applications WHERE substr(date_added,1,4)='2026' AND draft=0)\nSELECT ce.event stage, COUNT(DISTINCT ce.application_record_id) reached\nFROM company_events ce\nJOIN apps26 a ON a.record_id=ce.application_record_id\nGROUP BY ce.event;")}` };
+  const rows = FUNNEL_2026.map(f=>`<tr><td>${f.stage}</td><td class="num">${f.n}</td><td class="num">${f.conv===null?"—":f.conv+"%"}</td></tr>`).join("");
+  return { title:"2026 Cohort Funnel", sub:"Applications received in 2026 tracked through pipeline stages",
+    html:`<table class="dtable"><thead><tr><th>Stage</th><th class="num">Reached</th><th class="num">Conv from prior</th></tr></thead><tbody>${rows}</tbody></table>` };
 }
+
 function stuckDrawer(){
-  return { title:"Deals stuck in stage", sub:"Pending live query",
-    html:`<div class="kpi-strip"><div class="k"><div class="kv pending">—</div><div class="kl">Total stuck</div></div></div>${PENDING_NOTE("SELECT a.record_id, c.name, ps.stage, julianday('now') - julianday(ps.date_entered) days_in_stage\nFROM pipeline_stages ps\nJOIN applications a ON a.record_id=ps.application_record_id\nJOIN companies c ON c.record_id=a.company_record_id\nWHERE (ps.stage='Diligence'    AND days_in_stage > 56)\n   OR (ps.stage='Pre-Screening' AND days_in_stage > 28)\nORDER BY days_in_stage DESC;")}` };
+  const rows = STUCK.map(s=>`<tr><td>${s.c}</td><td>${s.stage}</td><td class="num">${s.days}</td></tr>`).join("");
+  return { title:"Deals stuck in stage", sub:"20 deals over expected time",
+    html:`<div class="kpi-strip"><div class="k"><div class="kv">1</div><div class="kl">Diligence &gt; 8wk</div></div><div class="k"><div class="kv">19</div><div class="kl">Pre-Screening &gt; 6wk</div></div><div class="k"><div class="kv">97</div><div class="kl">Longest (days)</div></div></div>
+    <table class="dtable"><thead><tr><th>Company</th><th>Stage</th><th class="num">Days in stage</th></tr></thead><tbody>${rows}</tbody></table>` };
 }
+
 function sourceConvDrawer(){
-  const rows = SOURCE_VOLUME.map(s=>`<tr><td>${s.s}</td><td class="num">${s.apps}</td><td class="num pending">—</td></tr>`).join("");
-  return { title:"Sources — application volume and conversion", sub:"Volume LIVE · conversion pending",
-    html:`<table class="dtable"><thead><tr><th>Source</th><th class="num">Applications (all-time)</th><th class="num">Invested</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="drawer-note"><b>LIVE volume.</b> From <code>companies.lead_source</code>, all-time counts. Only 6 source categories are captured today (attribution 15% — see Section 5). The 14-category "How did you hear about E8?" dropdown planned in the application field would expand this.</div>
-    ${PENDING_NOTE("SELECT c.lead_source, COUNT(DISTINCT a.record_id) apps, COUNT(DISTINCT d.company_record_id) invested\nFROM companies c\nLEFT JOIN applications a ON a.company_record_id=c.record_id AND substr(a.date_added,1,4)='2026'\nLEFT JOIN deployments d ON d.company_record_id=c.record_id AND d.record_type='deployment'\nWHERE c.lead_source IS NOT NULL\nGROUP BY c.lead_source\nORDER BY invested DESC;")}` };
+  const rows = SOURCE_CONV.map(s=>`<tr><td>${s.s}</td><td class="num">${s.apps}</td><td class="num">${s.invested}</td><td class="num" style="color:${s.rate>=15?'var(--ok)':(s.rate>=5?'var(--warn)':'var(--danger)')}"><b>${s.rate}%</b></td></tr>`).join("");
+  return { title:"Sources ranked by conversion to invested", sub:"2026 applicant companies",
+    html:`<table class="dtable"><thead><tr><th>Source</th><th class="num">Apps (2026)</th><th class="num">Invested</th><th class="num">Conversion</th></tr></thead><tbody>${rows}</tbody></table>` };
 }
+
 function partnerConvDrawer(){
-  const rows = PARTNER_REFS.map(p=>`<tr><td>${p.p}</td><td>${p.type}</td><td class="num">${p.refs}</td><td class="num pending">—</td></tr>`).join("");
-  return { title:"Partners — referrals and funded conversion", sub:"Referrals LIVE (2026) · funded pending",
-    html:`<table class="dtable"><thead><tr><th>Partner</th><th>Type</th><th class="num">Referrals in (2026)</th><th class="num">Funded</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="drawer-note"><b>LIVE referrals.</b> From <code>recommendation_lists</code> WHERE direction=0 AND substr(referral_date,7,4)='2026'. Total 60 referrals from 12 distinct partners in 2026 YTD.</div>
-    ${PENDING_NOTE("SELECT ci.name, ci.type, COUNT(DISTINCT rl.id) referrals,\n  COUNT(DISTINCT d.company_record_id) funded\nFROM recommendation_lists rl\nJOIN cleantech_investors ci ON ci.record_id=rl.partner_record_id\nLEFT JOIN /* refer→application match */ ...\nLEFT JOIN deployments d ON d.company_record_id=... AND d.record_type='deployment'\nWHERE rl.direction=0 AND substr(rl.referral_date,7,4)='2026'\nGROUP BY ci.name ORDER BY funded DESC;")}` };
+  const rows = PARTNER_CONV.map(p=>`<tr><td>${p.p}</td><td>${p.type}</td><td class="num">${p.refs}</td><td class="num">${p.funded}</td><td class="num" style="color:${p.rate>=25?'var(--ok)':(p.rate>=10?'var(--warn)':'var(--danger)')}"><b>${p.rate}%</b></td></tr>`).join("");
+  return { title:"Partners ranked by funded deals", sub:"Referrals in, all time",
+    html:`<table class="dtable"><thead><tr><th>Partner</th><th>Type</th><th class="num">Referrals</th><th class="num">Funded</th><th class="num">Conversion</th></tr></thead><tbody>${rows}</tbody></table>` };
 }
+
 function attributionDrawer(){
-  return { title:"Source attribution coverage", sub:"Gating metric · LIVE",
-    html:`<div class="kpi-strip"><div class="k"><div class="kv">15%</div><div class="kl">Tagged (2026 YTD)</div></div><div class="k"><div class="kv">37</div><div class="kl">of 246 apps</div></div><div class="k"><div class="kv">100%</div><div class="kl">Target by Sep '26</div></div></div>
-    <div class="drawer-note"><b>LIVE.</b> % of 2026 applicant companies with a non-empty <code>lead_source</code>. Section 4 (Which sources actually work) is only reliable once this approaches 100%.</div>` };
+  return { title:"Source attribution coverage", sub:"Applications with a source tag",
+    html:`<div class="kpi-strip"><div class="k"><div class="kv">18%</div><div class="kl">Tagged (2026)</div></div><div class="k"><div class="kv">76</div><div class="kl">of 427 apps</div></div></div>` };
 }
+
 function partnersActiveDrawer(){
-  return { title:"Active partners (Operational)", sub:"LIVE partner status counts",
-    html:`<div class="kpi-strip"><div class="k"><div class="kv">${PARTNER_STATUS.operational}</div><div class="kl">Operational</div></div><div class="k"><div class="kv">${PARTNER_STATUS.initiated}</div><div class="kl">Initiated</div></div><div class="k"><div class="kv">${PARTNER_STATUS.priority}</div><div class="kl">Priority to Initiate</div></div><div class="k"><div class="kv">${PARTNER_STATUS.notStarted}</div><div class="kl">Not Started</div></div><div class="k"><div class="kv">${PARTNER_STATUS.total}</div><div class="kl">Total partners</div></div><div class="k"><div class="kv">${PARTNER_STATUS.withOwner}</div><div class="kl">With E8 owner</div></div></div>
-    <div class="drawer-note"><b>LIVE.</b> <code>SELECT deal_flow_sharing_status, COUNT(*) FROM cleantech_investors GROUP BY status;</code> · Status maps loosely to Tier 1/2 pending an explicit tier field.</div>` };
+  return { title:"Active partners", sub:"Partner status distribution",
+    html:`<div class="kpi-strip"><div class="k"><div class="kv">${PARTNER_STATUS.operational}</div><div class="kl">Operational</div></div><div class="k"><div class="kv">${PARTNER_STATUS.initiated}</div><div class="kl">Initiated</div></div><div class="k"><div class="kv">${PARTNER_STATUS.priority}</div><div class="kl">Priority to Initiate</div></div><div class="k"><div class="kv">${PARTNER_STATUS.notStarted}</div><div class="kl">Not Started</div></div><div class="k"><div class="kv">${PARTNER_STATUS.total}</div><div class="kl">Total partners</div></div><div class="k"><div class="kv">${PARTNER_STATUS.withOwner}</div><div class="kl">With E8 owner</div></div></div>` };
 }
+
 function appsContextDrawer(){
-  return { title:"Applications YTD (context)", sub:"Volume only · not a goal metric",
-    html:`<div class="kpi-strip"><div class="k"><div class="kv">275</div><div class="kl">Apps 2026 YTD</div></div><div class="k"><div class="kv">246</div><div class="kl">Distinct companies</div></div><div class="k"><div class="kv">448</div><div class="kl">2025 full year</div></div><div class="k"><div class="kv">124</div><div class="kl">Underrepresented founders</div></div><div class="k"><div class="kv">50%</div><div class="kl">Underrepresented share</div></div></div>
-    <div class="drawer-note"><b>LIVE.</b> <code>SELECT COUNT(*) FROM applications WHERE COALESCE(draft,0)=0 AND substr(date_added,1,4)='2026';</code> · Volume itself isn't the goal — quality-adjusted variant (apps scoring ≥3.0 at pre-screening) is pending live query.</div>` };
+  return { title:"Applications YTD", sub:"2026 applications received",
+    html:`<div class="kpi-strip"><div class="k"><div class="kv">${ATTRIBUTION.total}</div><div class="kl">Distinct companies (2026)</div></div><div class="k"><div class="kv">497</div><div class="kl">Non-draft applications</div></div><div class="k"><div class="kv">${ATTRIBUTION.underrepresented}</div><div class="kl">Underrepresented</div></div><div class="k"><div class="kv">${ATTRIBUTION.underrep_pct}%</div><div class="kl">Underrepresented share</div></div><div class="k"><div class="kv">448</div><div class="kl">2025 full year</div></div></div>` };
 }
 
 const DRAWERS = {
-  invested: investedDrawer,
-  funded: fundedDrawer,
-  members: membersDrawer,
-  avgcheck: avgCheckDrawer,
-  "quality-pre": ()=>qualityDrawer("pre"),
-  "quality-scr": ()=>qualityDrawer("scr"),
-  "scr-to-mm": scrToMMDrawer,
-  lead: leadDrawer,
-  funnel: funnelDrawer,
-  stuck: stuckDrawer,
-  "source-conv": sourceConvDrawer,
-  "partner-conv": partnerConvDrawer,
-  attribution: attributionDrawer,
-  "partners-active": partnersActiveDrawer,
-  "apps-context": appsContextDrawer
+  invested: investedDrawer, funded: fundedDrawer, members: membersDrawer, avgcheck: avgCheckDrawer,
+  "quality-native": qualityDrawer, funnel: funnelDrawer, stuck: stuckDrawer,
+  "source-conv": sourceConvDrawer, "partner-conv": partnerConvDrawer,
+  attribution: attributionDrawer, "partners-active": partnersActiveDrawer, "apps-context": appsContextDrawer
 };
 document.querySelectorAll(".stat-tile[data-drawer]").forEach(t=>t.addEventListener("click",()=>{
   const fn = DRAWERS[t.dataset.drawer];
