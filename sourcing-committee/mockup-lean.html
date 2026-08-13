@@ -39,7 +39,6 @@
   .link-btn:hover{color:var(--primary-hover);text-decoration:underline}
   .pri-btn{background:var(--primary);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:500;cursor:pointer}
   .ghost-btn{background:var(--card-bg);color:var(--text);border:1px solid var(--card-border);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer}
-
   .toggle-row{display:flex;gap:6px;align-items:center}
   .toggle-btn{padding:5px 12px;font-size:11px;border-radius:6px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text);cursor:pointer;font-family:inherit;font-weight:500}
   .toggle-btn.active{background:var(--tab-active-bg);color:#fff;border-color:var(--tab-active-bg)}
@@ -62,7 +61,6 @@
   .t-up{color:var(--ok)} .t-down{color:var(--danger)} .t-flat{color:var(--text-muted)}
   .tt{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:#f1f5f9;color:var(--text-muted);font-size:10px;font-weight:700;cursor:help;font-style:normal}
 
-  /* Greyed section */
   .greyed .stat-tile{background:#f8f9fb;border-color:#eaecef}
   .greyed .stat-tile .t-value{color:#64748b}
   .greyed .stat-tile .t-label{color:#94a3b8}
@@ -107,13 +105,16 @@
   .dtable tr.clickable{cursor:pointer}
   .dtable tr.clickable:hover{background:var(--primary-soft)}
   .dtable tr.clickable td:last-child{color:var(--text-subtle)}
+  .dtable tr.zero td{color:var(--text-subtle)}
   .kpi-strip{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
   .kpi-strip .k{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:10px 14px;min-width:110px}
   .kpi-strip .k .kv{font-size:20px;font-weight:700}
   .kpi-strip .k .kl{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em}
   .subhead{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin:16px 0 8px}
-  .badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;letter-spacing:.03em}
+  .badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;letter-spacing:.03em;margin-right:4px}
   .badge.funded{background:var(--ok-soft);color:var(--ok)}
+  .badge.closed{background:var(--danger-soft);color:var(--danger)}
+  .badge.exited{background:#eef4ff;color:#4338ca}
 
   .month-bars{display:grid;grid-template-columns:60px 1fr 80px;gap:6px;align-items:center;font-size:12px;padding:3px 0}
   .month-bars .mb-track{background:var(--page-bg);border-radius:4px;height:14px;overflow:hidden}
@@ -153,7 +154,6 @@
           </div>
         </div>
 
-        <!-- Section 1: Portfolio outcome — greyed -->
         <div class="stats-section greyed">
           <div class="sec-head"><span class="sec-num">1</span><span class="sec-title">Are we investing more?</span><span class="sec-sub">Portfolio Committee metric · shown for context on deal quality</span></div>
           <div class="stats-grid g4">
@@ -180,7 +180,6 @@
           </div>
         </div>
 
-        <!-- Section 2: Quality -->
         <div class="stats-section">
           <div class="sec-head"><span class="sec-num">2</span><span class="sec-title">Is quality improving?</span></div>
           <div class="stats-grid g3">
@@ -192,29 +191,27 @@
           </div>
         </div>
 
-        <!-- Section 3: Sources -->
         <div class="stats-section">
           <div class="sec-head"><span class="sec-num">3</span><span class="sec-title">Which sources actually work?</span></div>
           <div class="stats-grid g3">
             <button class="stat-tile" data-drawer="source-conv">
               <span class="t-label">Sources by conversion to invested <i class="tt" title="Which application sources have produced the highest share of funded companies.">i</i></span>
-              <span class="t-value" style="font-size:17px;padding-top:5px;">Top: Pitch Event (25%)</span>
+              <span class="t-value" style="font-size:17px;padding-top:5px;">Top: Event – E8 hosted (25%)</span>
               <span class="t-sub">Most funded deals came from untagged applications</span>
             </button>
             <button class="stat-tile" data-drawer="partner-conv">
-              <span class="t-label">Partners by funded deals <i class="tt" title="Which sourcing partners' referrals have converted into E8 investments.">i</i></span>
-              <span class="t-value" style="font-size:17px;padding-top:5px;">Top: Anthropocene Ventures (2/2)</span>
+              <span class="t-label">Partners by funded deals <i class="tt" title="Which sourcing partners' referrals have converted into E8 investments. Also flags where funded companies later closed.">i</i></span>
+              <span class="t-value" style="font-size:17px;padding-top:5px;">Anthropocene: 2/2 funded · 2 closed</span>
               <span class="t-sub">Greentown Labs: 22 referred &middot; 0 funded</span>
             </button>
             <button class="stat-tile" data-drawer="channel-mix">
-              <span class="t-label">Channel mix <i class="tt" title="Distribution of applications across the source channels tagged on their application.">i</i></span>
-              <span class="t-value" style="font-size:17px;padding-top:5px;">Top: VC / Incubator (24)</span>
-              <span class="t-sub">6 channels active &middot; 76 of 427 apps tagged</span>
+              <span class="t-label">Channel mix <i class="tt" title="Distribution of applications across 14 planned source channels. Categories with no applications tagged yet show 0.">i</i></span>
+              <span class="t-value" style="font-size:17px;padding-top:5px;">Top: VC (24)</span>
+              <span class="t-sub">5 of 14 channels active</span>
             </button>
           </div>
         </div>
 
-        <!-- Section 4: Sourcing overview -->
         <div class="stats-section">
           <div class="sec-head"><span class="sec-num">4</span><span class="sec-title">Sourcing overview</span></div>
           <div class="stats-grid g3">
@@ -226,7 +223,7 @@
             <button class="stat-tile" data-drawer="partners-active">
               <span class="t-label">Active partners <i class="tt" title="Sourcing partners with an operational deal-flow-sharing agreement.">i</i></span>
               <span class="t-value">21</span>
-              <span class="t-sub">of 288 total &middot; 125 with an E8 owner</span>
+              <span class="t-sub">of 288 total · 125 with an E8 owner</span>
             </button>
             <button class="stat-tile" data-drawer="apps-context">
               <span class="t-label">Applications <i class="tt" title="Non-draft applications received in 2026.">i</i></span>
@@ -237,7 +234,6 @@
         </div>
       </div>
 
-      <!-- Notes -->
       <div class="card">
         <div class="card-header">
           <div class="card-title">
@@ -310,7 +306,6 @@ const TILE_VALUES = {
   }
 };
 
-/* Real data — May–Aug 2026 portal pull */
 const INVEST_MONTHLY = [
   ["2025-07", 829.3, 5, 10], ["2025-08", 38.2, 3, 4],
   ["2025-09", 415.4, 5, 21], ["2025-10", 552.5, 7, 4],
@@ -382,181 +377,251 @@ const APPS_BY_STAGE = [
 
 const SOURCE_CONV = [
   { key:"untagged",       label:"(untagged)",       apps:366, invested:22, rate:6 },
-  { key:"pitch",          label:"Pitch Event",      apps:4,   invested:1,  rate:25 },
-  { key:"personal",       label:"Personal",         apps:11,  invested:1,  rate:9 },
-  { key:"vc",             label:"VC / Incubator",   apps:24,  invested:0,  rate:0 },
-  { key:"industry",       label:"Industry Event",   apps:13,  invested:0,  rate:0 },
-  { key:"speed",          label:"Speed Networking", apps:2,   invested:0,  rate:0 },
-  { key:"portco",         label:"PortCo",           apps:1,   invested:0,  rate:0 }
+  { key:"event_hosted",   label:"Event – E8 hosted", apps:4,   invested:1,  rate:25 },
+  { key:"member",         label:"Member",           apps:11,  invested:1,  rate:9 },
+  { key:"vc",             label:"VC",               apps:24,  invested:0,  rate:0 },
+  { key:"event_elsewhere",label:"Event – met E8 rep elsewhere", apps:13, invested:0, rate:0 },
+  { key:"other",          label:"Other",            apps:2,   invested:0,  rate:0 },
+  { key:"portco",         label:"Portco referral",  apps:1,   invested:0,  rate:0 }
 ];
 
+/* 14-category channel mix — real data mapped; zeros where none yet */
 const CHANNEL_MIX = [
-  { key:"vc",       channel:"VC / Incubator",   apps:24, share:32 },
-  { key:"industry", channel:"Industry Event",   apps:13, share:17 },
-  { key:"personal", channel:"Personal",         apps:11, share:15 },
-  { key:"pitch",    channel:"Pitch Event",      apps:4,  share:5  },
-  { key:"speed",    channel:"Speed Networking", apps:2,  share:3  },
-  { key:"portco",   channel:"PortCo",           apps:1,  share:1  }
+  { key:"vc",             channel:"VC",                                        apps:24 },
+  { key:"accelerator",    channel:"Accelerator",                               apps:0  },
+  { key:"incubator",      channel:"Incubator",                                 apps:0  },
+  { key:"university",     channel:"University",                                apps:0  },
+  { key:"event_hosted",   channel:"Event – In-person (E8 hosted)",             apps:4  },
+  { key:"event_elsewhere",channel:"Event – In-person (met E8 rep elsewhere)", apps:13 },
+  { key:"webinar",        channel:"Online webinar",                            apps:0  },
+  { key:"member",         channel:"Member",                                    apps:11 },
+  { key:"portco",         channel:"Portco referral",                           apps:1  },
+  { key:"websearch",      channel:"Web Search",                                apps:0  },
+  { key:"llm",            channel:"LLM recommendation",                        apps:0  },
+  { key:"social",         channel:"Social Media (LinkedIn)",                   apps:0  },
+  { key:"newsletter",     channel:"Newsletter",                                apps:0  },
+  { key:"other",          channel:"Other",                                     apps:2  }
 ];
 
-/* Real companies per channel (from lead_source) */
+/* Real 2026 applicant companies per channel */
 const CHANNEL_COMPANIES = {
   vc: [
-    {c:"2S Water", stage:"—", funded:0},
-    {c:"Adaviv", stage:"Watchlist", funded:0},
-    {c:"AmHyTech", stage:"Watchlist", funded:0},
-    {c:"Beagle Services", stage:"—", funded:0},
-    {c:"Biospheric AI", stage:"Watchlist", funded:0},
-    {c:"CarbonBridge Inc", stage:"—", funded:0},
-    {c:"Corumat", stage:"—", funded:0},
-    {c:"Decycle Bio", stage:"—", funded:0},
-    {c:"Flow Environmental", stage:"—", funded:0},
-    {c:"Fluorityx", stage:"—", funded:0},
-    {c:"GeoSpirals Inc", stage:"Watchlist", funded:0},
-    {c:"Helix Earth", stage:"Pre-Screening", funded:0},
-    {c:"Leitnium", stage:"—", funded:0},
-    {c:"Mars Materials, Inc. PBC.Ⓡ", stage:"Pre-Screening", funded:0},
-    {c:"Nimbus Aerospace", stage:"—", funded:0},
-    {c:"Raya Power", stage:"D8 - Final", funded:0},
-    {c:"Real Baarish", stage:"Pre-Screening", funded:0},
-    {c:"Rise Reforming", stage:"—", funded:0},
-    {c:"Skip Technology", stage:"Watchlist", funded:0},
-    {c:"Solid Carbon", stage:"—", funded:0},
-    {c:"Telluscope", stage:"Watchlist", funded:0},
-    {c:"TerraSafe Materials", stage:"—", funded:0},
-    {c:"UnBOXED", stage:"Pre-Screening", funded:0},
-    {c:"Without", stage:"—", funded:0}
+    {c:"2S Water", stage:"—", funded:0},{c:"Adaviv", stage:"Watchlist", funded:0},
+    {c:"AmHyTech", stage:"Watchlist", funded:0},{c:"Beagle Services", stage:"—", funded:0},
+    {c:"Biospheric AI", stage:"Watchlist", funded:0},{c:"CarbonBridge Inc", stage:"—", funded:0},
+    {c:"Corumat", stage:"—", funded:0},{c:"Decycle Bio", stage:"—", funded:0},
+    {c:"Flow Environmental", stage:"—", funded:0},{c:"Fluorityx", stage:"—", funded:0},
+    {c:"GeoSpirals Inc", stage:"Watchlist", funded:0},{c:"Helix Earth", stage:"Pre-Screening", funded:0},
+    {c:"Leitnium", stage:"—", funded:0},{c:"Mars Materials, Inc. PBC.Ⓡ", stage:"Pre-Screening", funded:0},
+    {c:"Nimbus Aerospace", stage:"—", funded:0},{c:"Raya Power", stage:"D8 - Final", funded:0},
+    {c:"Real Baarish", stage:"Pre-Screening", funded:0},{c:"Rise Reforming", stage:"—", funded:0},
+    {c:"Skip Technology", stage:"Watchlist", funded:0},{c:"Solid Carbon", stage:"—", funded:0},
+    {c:"Telluscope", stage:"Watchlist", funded:0},{c:"TerraSafe Materials", stage:"—", funded:0},
+    {c:"UnBOXED", stage:"Pre-Screening", funded:0},{c:"Without", stage:"—", funded:0}
   ],
-  industry: [
-    {c:"Applied Biorefinery Sciences (ABS)", stage:"—", funded:0},
-    {c:"Carbon Infuse", stage:"Watchlist", funded:0},
-    {c:"Climate Solutions International", stage:"Watchlist", funded:0},
-    {c:"Enerclave", stage:"Watchlist", funded:0},
-    {c:"Harmony Desalting", stage:"D8 - Final", funded:0},
-    {c:"MetalPlant", stage:"Watchlist", funded:0},
-    {c:"Natrx, Inc.", stage:"—", funded:0},
-    {c:"Nucleic Sensing Systems", stage:"Watchlist", funded:0},
-    {c:"Ouros Materials", stage:"Pre-Screening", funded:0},
-    {c:"Plantaer Inc.", stage:"—", funded:0},
-    {c:"SVX", stage:"—", funded:0},
-    {c:"Supercarb", stage:"Watchlist", funded:0},
-    {c:"WAVR Technologies", stage:"Pre-Screening", funded:0}
-  ],
-  personal: [
-    {c:"AquaPoro", stage:"Requested Follow-On", funded:1},
-    {c:"Bio Fiber Industries", stage:"—", funded:0},
-    {c:"Fluidion US Inc", stage:"Pre-Screening", funded:0},
-    {c:"Folia Materials", stage:"Pre-Screening", funded:0},
-    {c:"Moon Five", stage:"—", funded:0},
-    {c:"Namaka Algae, Inc.", stage:"Watchlist", funded:0},
-    {c:"Permeta", stage:"Pre-Screening", funded:0},
-    {c:"Powder Watts", stage:"—", funded:0},
-    {c:"Saku Biosciences", stage:"Pre-Screening", funded:0},
-    {c:"Tobe Energy Corp.", stage:"—", funded:0},
-    {c:"Verdi", stage:"Pre-Screening", funded:0}
-  ],
-  pitch: [
+  accelerator: [], incubator: [], university: [],
+  event_hosted: [
     {c:"Furno Materials", stage:"Invested", funded:1},
     {c:"Innatrix Inc.", stage:"Watchlist", funded:0},
     {c:"PooPoof", stage:"Pre-Screening", funded:0},
     {c:"WattAir Inc", stage:"Pre-Screening", funded:0}
   ],
-  speed: [
+  event_elsewhere: [
+    {c:"Applied Biorefinery Sciences (ABS)", stage:"—", funded:0},{c:"Carbon Infuse", stage:"Watchlist", funded:0},
+    {c:"Climate Solutions International", stage:"Watchlist", funded:0},{c:"Enerclave", stage:"Watchlist", funded:0},
+    {c:"Harmony Desalting", stage:"D8 - Final", funded:0},{c:"MetalPlant", stage:"Watchlist", funded:0},
+    {c:"Natrx, Inc.", stage:"—", funded:0},{c:"Nucleic Sensing Systems", stage:"Watchlist", funded:0},
+    {c:"Ouros Materials", stage:"Pre-Screening", funded:0},{c:"Plantaer Inc.", stage:"—", funded:0},
+    {c:"SVX", stage:"—", funded:0},{c:"Supercarb", stage:"Watchlist", funded:0},
+    {c:"WAVR Technologies", stage:"Pre-Screening", funded:0}
+  ],
+  webinar: [],
+  member: [
+    {c:"AquaPoro", stage:"Requested Follow-On", funded:1},{c:"Bio Fiber Industries", stage:"—", funded:0},
+    {c:"Fluidion US Inc", stage:"Pre-Screening", funded:0},{c:"Folia Materials", stage:"Pre-Screening", funded:0},
+    {c:"Moon Five", stage:"—", funded:0},{c:"Namaka Algae, Inc.", stage:"Watchlist", funded:0},
+    {c:"Permeta", stage:"Pre-Screening", funded:0},{c:"Powder Watts", stage:"—", funded:0},
+    {c:"Saku Biosciences", stage:"Pre-Screening", funded:0},{c:"Tobe Energy Corp.", stage:"—", funded:0},
+    {c:"Verdi", stage:"Pre-Screening", funded:0}
+  ],
+  portco: [{c:"Carbion", stage:"—", funded:0}],
+  websearch: [], llm: [], social: [], newsletter: [],
+  other: [
     {c:"Licube3", stage:"—", funded:0},
     {c:"Psigryph.Inc", stage:"Pre-Screening", funded:0}
   ],
-  portco: [
-    {c:"Carbion", stage:"—", funded:0}
-  ],
-  untagged: [] // too many to list
+  untagged: []
 };
 
+/* Real all-time partner referrals with funded + closed + exited flags */
 const PARTNER_CONV = [
-  { key:"anthro",    p:"Anthropocene Ventures",              type:"VC",          refs:2,  funded:2, rate:100 },
-  { key:"svsvf",     p:"Silicon Valley Social Venture Fund", type:"Angel Group", refs:6,  funded:1, rate:17  },
-  { key:"cta",       p:"CleanTech Alliance",                 type:"Other",       refs:4,  funded:1, rate:25  },
-  { key:"prime",     p:"Prime Coalition",                    type:"—",           refs:1,  funded:1, rate:100 },
-  { key:"muus",      p:"MUUS Climate Partners",              type:"VC",          refs:1,  funded:1, rate:100 },
-  { key:"titletown", p:"Titletown Tech",                     type:"VC",          refs:1,  funded:1, rate:100 },
-  { key:"greentown", p:"Greentown Labs",                     type:"Accelerator", refs:22, funded:0, rate:0   },
-  { key:"keiretsu",  p:"Keiretsu Forum",                     type:"Angel Group", refs:6,  funded:0, rate:0   },
-  { key:"third",     p:"Third Derivative",                   type:"Accelerator", refs:6,  funded:0, rate:0   },
-  { key:"airminers", p:"AirMiners",                          type:"Accelerator", refs:5,  funded:0, rate:0   },
-  { key:"vertue",    p:"VertueLab",                          type:"VC",          refs:4,  funded:0, rate:0   },
-  { key:"aa",        p:"Alliance of Angels",                 type:"Angel Group", refs:3,  funded:0, rate:0   },
-  { key:"cto",       p:"Cleantech Open",                     type:"Accelerator", refs:3,  funded:0, rate:0   },
-  { key:"elemental", p:"Elemental Impact",                   type:"Corporate",   refs:3,  funded:0, rate:0   }
+  { key:"anthro",    p:"Anthropocene Ventures",              type:"VC",          refs:2,  funded:2, closed:2, exited:0, rate:100 },
+  { key:"svsvf",     p:"Silicon Valley Social Venture Fund", type:"Angel Group", refs:6,  funded:1, closed:0, exited:0, rate:17  },
+  { key:"cta",       p:"CleanTech Alliance",                 type:"Other",       refs:4,  funded:1, closed:0, exited:0, rate:25  },
+  { key:"prime",     p:"Prime Coalition",                    type:"—",           refs:1,  funded:1, closed:0, exited:0, rate:100 },
+  { key:"muus",      p:"MUUS Climate Partners",              type:"VC",          refs:1,  funded:1, closed:0, exited:0, rate:100 },
+  { key:"titletown", p:"Titletown Tech",                     type:"VC",          refs:1,  funded:1, closed:0, exited:0, rate:100 },
+  { key:"greentown", p:"Greentown Labs",                     type:"Accelerator", refs:22, funded:0, closed:0, exited:0, rate:0   },
+  { key:"keiretsu",  p:"Keiretsu Forum",                     type:"Angel Group", refs:6,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"third",     p:"Third Derivative",                   type:"Accelerator", refs:6,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"airminers", p:"AirMiners",                          type:"Accelerator", refs:5,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"vertue",    p:"VertueLab",                          type:"VC",          refs:4,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"aa",        p:"Alliance of Angels",                 type:"Angel Group", refs:3,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"cto",       p:"Cleantech Open",                     type:"Accelerator", refs:3,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"elemental", p:"Elemental Impact",                   type:"Corporate",   refs:3,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"sosv",      p:"SOSV",                               type:"VC",          refs:2,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"envest",    p:"EnVest",                             type:"Other",       refs:2,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"gener8",    p:"gener8tor Sustainability Accelerator",type:"Accelerator",refs:2,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"cascadia",  p:"Cascadia CleanTech Accelerator",     type:"Accelerator", refs:2,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"isn",       p:"ISN (Investment Syndication Network)",type:"VC",         refs:2,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"activate",  p:"Activate Capital",                   type:"Accelerator", refs:2,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"starshot",  p:"Starshot Capital",                   type:"VC",          refs:2,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"psf",       p:"Portland Seed Fund",                 type:"VC",          refs:2,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"burnt",     p:"Burnt Island",                       type:"VC",          refs:2,  funded:0, closed:0, exited:0, rate:0   },
+  { key:"cevg",      p:"Clean Energy Venture Group",         type:"Angel Group", refs:2,  funded:0, closed:0, exited:0, rate:0   }
 ];
 
-/* Real referred companies per partner (top partners) */
+/* All-time referred companies per partner with funded/closed/exited flags */
 const PARTNER_REFERRED = {
   anthro: [
-    {c:"Circe Bioscience", stage:"—", funded:1},
-    {c:"Scape Carbon",     stage:"—", funded:1}
+    {c:"Circe Bioscience", stage:"—", funded:1, closed:1, exited:0},
+    {c:"Scape Carbon",     stage:"—", funded:1, closed:1, exited:0}
   ],
   svsvf: [
-    {c:"It's Electric Inc.", stage:"Invested", funded:1},
-    {c:"CarbonBridge Inc",   stage:"—", funded:0},
-    {c:"Rise Reforming",     stage:"—", funded:0},
-    {c:"SunChem",            stage:"—", funded:0},
-    {c:"Telluscope",         stage:"Watchlist", funded:0},
-    {c:"Without",            stage:"—", funded:0}
+    {c:"It's Electric Inc.", stage:"Invested", funded:1, closed:0, exited:0},
+    {c:"CarbonBridge Inc",   stage:"—", funded:0, closed:0, exited:0},
+    {c:"Rise Reforming",     stage:"—", funded:0, closed:0, exited:0},
+    {c:"SunChem",            stage:"—", funded:0, closed:0, exited:0},
+    {c:"Telluscope",         stage:"Watchlist", funded:0, closed:0, exited:0},
+    {c:"Without",            stage:"—", funded:0, closed:0, exited:0}
   ],
   cta: [
-    {c:"Algafilm",  stage:"Invested", funded:1},
-    {c:"Biobead",   stage:"—", funded:0},
-    {c:"DCarbon",   stage:"—", funded:0},
-    {c:"WhyGrene",  stage:"—", funded:0}
+    {c:"Algafilm",  stage:"Invested", funded:1, closed:0, exited:0},
+    {c:"Biobead",   stage:"—", funded:0, closed:0, exited:0},
+    {c:"DCarbon",   stage:"—", funded:0, closed:0, exited:0},
+    {c:"WhyGrene",  stage:"—", funded:0, closed:0, exited:0}
+  ],
+  prime: [
+    {c:"Lilac Solutions, Inc.", stage:"—", funded:1, closed:0, exited:0}
+  ],
+  muus: [
+    {c:"NxLite", stage:"—", funded:1, closed:0, exited:0}
+  ],
+  titletown: [
+    {c:"Ateios Systems", stage:"Invested", funded:1, closed:0, exited:0}
   ],
   greentown: [
-    {c:"10DQ", stage:"Watchlist", funded:0},
-    {c:"Andros Innovations Inc.", stage:"D8 - Final", funded:0},
-    {c:"Biospheric AI", stage:"Watchlist", funded:0},
-    {c:"CLS Wind", stage:"Watchlist", funded:0},
-    {c:"Capwell", stage:"—", funded:0},
-    {c:"Carbon To Stone", stage:"Watchlist", funded:0},
-    {c:"Concept Loop", stage:"—", funded:0},
-    {c:"HGenium", stage:"Watchlist", funded:0},
-    {c:"Harmony Desalting", stage:"D8 - Final", funded:0},
-    {c:"HarvestAi", stage:"Watchlist", funded:0},
-    {c:"Helix Earth", stage:"Pre-Screening", funded:0},
-    {c:"Helix Power", stage:"—", funded:0},
-    {c:"MCatalysis", stage:"—", funded:0},
-    {c:"MagDrive", stage:"—", funded:0},
-    {c:"Mithril Technologies", stage:"—", funded:0},
-    {c:"PlaSene", stage:"—", funded:0},
-    {c:"PolyQor (Concept Loop)", stage:"—", funded:0},
-    {c:"PooPoof", stage:"Pre-Screening", funded:0},
-    {c:"Realizse", stage:"—", funded:0},
-    {c:"Sol Clarity", stage:"—", funded:0},
-    {c:"Teknobuilt", stage:"—", funded:0},
-    {c:"change:WATER Labs", stage:"—", funded:0}
+    {c:"10DQ", stage:"Watchlist", funded:0, closed:0, exited:0},
+    {c:"Andros Innovations Inc.", stage:"D8 - Final", funded:0, closed:0, exited:0},
+    {c:"Biospheric AI", stage:"Watchlist", funded:0, closed:0, exited:0},
+    {c:"CLS Wind", stage:"Watchlist", funded:0, closed:0, exited:0},
+    {c:"Capwell", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Carbon To Stone", stage:"Watchlist", funded:0, closed:0, exited:0},
+    {c:"Concept Loop", stage:"—", funded:0, closed:0, exited:0},
+    {c:"HGenium", stage:"Watchlist", funded:0, closed:0, exited:0},
+    {c:"Harmony Desalting", stage:"D8 - Final", funded:0, closed:0, exited:0},
+    {c:"HarvestAi", stage:"Watchlist", funded:0, closed:0, exited:0},
+    {c:"Helix Earth", stage:"Pre-Screening", funded:0, closed:0, exited:0},
+    {c:"Helix Power", stage:"—", funded:0, closed:0, exited:0},
+    {c:"MCatalysis", stage:"—", funded:0, closed:0, exited:0},
+    {c:"MagDrive", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Mithril Technologies", stage:"—", funded:0, closed:0, exited:0},
+    {c:"PlaSene", stage:"—", funded:0, closed:0, exited:0},
+    {c:"PolyQor (Concept Loop)", stage:"—", funded:0, closed:0, exited:0},
+    {c:"PooPoof", stage:"Pre-Screening", funded:0, closed:0, exited:0},
+    {c:"Realizse", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Sol Clarity", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Teknobuilt", stage:"—", funded:0, closed:0, exited:0},
+    {c:"change:WATER Labs", stage:"—", funded:0, closed:0, exited:0}
   ],
   keiretsu: [
-    {c:"EV Labs", stage:"—", funded:0},
-    {c:"Helios Charging", stage:"—", funded:0},
-    {c:"Leitnium", stage:"—", funded:0},
-    {c:"Mussell Polymers", stage:"—", funded:0},
-    {c:"Rangeway Energy", stage:"Watchlist", funded:0},
-    {c:"Skip Technology", stage:"Watchlist", funded:0}
+    {c:"EV Labs", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Helios Charging", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Leitnium", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Mussell Polymers", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Rangeway Energy", stage:"Watchlist", funded:0, closed:0, exited:0},
+    {c:"Skip Technology", stage:"Watchlist", funded:0, closed:0, exited:0}
   ],
   third: [
-    {c:"Determinant Materials", stage:"—", funded:0},
-    {c:"Dynami Battery Corp", stage:"—", funded:0},
-    {c:"Metal Light", stage:"Watchlist", funded:0},
-    {c:"SVX", stage:"—", funded:0},
-    {c:"SeaBrick", stage:"—", funded:0},
-    {c:"Sylvatex Inc", stage:"—", funded:0}
+    {c:"Determinant Materials", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Dynami Battery Corp", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Metal Light", stage:"Watchlist", funded:0, closed:0, exited:0},
+    {c:"SVX", stage:"—", funded:0, closed:0, exited:0},
+    {c:"SeaBrick", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Sylvatex Inc", stage:"—", funded:0, closed:0, exited:0}
   ],
-  prime:     [{c:"(single referred company)", stage:"—", funded:1}],
-  muus:      [{c:"(single referred company)", stage:"—", funded:1}],
-  titletown: [{c:"(single referred company)", stage:"—", funded:1}],
-  airminers: [], vertue:[], aa:[], cto:[], elemental:[]
+  airminers: [
+    {c:"Carbon Square", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Dugu Systems", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Rivotto", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Sea-Up", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Teracarbon Energy", stage:"—", funded:0, closed:0, exited:0}
+  ],
+  vertue: [
+    {c:"Maxterial, Inc.", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Ocean Pulse Power Systems", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Re-Nuble, Inc.", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Voltaic Marine, Inc.", stage:"—", funded:0, closed:0, exited:0}
+  ],
+  aa: [
+    {c:"Flow Environmental", stage:"—", funded:0, closed:0, exited:0},
+    {c:"NanoICE, Inc.", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Polymer Research Technologies Ltd.", stage:"—", funded:0, closed:0, exited:0}
+  ],
+  cto: [
+    {c:"Inventev", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Solar Hydrogen Holdings Inc.", stage:"—", funded:0, closed:0, exited:0},
+    {c:"foris.io, inc.", stage:"—", funded:0, closed:0, exited:0}
+  ],
+  elemental: [
+    {c:"PROMEX TECHNOLOGIES, INC.", stage:"—", funded:0, closed:0, exited:0},
+    {c:"TG Recycling", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Verdi", stage:"—", funded:0, closed:0, exited:0}
+  ],
+  sosv: [
+    {c:"Pyrone Systems", stage:"—", funded:0, closed:0, exited:0},
+    {c:"TrelliSense", stage:"—", funded:0, closed:0, exited:0}
+  ],
+  envest: [
+    {c:"Blue Sonde", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Kai Pono Solutions", stage:"—", funded:0, closed:0, exited:0}
+  ],
+  gener8: [
+    {c:"Lacuum", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Psigryph.Inc", stage:"—", funded:0, closed:0, exited:0}
+  ],
+  cascadia: [
+    {c:"Banyon Power Co.", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Blue Dot Motorworks", stage:"—", funded:0, closed:0, exited:0}
+  ],
+  isn: [
+    {c:"Trevi Systems", stage:"—", funded:0, closed:0, exited:0},
+    {c:"carbogenics", stage:"—", funded:0, closed:0, exited:0}
+  ],
+  activate: [
+    {c:"Andros Innovations Inc.", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Fluorityx", stage:"—", funded:0, closed:0, exited:0}
+  ],
+  starshot: [
+    {c:"Adaviv", stage:"—", funded:0, closed:0, exited:0},
+    {c:"CLS Wind", stage:"—", funded:0, closed:0, exited:0}
+  ],
+  psf: [
+    {c:"Atacama Manufacturing Inc.", stage:"—", funded:0, closed:0, exited:0},
+    {c:"iGridSim Inc", stage:"—", funded:0, closed:0, exited:0}
+  ],
+  burnt: [
+    {c:"2S Water", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Undesert Corporation", stage:"—", funded:0, closed:0, exited:0}
+  ],
+  cevg: [
+    {c:"Fast Metals", stage:"—", funded:0, closed:0, exited:0},
+    {c:"Nāmaka", stage:"—", funded:0, closed:0, exited:0}
+  ]
 };
 
 const PARTNER_STATUS = { operational:21, initiated:36, priority:8, notStarted:137, total:288, withOwner:125 };
 
-/* Real partner lists by activation status */
 const PARTNERS_BY_STATUS = {
   operational: [
     {n:"AirMiners", t:"Accelerator", owner:"Phil Li"},
@@ -625,7 +690,7 @@ const PARTNERS_BY_STATUS = {
     {n:"Powerhouse Ventures", t:"VC", owner:"David Jackson"},
     {n:"Starlight Ventures", t:"VC", owner:"—"},
     {n:"Thin Line Capital", t:"VC", owner:"David Jackson"},
-    {n:"Urban Innovation Fund", t:"VC", owner:"—"},
+    {n:"Urban Innovation Fund", t:"VC", owner:"Scott Pinizzotto"},
     {n:"Virta Ventures", t:"VC", owner:"Scott Pinizzotto"}
   ]
 };
@@ -655,7 +720,6 @@ document.querySelectorAll('#page-toggle .toggle-btn').forEach(b=>{
 });
 applyMode();
 
-/* Drawer stack — multi-level navigation with back button */
 const bd = document.getElementById("backdrop"), dr = document.getElementById("drawer");
 const closeBtn = document.getElementById("close-btn"), backBtn = document.getElementById("back-btn");
 let stack = [];
@@ -667,7 +731,6 @@ function renderStack(){
   document.getElementById("drawer-body").innerHTML = v.html;
   backBtn.style.display = stack.length>1 ? "" : "none";
   bd.classList.add("open"); dr.classList.add("open");
-  // wire drill actions
   document.querySelectorAll("[data-drill]").forEach(el=>{
     el.addEventListener("click",(e)=>{ e.stopPropagation(); DRILL[el.dataset.drill](el.dataset.arg); });
   });
@@ -706,9 +769,14 @@ function ytdMonthlyTabs(ytdHtml, monthlyHtml){
   <div data-viewpane="month" style="display:none">${monthlyHtml}</div>
   </div>`;
 }
-function fundedBadge(f){ return f ? `<span class="badge funded">FUNDED</span>` : ''; }
+function outcomeBadges(x){
+  const b = [];
+  if(x.funded) b.push('<span class="badge funded">FUNDED</span>');
+  if(x.closed) b.push('<span class="badge closed">CLOSED</span>');
+  if(x.exited) b.push('<span class="badge exited">EXITED</span>');
+  return b.join('');
+}
 
-/* ==================== TOP-LEVEL DRAWERS ==================== */
 function investedDrawer(){
   const ytd = `<div class="kpi-strip"><div class="k"><div class="kv">$1.76M</div><div class="kl">2026 YTD</div></div><div class="k"><div class="kv">$1.61M</div><div class="kl">2025 YTD</div></div><div class="k"><div class="kv">$5.55M</div><div class="kl">2025 full year</div></div><div class="k"><div class="kv">$4.56M</div><div class="kl">2024 full year</div></div></div>
     <div class="subhead">Funded companies (2026 YTD)</div>
@@ -752,7 +820,8 @@ function qualityDrawer(){
 function sourceConvDrawer(){
   const rows = SOURCE_CONV.map(s=>{
     const cls = s.rate>=15?'var(--ok)':(s.rate>=5?'var(--warn)':'var(--danger)');
-    const clickable = s.key!=="untagged" && (CHANNEL_COMPANIES[s.key]||[]).length>0 ? `class="clickable" data-drill="channelCompanies" data-arg="${s.key}"` : '';
+    const list = CHANNEL_COMPANIES[s.key]||[];
+    const clickable = s.key!=="untagged" && list.length>0 ? `class="clickable" data-drill="channelCompanies" data-arg="${s.key}"` : '';
     const arrow = clickable ? '<td class="num">&rsaquo;</td>' : '<td class="num"></td>';
     return `<tr ${clickable}><td>${s.label}</td><td class="num">${s.apps}</td><td class="num">${s.invested}</td><td class="num" style="color:${cls}"><b>${s.rate}%</b></td>${arrow}</tr>`;
   }).join("");
@@ -764,10 +833,14 @@ function channelMixDrawer(){
   const rows = CHANNEL_MIX.map(c=>{
     const list = CHANNEL_COMPANIES[c.key]||[];
     const funded = list.filter(x=>x.funded).length;
-    return `<tr class="clickable" data-drill="channelCompanies" data-arg="${c.key}"><td>${c.channel}</td><td class="num">${c.apps}</td><td class="num">${c.share}%</td><td class="num">${funded}</td><td class="num">&rsaquo;</td></tr>`;
+    const share = ATTRIBUTION.tagged>0 ? Math.round(c.apps/ATTRIBUTION.tagged*100) : 0;
+    const zero = c.apps===0;
+    const cl = zero ? 'class="zero"' : `class="clickable" data-drill="channelCompanies" data-arg="${c.key}"`;
+    const arrow = zero ? '<td class="num"></td>' : '<td class="num">&rsaquo;</td>';
+    return `<tr ${cl}><td>${c.channel}</td><td class="num">${c.apps}</td><td class="num">${zero?'0%':share+'%'}</td><td class="num">${funded}</td>${arrow}</tr>`;
   }).join("");
-  return { title:"Channel mix", sub:"Click a channel to see the companies",
-    html:`<div class="kpi-strip"><div class="k"><div class="kv">76</div><div class="kl">Tagged apps</div></div><div class="k"><div class="kv">6</div><div class="kl">Active channels</div></div><div class="k"><div class="kv">18%</div><div class="kl">Attribution coverage</div></div></div>
+  return { title:"Channel mix", sub:"14 planned channels · click any active row for the companies",
+    html:`<div class="kpi-strip"><div class="k"><div class="kv">76</div><div class="kl">Tagged apps</div></div><div class="k"><div class="kv">5</div><div class="kl">Active channels</div></div><div class="k"><div class="kv">14</div><div class="kl">Planned channels</div></div><div class="k"><div class="kv">18%</div><div class="kl">Attribution coverage</div></div></div>
     <table class="dtable"><thead><tr><th>Channel</th><th class="num">Apps</th><th class="num">Share</th><th class="num">Funded</th><th class="num">&nbsp;</th></tr></thead><tbody>${rows}</tbody></table>` };
 }
 
@@ -775,29 +848,30 @@ function channelCompaniesDrawer(key){
   const list = CHANNEL_COMPANIES[key]||[];
   const meta = CHANNEL_MIX.find(c=>c.key===key) || SOURCE_CONV.find(s=>s.key===key);
   const label = meta ? (meta.channel || meta.label) : key;
-  const rows = list.map(x=>`<tr><td>${x.c}</td><td>${x.stage}</td><td>${fundedBadge(x.funded)}</td></tr>`).join("");
+  const rows = list.map(x=>`<tr><td>${x.c}</td><td>${x.stage}</td><td>${outcomeBadges(x)||'—'}</td></tr>`).join("");
   const funded = list.filter(x=>x.funded).length;
-  pushDrawer({ title:`Companies from ${label}`, sub:`${list.length} companies · ${funded} funded`,
-    html:`<table class="dtable"><thead><tr><th>Company</th><th>Current stage</th><th>Outcome</th></tr></thead><tbody>${rows||'<tr><td colspan="3" style="color:var(--text-subtle);text-align:center;padding:20px">No companies yet</td></tr>'}</tbody></table>` });
+  const closed = list.filter(x=>x.closed).length;
+  pushDrawer({ title:`Companies from ${label}`, sub:`${list.length} companies · ${funded} funded${closed?' · '+closed+' closed':''}`,
+    html:`<table class="dtable"><thead><tr><th>Company</th><th>Current stage</th><th>Outcome</th></tr></thead><tbody>${rows||'<tr><td colspan="3" style="color:var(--text-subtle);text-align:center;padding:20px">No companies yet from this channel</td></tr>'}</tbody></table>` });
 }
 
 function partnerConvDrawer(){
   const rows = PARTNER_CONV.map(p=>{
     const cls = p.rate>=25?'var(--ok)':(p.rate>=10?'var(--warn)':'var(--danger)');
-    const list = PARTNER_REFERRED[p.key]||[];
-    const clickable = list.length>0 ? `class="clickable" data-drill="partnerReferred" data-arg="${p.key}"` : '';
-    const arrow = clickable ? '<td class="num">&rsaquo;</td>' : '<td class="num"></td>';
-    return `<tr ${clickable}><td>${p.p}</td><td>${p.type}</td><td class="num">${p.refs}</td><td class="num">${p.funded}</td><td class="num" style="color:${cls}"><b>${p.rate}%</b></td>${arrow}</tr>`;
+    return `<tr class="clickable" data-drill="partnerReferred" data-arg="${p.key}"><td>${p.p}</td><td>${p.type}</td><td class="num">${p.refs}</td><td class="num">${p.funded}</td><td class="num" style="color:${p.closed>0?'var(--danger)':'var(--text-muted)'}">${p.closed||''}</td><td class="num" style="color:${cls}"><b>${p.rate}%</b></td><td class="num">&rsaquo;</td></tr>`;
   }).join("");
-  return { title:"Partners by funded deals", sub:"Click a partner to see referred companies",
-    html:`<table class="dtable"><thead><tr><th>Partner</th><th>Type</th><th class="num">Referrals</th><th class="num">Funded</th><th class="num">Conversion</th><th class="num">&nbsp;</th></tr></thead><tbody>${rows}</tbody></table>` };
+  return { title:"Partners by funded deals", sub:"All-time referrals · click a partner to see the companies",
+    html:`<table class="dtable"><thead><tr><th>Partner</th><th>Type</th><th class="num">Referrals</th><th class="num">Funded</th><th class="num">Closed</th><th class="num">Conversion</th><th class="num">&nbsp;</th></tr></thead><tbody>${rows}</tbody></table>` };
 }
 
 function partnerReferredDrawer(key){
   const list = PARTNER_REFERRED[key]||[];
   const meta = PARTNER_CONV.find(p=>p.key===key);
-  const rows = list.map(x=>`<tr><td>${x.c}</td><td>${x.stage}</td><td>${fundedBadge(x.funded)}</td></tr>`).join("");
-  pushDrawer({ title:`${meta.p} — referred companies`, sub:`${meta.refs} referrals · ${meta.funded} funded (${meta.rate}%)`,
+  const rows = list.map(x=>`<tr><td>${x.c}</td><td>${x.stage}</td><td>${outcomeBadges(x)||'—'}</td></tr>`).join("");
+  const subParts = [`${meta.refs} referrals`, `${meta.funded} funded (${meta.rate}%)`];
+  if(meta.closed>0) subParts.push(`${meta.closed} closed`);
+  if(meta.exited>0) subParts.push(`${meta.exited} exited`);
+  pushDrawer({ title:`${meta.p} — referred companies`, sub:subParts.join(' · '),
     html:`<table class="dtable"><thead><tr><th>Company</th><th>Current stage</th><th>Outcome</th></tr></thead><tbody>${rows}</tbody></table>` });
 }
 
