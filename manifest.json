@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-13T07:31:40+00:00",
+  "generated": "2026-08-13T14:53:23+00:00",
   "plans": [
     {
       "slug": "audience-questions-claude",
@@ -239,7 +239,7 @@
       "created": "2026-05-26",
       "last_updated": "2026-08-10",
       "last_changed_by": "sarah",
-      "last_changed_at": "2026-08-13T00:31:26-07:00",
+      "last_changed_at": "2026-08-13T07:53:04-07:00",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
