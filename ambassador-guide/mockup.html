@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ambassador Guide</title>
+<style>
+  @font-face{font-family:"Cosmica";src:url("assets/Cosmica-Semibold.woff2") format("woff2");font-weight:600}
+  @font-face{font-family:"Cosmica";src:url("assets/Cosmica-Bold.woff2") format("woff2");font-weight:700}
+
+  /* Values copied from src/css/e8-design-tokens.css */
+  :root{
+    --e8-color-page:#edf2f7; --e8-color-surface:#fff; --e8-color-surface-muted:#f7f8f6; --e8-color-surface-subtle:#eef1ee; --e8-color-surface-strong:#e7eae6;
+    --e8-color-ink:#14201e; --e8-color-ink-secondary:#45524d; --e8-color-ink-muted:#66746e; --e8-color-ink-faint:#93a09a;
+    --e8-color-border:#dfe4e0; --e8-color-border-strong:#c2cbc6;
+    --e8-color-primary:#07312c; --e8-color-primary-hover:#0f5049; --e8-color-link:#1f5f52; --e8-color-link-hover:#0f5049; --e8-primary-50:#ecf5f2;
+    --e8-radius-control:8px; --e8-radius-card:10px; --e8-radius-panel:14px;
+    --e8-shadow-sm:0 1px 3px rgb(20 32 30 / 8%),0 1px 2px rgb(20 32 30 / 4%);
+    --e8-font-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --e8-font-display:"Cosmica","Avenir Next",sans-serif;
+    --e8-font-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+    --e8-text-2xs:11px; --e8-text-xs:12px; --e8-text-sm:14.5px; --e8-text-base:14.5px; --e8-text-reading:15px; --e8-text-lg:17.835px; --e8-text-xl:20px; --e8-text-2xl:24px; --e8-text-3xl:30px;
+    --text-meta:13px;
+    --e8-leading-ui:1.4; --e8-leading-reading:1.5; --e8-heading-weight:600;
+    --e8-layout-reading-max:800px; --e8-layout-gutter:clamp(16px,2vw,24px);
+    --warn-bg:#fdf6ee; --warn-border:#efd3b0; --warn-text:#96591c;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--e8-color-page);color:var(--e8-color-ink);font-family:var(--e8-font-body);font-size:var(--e8-text-base);line-height:var(--e8-leading-ui);-webkit-font-smoothing:antialiased}
+  a{color:var(--e8-color-link);text-decoration:none}
+  a:hover{color:var(--e8-color-link-hover);text-decoration:underline}
+  h1,h2,h3{font-family:var(--e8-font-display);font-weight:var(--e8-heading-weight);color:var(--e8-color-ink);margin:0}
+
+  /* portal chrome (context only) */
+  .nav{background:var(--e8-color-surface);border-bottom:1px solid var(--e8-color-border);height:56px;display:flex;align-items:center;padding:0 28px;gap:28px}
+  .nav .brand{font-weight:700;line-height:1.1}
+  .nav .brand small{display:block;font-weight:400;font-size:var(--e8-text-2xs);color:var(--e8-color-ink-muted)}
+  .nav .links{display:flex;gap:22px;font-size:var(--text-meta);color:var(--e8-color-ink-secondary)}
+  .nav .links b{color:var(--e8-color-ink);font-weight:600}
+
+  .shell{max-width:1080px;margin:0 auto;padding:36px var(--e8-layout-gutter) 96px;display:grid;grid-template-columns:minmax(0,var(--e8-layout-reading-max)) 232px;gap:48px;align-items:start;justify-content:center}
+
+  .eyebrow{font-family:var(--e8-font-mono);font-size:var(--e8-text-2xs);letter-spacing:.08em;text-transform:uppercase;color:var(--e8-color-ink-muted)}
+  h1{font-size:var(--e8-text-3xl);line-height:1.15;letter-spacing:-.01em;margin:8px 0 12px}
+  .lede{font-size:var(--e8-text-reading);line-height:var(--e8-leading-reading);color:var(--e8-color-ink-secondary);margin:0;text-wrap:pretty}
+  h3{font-size:var(--e8-text-lg);margin:0 0 6px}
+  .reading{font-size:var(--e8-text-reading);line-height:var(--e8-leading-reading)}
+  p{margin:0 0 12px;color:var(--e8-color-ink-secondary);text-wrap:pretty}
+  p strong{color:var(--e8-color-ink)}
+
+  /* shortcuts under the header */
+  .shortcuts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0 28px}
+  .shortcut{background:var(--e8-color-surface);border:1px solid var(--e8-color-border);border-radius:var(--e8-radius-card);padding:14px 16px}
+  .shortcut b{display:block;margin-bottom:2px}
+  .shortcut span{display:block;font-size:var(--text-meta);color:var(--e8-color-ink-muted);margin-bottom:10px}
+
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:var(--e8-radius-control);border:1px solid var(--e8-color-border-strong);background:var(--e8-color-surface);color:var(--e8-color-ink);font:inherit;font-size:var(--text-meta);font-weight:500;cursor:pointer;text-decoration:none;white-space:nowrap}
+  .btn:hover{background:var(--e8-color-surface-muted);text-decoration:none;color:var(--e8-color-ink)}
+  .btn.primary{background:var(--e8-color-primary);border-color:var(--e8-color-primary);color:#fff}
+  .btn.primary:hover{background:var(--e8-color-primary-hover);color:#fff}
+  .btn.sm{height:28px;padding:0 10px;font-size:var(--e8-text-xs)}
+
+  /* ---- accordion sections ---- */
+  .sec{background:var(--e8-color-surface);border:1px solid var(--e8-color-border);border-radius:var(--e8-radius-card);margin:0 0 10px;box-shadow:var(--e8-shadow-sm);scroll-margin-top:16px}
+  .sec summary{list-style:none;display:grid;grid-template-columns:minmax(44px,auto) 1fr 24px;align-items:center;gap:12px;padding:14px 16px 14px 18px;cursor:pointer;user-select:none;border-radius:var(--e8-radius-card)}
+  .sec summary::-webkit-details-marker{display:none}
+  .sec summary:hover{background:var(--e8-color-surface-muted)}
+  .sec[open] summary{border-bottom:1px solid var(--e8-color-border);border-radius:var(--e8-radius-card) var(--e8-radius-card) 0 0;background:var(--e8-color-surface-muted)}
+  .sec .n{font-family:var(--e8-font-mono);font-size:var(--e8-text-xs);letter-spacing:.06em;color:var(--e8-color-ink-faint)}
+  .sec[open] .n{color:var(--e8-color-link)}
+  .sec.alt .n{font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+  .sec.alt{margin-top:22px}
+  .sec h2{font-size:var(--e8-text-xl);line-height:1.25}
+  .sec .chev{width:24px;height:24px;display:grid;place-items:center;color:var(--e8-color-ink-faint);transition:transform .15s}
+  .sec[open] .chev{transform:rotate(180deg);color:var(--e8-color-ink-muted)}
+  .sec .body{padding:20px 22px 24px}
+  .sec .body>:last-child{margin-bottom:0}
+
+  /* ---- sequence stepper (page spine) ---- */
+  .seq{display:grid;grid-template-columns:repeat(4,1fr);margin:0 0 14px;padding:22px 8px 20px;background:var(--e8-color-surface);border:1px solid var(--e8-color-border);border-radius:var(--e8-radius-card);box-shadow:var(--e8-shadow-sm)}
+  .seq .step{cursor:pointer;border-radius:var(--e8-radius-control)}
+  .seq .step:hover b{color:var(--e8-color-link)}
+  .seq .step.todo .node{border-color:var(--e8-color-border-strong);color:var(--e8-color-ink-muted)}
+  .seq .step.todo b{color:var(--e8-color-ink-secondary)}
+  .seq .step.current .node{background:var(--e8-color-primary);border-color:var(--e8-color-primary);color:#fff}
+  .seq .step.current b{color:var(--e8-color-ink)}
+  .seq .step{position:relative;text-align:center;padding:0 10px 4px}
+  .seq .step::before,.seq .step::after{content:"";position:absolute;top:15px;height:2px;background:var(--e8-color-border-strong)}
+  .seq .step::before{left:0;right:calc(50% + 20px)}
+  .seq .step::after{left:calc(50% + 20px);right:0}
+  .seq .step:first-child::before,.seq .step:last-child::after{display:none}
+  .seq .step.done::before,.seq .step.done::after{background:var(--e8-color-link)}
+  .seq .node{position:relative;z-index:1;width:32px;height:32px;margin:0 auto 10px;border-radius:999px;border:2px solid var(--e8-color-link);background:var(--e8-color-surface);color:var(--e8-color-link);font-family:var(--e8-font-mono);font-size:var(--e8-text-xs);font-weight:600;display:grid;place-items:center}
+  .seq b{display:block;font-family:var(--e8-font-display);font-weight:600;font-size:var(--e8-text-sm);line-height:1.3;color:var(--e8-color-ink)}
+  .seq small{display:block;margin-top:3px;font-size:var(--e8-text-xs);line-height:1.35;color:var(--e8-color-ink-muted)}
+
+  /* prompts */
+  .prompts{margin:12px 0 0;padding:0;list-style:none;border:1px solid var(--e8-color-border);border-radius:var(--e8-radius-card);overflow:hidden}
+  .prompts li{display:grid;grid-template-columns:150px 1fr;gap:16px;padding:11px 16px;border-top:1px solid var(--e8-color-surface-subtle)}
+  .prompts li:first-child{border-top:0}
+  .prompts b{font-weight:600}
+  .prompts span{color:var(--e8-color-ink-secondary)}
+
+  /* callouts */
+  .callout{display:flex;gap:12px;align-items:flex-start;background:var(--e8-primary-50);border:1px solid var(--e8-color-link);border-radius:var(--e8-radius-card);padding:14px 16px;margin:20px 0}
+  .callout .dot{flex:none;width:28px;height:28px;border-radius:999px;background:var(--e8-color-link);color:#fff;display:grid;place-items:center;font-size:14px}
+  .callout b{display:block;margin-bottom:2px}
+  .callout p{margin:0;font-size:var(--text-meta)}
+  .aside{background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:var(--e8-radius-card);padding:14px 16px;margin:20px 0}
+  .aside h3{color:var(--warn-text);font-size:var(--e8-text-sm);font-family:var(--e8-font-body)}
+  .aside ul{margin:6px 0 0;padding-left:18px;color:var(--e8-color-ink-secondary)}
+  .aside li{margin:3px 0}
+
+  /* two-column lists */
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .col{background:var(--e8-color-surface-muted);border:1px solid var(--e8-color-surface-subtle);border-radius:var(--e8-radius-card);padding:14px 16px}
+  .col h3{font-size:var(--e8-text-sm);font-family:var(--e8-font-body)}
+  .col ul{margin:6px 0 0;padding-left:18px;color:var(--e8-color-ink-secondary)}
+  .col li{margin:4px 0}
+  .col.no h3{color:var(--warn-text)}
+
+  /* copy block */
+  .copy{background:var(--e8-color-surface);border:1px solid var(--e8-color-border);border-radius:var(--e8-radius-card);margin:16px 0;overflow:hidden}
+  .copy header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 12px 9px 16px;background:var(--e8-color-surface-muted);border-bottom:1px solid var(--e8-color-border)}
+  .copy .body{padding:16px 18px;color:var(--e8-color-ink)}
+  .copy .body p{color:var(--e8-color-ink);margin:0 0 10px}
+  .copy .body p:last-child{margin-bottom:0}
+  .copy .body ol{margin:4px 0 10px;padding-left:22px}
+  .copy .body li{margin:4px 0}
+  .copy .opt{position:relative;margin:10px 0;padding:8px 12px 8px 14px;border-left:3px dashed var(--warn-border);background:var(--warn-bg);border-radius:0 6px 6px 0}
+  .copy .opt .tag{position:absolute;top:-9px;right:10px;background:var(--e8-color-surface);border:1px solid var(--warn-border);color:var(--warn-text);font-family:var(--e8-font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:999px}
+  .copy .opt p{margin:0}
+
+  /* cta band */
+  .cta{display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--e8-color-surface-muted);border:1px solid var(--e8-color-surface-subtle);border-radius:var(--e8-radius-card);padding:16px 18px;margin:20px 0}
+  .cta b{display:block;font-family:var(--e8-font-display);font-size:var(--e8-text-lg);font-weight:600}
+  .cta span{font-size:var(--text-meta);color:var(--e8-color-ink-muted)}
+
+  /* resources */
+  .res{list-style:none;margin:0;padding:0;border:1px solid var(--e8-color-border);border-radius:var(--e8-radius-card);overflow:hidden}
+  .res li{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--e8-color-surface-subtle)}
+  .res li:first-child{border-top:0}
+  .res .ic{width:30px;height:30px;border-radius:var(--e8-radius-control);background:var(--e8-primary-50);color:var(--e8-color-link);display:grid;place-items:center;font-size:13px;font-weight:700;flex:none}
+  .res b{display:block;font-weight:600}
+  .res small{color:var(--e8-color-ink-muted);font-size:var(--e8-text-xs)}
+  .res .go{margin-left:auto;font-size:var(--text-meta);white-space:nowrap}
+
+  /* sticky rail */
+  .rail{position:sticky;top:24px;display:flex;flex-direction:column;gap:16px}
+  .rail .box{background:var(--e8-color-surface);border:1px solid var(--e8-color-border);border-radius:var(--e8-radius-card);padding:14px 16px}
+  .toc{list-style:none;margin:8px 0 0;padding:0}
+  .toc a{display:flex;gap:10px;padding:6px 0 6px 12px;border-left:2px solid var(--e8-color-border);color:var(--e8-color-ink-secondary);font-size:var(--text-meta)}
+  .toc a i{font-style:normal;font-family:var(--e8-font-mono);font-size:var(--e8-text-2xs);color:var(--e8-color-ink-faint);padding-top:2px}
+  .toc a:hover{text-decoration:none;color:var(--e8-color-ink)}
+  .toc a.on{border-left-color:var(--e8-color-link);color:var(--e8-color-link);font-weight:600}
+  .toc a.on i{color:var(--e8-color-link)}
+  .rules{margin:8px 0 0;padding:0 0 0 16px;color:var(--e8-color-ink-secondary);font-size:var(--text-meta)}
+  .rules li{margin:3px 0}
+  .rules.no{color:var(--e8-color-ink-secondary)}
+  .rules-h{display:block;margin-top:10px;font-weight:600;font-size:var(--text-meta)}
+  .rules-h.no{color:var(--warn-text)}
+  .handy{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .handy a.link{font-size:var(--text-meta);padding:4px 0}
+
+  @media (max-width:980px){
+    .shell{grid-template-columns:1fr;gap:24px}
+    .rail{position:static}
+  }
+  @media (max-width:640px){
+    .shortcuts,.cols{grid-template-columns:1fr}
+    .prompts li{grid-template-columns:1fr;gap:2px}
+    .cta{flex-direction:column;align-items:flex-start}
+    .seq{display:block;padding:8px 16px}
+    .seq .step{display:grid;grid-template-columns:32px 1fr;gap:14px;text-align:left;padding:10px 0;align-items:start}
+    .seq .node{margin:0}
+    .seq .step::before,.seq .step::after{left:15px;right:auto;width:2px;height:auto}
+    .seq .step::before{top:0;bottom:calc(100% - 10px)}
+    .seq .step::after{top:42px;bottom:0}
+  }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="brand">E8 Angels<small>Member Portal</small></div>
+  <div class="links"><span>Home</span><span>Pipeline</span><span><b>Membership</b></span><span>E8 Fund</span><span>Manage</span></div>
+</div>
+
+<div class="shell">
+<main>
+
+  <div class="eyebrow">Ambassador Guide</div>
+  <h1>Bringing Entrepreneurs to E8</h1>
+  <p class="lede">Members are E8’s best source of new companies. This guide covers how to spot a founder who fits, what to say when you meet one, and how to pass what you learn to the Screening Committee, who decide which companies advance to pitch.</p>
+
+  <div class="shortcuts">
+    <div class="shortcut">
+      <b>Received a referral from an E8 partner?</b>
+      <span>You don’t need the guide. Log the referral directly.</span>
+      <a class="btn sm" href="#">Refer a Company →</a>
+    </div>
+    <div class="shortcut">
+      <b>Only spoke for a minute at an event?</b>
+      <span>Send them the short note and you’re done.</span>
+      <a class="btn sm" href="#brief" data-open="brief">Jump to the short note ↓</a>
+    </div>
+  </div>
+
+  <div class="seq" id="spine">
+    <div class="step" data-open="introduce"><span class="node">1</span><b>Introduce E8</b><small>Who fits, and your 30-second version</small></div>
+    <div class="step" data-open="understand"><span class="node">2</span><b>Understand the company</b><small>Five things worth learning</small></div>
+    <div class="step" data-open="process"><span class="node">3</span><b>Explain E8’s process</b><small>What happens after they apply</small></div>
+    <div class="step" data-open="refer"><span class="node">4</span><b>Refer</b><small>Get their email, submit notes, follow up</small></div>
+  </div>
+
+  <!-- 1 -->
+  <details class="sec" name="guide" id="introduce" open>
+    <summary><span class="n">01</span><h2>Introduce E8</h2><span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></span></summary>
+    <div class="body reading">
+      <p>E8 backs early-stage cleantech founders, typically raising a Seed round (Pre-Seed to Series A), building toward a thriving planet. If the company has no climate thesis, it isn’t a fit for E8, however strong it looks otherwise.</p>
+      <p>When someone fits, you’ll want a crisp description of E8 ready. This is the standard version.</p>
+      <div class="copy">
+        <header><span class="eyebrow">Your 30-second introduction</span><button class="btn sm" data-copy>Copy</button></header>
+        <div class="body"><p>E8 is a network of 150+ accredited impact investors backing early-stage cleantech companies since 2006. We’ve invested $75M+, typically $100K to $300K per company, at Pre-Seed to Series A. Our sweet spot is Seed. More at <a href="https://www.e8angels.com" target="_blank" rel="noopener">e8angels.com</a>, and founders can apply at <a href="https://www.e8angels.com/entrepreneurs" target="_blank" rel="noopener">e8angels.com/entrepreneurs</a>.</p></div>
+      </div>
+    </div>
+  </details>
+
+  <!-- 2 -->
+  <details class="sec" name="guide" id="understand">
+    <summary><span class="n">02</span><h2>Understand the company</h2><span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></span></summary>
+    <div class="body reading">
+      <p>These are prompts, not a scorecard. You don’t need answers to all of them before making a referral. The goal is to spot a potentially interesting company and pass what you heard to the Screening Committee.</p>
+      <ul class="prompts">
+        <li><b>The challenge</b><span>What specific problem are they solving, and how does their solution fit it?</span></li>
+        <li><b>Validation</b><span>What traction or proof do they have so far?</span></li>
+        <li><b>Scale</b><span>Could this become very large and deliver venture-scale returns?</span></li>
+        <li><b>Climate benefit</b><span>What’s the climate or planetary benefit if they succeed?</span></li>
+        <li><b>Stage &amp; timing</b><span>Are they at Seed stage, and when does the round close?</span></li>
+      </ul>
+      <div class="aside">
+        <h3>Red flags</h3>
+        <p style="margin-bottom:4px">Any of these may mean the entrepreneur isn’t a good fit for E8.</p>
+        <ul>
+          <li>No climate thesis, even when prompted</li>
+          <li>Founder comes across as arrogant</li>
+          <li>Uncapped, no-discount SAFE</li>
+          <li>Valuation that’s unrealistically high for the stage</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <!-- 3 -->
+  <details class="sec" name="guide" id="process">
+    <summary><span class="n">03</span><h2>Explain E8’s process</h2><span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></span></summary>
+    <div class="body reading">
+      <p>Set expectations. Founders mostly want to know what happens after they apply. This is the short version, written so you can paste it into an email as-is.</p>
+      <div class="copy">
+        <header><span class="eyebrow">E8’s process, in brief</span><button class="btn sm" data-copy>Copy</button></header>
+        <div class="body">
+          <p>Here is how E8’s process works. There is no cost to apply, and you can apply any time at <a href="https://www.e8angels.com/entrepreneurs" target="_blank" rel="noopener">e8angels.com/entrepreneurs</a>.</p>
+          <ol>
+            <li>Applications are reviewed at the start of each month.</li>
+            <li>The top ~10 companies are invited to submit a video pitch of up to 3 minutes for the Screening Committee.</li>
+            <li>The top three companies present to 50+ E8 members at the monthly meeting, in a 20-minute slot.</li>
+            <li>If members show strong interest, we hold a follow-up call the following Monday or Tuesday and confirm that day whether we are moving to diligence.</li>
+            <li>Diligence takes about four weeks.</li>
+            <li>After diligence, the company is eligible for direct investment from E8 members and the E8 Annual Fund. Between the fund and direct investments from members, E8 typically invests between $200K - $500K in a round.</li>
+          </ol>
+          <p>More about E8 at <a href="https://www.e8angels.com" target="_blank" rel="noopener">e8angels.com</a>.</p>
+        </div>
+      </div>
+      <p>For anything beyond this, point them to the <a href="https://www.e8angels.com/entrepreneurs" target="_blank" rel="noopener">Entrepreneur FAQ ↗</a> or ask Sarah Bell (<a href="mailto:sarah@e8angels.com">sarah@e8angels.com</a>) rather than guessing.</p>
+    </div>
+  </details>
+
+  <!-- 4 -->
+  <details class="sec" name="guide" id="refer">
+    <summary><span class="n">04</span><h2>Refer</h2><span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></span></summary>
+    <div class="body reading">
+      <div class="callout" style="margin-top:0">
+        <div class="dot">@</div>
+        <div><b>Before you part ways, get their email address.</b><p>You can’t submit a referral without it, and it’s the one thing that’s hard to recover later.</p></div>
+      </div>
+      <p>Either way, submit notes. The Screening Committee needs the signal from conversations that didn’t go anywhere as much as the ones that did.</p>
+      <div class="cols">
+        <div class="col"><h3>If they may be a good fit</h3><ul>
+          <li>Tell them you’ll record notes for the Screening Committee.</li>
+          <li>Submit the Refer a Company form.</li>
+          <li>Send a personalized follow-up email (template below).</li>
+        </ul></div>
+        <div class="col no"><h3>If they’re not a good fit</h3><ul>
+          <li>Still submit concise, factual notes.</li>
+          <li>Select “Don’t Encourage.”</li>
+          <li>Don’t deliver an investment judgment for E8.</li>
+        </ul></div>
+      </div>
+
+      <div class="cta">
+        <div><b>Ready to record the introduction?</b><span>Your notes go straight to the Screening Committee.</span></div>
+        <a class="btn primary" href="#">Refer a Company →</a>
+      </div>
+
+      <h3 style="margin-top:28px">Follow-up email for a founder who fits</h3>
+      <p>Copy it, then edit before sending. Keep the marked paragraph if you have advice from your conversation; delete it if you don’t.</p>
+      <div class="copy">
+        <header><span class="eyebrow">Follow-up email</span><button class="btn sm" data-copy>Copy email</button></header>
+        <div class="body">
+          <p>It was great to meet you.</p>
+          <p>To recap, <a href="https://www.e8angels.com" target="_blank" rel="noopener">E8</a> (e8angels.com) is a network of 150+ accredited impact investors backing early-stage cleantech companies. We’ve invested $75M+ since 2006, typically $100K – $300K per company, between Seed and Series A (our sweet spot is Seed stage). We invest in companies whose innovations increase the sustainability and health of our planet. There’s no cost to apply. Selected companies are given the opportunity to present (online) to our membership at one of our monthly meetings.</p>
+          <p>If you want to be considered to pitch to E8, apply on our website at <a href="https://www.e8angels.com/entrepreneurs" target="_blank" rel="noopener">e8angels.com/entrepreneurs</a>. I’ve submitted my notes from our conversation to our Screening Committee. Once you submit:</p>
+          <ol>
+            <li>We review applications at the start of each month.</li>
+            <li>The top ~10 companies selected through our Pre-Screening process have the opportunity to submit a video pitch of up to 3 minutes for consideration by our Screening Committee.</li>
+            <li>The top three companies will present to 50+ E8 members later that month, in one of three 20-minute pitch slots between 10:00am and 12:30pm PT. (You’ll receive your exact slot time when invited to pitch.)</li>
+            <li>If members show strong interest — for example, several want to explore investing further — we’ll invite you to a Follow-Up Call the following Monday or Tuesday, and confirm that day whether we’re moving forward to diligence.</li>
+            <li>Diligence runs ~4 weeks from that date.</li>
+            <li>Once diligence concludes (typically within four weeks of your pitch), you’re eligible for direct investment from our members and from the E8 Annual Fund. In 2025, the average investment was $153K per company.</li>
+          </ol>
+          <div class="opt"><span class="tag">Optional</span><p>Based on our conversation, there are a few things to consider before applying.</p></div>
+          <p>If you decide to apply, please let me know.</p>
+          <p>Best regards,</p>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- shortcut path, outside the sequence -->
+  <details class="sec alt" name="guide" id="brief">
+    <summary><span class="n">Shortcut</span><h2>If you only met them briefly</h2><span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></span></summary>
+    <div class="body reading">
+      <p>Not every conversation turns into a referral. If you spoke briefly at an event, send this note and point them at the website. No referral, no notes, nothing further expected of you.</p>
+      <div class="copy">
+        <header><span class="eyebrow">Short note</span><button class="btn sm" data-copy>Copy</button></header>
+        <div class="body"><p>We met briefly just now - I’m an E8 member. E8 is a network of 150+ accredited impact investors backing early-stage cleantech companies. We’ve invested $75M+ since 2006, typically $100K – $300K per company, at Pre-Seed to Series A (our sweet spot is Seed). Please take a look at our website, <a href="https://www.e8angels.com" target="_blank" rel="noopener">e8angels.com</a>, for more information. You can apply directly at <a href="https://www.e8angels.com/entrepreneurs" target="_blank" rel="noopener">e8angels.com/entrepreneurs</a>.</p></div>
+      </div>
+    </div>
+  </details>
+
+</main>
+
+<aside class="rail">
+  <div class="box">
+    <div class="eyebrow">Keep handy</div>
+    <div class="handy">
+      <a class="btn primary" href="#">Refer a Company →</a>
+      <a class="link" href="#" target="_blank" rel="noopener">Entrepreneur slide deck ↗</a>
+      <a class="link" href="https://www.e8angels.com/entrepreneurs" target="_blank" rel="noopener">Entrepreneur FAQ ↗</a>
+    </div>
+  </div>
+  <div class="box">
+    <div class="eyebrow">Guardrails</div>
+    <span class="rules-h">Do</span>
+    <ul class="rules">
+      <li>Explain E8’s mission.</li>
+      <li>Ask high-level questions.</li>
+      <li>Set expectations about the process.</li>
+      <li>Take concise notes.</li>
+    </ul>
+    <span class="rules-h no">Don’t</span>
+    <ul class="rules no">
+      <li>Promise funding.</li>
+      <li>Negotiate terms.</li>
+      <li>Request confidential information.</li>
+    </ul>
+  </div>
+</aside>
+</div>
+
+<script>
+  // Copy buttons: plain text of the block, links rendered as "word (url)".
+  document.querySelectorAll('[data-copy]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var body = btn.closest('.copy').querySelector('.body').cloneNode(true);
+      body.querySelectorAll('.tag').forEach(function(t){ t.remove(); });
+      var html = body.innerHTML;
+      // Plain-text fallback: spell out the address unless the link text already is one.
+      body.querySelectorAll('a').forEach(function(a){ if (a.textContent.indexOf('e8angels.com') < 0) a.textContent += ' (' + a.hostname + ')'; });
+      var text = body.innerText.replace(/\n{3,}/g,'\n\n').trim();
+      var item = new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([text], { type: 'text/plain' }) });
+      navigator.clipboard.write([item]).then(function(){
+        var was = btn.textContent; btn.textContent = 'Copied ✓';
+        setTimeout(function(){ btn.textContent = was; }, 1600);
+      });
+    });
+  });
+  // Exclusive accordion is native (details[name]). The spine mirrors it: done / current / todo.
+  var secs = Array.from(document.querySelectorAll('details.sec'));
+  var steps = Array.from(document.querySelectorAll('#spine .step'));
+  function syncSpine(){
+    var open = secs.find(function(s){ return s.open; });
+    var idx = open ? steps.findIndex(function(st){ return st.dataset.open === open.id; }) : -1;
+    steps.forEach(function(st, i){
+      st.classList.toggle('done', idx >= 0 && i < idx);
+      st.classList.toggle('current', i === idx);
+      st.classList.toggle('todo', idx >= 0 && i > idx);
+    });
+  }
+  secs.forEach(function(s){ s.addEventListener('toggle', syncSpine); });
+  document.querySelectorAll('[data-open]').forEach(function(a){
+    a.addEventListener('click', function(){
+      var d = document.getElementById(a.dataset.open); d.open = true;
+      if (a.tagName !== 'A') d.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+  syncSpine();
+</script>
+</body>
+</html>
