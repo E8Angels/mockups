@@ -1,0 +1,74 @@
+/* E8 Angels (Live) — Interaction state tokens
+   VERIFIED. Every value below is read from the live compiled stylesheet
+   (uploads/index.css, captured Aug 28 2026), not inferred from a screenshot.
+   The app ships its own token layer under the --e8-* prefix; the live name is
+   noted beside each value so the two systems can be reconciled by hand.
+
+   One finding is a defect rather than a value: an unscoped
+     *:focus, *:focus-visible { outline: none !important; box-shadow: none !important }
+   sits near the end of the sheet and suppresses EVERY focus indicator in the
+   product — including --e8-color-focus, the input focus ring and the
+   .ask-card:focus-visible outline, all of which are defined and then overridden.
+   The focus tokens below are therefore what the product INTENDS, not what a
+   keyboard user currently sees. See readme.md § BRAND-GUIDELINE DEVIATIONS. */
+:root {
+  /* Filled action — live --e8-color-primary / -hover / -active */
+  --state-action-fill:        #07312C;
+  --state-action-fill-hover:  #0F5049;
+  --state-action-fill-active: #14201E;
+  --state-action-text:        #FFFFFF;
+
+  /* Link — live --e8-color-link / --e8-color-link-hover.
+     Hover also adds text-decoration: underline on most link classes. */
+  --state-link:       #1F5F52;
+  --state-link-hover: #0F5049;
+
+  /* Quiet / secondary controls: hover fills a surface and darkens the border.
+     Live: .mine-btn:hover, .btn-copy-link:hover, .application-btn:hover */
+  --state-quiet-hover-bg:     #F7F8F6; /* --e8-color-surface-muted */
+  --state-quiet-hover-border: #93A09A; /* --e8-color-ink-faint */
+
+  /* Secondary button — live .btn-secondary:hover */
+  --state-secondary-hover-bg: #DFE4E0; /* --e8-color-border */
+
+  /* Rows, menu items, tabs — live .dd-item:hover, .team-dropdown-item:hover */
+  --state-row-hover-bg:  #F7F8F6;
+  --state-item-hover-bg: #EEF1EE; /* --e8-color-surface-subtle */
+
+  /* Card hover — live .ask-card:hover */
+  --state-card-hover-shadow: 0 2px 8px rgb(20 32 30 / 8%), 0 8px 28px rgb(20 32 30 / 7%);
+  --state-card-hover-border: #C2CBC6; /* --e8-color-border-strong */
+
+  /* Focus — INTENDED, globally suppressed in production (see header note).
+     Inputs: border-color -> ink-faint plus a 3px ink wash ring.
+     Cards/tiles: a 2px ink-faint outline at 2px offset. */
+  --state-focus-color:          #1F5F52; /* --e8-color-focus, defined, unused */
+  --state-focus-input-border:   #93A09A;
+  --state-focus-input-ring:     0 0 0 3px rgb(20 32 30 / 5%);
+  --state-focus-outline:        2px solid #93A09A; /* @kind other */
+  --state-focus-outline-offset: 2px;
+
+  /* Disabled — live .btn:disabled / .btn-primary:disabled / toolbar buttons */
+  --state-disabled-fill:    #C2CBC6; /* --e8-color-border-strong */
+  --state-disabled-text:    #66746E; /* --e8-color-ink-muted */
+  --state-disabled-opacity: 0.5; /* @kind other */
+  --state-disabled-cursor:  not-allowed; /* @kind other */
+
+  /* Error — live .error-message block. There is no field-level error style:
+     required fields fall through to the browser native validation bubble
+     (see sources/, "Refer a Company"). */
+  --state-error-text:    #DC2626; /* --e8-color-danger  = danger-600 */
+  --state-error-bg:      #FECDD3; /* --color-error-bg   = rose-200 */
+  --state-error-bg-soft: #FEF2F2; /* --color-error-bg-soft = danger-50 */
+  --state-error-border:  #FECACA; /* --e8-color-danger-border = danger-200 */
+  --state-error-pad:     12px 16px;
+  --state-error-radius:  6px;
+
+  /* Motion — measured across the sheet. .12-.15s dominates for fills and
+     backgrounds, .2s for buttons and border-colour; the easing is the CSS
+     default in nearly every rule. */
+  --state-dur-quick: 130ms; /* @kind other */
+  --state-dur-fast:  150ms; /* @kind other */
+  --state-dur-base:  200ms; /* @kind other */
+  --state-ease:      ease; /* @kind other */
+}

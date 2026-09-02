@@ -1,0 +1,158 @@
+/* E8 Angels (Live) — Color tokens
+   The live app ships its own token layer under the --e8-* prefix. As of the
+   Aug 28 2026 stylesheet capture (uploads/index.css) every value below is read
+   from that layer rather than sampled from a screenshot; the live token name is
+   named in the comment beside it. Where a pixel sample and a token disagreed,
+   the token won — antialiasing and overlay opacity made several samples read a
+   few points light.
+
+   The layer is themed: the palette lives on
+     :root, :root[data-e8-color-scheme=stonewash]
+   and the type scale on
+     :root, :root[data-e8-type-scheme=blend]
+   so the product already has the switch a guideline-aligned theme would need.
+   Only the stonewash / blend pair is present in the shipped sheet.
+
+   Headline findings:
+   - The page ground is a COOL blue-grey (#EDF2F7 = --e8-color-page), not Bone.
+   - Brand teal #2EC4B6 appears nowhere. The teal ramp bottoms out dark:
+     primary #07312C, link #1F5F52, hover #0F5049, accent-on-dark #89B8AB.
+   - danger / warning / success / info / violet / rose are the unmodified
+     Tailwind default ramps, carried in as --e8-<family>-<step>-rgb.
+   - A five-step red-to-green rating ramp and a LinkedIn blue exist in the
+     product and have no counterpart in the guide.
+
+   The "Brand-guideline reference" block below was verified swatch by swatch
+   against the guidelines PDF, §04 Color Palette. The guide's accessibility rule
+   for teal: bright teal #2EC4B6 on dark grounds only; on light grounds use
+   Teal Ink #0D6E62 for small text (WCAG AA). */
+:root {
+  /* ---------- Ink (green-tinted, live) ---------- */
+  --ink-900: #14201E; /* --e8-color-ink */ /* page titles, company names */
+  --ink-850: #1E2B28; /* --e8-neutral-800 */ /* table row names */
+  --ink-700: #45524D; /* --e8-color-ink-secondary */ /* body copy */
+  --ink-750: #2F3D39; /* sampled, referral-submitted.png */ /* body copy and
+                         label ink on the referral flow — darker than
+                         --ink-secondary and not present in index.css; the
+                         route appears to carry its own secondary ink. */
+  --ink-600: #66746E; /* --e8-color-ink-muted */ /* meta, secondary */
+  --ink-400: #93A09A; /* --e8-color-ink-faint */ /* placeholder, disabled tab */
+
+  /* ---------- Neutral surfaces & lines (live) ---------- */
+  --white:        #FFFFFF;
+  --paper-50:     #FAFBFA; /* card hover */
+  --paper-100:    #F7F8F6; /* --e8-color-surface-muted */ /* input fill, table head, inset panel */
+  --paper-200:    #EEF1EE; /* --e8-color-surface-subtle */
+  --paper-300:    #E7EAE6; /* --e8-color-surface-strong */ /* zebra row, soft fill */
+  --line-100:     #EEF1EE; /* hairline inside cards */
+  --line-200:     #DFE4E0; /* --e8-color-border */ /* default card / table border */
+  --line-300:     #C2CBC6; /* --e8-color-border-strong */ /* input border, stronger rule */
+
+  /* ---------- Page ground (live) ----------
+     DEVIATION: cool blue-grey. Brand ground is Bone #F0EDE8. */
+  --ground-100:   #EDF2F7; /* --e8-color-page */
+  --ground-200:   #E8EDF2; /* scrim / deeper region */
+  --scrim:        rgb(20 32 30 / 48%); /* --e8-color-overlay */
+
+  /* ---------- Teal (live usage) ---------- */
+  --teal-link:    #1F5F52; /* --e8-color-link */
+  --teal-link-alt:#167168; /* sampled, referral-submitted.png */ /* a fifth
+                     teal: the referral flow's link colour, brighter than
+                     --e8-color-link and closest of the five to the guide's
+                     Teal Ink #0D6E62. See deviation 4. */
+  --teal-deep:    #0F5049; /* --e8-color-primary-hover / --e8-color-link-hover */
+  --teal-wash:    #ECF5F2; /* --e8-primary-50 */
+  --teal-accent-on-dark: #89B8AB; /* --e8-color-accent-on-dark = primary-300 */
+  --teal-mid:     #07312C; /* --e8-color-primary — filled CTA. A screenshot
+                              sample read #325E53; the token is the truth. */
+
+  /* ---------- Status: green (live, Tailwind-derived) ----------
+     DEVIATION: not a brand family. */
+  --ok-bg:        #F0FDF4; /* success-50 */
+  --ok-bg-alt:    #F3FDF5;
+  --ok-border:    #BBF7D0; /* success-200 */
+  --ok-border-alt:#C8F6D3;
+  --ok-text:      #15803D; /* --e8-color-success = success-700 */
+
+  /* ---------- Status: amber (derived, not live) ----------
+     DEVIATION: no amber pill exists in the captured CSS. Derived from the
+     live rating-ramp ochre --rate-1 #E4A464 (which the portal used inline
+     for the "Contingent" tag) and darkened to a readable pill text. */
+  --warn-bg:      #FDF6EE;
+  --warn-border:  #EFD3B0;
+  --warn-text:    #96591C;
+
+  /* ---------- Status: informational blue (live) ----------
+     DEVIATION: the guide admits no blue. Used for the LinkedIn glyph. */
+  --info-600:     #2D65BC;
+  --info-400:     #628CCD;
+  --info-bg:      #ECF1F6;
+
+  /* ---------- Rating ramp, 0-4 (live) ----------
+     NOT IN THE GUIDE. Screening matrix cell fills. Numerals sit in ink. */
+  --rate-0:       #E46464;
+  --rate-1:       #E4A464;
+  --rate-2:       #E4E465;
+  --rate-3:       #A5D664;
+  --rate-4:       #64C865;
+  --rate-none:    #E7E9E7;
+
+  /* ---------- Rating ramp, INPUT variant (live) ----------
+     The "Rate <Company>" dialog fills the selected segment from a fully
+     saturated ramp, NOT the muted matrix ramp above: same hues, s=100%.
+     Steps 2 and 3 are sampled from rate-company-modal.png (#FFFF05,
+     #81E400); 0, 1 and 4 are hue-matched extrapolations at the same
+     construction, pending a capture with those cells selected. */
+  --rate-input-0: #E40000;
+  --rate-input-1: #E47200;
+  --rate-input-2: #FFFF05;
+  --rate-input-3: #81E400;
+  --rate-input-4: #00E400;
+
+  /* ---------- Brand-guideline reference (NOT used by live components) ----
+     Verified against the guidelines PDF §04. Kept so a corrected,
+     guide-aligned theme is a token swap away. */
+  --guide-forest:     #1A2826;
+  --guide-teal:       #2EC4B6;
+  --guide-teal-ink:   #0D6E62;
+  --guide-slate:      #3D4F4A;
+  --guide-sage:       #8BA88E;
+  --guide-bone:       #F0EDE8;
+  --guide-ochre:      #D4964A;
+  --guide-rose:       #BD9189;
+  --guide-terracotta: #C47055;
+  --guide-sand:       #C8B9A0;
+
+  /* ---------- Semantic aliases (what components consume) ---------- */
+  --text-strong:  var(--ink-900);
+  --text-body:    var(--ink-700);
+  --text-muted:   var(--ink-600);
+  --text-faint:   var(--ink-400);
+  --text-link:    var(--teal-link);
+  --text-on-dark: var(--white);
+
+  --surface-page:    var(--ground-100);
+  --surface-card:    var(--white);
+  --surface-inset:   var(--paper-100);
+  --surface-subtle:  var(--paper-200);
+  --surface-inverse: var(--ink-900);
+
+  --border-hairline: var(--line-100);
+  --border-default:  var(--line-200);
+  --border-strong:   var(--line-300);
+
+  --action-fill:      var(--teal-mid);   /* filled CTA */
+  --action-fill-hover:var(--state-action-fill-hover);
+  --action-text:      var(--white);
+  --nav-active-fill:  var(--teal-deep); /* #0F5049 */
+  --nav-active-text:  var(--white);
+  --focus-ring:       var(--state-focus-color); /* see tokens/interaction.css */
+
+  --success:      var(--ok-text);
+  --success-soft: var(--ok-bg);
+  --success-line: var(--ok-border);
+
+  --warning:      var(--warn-text);
+  --warning-soft: var(--warn-bg);
+  --warning-line: var(--warn-border);
+}

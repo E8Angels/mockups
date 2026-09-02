@@ -1,0 +1,62 @@
+/* E8 Angels (Live) — Spacing, radii, shadows, layout, motion
+   Radii, shadows and motion are read from the live token layer (--e8-radius-*,
+   --e8-shadow-*) in the Aug 28 2026 stylesheet capture. Layout and control
+   heights are still measured from the captures; where a value is odd (37px
+   input, 42px nav pill, 69px header) it is written as measured.
+   Note the live card radius is 10px, not the 12px this system first recorded. */
+:root {
+  --space-0:  0;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --radius-xs:     4px;
+  --radius-sm:     6px;  /* rating cell */
+  --radius-md:     8px;  /* --e8-radius-control: input, button, nav pill */
+  --radius-lg:     10px; /* --e8-radius-card */
+  --radius-xl:     10px; /* card — was 12px by measurement, token says 10px */
+  --radius-2xl:    14px; /* --e8-radius-panel: detail sheet / modal */
+  --radius-pill:   999px;
+  --radius-circle: 50%;
+
+  --border-w: 1px; /* @kind spacing */
+
+  --shadow-none: none;
+  --shadow-xs:   0 1px 2px rgb(20 32 30 / 5%);
+  --shadow-sm:   0 1px 3px rgb(20 32 30 / 8%), 0 1px 2px rgb(20 32 30 / 4%);
+  --shadow-md:   0 8px 24px rgb(20 32 30 / 10%);
+  --shadow-lg:   0 16px 44px rgb(20 32 30 / 16%);
+  --shadow-card-hover: var(--state-card-hover-shadow);
+  --shadow-focus: var(--state-focus-input-ring);
+
+  /* Layout (measured) */
+  --header-h:      69px; /* top nav, white, hairline base */
+  --slack-strip-h: 34px;
+  --container-max: 1440px;
+  --gutter:        24px;
+  --col-gap:       20px;
+  --card-pad:      20px;
+  --card-gap:      20px;
+
+  /* Controls (measured) */
+  --control-h:     37px; /* search input */
+  --nav-pill-h:    42px;
+  --rating-cell-h: 29px;
+  --rating-gap-x:  8px;
+  --rating-gap-y:  4px;
+  --avatar-sm:     26px;
+  --avatar-md:     32px;
+  --logo-tile:     48px;
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1); /* @kind other */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* @kind other */
+  --dur-fast: 150ms; /* @kind other */ /* live .15s, the dominant duration */
+  --dur-base: 200ms; /* @kind other */ /* live .2s, buttons and border-colour */
+}

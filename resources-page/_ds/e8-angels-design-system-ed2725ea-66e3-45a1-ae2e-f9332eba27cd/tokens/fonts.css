@@ -1,0 +1,17 @@
+/* E8 Angels (Live) — Webfonts
+
+   OBSERVED: the running portal renders its UI in a wide geometric grotesk —
+   circular bowls, single-storey 'a', angled-cut 't', short 'r' flag. That is
+   consistent with Cosmica, the primary typeface named in the E8 Brand
+   Guidelines (§03). No Cosmica webfont files were supplied to this project,
+   so it cannot be loaded here.
+
+   FALLBACK: Urbanist — the guide's own approved stand-in wherever Cosmica
+   cannot be embedded. Free on Google Fonts; it is what actually renders in
+   these artifacts today. It is narrower and lighter than the live face, so
+   headline widths here run slightly short of the real app.
+
+   TO ACTIVATE COSMICA: drop the woff2 files into assets/fonts/, add @font-face
+   rules below for weights 300-700, and nothing else changes — "Cosmica" is
+   already first in --font-sans. */
+@import url("https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap");

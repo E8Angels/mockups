@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/e8-angels-design-system-ed2725ea-66e3-45a1-ae2e-f9332eba27cd/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/e8-angels-design-system-ed2725ea-66e3-45a1-ae2e-f9332eba27cd/tokens/colors.css">
+<link rel="stylesheet" href="_ds/e8-angels-design-system-ed2725ea-66e3-45a1-ae2e-f9332eba27cd/tokens/typography.css">
+<link rel="stylesheet" href="_ds/e8-angels-design-system-ed2725ea-66e3-45a1-ae2e-f9332eba27cd/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/e8-angels-design-system-ed2725ea-66e3-45a1-ae2e-f9332eba27cd/tokens/interaction.css">
+<link rel="stylesheet" href="_ds/e8-angels-design-system-ed2725ea-66e3-45a1-ae2e-f9332eba27cd/tokens/base.css">
+<link rel="stylesheet" href="_ds/e8-angels-design-system-ed2725ea-66e3-45a1-ae2e-f9332eba27cd/_ds_bundle.css">
+<link rel="stylesheet" href="_ds/e8-angels-design-system-ed2725ea-66e3-45a1-ae2e-f9332eba27cd/styles.css">
+<script src="https://unpkg.com/lucide@0.462.0/dist/umd/lucide.js"></script>
+<script src="_ds/e8-angels-design-system-ed2725ea-66e3-45a1-ae2e-f9332eba27cd/_ds_bundle.js"></script>
+<script src="resources-sheet.js"></script>
+<script src="resources-data.js"></script>
+<style>
+body { margin: 0; background: #E4E9EE; }
+a { color: var(--text-link); text-decoration: none; }
+a:hover { color: var(--teal-deep); text-decoration: underline; }
+.rowscroll::-webkit-scrollbar { height: 8px; }
+.rowscroll::-webkit-scrollbar-thumb { background: var(--line-300); border-radius: 4px; }
+</style>
+</helmet>
+
+<div style="padding:40px 40px 8px;font-family:var(--font-sans);max-width:1400px">
+<div style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase">E8 Angels member portal</div>
+<h1 style="margin:8px 0 10px;font-size:34px;font-weight:700;color:var(--ink-900);letter-spacing:-0.01em">Resources</h1>
+<p style="margin:0;max-width:760px;font-size:15px;line-height:1.6;color:var(--ink-700);text-wrap:pretty">Built from the planning sheet. Only rows marked <strong>Y</strong> in “Shown on UI” render; <em>N</em> and blank rows stay in <code>resources-sheet.js</code> for later. Order comes from the Order column, descriptions from Short Description, and the type tile from Media Type. Decarbon8 is held for March 2027.</p>
+<div style="margin-top:20px;display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px dashed var(--line-300);border-radius:8px;background:rgba(255,255,255,0.6);width:fit-content">
+<span style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.06em;color:var(--text-muted);text-transform:uppercase">Preview as</span>
+<div style="display:flex;gap:6px">
+<sc-for list="{{ roleChips }}" as="chip" hint-placeholder-count="4">
+<button onClick="{{ chip.onClick }}" style="height:30px;padding:0 12px;border-radius:999px;cursor:pointer;font-family:var(--font-sans);font-size:13px;font-weight:500;border:1px solid {{ chip.border }};background:{{ chip.bg }};color:{{ chip.fg }}">{{ chip.label }}</button>
+</sc-for>
+</div>
+<span style="font-size:12px;color:var(--text-faint)">Prototype control — the live page reads the signed-in role.</span>
+</div>
+</div>
+
+<section style="padding:24px 40px 80px">
+<div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+
+<div id="1c" style="width:1440px;flex:0 0 1440px">
+<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:12px;font-family:var(--font-sans)">
+<span style="font-size:17px;font-weight:600;color:var(--ink-900)">Resource library</span>
+<span style="font-size:13px;color:var(--text-muted)">Media-forward: tabs by type, four-up rows that expand with “View all”, and 16:9 poster frames pulled from Drive and YouTube.</span>
+</div>
+<div style="border:1px solid var(--line-200);border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(20,32,30,0.08);background:var(--surface-page)">
+<x-import component-from-global-scope="E8AngelsDesignSystem_ed2725.TopNav" items="{{ navItems }}" active="members" logo-src="assets/logo.svg" hint-size="100%,69px"></x-import>
+<div style="padding:32px 0 44px">
+<sc-if value="{{ viewing }}" hint-placeholder-val="{{ false }}">
+<div style="padding:0 max(var(--gutter), calc((100% - 1152px) / 2))">
+<button onClick="{{ closeViewer }}" style="display:flex;align-items:center;gap:8px;background:none;border:none;padding:0;margin-bottom:18px;cursor:pointer;font-family:var(--font-sans);font-size:13.5px;font-weight:500;color:var(--text-link)">← Back to Resources</button>
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap">
+<div style="max-width:640px">
+<div style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted)">{{ viewerKicker }}</div>
+<h2 style="margin:6px 0 8px;font-size:26px;font-weight:700;color:var(--ink-900);letter-spacing:-0.01em;text-wrap:pretty">{{ viewerTitle }}</h2>
+<p style="margin:0;font-size:14.5px;line-height:1.6;color:var(--ink-700);text-wrap:pretty">{{ viewerDesc }}</p>
+</div>
+<a href="{{ viewerHref }}" target="_blank" rel="noopener" style="flex:0 0 auto;height:38px;display:inline-flex;align-items:center;gap:8px;padding:0 16px;border-radius:8px;background:var(--teal-deep);color:var(--white);font-size:13.5px;font-weight:600;text-decoration:none">Open in new tab ↗</a>
+</div>
+<div style="margin-top:22px;border:1px solid var(--line-200);border-radius:12px;overflow:hidden;background:var(--surface-card)">
+{{ viewerFrame }}
+</div>
+<p style="margin:10px 0 0;font-size:12.5px;color:var(--text-faint)">Preview requires Google access to the file. If it doesn’t load, use “Open in new tab”.</p>
+</div>
+</sc-if>
+<sc-if value="{{ browsing }}" hint-placeholder-val="{{ true }}">
+<div style="padding:0 max(var(--gutter), calc((100% - 1152px) / 2))">
+<div style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted)">Resources</div>
+<h2 style="margin:6px 0 8px;font-size:30px;font-weight:700;color:var(--ink-900);letter-spacing:-0.01em">Resource library</h2>
+<p style="margin:0;max-width:620px;font-size:15px;line-height:1.6;color:var(--ink-700)">Guidance, policies, and videos for you to reference.</p>
+<div style="margin-top:22px;display:flex;gap:0;border-bottom:1px solid var(--line-200)">
+<sc-for list="{{ chipsC }}" as="chip" hint-placeholder-count="5">
+<button onClick="{{ chip.onClick }}" style="padding:0 4px 12px;margin-right:26px;background:none;border:none;cursor:pointer;font-family:var(--font-sans);font-size:14px;font-weight:{{ chip.weight }};color:{{ chip.fg }};border-bottom:2px solid {{ chip.underline }}">{{ chip.label }}</button>
+</sc-for>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr);gap:36px;margin-top:30px">
+<sc-for list="{{ secsC }}" as="sec" hint-placeholder-count="4">
+<div>
+<div style="padding:0 max(var(--gutter), calc((100% - 1152px) / 2));display:flex;align-items:baseline;gap:10px;margin-bottom:14px">
+<h3 style="margin:0;font-size:19px;font-weight:600;color:var(--ink-900)">{{ sec.title }}</h3>
+<span style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-faint)">{{ sec.kicker }}</span>
+<sc-if value="{{ sec.canExpand }}" hint-placeholder-val="{{ true }}">
+<button onClick="{{ sec.onToggle }}" style="margin-left:auto;background:none;border:none;padding:0;cursor:pointer;font-family:var(--font-sans);font-size:13px;font-weight:500;color:var(--text-link)">{{ sec.expandLabel }}</button>
+</sc-if>
+</div>
+<div class="rowscroll" style="display:{{ sec.rowDisplay }};grid-template-columns:{{ sec.rowCols }};gap:{{ sec.rowGap }};overflow-x:{{ sec.rowOverflow }};padding:4px max(var(--gutter), calc((100% - 1152px) / 2)) 12px">
+<sc-for list="{{ sec.flat }}" as="item" hint-placeholder-count="4">
+<div style="flex:{{ sec.cardFlex }};min-width:0;display:flex;flex-direction:column;gap:10px;opacity:{{ item.cardOpacity }}">
+<a href="{{ item.href }}" onClick="{{ item.onOpen }}" target="{{ item.target }}" rel="noopener" style="position:relative;display:grid;place-items:center;aspect-ratio:16/9;border-radius:10px;border:1px solid var(--line-200);background:{{ item.tint }};color:{{ item.ink }};overflow:hidden;text-decoration:none;cursor:{{ item.cursor }}">
+<span style="font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:0.14em">{{ item.typeLabel }}</span>
+{{ item.posterEl }}
+<sc-if value="{{ item.isVideo }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;inset:0;display:grid;place-items:center">
+<div style="width:46px;height:46px;border-radius:999px;background:rgba(255,255,255,0.92);display:grid;place-items:center">
+<div style="width:0;height:0;margin-left:3px;border-left:13px solid var(--teal-mid);border-top:8px solid transparent;border-bottom:8px solid transparent"></div>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ item.hasStatus }}" hint-placeholder-val="{{ true }}">
+<span style="position:absolute;top:10px;left:10px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.04em;text-transform:uppercase;padding:4px 7px;border-radius:4px;background:{{ item.statusBg }};color:{{ item.statusInk }}">{{ item.statusLabel }}</span>
+</sc-if>
+</a>
+<div style="font-size:15px;font-weight:600;line-height:1.35;color:var(--ink-900);text-wrap:pretty">{{ item.title }}</div>
+<div style="font-size:13px;line-height:1.5;color:var(--ink-600);text-wrap:pretty">{{ item.desc }}</div>
+<div style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ item.meta }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</div>
+</div>
+
+</div>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;viewerRole&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;member&quot;,&quot;fellow&quot;],&quot;default&quot;:&quot;member&quot;,&quot;tsType&quot;:&quot;'member'|'fellow'&quot;,&quot;section&quot;:&quot;Access&quot;},&quot;showComingSoon&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Access&quot;}}">
+const ROLES = [
+  { id: 'member', label: 'Member' },
+  { id: 'fellow', label: 'Fellow' }
+];
+
+const FILTERS = [
+  { id: 'all', label: 'All' },
+  { id: 'video', label: 'Videos' },
+  { id: 'deck', label: 'Slides' },
+  { id: 'document', label: 'Documents' },
+  { id: 'form', label: 'Links' }
+];
+
+const STATUS = {
+  soon:    { label: 'Coming soon', bg: 'var(--paper-300)', ink: 'var(--ink-600)' },
+  needs:   { label: 'Needs content', bg: 'var(--warn-bg)', ink: 'var(--warn-text)' },
+  pending: { label: 'Link pending', bg: 'var(--warn-bg)', ink: 'var(--warn-text)' },
+  planned: { label: 'March 2027', bg: 'var(--teal-wash)', ink: 'var(--teal-deep)' },
+  existing:{ label: 'From library', bg: 'var(--teal-wash)', ink: 'var(--teal-deep)' }
+};
+
+function visibleTo(audience, role) {
+  if (audience === 'all') return true;
+  if (audience === 'members') return role === 'member';
+  if (audience === 'fellows') return role === 'fellow';
+  return true;
+}
+
+/* Poster layer: sits over the tinted type tile. If the thumbnail 404s (Drive file not
+   link-visible) it removes itself, revealing the tile and its DOC/SLIDES label. */
+function PosterLayer(props) {
+  const [failed, setFailed] = React.useState(false);
+  if (failed) return null;
+  return React.createElement('div', { style: { position: 'absolute', inset: 0 } },
+    React.createElement('img', {
+      src: props.src, alt: '', onError: () => setFailed(true),
+      loading: 'eager', referrerPolicy: 'no-referrer', crossOrigin: undefined,
+      style: { position: 'absolute', inset: 0, width: '100%', height: '100%',
+               objectFit: 'cover', objectPosition: 'top center' }
+    }),
+    React.createElement('span', {
+      style: { position: 'absolute', bottom: 8, right: 8, fontFamily: 'var(--font-mono)',
+               fontSize: 9.5, fontWeight: 600, letterSpacing: '0.12em', padding: '3px 6px',
+               borderRadius: 4, background: 'rgba(255,255,255,0.92)', color: 'var(--ink-850)' }
+    }, props.label)
+  );
+}
+
+function sourceLabel(src) {
+  const s = String(src || '');
+  if (!s) return '';
+  if (/youtu/.test(s)) return 'YouTube';
+  if (/docs\.google\.com\/presentation/.test(s)) return 'Google Slides';
+  if (/docs\.google\.com\/document/.test(s)) return 'Google Docs';
+  if (/app\.e8angels\.com/.test(s)) return 'E8 portal';
+  if (/^https?:/.test(s)) { try { return s.replace(/^https?:\/\//, '').split('/')[0]; } catch (e) { return s; } }
+  return s;
+}
+
+function bucket(type) {
+  if (type === 'video') return 'video';
+  if (type === 'deck') return 'deck';
+  if (type === 'form' || type === 'contact') return 'form';
+  return 'document';
+}
+
+class Component extends DCLogic {
+  state = { ready: false, role: 'member', fA: 'all', fB: 'all', fC: 'all', q: '', collapsed: {}, viewing: null };
+
+  componentDidMount() {
+    const tick = () => {
+      if (window.E8AngelsDesignSystem_ed2725 && window.RES_DATA) this.setState({ ready: true });
+      else this.timer = setTimeout(tick, 40);
+    };
+    tick();
+    if (this.props.viewerRole) this.setState({ role: this.props.viewerRole });
+  }
+  componentDidUpdate(prev) {
+    if (prev.viewerRole !== this.props.viewerRole && this.props.viewerRole) {
+      this.setState({ role: this.props.viewerRole });
+    }
+  }
+  componentWillUnmount() { clearTimeout(this.timer); }
+
+  frameTop() {
+    const el = document.getElementById('1c');
+    if (!el) return 0;
+    return Math.max(0, el.getBoundingClientRect().top + window.scrollY - 24);
+  }
+
+  prep(item, groupTitle) {
+    const T = window.RES_DATA.TYPE[item.type] || window.RES_DATA.TYPE.doc;
+    let key = null;
+    if (item.needs) key = 'needs';
+    else if (item.status === 'soon') key = 'soon';
+    else if (item.status === 'planned') key = 'planned';
+    else if (item.status === 'existing') key = 'existing';
+    else if (item.link === 'pending') key = 'pending';
+    const st = key ? STATUS[key] : null;
+    const dim = item.status === 'soon' || item.status === 'planned' || item.needs;
+    return {
+      title: item.title,
+      desc: item.desc,
+      typeLabel: item.link ? (item.typeLabel || T.label) : 'COMING SOON',
+      tint: T.tint,
+      ink: T.ink,
+      isVideo: item.type === 'video',
+      href: item.link || undefined,
+      cursor: item.link ? 'pointer' : 'default',
+      target: (!item.embed && item.link) ? '_self' : '_blank',
+      onOpen: e => {
+        if (!item.embed) return;
+        e.preventDefault();
+        this.browseScroll = window.scrollY;
+        this.setState({ viewing: item }, () => window.scrollTo(0, this.frameTop()));
+      },
+      posterEl: item.poster ? React.createElement(PosterLayer, { src: item.poster, label: item.typeLabel }) : null,
+      meta: item.duration || item.pages || sourceLabel(item.source) || '—',
+      hasStatus: !!st,
+      statusLabel: st ? st.label : '',
+      statusBg: st ? st.bg : 'transparent',
+      statusInk: st ? st.ink : 'inherit',
+      cardOpacity: dim ? 0.72 : 1,
+      cardBorder: dim ? 'var(--line-100)' : 'var(--line-200)',
+      open: item.status === 'live' && item.link !== 'pending',
+      groupTitle: groupTitle || '',
+      hasGroup: !!groupTitle
+    };
+  }
+
+  build(filter, query) {
+    if (!window.RES_DATA) return [];
+    const role = this.state.role;
+    const q = (query || '').trim().toLowerCase();
+    const out = [];
+    window.RES_DATA.sections.forEach(sec => {
+      if (sec.audience && !visibleTo(sec.audience, role)) return;
+      const groups = [];
+      const flat = [];
+      sec.groups.forEach(grp => {
+        const items = grp.items.filter(it => {
+          if (!visibleTo(it.audience, role)) return false;
+          if (filter !== 'all' && bucket(it.type) !== filter) return false;
+          if (q && (it.title + ' ' + it.desc).toLowerCase().indexOf(q) < 0) return false;
+          if (this.props.showComingSoon === false && it.status !== 'live' && it.status !== 'existing') return false;
+          return true;
+        }).map(it => this.prep(it, grp.title));
+        if (!items.length) return;
+        groups.push({ title: grp.title, hasTitle: !!grp.title, items: items });
+        items.forEach(i => flat.push(i));
+      });
+      if (!groups.length) return;
+      out.push({
+        id: sec.id, title: sec.title, kicker: sec.kicker, blurb: sec.blurb,
+        count: String(flat.length), groups: groups, flat: flat
+      });
+    });
+    return out;
+  }
+
+  chips(list, current, key, style) {
+    return list.map(f => {
+      const on = f.id === current;
+      return {
+        id: f.id,
+        label: f.label,
+        on: on,
+        weight: on ? '600' : '500',
+        bg: on ? 'var(--teal-mid)' : 'var(--surface-card)',
+        fg: style === 'tab' ? (on ? 'var(--ink-900)' : 'var(--text-muted)') : (on ? 'var(--white)' : 'var(--ink-700)'),
+        border: on ? 'var(--teal-mid)' : 'var(--line-300)',
+        underline: on ? 'var(--teal-deep)' : 'transparent',
+        onClick: () => this.setState({ [key]: f.id })
+      };
+    });
+  }
+
+  renderVals() {
+    const secsA = this.build(this.state.fA, '');
+    const secsB = this.build(this.state.fB, this.state.q);
+    const secsC = this.build(this.state.fC, '').map(sec => {
+      const open = this.state.collapsed[sec.id] !== true;
+      const canExpand = sec.flat.length > 4;
+      return Object.assign({}, sec, {
+        flat: open ? sec.flat : sec.flat.slice(0, 4),
+        canExpand: canExpand,
+        expandLabel: open ? 'Show less ↑' : 'View all ' + sec.flat.length + ' ↓',
+        rowDisplay: 'grid',
+        rowCols: 'repeat(4,minmax(0,1fr))',
+        rowOverflow: 'visible',
+        rowGap: '28px 20px',
+        cardFlex: '1 1 auto',
+        onToggle: () => this.setState(s => ({
+          collapsed: Object.assign({}, s.collapsed, { [sec.id]: !s.collapsed[sec.id] })
+        }))
+      });
+    });
+    let n = 0;
+    secsB.forEach(s => { n += s.flat.length; });
+    const v = this.state.viewing;
+    return {
+      ready: this.state.ready,
+      viewing: !!v,
+      browsing: !v,
+      viewerTitle: v ? v.title : '',
+      viewerDesc: v ? v.desc : '',
+      viewerKicker: v ? (v.type === 'video' ? 'Video' : v.typeLabel === 'SLIDES' ? 'Slides' : 'Document') : '',
+      viewerHref: v ? v.link : undefined,
+      viewerFrame: v ? React.createElement('iframe', {
+        src: v.embed, title: v.title, allowFullScreen: true, referrerPolicy: 'no-referrer',
+        style: { display: 'block', width: '100%', aspectRatio: '16 / 9', border: 'none',
+                 background: 'var(--surface-inset)' }
+      }) : null,
+      closeViewer: () => this.setState({ viewing: null }, () => {
+        window.scrollTo(0, this.browseScroll || 0);
+      }),
+      navItems: [
+        { id: 'home', label: 'Home', icon: 'home' },
+        { id: 'pipeline', label: 'Pipeline', icon: 'git-branch', menu: true },
+        { id: 'members', label: 'Members', icon: 'users', menu: true },
+        { id: 'links', label: 'Links', icon: 'link-2', menu: true }
+      ],
+      roleChips: this.chips(ROLES, this.state.role, 'role'),
+      chipsA: this.chips(FILTERS, this.state.fA, 'fA'),
+      chipsB: this.chips(FILTERS, this.state.fB, 'fB'),
+      chipsC: this.chips(FILTERS, this.state.fC, 'fC', 'tab'),
+      secsA: secsA, secsB: secsB, secsC: secsC,
+      totalB: n + ' resources',
+      q: this.state.q,
+      setQ: e => this.setState({ q: e.target.value })
+    };
+  }
+}
+
+</script>
+</body>
+</html>

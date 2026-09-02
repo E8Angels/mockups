@@ -1,0 +1,42 @@
+/* E8 Angels (Live) — base resets and shared primitives */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--surface-page);
+  color: var(--text-body);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 { margin: 0; color: var(--text-strong); font-family: var(--font-heading); line-height: var(--lh-tight); }
+p { margin: 0; }
+
+a { color: var(--text-link); text-decoration: none; }
+a:hover { color: var(--teal-deep); text-decoration: underline; text-underline-offset: 2px; }
+
+button { font-family: inherit; }
+:focus-visible { outline: none; box-shadow: var(--shadow-focus); border-radius: var(--radius-md); }
+
+/* Uppercase eyebrow label — used for "DECARBON8", "APPLICATION", "FILTER" */
+.e8-eyebrow {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-label);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Page-level card: the portal's one container treatment */
+.e8-card {
+  background: var(--surface-card);
+  border: var(--border-w) solid var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.e8-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.e8-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }

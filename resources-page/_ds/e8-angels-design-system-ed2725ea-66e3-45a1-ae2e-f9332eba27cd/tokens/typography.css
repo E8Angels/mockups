@@ -1,0 +1,78 @@
+/* E8 Angels (Live) — Typography tokens
+   Read from the live token layer (--e8-text-*, --e8-font-*, --e8-leading-*) in
+   the Aug 28 2026 stylesheet capture, replacing the earlier screenshot
+   measurements. Two findings worth naming:
+
+   1. Cosmica IS self-hosted in production — /fonts/Cosmica-{Regular,Medium,
+      Semibold,Bold}.woff2, weights 400/500/600/700-900 — but it is bound only
+      to --e8-font-display. Body, UI and data text run on the platform system
+      stack, so almost nothing in the portal actually renders in Cosmica.
+      The woff2 files were not supplied to this project, so --font-display
+      falls through to Avenir Next / system here.
+   2. The heading weight token is 600 (--e8-heading-weight); the 700s in the
+      product come from component-level rules (.page-title, .card-company)
+      overriding it. */
+:root {
+  /* Live stacks, verbatim */
+  --font-system:  -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Cosmica", "Avenir Next", sans-serif;
+  --font-mono:    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+  --font-sans:    var(--font-system); /* --e8-font-body */
+  --font-ui:      var(--font-sans);
+  --font-heading: var(--font-sans);   /* live headings inherit the body stack */
+  --font-body:    var(--font-sans);
+  --font-label:   var(--font-sans);
+  --font-data:    var(--font-sans);   /* .e8-data-table runs the body stack */
+
+  --fw-regular:  400; /* @kind font */
+  --fw-medium:   500; /* @kind font */
+  --fw-semibold: 600; /* @kind font */
+  --fw-bold:     700; /* @kind font */
+
+  /* Role weights.
+     --e8-heading-weight is 600; components push page and company titles to 700.
+     DEVIATION either way: the guide specifies headlines Medium 500. */
+  --fw-heading-token: var(--fw-semibold); /* @kind font */ /* live --e8-heading-weight */
+  --fw-headline: var(--fw-bold);          /* @kind font */ /* as components render */
+  --fw-title:    var(--fw-semibold);      /* @kind font */
+  --fw-body:     var(--fw-regular);       /* @kind font */
+  --fw-label:    var(--fw-semibold);      /* @kind font */ /* --e8-data-header-weight */
+
+  /* Live scale, verbatim (--e8-text-*) */
+  --fs-2xs:         11px;
+  --fs-xs:          12px;
+  --fs-data-header: 12px;
+  --fs-data:        13.5px;
+  --fs-sm:          14.5px;
+  --fs-base:        14.5px;
+  --fs-reading:     15px;
+  --fs-lg:          17.835px;
+  --fs-xl:          20px;
+  --fs-2xl:         24px;
+  --fs-3xl:         30px;
+  --fs-4xl:         36px;
+  --fs-5xl:         42px;
+
+  /* Role aliases (what the components consume) */
+  --fs-page:    var(--fs-4xl); /* "Member Directory" */
+  --fs-subject: var(--fs-3xl); /* company name in the detail sheet */
+  --fs-h2:      var(--fs-xl);  /* card / section title */
+  --fs-h3:      var(--fs-lg);  /* company name on a pipeline card */
+  --fs-body:    var(--fs-reading);
+
+  /* Live leading (--e8-leading-*) */
+  --lh-ui:      1.4;  /* @kind font */
+  --lh-reading: 1.5;  /* @kind font */
+  --lh-data:    1.3;  /* @kind font */
+  --lh-tight:   1.15; /* @kind font */ /* display headings, measured */
+  --lh-snug:    1.35; /* @kind font */
+  --lh-normal:  var(--lh-reading); /* @kind font */
+  --lh-relaxed: 1.65; /* @kind font */ /* .card-body, .ask-section-body */
+
+  --ls-page:   -0.02em; /* @kind font */
+  --ls-tight:  -0.01em; /* @kind font */
+  --ls-normal: 0;       /* @kind font */
+  --ls-label:  0.09em;  /* @kind font */ /* uppercase eyebrows */
+  --ls-tag:    0.06em;  /* @kind font */ /* pill tags */
+}
