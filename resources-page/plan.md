@@ -47,3 +47,11 @@ Carried over directly from `resource-descriptions.md`, where they're flagged inl
 ## Not yet reviewed
 
 This plan captures what's in the mockup as authored; it hasn't yet been discussed with the rest of the project team per this project's group-review norm. Flagging for review rather than treating any of the above as decided.
+
+## Known issue — not yet fixed
+
+The published page currently renders on browser fallback styling, not the real E8 design tokens: every file under `_ds/` (fonts/colors/typography/spacing tokens, and the TopNav component) returns HTTP 503 on `e8angels.github.io`, and the top nav bar is blank as a result. Everything else (cards, tabs, descriptions, the role-preview chips) renders fine since it's inline in the mockup HTML.
+
+Likely cause: the `mockups` repo has no `.nojekyll` file, and GitHub Pages' default Jekyll processing excludes underscore-prefixed folders like `_ds/` from the built site. Standard fix is an empty `.nojekyll` at the repo root — a repo-wide change, not scoped to this folder, so it's being held for a decision with Jordan/the team rather than applied here.
+
+Live URL: https://e8angels.github.io/mockups/resources-page/resources-page.html
