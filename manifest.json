@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-13T14:53:23+00:00",
+  "generated": "2026-09-02T07:47:30+00:00",
   "plans": [
     {
       "slug": "audience-questions-claude",
@@ -227,6 +227,25 @@
         {
           "name": "mockup",
           "path": "prospects/mockup.html",
+          "is_home": true
+        }
+      ]
+    },
+    {
+      "slug": "resources-page",
+      "title": "Resources Page",
+      "status": "draft",
+      "owner": "nami",
+      "created": "2026-09-02",
+      "last_updated": "2026-09-02",
+      "last_changed_by": "Nami",
+      "last_changed_at": "2026-09-02T07:47:19Z",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": [
+        {
+          "name": "resources-page",
+          "path": "resources-page/resources-page.html",
           "is_home": true
         }
       ]
