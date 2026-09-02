@@ -36,9 +36,8 @@ Clicking a step opens its section. The stepper mirrors the open section: earlier
 
 Outside the arc:
 
-- **Shortcut: If you only met them briefly** — an unnumbered section after the four steps, holding the short note (copy block). Also reachable from the header shortcut card.
-- **Sticky rail** — Refer a Company, slide deck, FAQ under *Keep handy*, and the Do / Don't guardrails, which apply to every step and so live beside all of them instead of inside one.
-- **Header shortcut cards** — "already have an intro → refer directly" and "only met briefly → short note".
+- **Shortcut: If you only met them briefly** — an unnumbered section after the four steps, holding the short note (copy block). Reached from a branch row at the end of step 1 ("Only had a minute?"), since that's the moment the path forks.
+- **Sticky rail** — *Refer* (the Refer a Company button, with the partner-referral note under it: skip the guide, log it), *Keep handy* (slide deck, FAQ), and the Do / Don't guardrails, which apply to every step and so live beside all of them instead of inside one.
 
 ## What changed from the live page and why
 
@@ -59,5 +58,4 @@ Outside the arc:
 ## Open questions
 
 - Page title: "Bringing Entrepreneurs to E8" vs keeping "Ambassador Guide" as the H1.
-- Whether the header shortcut cards are worth keeping now that the rail carries Refer a Company and the short note has its own section.
 - Guardrails in the rail vs. as a fifth accordion section. Rail keeps them visible at every step but is 232px wide.
