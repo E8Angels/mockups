@@ -3,7 +3,7 @@ title: Resources Page
 status: draft
 owner: nami
 created: 2026-09-02
-last_updated: 2026-09-02
+last_updated: 2026-09-03
 home: resources-page.html
 ---
 
@@ -11,10 +11,11 @@ home: resources-page.html
 
 ## Mockup files in this folder
 
-- **`resources-page.html`** (home) — the Resource library page for the E8 Angels member portal: role-aware tabs by resource type, four-up card rows that expand with "View all", and a viewer for opening a resource (Google Drive / YouTube) in place.
+- **`resources-page.html`** (home, v1) — the Resource library page for the E8 Angels member portal: role-aware tabs by resource type, four-up card rows that expand with "View all", and a viewer for opening a resource (Google Drive / YouTube) in place.
+- **`resources-page-v2.html`** — second iteration, designed in Claude Design and exported as a self-contained bundled HTML file (fonts, design-system bundle, and content all embedded in the one file — no external dependencies besides the public React CDN). Kept alongside v1 so the team can compare both before one is chosen.
 - **`resource-descriptions.md`** — draft copy for each resource's description line, as shown under the item title.
-- `resources-data.js`, `resources-sheet.js` — the mock data driving the page (built from a planning sheet; only rows marked "Y" in a "Shown on UI" column render — see note below).
-- `_ds/` — the E8 Angels design system token/component bundle this mockup renders against (design-canvas export).
+- `resources-data.js`, `resources-sheet.js` — the mock data driving v1 (built from a planning sheet; only rows marked "Y" in a "Shown on UI" column render — see note below).
+- `_ds/` — the E8 Angels design system token/component bundle v1 renders against (design-canvas export).
 
 ## Background
 
@@ -43,15 +44,25 @@ Carried over directly from `resource-descriptions.md`, where they're flagged inl
 - **Diligence Talk — Dec 2024** — recording currently unlocated, may sit in Learning Labs.
 - **Legal Doc for D8** — to be drafted.
 - Learning Lab and Member meeting recording feeds are marked "to be connected" — not yet wired to a real source.
+- **v1 vs v2** — not yet decided which direction the team wants to move forward with.
 
 ## Not yet reviewed
 
 This plan captures what's in the mockup as authored; it hasn't yet been discussed with the rest of the project team per this project's group-review norm. Flagging for review rather than treating any of the above as decided.
 
-## Known issue — not yet fixed
+## Resolved issue
 
-The published page currently renders on browser fallback styling, not the real E8 design tokens: every file under `_ds/` (fonts/colors/typography/spacing tokens, and the TopNav component) returns HTTP 503 on `e8angels.github.io`, and the top nav bar is blank as a result. Everything else (cards, tabs, descriptions, the role-preview chips) renders fine since it's inline in the mockup HTML.
+The `_ds/` 503 issue noted below was fixed by Jordan, who added a `.nojekyll` file to the repo root (commit `3104c97`, "Add .nojekyll so underscore dirs (_ds/) publish on Pages"). v1 now renders with the real E8 design tokens and top nav. v2 doesn't depend on `_ds/` at all (everything is embedded in the single file), so it was never affected.
 
-Likely cause: the `mockups` repo has no `.nojekyll` file, and GitHub Pages' default Jekyll processing excludes underscore-prefixed folders like `_ds/` from the built site. Standard fix is an empty `.nojekyll` at the repo root — a repo-wide change, not scoped to this folder, so it's being held for a decision with Jordan/the team rather than applied here.
+<details>
+<summary>Original issue writeup (for history)</summary>
 
-Live URL: https://e8angels.github.io/mockups/resources-page/resources-page.html
+The published page originally rendered on browser fallback styling, not the real E8 design tokens: every file under `_ds/` (fonts/colors/typography/spacing tokens, and the TopNav component) returned HTTP 503 on `e8angels.github.io`, and the top nav bar was blank as a result. Everything else (cards, tabs, descriptions, the role-preview chips) rendered fine since it's inline in the mockup HTML.
+
+Cause: the `mockups` repo had no `.nojekyll` file, and GitHub Pages' default Jekyll processing excludes underscore-prefixed folders like `_ds/` from the built site.
+
+</details>
+
+Live URLs:
+- v1: https://e8angels.github.io/mockups/resources-page/resources-page.html
+- v2: https://e8angels.github.io/mockups/resources-page/resources-page-v2.html
