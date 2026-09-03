@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-02T23:57:58+00:00",
+  "generated": "2026-09-03T07:10:45+00:00",
   "plans": [
     {
       "slug": "ambassador-guide",
@@ -256,9 +256,9 @@
       "status": "draft",
       "owner": "nami",
       "created": "2026-09-02",
-      "last_updated": "2026-09-02",
+      "last_updated": "2026-09-03",
       "last_changed_by": "Nami",
-      "last_changed_at": "2026-09-02T07:56:06Z",
+      "last_changed_at": "2026-09-03T07:10:33Z",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
@@ -266,6 +266,11 @@
           "name": "resources-page",
           "path": "resources-page/resources-page.html",
           "is_home": true
+        },
+        {
+          "name": "resources-page-v2",
+          "path": "resources-page/resources-page-v2.html",
+          "is_home": false
         }
       ]
     },
