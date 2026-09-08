@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Deal Terms Band — Layout Options</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; background:#f1f5f9; color:#0f172a; }
+  .panel { max-width:1360px; margin:0 auto; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:16px 20px 20px; }
+  .band { border:1px solid #a7f3d0; background:#ecfdf5; border-radius:8px; padding:16px; }
+  .eyebrow { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:#047857; }
+  .stat-value { font-size:14.5px; font-weight:600; color:#0f172a; line-height:1.5; }
+  .stat-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:#64748b; margin-top:2px; }
+  .terms { border:1px solid #a7f3d0; background:#fff; border-radius:6px; padding:10px 12px; font-size:13px; line-height:1.6; color:#334155; }
+  .terms p { margin:6px 0; }
+
+  /* Small-font detail line used under the deal terms */
+  .detail-strip { display:flex; flex-wrap:wrap; align-items:baseline; gap:0 18px; font-size:12px; line-height:1.9; color:#334155; }
+  .detail-strip .k { color:#64748b; font-weight:600; }
+  .detail-strip .v { font-weight:600; color:#0f172a; }
+  .detail-strip .item { white-space:nowrap; }
+  .detail-strip .item + .item::before { content:""; }
+
+  .dl { display:grid; grid-template-columns:auto 1fr; gap:2px 12px; font-size:12px; line-height:1.65; }
+  .dl dt { color:#64748b; font-weight:600; white-space:nowrap; }
+  .dl dd { margin:0; color:#0f172a; font-weight:600; }
+
+  .thumb { width:200px; }
+  .thumb .page { height:150px; width:116px; border:1px solid #a7f3d0; background:#fff; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#94a3b8; box-shadow:0 1px 2px rgb(0 0 0 / .05); }
+  .btn-dark { display:inline-flex; align-items:center; gap:7px; white-space:nowrap; border-radius:6px; border:1px solid #0f172a; background:#0f172a; padding:6px 12px; font-size:12px; font-weight:500; color:#fff; }
+
+  .note { font-size:13px; line-height:1.6; color:#475569; }
+  .callout { border-left:3px solid #94a3b8; background:#f8fafc; padding:8px 12px; font-size:12.5px; line-height:1.6; color:#475569; }
+  h2.opt { font-size:20px; font-weight:700; }
+  .h { font-size:11px; font-weight:700; letter-spacing:.04em; color:#64748b; background:#f1f5f9; border:1px solid #e2e8f0; border-radius:999px; padding:2px 8px; }
+  .h-bad { color:#991b1b; background:#fef2f2; border-color:#fecaca; }
+  .h-good { color:#065f46; background:#ecfdf5; border-color:#a7f3d0; }
+  .tag { display:inline-block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; border-radius:999px; padding:2px 9px; }
+  .tag-now { background:#e2e8f0; color:#334155; }
+  .tag-opt { background:#dbeafe; color:#1e3a8a; }
+  .rule { border-top:1px solid #a7f3d0; }
+</style>
+</head>
+<body class="py-8">
+<div class="mx-auto max-w-[1400px] px-4 space-y-10">
+
+  <header class="space-y-2">
+    <h1 class="text-2xl font-bold">Deal Terms band — layout options</h1>
+    <p class="note max-w-[80ch]">Top of the application slide-out panel (<code>InvestorHero</code>). Real data from Enzinc (Series A-3) in dev, plus a sparse SAFE example at the bottom to show how each option behaves when most fields are empty. Panel is shown at its real max width (1360px); the pill beside each heading is the measured band height at that width.</p>
+  </header>
+
+  <!-- ═══════════════════════ CURRENT ═══════════════════════ -->
+  <section class="space-y-3">
+    <div class="flex items-center gap-3"><span class="tag tag-now">Today</span><h2 class="opt">Stat rail + terms box</h2><span class="h">266px</span></div>
+    <p class="note">Four stats stacked down the left, description in its own box, term sheet, register. Adding three more stats makes the rail ~7 items tall and the band grows to match.</p>
+    <div class="panel">
+      <div class="band">
+        <div class="eyebrow mb-3">Series A-3</div>
+        <div class="flex flex-wrap items-start gap-x-6 gap-y-3">
+          <div class="flex max-w-[340px] shrink-0 flex-col justify-center gap-3.5 self-stretch">
+            <div><div class="stat-value">Equity</div><div class="stat-label">Instrument</div></div>
+            <div><div class="stat-value">$2,000,000 – $3,000,000</div><div class="stat-label">Capital Seeking</div></div>
+            <div><div class="stat-value">May 20, 2026</div><div class="stat-label">Round Close</div></div>
+            <div><div class="stat-value">Stonecreek Operators Fund and TO VC</div><div class="stat-label">Lead Investor</div></div>
+          </div>
+          <div class="terms min-w-[280px] flex-1 max-w-[68ch]">
+            <p>Enzinc is raising a Preferred Equity round for $2.0M – $3.0M at a $3.5M pre-money valuation, with a 1× participating liquidation preference and a 10% accrued dividend plus 100% return of capital ahead of other equity holders upon liquidation, change of control, or sale of the Company.</p>
+            <p>Stonecreek Operators Fund and TO VC are leading the round, with Stonecreek receiving 5-year warrants to purchase shares of Common Stock equal to 8% of the Company’s post-money capitalization.</p>
+          </div>
+          <div class="thumb shrink-0 flex flex-col items-center">
+            <div class="page">PDF</div>
+            <div class="mt-1 text-xs font-semibold text-slate-900">Term Sheet</div>
+          </div>
+          <div class="ml-auto flex shrink-0 flex-col items-center self-center">
+            <button class="btn-dark">Register Investment Interest</button>
+            <div class="mt-1.5 text-xs text-slate-500">E8 will coordinate for direct investments.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="space-y-3">
+    <div class="flex items-center gap-3"><span class="tag tag-now">Straw man</span><h2 class="opt">Same layout, three stats appended</h2><span class="h h-bad">428px</span></div>
+    <p class="note">What happens if the new fields just join the rail.</p>
+    <div class="panel">
+      <div class="band">
+        <div class="eyebrow mb-3">Series A-3</div>
+        <div class="flex flex-wrap items-start gap-x-6 gap-y-3">
+          <div class="flex max-w-[340px] shrink-0 flex-col justify-center gap-3.5 self-stretch">
+            <div><div class="stat-value">Equity</div><div class="stat-label">Instrument</div></div>
+            <div><div class="stat-value">$2,000,000 &ndash; $3,000,000</div><div class="stat-label">Capital Seeking</div></div>
+            <div><div class="stat-value">May 20, 2026</div><div class="stat-label">Round Close</div></div>
+            <div><div class="stat-value">Stonecreek Operators Fund and TO VC</div><div class="stat-label">Lead Investor</div></div>
+            <div><div class="stat-value">$25,000</div><div class="stat-label">Min Check Size</div></div>
+            <div><div class="stat-value">$13,000,000</div><div class="stat-label">Raised to Date</div></div>
+            <div><div class="stat-value">$4,744,000</div><div class="stat-label">Non-Dilutive to Date</div></div>
+          </div>
+          <div class="terms min-w-[280px] flex-1 max-w-[68ch]">
+            <p>Enzinc is raising a Preferred Equity round for $2.0M &ndash; $3.0M at a $3.5M pre-money valuation, with a 1&times; participating liquidation preference and a 10% accrued dividend plus 100% return of capital ahead of other equity holders upon liquidation, change of control, or sale of the Company.</p>
+            <p>Stonecreek Operators Fund and TO VC are leading the round, with Stonecreek receiving 5-year warrants to purchase shares of Common Stock equal to 8% of the Company&rsquo;s post-money capitalization.</p>
+          </div>
+          <div class="thumb shrink-0 flex flex-col items-center">
+            <div class="page">PDF</div>
+            <div class="mt-1 text-xs font-semibold text-slate-900">Term Sheet</div>
+          </div>
+          <div class="ml-auto flex shrink-0 flex-col items-center self-center">
+            <button class="btn-dark">Register Investment Interest</button>
+            <div class="mt-1.5 text-xs text-slate-500">E8 will coordinate for direct investments.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout">The three new figures dwarf the description &mdash; and the rail now owns the reader&rsquo;s eye even though the prose is the thing worth reading. This is the layout the options below avoid.</div>
+  </section>
+
+  <!-- ═══ OPTION A ═══ -->
+  <section class="space-y-3">
+    <div class="flex items-center gap-3"><span class="tag tag-opt">Option A</span><h2 class="opt">Rail keeps the headline four · everything else runs underneath</h2><span class="h">311px</span></div>
+    <p class="note">Closest to what you described. The rail is untouched, and the added figures live in one small wrapping line under the whole band, above a hairline rule. Nothing competes with the description; the strip grows sideways, not down.</p>
+    <div class="panel">
+      <div class="band">
+        <div class="eyebrow mb-3">Series A-3</div>
+        <div class="flex flex-wrap items-start gap-x-6 gap-y-3">
+          <div class="flex max-w-[300px] shrink-0 flex-col justify-center gap-3.5 self-stretch">
+            <div><div class="stat-value">Equity</div><div class="stat-label">Instrument</div></div>
+            <div><div class="stat-value">$2,000,000 – $3,000,000</div><div class="stat-label">Capital Seeking</div></div>
+            <div><div class="stat-value">May 20, 2026</div><div class="stat-label">Round Close</div></div>
+            <div><div class="stat-value">Stonecreek Operators Fund and TO VC</div><div class="stat-label">Lead Investor</div></div>
+          </div>
+          <div class="terms min-w-[280px] flex-1 max-w-[68ch]">
+            <p>Enzinc is raising a Preferred Equity round for $2.0M – $3.0M at a $3.5M pre-money valuation, with a 1× participating liquidation preference and a 10% accrued dividend plus 100% return of capital ahead of other equity holders upon liquidation, change of control, or sale of the Company.</p>
+            <p>Stonecreek Operators Fund and TO VC are leading the round, with Stonecreek receiving 5-year warrants to purchase shares of Common Stock equal to 8% of the Company’s post-money capitalization.</p>
+          </div>
+          <div class="thumb shrink-0 flex flex-col items-center">
+            <div class="page">PDF</div>
+            <div class="mt-1 text-xs font-semibold text-slate-900">Term Sheet</div>
+          </div>
+          <div class="ml-auto flex shrink-0 flex-col items-center self-center">
+            <button class="btn-dark">Register Investment Interest</button>
+            <div class="mt-1.5 text-xs text-slate-500">E8 will coordinate for direct investments.</div>
+          </div>
+        </div>
+        <div class="rule mt-3 pt-2.5">
+          <div class="detail-strip">
+            <span class="item"><span class="k">Min check</span> <span class="v">$25,000</span></span>
+            <span class="item"><span class="k">Raised to date</span> <span class="v">$13,000,000</span></span>
+            <span class="item"><span class="k">Non-dilutive</span> <span class="v">$4,744,000</span></span>
+            <span class="item"><span class="k">Valuation</span> <span class="v">$3,500,000 pre-money</span></span>
+            <span class="item"><span class="k">Preference</span> <span class="v">1× non-participating</span></span>
+            <span class="item"><span class="k">Target close</span> <span class="v">May 29, 2026</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout">Trade-off: on a narrow window the strip wraps to two or three lines, and long values (a wordy preference, a two-name lead) push the wrap. Order matters — put the three you asked for first so they survive above the fold of the wrap.</div>
+  </section>
+
+  <!-- ═══════════════════════ OPTION B ═══════════════════════ -->
+  <section class="space-y-3">
+    <div class="flex items-center gap-3"><span class="tag tag-opt">Option B</span><h2 class="opt">Headline four across the top · terms full width · details underneath</h2><span class="h">312px</span></div>
+    <p class="note">The rail rotates into a header row, so the description gets the full band width and the band gets meaningfully shorter. Detail strip sits under the description, same treatment as A.</p>
+    <div class="panel">
+      <div class="band">
+        <div class="mb-3 flex items-baseline justify-between gap-4">
+          <div class="eyebrow">Series A-3</div>
+        </div>
+        <div class="flex flex-wrap items-end gap-x-10 gap-y-3 pb-3">
+          <div><div class="stat-value">Equity</div><div class="stat-label">Instrument</div></div>
+          <div><div class="stat-value">$2,000,000 – $3,000,000</div><div class="stat-label">Capital Seeking</div></div>
+          <div><div class="stat-value">May 20, 2026</div><div class="stat-label">Round Close</div></div>
+          <div><div class="stat-value">Stonecreek Operators Fund and TO VC</div><div class="stat-label">Lead Investor</div></div>
+          <div class="ml-auto flex flex-col items-center">
+            <button class="btn-dark">Register Investment Interest</button>
+            <div class="mt-1.5 text-xs text-slate-500">E8 will coordinate for direct investments.</div>
+          </div>
+        </div>
+        <div class="rule pt-3 flex flex-wrap items-start gap-x-6 gap-y-3">
+          <div class="min-w-[280px] flex-1">
+            <div class="terms">
+              <p>Enzinc is raising a Preferred Equity round for $2.0M – $3.0M at a $3.5M pre-money valuation, with a 1× participating liquidation preference and a 10% accrued dividend plus 100% return of capital ahead of other equity holders upon liquidation, change of control, or sale of the Company.</p>
+              <p>Stonecreek Operators Fund and TO VC are leading the round, with Stonecreek receiving 5-year warrants to purchase shares of Common Stock equal to 8% of the Company’s post-money capitalization.</p>
+            </div>
+            <div class="detail-strip mt-2.5">
+              <span class="item"><span class="k">Min check</span> <span class="v">$25,000</span></span>
+              <span class="item"><span class="k">Raised to date</span> <span class="v">$13,000,000</span></span>
+              <span class="item"><span class="k">Non-dilutive</span> <span class="v">$4,744,000</span></span>
+              <span class="item"><span class="k">Valuation</span> <span class="v">$3,500,000 pre-money</span></span>
+              <span class="item"><span class="k">Preference</span> <span class="v">1× non-participating</span></span>
+              <span class="item"><span class="k">Target close</span> <span class="v">May 29, 2026</span></span>
+            </div>
+          </div>
+          <div class="thumb shrink-0 flex flex-col items-center">
+            <div class="page">PDF</div>
+            <div class="mt-1 text-xs font-semibold text-slate-900">Term Sheet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout">The description finally gets a real measure — the prose runs the full band instead of a 68ch column. No shorter than A overall, and it costs the vertical stat rail that members are used to.</div>
+  </section>
+
+  <!-- ═══════════════════════ OPTION C ═══════════════════════ -->
+  <section class="space-y-3">
+    <div class="flex items-center gap-3"><span class="tag tag-opt">Option C</span><h2 class="opt">Two-tier rail — three big stats, the rest demoted below them</h2><span class="h">365px</span></div>
+    <p class="note">Keeps the rail, but only the three decision stats stay large. Everything else becomes a small label/value list at the bottom of the same column, so the rail carries seven facts in roughly the height it carries four today.</p>
+    <div class="panel">
+      <div class="band">
+        <div class="eyebrow mb-3">Series A-3</div>
+        <div class="flex flex-wrap items-start gap-x-6 gap-y-3">
+          <div class="flex w-[260px] shrink-0 flex-col gap-3.5 self-stretch">
+            <div><div class="stat-value">Equity</div><div class="stat-label">Instrument</div></div>
+            <div><div class="stat-value">$2,000,000 – $3,000,000</div><div class="stat-label">Capital Seeking</div></div>
+            <div><div class="stat-value">May 20, 2026</div><div class="stat-label">Round Close</div></div>
+            <dl class="dl rule pt-2.5 mt-0.5">
+              <dt>Lead</dt><dd>Stonecreek Operators Fund and TO VC</dd>
+              <dt>Min check</dt><dd>$25,000</dd>
+              <dt>Raised to date</dt><dd>$13,000,000</dd>
+              <dt>Non-dilutive</dt><dd>$4,744,000</dd>
+              <dt>Valuation</dt><dd>$3,500,000 pre</dd>
+            </dl>
+          </div>
+          <div class="terms min-w-[280px] flex-1 max-w-[68ch]">
+            <p>Enzinc is raising a Preferred Equity round for $2.0M – $3.0M at a $3.5M pre-money valuation, with a 1× participating liquidation preference and a 10% accrued dividend plus 100% return of capital ahead of other equity holders upon liquidation, change of control, or sale of the Company.</p>
+            <p>Stonecreek Operators Fund and TO VC are leading the round, with Stonecreek receiving 5-year warrants to purchase shares of Common Stock equal to 8% of the Company’s post-money capitalization.</p>
+          </div>
+          <div class="thumb shrink-0 flex flex-col items-center">
+            <div class="page">PDF</div>
+            <div class="mt-1 text-xs font-semibold text-slate-900">Term Sheet</div>
+          </div>
+          <div class="ml-auto flex shrink-0 flex-col items-center self-center">
+            <button class="btn-dark">Register Investment Interest</button>
+            <div class="mt-1.5 text-xs text-slate-500">E8 will coordinate for direct investments.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout">No new horizontal real estate needed and it degrades well — a sparse deal just drops the bottom list. But it is the tallest of the four: the rail now outruns the description, which is the problem we started with, only quieter.</div>
+  </section>
+
+  <!-- ═══════════════════════ OPTION D ═══════════════════════ -->
+  <section class="space-y-3">
+    <div class="flex items-center gap-3"><span class="tag tag-opt">Option D</span><h2 class="opt">Terms first · detail table on the right, under the term sheet</h2><span class="h h-good">262px</span></div>
+    <p class="note">Inverts the band: description leads, the four headline stats become a single line above it, and every remaining figure is a tidy two-column table in the right margin beside the term sheet. Reads like a fact sheet.</p>
+    <div class="panel">
+      <div class="band">
+        <div class="mb-2.5 flex flex-wrap items-center gap-x-5 gap-y-2">
+          <span class="eyebrow">Series A-3</span>
+          <span class="detail-strip"><span class="item"><span class="v">Equity</span></span><span class="item"><span class="v">$2,000,000 – $3,000,000</span></span><span class="item"><span class="k">closes</span> <span class="v">May 20, 2026</span></span><span class="item"><span class="k">lead</span> <span class="v">Stonecreek Operators Fund and TO VC</span></span></span>
+          <span class="ml-auto flex shrink-0 items-center gap-3">
+            <span class="text-xs text-slate-500">E8 will coordinate for direct investments.</span>
+            <button class="btn-dark">Register Investment Interest</button>
+          </span>
+        </div>
+        <div class="flex flex-wrap items-start gap-x-6 gap-y-3">
+          <div class="terms min-w-[320px] flex-1 max-w-[74ch]">
+            <p>Enzinc is raising a Preferred Equity round for $2.0M – $3.0M at a $3.5M pre-money valuation, with a 1× participating liquidation preference and a 10% accrued dividend plus 100% return of capital ahead of other equity holders upon liquidation, change of control, or sale of the Company.</p>
+            <p>Stonecreek Operators Fund and TO VC are leading the round, with Stonecreek receiving 5-year warrants to purchase shares of Common Stock equal to 8% of the Company’s post-money capitalization.</p>
+          </div>
+          <div class="w-[280px] shrink-0">
+            <dl class="dl rounded-md border border-emerald-200 bg-white/70 px-3 py-2.5">
+              <dt>Min check</dt><dd>$25,000</dd>
+              <dt>Raised to date</dt><dd>$13,000,000</dd>
+              <dt>Non-dilutive</dt><dd>$4,744,000</dd>
+              <dt>Valuation</dt><dd>$3,500,000 pre-money</dd>
+              <dt>Preference</dt><dd>1× non-participating</dd>
+              <dt>Target close</dt><dd>May 29, 2026</dd>
+            </dl>
+          </div>
+          <div class="thumb shrink-0 flex flex-col items-center">
+            <div class="page">PDF</div>
+            <div class="mt-1 text-xs font-semibold text-slate-900">Term Sheet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout">Shortest of the lot — it carries three more figures than today in slightly less height, because the table sits beside the prose instead of under it. Scales best if the field list keeps growing (twelve rows cost nothing). Widest, so it is the first to wrap in a narrow window, and it drops the big-number stat treatment entirely.</div>
+  </section>
+
+  <!-- ═══════════════════════ SPARSE ═══════════════════════ -->
+  <section class="space-y-3">
+    <h2 class="opt">Sparse deal — Option A vs Option D</h2>
+    <p class="note">Beyond Silicon, a real pre-seed SAFE: no round close date, no valuation cap, no term sheet, no interest tally. Most deals in the pipeline look more like this than like Enzinc.</p>
+
+    <div class="panel">
+      <div class="band">
+        <div class="eyebrow mb-3">Pre-Seed</div>
+        <div class="flex flex-wrap items-start gap-x-6 gap-y-3">
+          <div class="flex max-w-[300px] shrink-0 flex-col justify-center gap-3.5 self-stretch">
+            <div><div class="stat-value">SAFE</div><div class="stat-label">Instrument</div></div>
+            <div><div class="stat-value">$1,250,000</div><div class="stat-label">Capital Seeking</div></div>
+          </div>
+          <div class="terms min-w-[280px] flex-1 max-w-[68ch]">
+            <p>Beyond Silicon is raising a SAFE round for $1,250,000 with a 20% discount and MFN. No lead investor has been identified.</p>
+          </div>
+          <div class="ml-auto flex shrink-0 flex-col items-center self-center">
+            <button class="btn-dark">Register Investment Interest</button>
+            <div class="mt-1.5 text-xs text-slate-500">E8 will coordinate for direct investments.</div>
+          </div>
+        </div>
+        <div class="rule mt-3 pt-2.5">
+          <div class="detail-strip">
+            <span class="item"><span class="k">Min check</span> <span class="v">$25,000</span></span>
+            <span class="item"><span class="k">Raised to date</span> <span class="v">$500,000</span></span>
+            <span class="item"><span class="k">Non-dilutive</span> <span class="v">$2,165,499</span></span>
+            <span class="item"><span class="k">Discount</span> <span class="v">20%</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="mt-2 text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">Option A</div>
+    </div>
+
+    <div class="panel">
+      <div class="band">
+        <div class="mb-2.5 flex flex-wrap items-center gap-x-5 gap-y-2">
+          <span class="eyebrow">Pre-Seed</span>
+          <span class="detail-strip"><span class="item"><span class="v">SAFE</span></span><span class="item"><span class="v">$1,250,000</span></span><span class="item"><span class="k">lead</span> <span class="v">none identified</span></span></span>
+          <span class="ml-auto flex shrink-0 items-center gap-3">
+            <span class="text-xs text-slate-500">E8 will coordinate for direct investments.</span>
+            <button class="btn-dark">Register Investment Interest</button>
+          </span>
+        </div>
+        <div class="flex flex-wrap items-start gap-x-6 gap-y-3">
+          <div class="terms min-w-[320px] flex-1 max-w-[74ch]">
+            <p>Beyond Silicon is raising a SAFE round for $1,250,000 with a 20% discount and MFN. No lead investor has been identified.</p>
+          </div>
+          <div class="w-[280px] shrink-0">
+            <dl class="dl rounded-md border border-emerald-200 bg-white/70 px-3 py-2.5">
+              <dt>Min check</dt><dd>$25,000</dd>
+              <dt>Raised to date</dt><dd>$500,000</dd>
+              <dt>Non-dilutive</dt><dd>$2,165,499</dd>
+              <dt>Discount</dt><dd>20%</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="mt-2 text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">Option D</div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════ FIELDS ═══════════════════════ -->
+  <section class="space-y-3">
+    <h2 class="opt">Candidate fields</h2>
+    <p class="note">All of these are already stored — no new capture. The structured deal terms live in <code>instruments.metadata_json</code> for the application; the raise figures live on the application row.</p>
+    <div class="panel overflow-x-auto">
+      <table class="w-full text-left text-[13px]">
+        <thead class="text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">
+          <tr class="border-b border-slate-200"><th class="py-2 pr-4">Field</th><th class="py-2 pr-4">Source</th><th class="py-2 pr-4">Example</th><th class="py-2">Worth showing?</th></tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 align-top">
+          <tr><td class="py-2 pr-4 font-semibold">Min check size</td><td class="py-2 pr-4 text-slate-500">deal terms <code>min_check_size_dollars</code></td><td class="py-2 pr-4">$25,000</td><td class="py-2">Yes — asked for. Nearly always set (wizard defaults it).</td></tr>
+          <tr><td class="py-2 pr-4 font-semibold">Raised to date</td><td class="py-2 pr-4 text-slate-500"><code>funding_to_date_amount_cents</code></td><td class="py-2 pr-4">$13,000,000</td><td class="py-2">Yes — asked for.</td></tr>
+          <tr><td class="py-2 pr-4 font-semibold">Non-dilutive to date</td><td class="py-2 pr-4 text-slate-500"><code>non_dilutive_amount_cents</code></td><td class="py-2 pr-4">$4,744,000</td><td class="py-2">Yes — asked for. Reads best right beside Raised to date.</td></tr>
+          <tr><td class="py-2 pr-4 font-semibold">Valuation / cap</td><td class="py-2 pr-4 text-slate-500">deal terms <code>valuation_dollars</code> or <code>cap_amount_dollars</code> + pre/post</td><td class="py-2 pr-4">$3,500,000 pre-money</td><td class="py-2">Strongest addition beyond your three. It is the number an angel checks first and it is currently only in prose.</td></tr>
+          <tr><td class="py-2 pr-4 font-semibold">Discount</td><td class="py-2 pr-4 text-slate-500">deal terms <code>discount_pct</code></td><td class="py-2 pr-4">20%</td><td class="py-2">Yes, for SAFE / Note. Pairs with the cap; meaningless for equity.</td></tr>
+          <tr><td class="py-2 pr-4 font-semibold">Price per share · share type · liquidation preference</td><td class="py-2 pr-4 text-slate-500">deal terms</td><td class="py-2 pr-4">$4.375 · Preferred · 1× non-participating</td><td class="py-2">Equity rounds only. Preference is the one that matters at a $25k check; price per share rarely is.</td></tr>
+          <tr><td class="py-2 pr-4 font-semibold">Interest rate · maturity</td><td class="py-2 pr-4 text-slate-500">deal terms</td><td class="py-2 pr-4">6% · 24 months</td><td class="py-2">Notes only. Same slot as discount — instrument decides which appear.</td></tr>
+          <tr><td class="py-2 pr-4 font-semibold">Lead commitment</td><td class="py-2 pr-4 text-slate-500">deal terms <code>lead_committed_cents</code></td><td class="py-2 pr-4">$1,200,000</td><td class="py-2">Good — but as a suffix on the existing Lead Investor stat, not its own row.</td></tr>
+          <tr><td class="py-2 pr-4 font-semibold">Target close date</td><td class="py-2 pr-4 text-slate-500">deal terms <code>target_close_date</code></td><td class="py-2 pr-4">May 29, 2026</td><td class="py-2">Careful — this is a second, different date from the Round Close stat (from the Round Close event). Enzinc has both, nine days apart. Either reconcile them or only show one.</td></tr>
+          <tr><td class="py-2 pr-4 font-semibold">Raise min – max</td><td class="py-2 pr-4 text-slate-500">deal terms <code>raise_min_cents</code> / <code>raise_max_cents</code></td><td class="py-2 pr-4">$2.0M – $3.0M</td><td class="py-2">Replace Capital Seeking with it where present. Capital Seeking is a free-text bucket ("1,500,000 or more"); this is the real number.</td></tr>
+          <tr><td class="py-2 pr-4 font-semibold">E8 interest registered</td><td class="py-2 pr-4 text-slate-500"><code>investment_interest</code> sum</td><td class="py-2 pr-4">$150,000 from 6 members</td><td class="py-2">Possible, and E8-specific in a way none of the others are — but it nudges herd behaviour and needs a permission call. Ask before building.</td></tr>
+          <tr><td class="py-2 pr-4 font-semibold">Employees</td><td class="py-2 pr-4 text-slate-500"><code>num_employees</code></td><td class="py-2 pr-4">14</td><td class="py-2">No — company context, not deal terms. Belongs in Overview.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">Note the overlap: the generated description already states the valuation, the close date and the lead in prose. Whatever lands in the strip should be the structured, comparable version of those facts — figures a member scans across three companies — while the prose keeps the narrative (warrants, dividends, MFN).</div>
+  </section>
+
+</div>
+</body>
+</html>
