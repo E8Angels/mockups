@@ -270,9 +270,7 @@ The production prompt should inject a complete valid example. This abbreviated d
       "type": "callout",
       "tone": "info",
       "title": "Prior contact with E8",
-      "body": [
-        { "type": "text", "text": "The company first applied in 2024 and represented that commercial launch would begin in Q1 2026." }
-      ]
+      "body": "The company first applied in 2024 and represented that commercial launch would begin in Q1 2026."
     },
     {
       "type": "section",
