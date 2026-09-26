@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-03T07:10:45+00:00",
+  "generated": "2026-09-26T15:16:06+00:00",
   "plans": [
     {
       "slug": "ambassador-guide",
@@ -16,6 +16,25 @@
         {
           "name": "mockup",
           "path": "ambassador-guide/mockup.html",
+          "is_home": true
+        }
+      ]
+    },
+    {
+      "slug": "application-sector-and-tags",
+      "title": "Sector & Tags",
+      "status": "planning",
+      "owner": "jordan",
+      "created": "2026-09-25",
+      "last_updated": "2026-09-26",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-09-26T11:15:56-04:00",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": [
+        {
+          "name": "mockup",
+          "path": "application-sector-and-tags/mockup.html",
           "is_home": true
         }
       ]
@@ -46,6 +65,25 @@
           "name": "variant-c-console",
           "path": "audience-questions-claude/variant-c-console.html",
           "is_home": false
+        }
+      ]
+    },
+    {
+      "slug": "deal-terms-band",
+      "title": "Deal Terms Band \u2014 Layout Options",
+      "status": "draft",
+      "owner": "jordan",
+      "created": "2026-09-08",
+      "last_updated": "2026-09-08",
+      "last_changed_by": "Jordan Schwartz",
+      "last_changed_at": "2026-09-08T12:22:49-07:00",
+      "has_plan": true,
+      "has_changelog": true,
+      "mockups": [
+        {
+          "name": "deal-terms",
+          "path": "deal-terms-band/deal-terms.html",
+          "is_home": true
         }
       ]
     },
