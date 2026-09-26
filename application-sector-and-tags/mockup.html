@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Mockup — Sector &amp; Tags</title>
+<style>
+  :root{
+    color-scheme: light;
+    --slate-900:#0f172a; --slate-700:#334155; --slate-600:#475569; --slate-500:#64748b;
+    --slate-400:#94a3b8; --slate-300:#cbd5e1; --slate-200:#e2e8f0; --slate-100:#f1f5f9; --slate-50:#f8fafc;
+    --blue-700:#1d4ed8; --blue-600:#2563eb; --blue-200:#bfdbfe; --blue-50:#eff6ff;
+    --emerald-700:#047857; --emerald-200:#a7f3d0; --emerald-50:#ecfdf5;
+    --amber-700:#b45309; --amber-200:#fde68a; --amber-50:#fffbeb;
+    --violet-700:#6d28d9; --violet-200:#ddd6fe; --violet-50:#f5f3ff;
+    --sector:#d97706;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--slate-100);color:var(--slate-900);-webkit-font-smoothing:antialiased;line-height:1.45;}
+  .wrap{max-width:1080px;margin:0 auto;padding:20px 18px 80px;}
+  .mock-banner{background:#fef3c7;border:1px solid var(--amber-200);color:var(--amber-700);font-size:12.5px;padding:8px 14px;border-radius:8px;margin-bottom:18px;}
+  h1{font-size:20px;font-weight:650;margin-bottom:4px;}
+  .lede{color:var(--slate-600);font-size:14px;margin-bottom:8px;max-width:760px;}
+  h2.sec{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--slate-500);margin:34px 0 6px;}
+  .note{font-size:12.5px;color:var(--slate-500);margin-bottom:10px;max-width:760px;}
+  .stagecanvas{background:var(--slate-200);border-radius:14px;padding:18px;}
+  .panel{background:#fff;border:1px solid var(--slate-200);border-radius:10px;box-shadow:0 1px 2px rgba(15,23,42,.04);}
+  .row{display:flex;align-items:flex-start;gap:12px;}
+  .logo{width:42px;height:42px;border-radius:9px;background:var(--blue-50);color:var(--blue-700);display:grid;place-items:center;font-weight:800;font-size:14px;border:1px solid var(--blue-200);flex:0 0 auto;}
+  .cname{font-size:17px;font-weight:650;}
+  .meta{color:var(--slate-500);font-size:12.5px;margin-top:4px;}
+  .tagline{font-size:13px;color:var(--slate-700);margin-top:4px;}
+  .line1{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .muted{color:var(--slate-400);font-size:12px;}
+
+  /* pills */
+  .chip{display:inline-flex;align-items:center;gap:5px;min-height:22px;padding:1px 9px;border-radius:999px;font-size:11.5px;font-weight:600;border:1px solid var(--slate-200);background:var(--slate-50);color:var(--slate-600);white-space:nowrap;}
+  .chip.sector{background:color-mix(in srgb,var(--sector) 16%,white);border-color:var(--sector);color:#7c3a00;}
+  .chip.blue{background:var(--blue-50);color:var(--blue-700);border-color:var(--blue-200);}
+  .chip.stage{background:var(--blue-50);color:var(--blue-700);border-color:var(--blue-200);}
+  button.chip{cursor:pointer;font-family:inherit;}
+  .tagspill{background:#fff;color:var(--slate-700);}
+  .tagspill:hover,.tagspill[aria-expanded="true"]{border-color:var(--slate-400);background:var(--slate-50);}
+  .tagspill .n{font-variant-numeric:tabular-nums;color:var(--slate-500);font-weight:600;}
+  .ico{width:12px;height:12px;flex:0 0 auto;}
+
+  /* popover */
+  .pop{position:absolute;z-index:10;background:#fff;border:1px solid var(--slate-200);border-radius:10px;box-shadow:0 10px 30px rgba(15,23,42,.12);width:360px;max-width:calc(100vw - 40px);}
+  .pop .ph{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid var(--slate-100);font-size:12.5px;font-weight:650;}
+  .pop .pb{padding:8px 12px 12px;display:grid;gap:10px;max-height:340px;overflow:auto;}
+  .fam .fl{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--slate-400);margin-bottom:5px;}
+  .paths{display:grid;gap:4px;}
+  .path{font-size:12.5px;color:var(--slate-500);display:flex;flex-wrap:wrap;align-items:center;gap:3px;}
+  .path a{color:inherit;text-decoration:none;border-radius:4px;padding:0 2px;}
+  .path a:hover{background:var(--blue-50);color:var(--blue-700);}
+  .path a.leaf{color:var(--slate-900);font-weight:600;}
+  .path .sep{color:var(--slate-300);}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;}
+  .chips a{text-decoration:none;}
+  .pop .pf{padding:8px 12px;border-top:1px solid var(--slate-100);font-size:11.5px;color:var(--slate-400);display:flex;justify-content:space-between;gap:10px;}
+  .pop .pf a{color:var(--blue-700);text-decoration:none;font-weight:600;}
+  .rel{position:relative;display:inline-block;}
+
+  /* grid */
+  table.grid{width:100%;border-collapse:collapse;font-size:12.5px;}
+  table.grid th{text-align:left;font-size:11px;font-weight:600;color:var(--slate-500);padding:8px 10px;border-bottom:1px solid var(--slate-200);background:var(--slate-50);white-space:nowrap;}
+  table.grid td{padding:7px 10px;border-bottom:1px solid var(--slate-100);white-space:nowrap;vertical-align:middle;}
+  table.grid td .cellrow{display:flex;gap:5px;align-items:center;}
+  .scroll{overflow-x:auto;}
+
+  /* filter picker */
+  .filterrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px;}
+  .sel{display:inline-flex;align-items:center;gap:6px;height:32px;border:1px solid var(--slate-200);background:#fff;border-radius:7px;padding:0 10px;font-size:12.5px;color:var(--slate-700);}
+  .sel.btn{cursor:pointer;}
+  .sel b{font-weight:600;}
+  .picker{width:420px;max-width:calc(100vw - 40px);background:#fff;border:1px solid var(--slate-200);border-radius:10px;box-shadow:0 10px 30px rgba(15,23,42,.12);}
+  .picker .search{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--slate-100);}
+  .picker .search input{border:0;outline:0;font-size:13px;font-family:inherit;flex:1;min-width:0;}
+  .picker .selected{display:flex;flex-wrap:wrap;gap:5px;padding:8px 10px;border-bottom:1px solid var(--slate-100);}
+  .picker .selected:empty{display:none;}
+  .picker .list{max-height:360px;overflow:auto;padding:4px 0;}
+  .grp{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--slate-400);padding:8px 12px 4px;}
+  .opt{display:flex;align-items:center;gap:8px;padding:5px 12px;font-size:13px;cursor:pointer;}
+  .opt:hover,.opt.active{background:var(--slate-50);}
+  .opt input{accent-color:var(--blue-600);}
+  .opt .tw{width:14px;color:var(--slate-500);font-size:12px;text-align:center;flex:0 0 auto;cursor:pointer;user-select:none;}
+  .opt .lbl{flex:1;min-width:0;}
+  .opt .crumb{display:block;font-size:11px;color:var(--slate-400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .opt mark{background:#fef08a;color:inherit;border-radius:2px;}
+  .opt.implied{color:var(--slate-500);}
+  .opt .hint{font-size:11px;color:var(--slate-400);white-space:nowrap;}
+  .picker .pfoot{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-top:1px solid var(--slate-100);font-size:12px;}
+  .picker .pfoot button{border:0;background:0;color:var(--blue-700);font-weight:600;cursor:pointer;font-size:12px;}
+  .x{border:0;background:0;color:inherit;cursor:pointer;font-size:12px;line-height:1;opacity:.7;}
+  .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:18px;align-items:start;}
+  @media (max-width:520px){ .two{grid-template-columns:1fr;} }
+
+  /* edit */
+  .form{display:grid;gap:10px;padding:14px 16px;}
+  .frow{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:start;}
+  .frow label{font-size:12.5px;color:var(--slate-500);padding-top:6px;}
+  .editlist{display:grid;gap:6px;}
+  .edititem{display:flex;align-items:center;gap:8px;font-size:12.5px;}
+  .src{font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:4px;}
+  .src.ai{background:var(--violet-50);color:var(--violet-700);}
+  .src.man{background:var(--emerald-50);color:var(--emerald-700);}
+  .addbtn{border:1px dashed var(--slate-300);background:#fff;border-radius:999px;padding:2px 10px;font-size:11.5px;color:var(--slate-600);cursor:pointer;width:fit-content;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="mock-banner">Mockup. The companies are made up; the tag lists are the current draft (Industry renamed Industrial, Biotech moved to Enabling tech).</div>
+  <h1>Sector &amp; Tags</h1>
+  <p class="lede">"Category" becomes <b>Sector</b> everywhere. The old secondary categories become <b>Tags</b>, in four families: Technology (a tree), Market, Business type and Enabling tech. Companies show one Sector pill and one Tags pill. The pill opens the full list, grouped by family.</p>
+
+  <!-- 1. Company header -->
+  <h2 class="sec">1 · Company page and application flyout header</h2>
+  <p class="note">The Sector pill replaces today's category pill. The Tags pill shows a count and opens the list. Clicking any tag, or any level of a Technology path, opens Explore Companies filtered to that tag.</p>
+  <div class="stagecanvas">
+    <div class="panel" style="padding:14px 16px;">
+      <div class="row">
+        <div class="logo">VL</div>
+        <div style="flex:1;min-width:0">
+          <div class="line1">
+            <span class="cname">Voltlane Materials</span><span class="muted">· voltlane.example</span>
+            <span class="chip sector">Energy Storage</span>
+            <span class="rel"><button class="chip tagspill" id="hdr-tags" aria-expanded="true" aria-haspopup="dialog">
+              <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8.6V2.5c0-.3.2-.5.5-.5h6.1l5.2 5.2c.3.3.3.7 0 1l-5.1 5.1c-.3.3-.7.3-1 0z"/><circle cx="5.2" cy="5.2" r="1.1"/></svg>
+              Tags <span class="n">6</span></button>
+              <div class="pop" id="hdr-pop" style="top:30px;left:0"></div>
+            </span>
+            <span class="chip stage">Screening</span>
+          </div>
+          <div class="tagline">Drop-in silicon anode material that lifts lithium-ion cell energy density without new factory equipment.</div>
+          <div class="meta">Oakland, CA · C-Corp</div>
+          <div style="height:260px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Grid -->
+  <h2 class="sec">2 · Grids and lists</h2>
+  <p class="note">Admin grids, Explore Companies, Stage Review and Pitch History get a Sector column and a Tags column. Grid cells stay on one line: the most specific Technology tag is shown, then a count button that opens the same popover.</p>
+  <div class="stagecanvas">
+    <div class="panel scroll">
+      <table class="grid">
+        <thead><tr><th>Company</th><th>Sector</th><th>Tags</th><th>Stage</th><th>Applied</th></tr></thead>
+        <tbody id="gridbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 3. Filter picker -->
+  <h2 class="sec">3 · Filtering: the tag picker</h2>
+  <p class="note">This one picker is used by every filter and every tag editor. With no search it browses the tree, grouped by family. Typing searches every level at once and shows each match with its path. Picking a parent includes everything under it, so choosing <i>Batteries</i> also finds companies tagged only <i>Silicon anodes</i>. Try typing "anode", "grid" or "hydrogen".</p>
+  <div class="stagecanvas">
+    <div class="two">
+      <div>
+        <div class="panel">
+          <div class="filterrow" style="border-bottom:1px solid var(--slate-100)">
+            <span class="sel"><b>Technology</b></span>
+            <span class="sel">includes any of ▾</span>
+            <span class="sel btn" id="pick-trigger">Select tags…</span>
+          </div>
+          <div style="padding:12px">
+            <div class="picker" id="picker"></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="panel" style="padding:14px 16px;display:grid;gap:10px">
+          <div style="font-size:12.5px;font-weight:650">Matching rules</div>
+          <ul style="font-size:12.5px;color:var(--slate-600);display:grid;gap:6px;padding-left:18px">
+            <li>Search matches any word at any level, plus each tag's synonyms (e.g. "EV" → Electric vehicles).</li>
+            <li>Results show the full path, so "Anodes" under batteries and "Anodes" anywhere else can't be confused.</li>
+            <li>Selecting a parent selects its whole branch. Children appear checked and grey; unchecking the parent clears them.</li>
+            <li>Selected tags appear as removable chips at the top of the picker and on the filter button.</li>
+            <li>Keyboard: arrows move, Enter toggles, Escape closes.</li>
+          </ul>
+          <div style="font-size:12.5px;font-weight:650;margin-top:6px">Explore Companies filter bar</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <span class="sel btn">Sector ▾</span>
+            <span class="sel btn">Tags · <b id="bar-count">0</b> ▾</span>
+            <span class="sel" style="color:var(--slate-400)">Search companies…</span>
+          </div>
+          <div class="chips" id="bar-chips"></div>
+          <p class="note" style="margin:0">On Explore the picker covers all four families at once. In admin grids each family is its own filter field: Technology, Market, Business type and Enabling tech.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Edit -->
+  <h2 class="sec">4 · Editing Sector and Tags</h2>
+  <p class="note">Admins can change a company's Sector and Tags from the header's edit mode. AI tags are marked. A manual change is kept when the company is re-tagged later.</p>
+  <div class="stagecanvas">
+    <div class="panel form">
+      <div class="frow"><label>Sector</label><span class="sel" style="width:fit-content">Energy Storage ▾</span></div>
+      <div class="frow"><label>Tags</label>
+        <div class="editlist" id="editlist"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Draft taxonomy (review page version + agreed changes). */
+const TECH = {
+  'Energy Storage': { 'Battery cells': ['Lithium-ion cells','Sodium-ion','Zinc & metal-air','Other chemistries'], 'Battery materials': ['Silicon anodes','Carbon & other anodes','Cathodes','Electrolytes & coatings'], 'Battery packs & management': ['Battery diagnostics'], 'Flow batteries': [], 'Stationary storage systems': [], 'Thermal storage': [], 'Mechanical & gravity storage': [], 'Supercapacitors': [], 'Portable & mobile power': [] },
+  'Energy Generation': { 'Solar PV': ['Next-gen cells','Building-integrated PV','Plug-in solar','Mounting & trackers','Solar software & installers'], 'Solar thermal': [], 'Wind': ['Small & building-integrated wind','Offshore & floating wind','Airborne wind'], 'Geothermal': ['Deep & enhanced geothermal','Ground-source heat'], 'Nuclear fission': [], 'Fusion': [], 'Hydropower': [], 'Marine energy': [], 'Waste heat to power': [], 'Energy harvesting': [], 'Project development software': [] },
+  'Grid & Power': { 'DER management & VPPs': [], 'Microgrids & off-grid power': [], 'Demand response & load control': [], 'Power electronics': ['Wide-bandgap semiconductors','Inverters'], 'Transmission & distribution hardware': [], 'Grid planning & analytics': [], 'Energy markets & trading': ['Battery dispatch','Renewable energy certificates','Clean power procurement'], 'Utility data integration': [], 'Backup generators': [] },
+  'Clean Fuels & Hydrogen': { 'Hydrogen production': ['Electrolysis','Methane pyrolysis','Other hydrogen production'], 'Hydrogen storage & fueling': [], 'Fuel cells': [], 'Ammonia': [], 'Biofuels': ['Biodiesel & renewable diesel','Sustainable aviation fuel'], 'Renewable natural gas & biogas': [], 'Biomass gasification & pyrolysis': [], 'Synthetic fuels': [] },
+  'Transportation': { 'Electric vehicles': ['Passenger EVs','Buses & trucks','Motorcycles & micromobility','Specialty & off-road EVs'], 'EV powertrain & components': [], 'EV charging': ['Charging software','Multifamily & curbside charging','DC fast charging','Wireless charging','Bidirectional & V2G'], 'Battery swapping': [], 'Electric & hybrid aviation': [], 'Marine vessels & propulsion': [], 'Rail': [], 'Freight & logistics': [], 'Fleet management & analytics': [], 'Vehicle efficiency retrofits': [], 'Transit & shared mobility': [], 'Transport refrigeration': [] },
+  'Built Environment': { 'Heat pumps': ['Heat pump water heaters'], 'HVAC & ventilation': [], 'Building controls & energy management': [], 'Building envelope': ['Windows & glazing','Insulation','Roofing & cool surfaces'], 'Low-carbon building products': [], 'Modular & prefab construction': [], 'Home electrification services': [], 'Building compliance & permitting': [], 'Data center cooling & efficiency': [] },
+  'Industrial': { 'Cement & concrete': ['Supplementary cementitious materials','Geopolymers','CO2-cured concrete'], 'Metals & steel': [], 'Chemicals & catalysts': [], 'Industrial heat & steam': [], 'Critical minerals & mining': ['Lithium extraction & refining','Other mineral processing'], 'Industrial efficiency & equipment': [], 'Biomanufacturing & fermentation': [], 'Manufacturing processes': [], 'Materials discovery & R&D tools': [] },
+  'Carbon': { 'Carbon accounting': ['Corporate emissions reporting','Product footprinting & LCA'], 'MRV & verification': [], 'Carbon markets & credits': [], 'Direct air capture': [], 'Point-source capture': [], 'Mineralization & utilization': [], 'Biochar': [], 'Methane detection & abatement': [], 'Soil & nature-based carbon': [], 'Climate engagement & giving': [], 'IT & cloud footprint': [] },
+  'AgTech & Food': { 'Crop inputs': ['Biologicals & biopesticides','Fertilizers & nutrient delivery'], 'Precision ag & farm analytics': [], 'Controlled environment agriculture': [], 'Livestock': ['Livestock methane reduction'], 'Aquaculture': [], 'Alternative proteins': [], 'Food ingredients & processing': [], 'Postharvest & food preservation': [], 'Food waste': [], 'Soil health': [], 'Farm robotics & irrigation': [] },
+  'Water': { 'Desalination': [], 'Water & wastewater treatment': ['Nutrient recovery'], 'PFAS treatment': [], 'Atmospheric water generation': [], 'Water quality monitoring': [], 'Leak detection & metering': [], 'Stormwater': [], 'Decentralized sanitation': [] },
+  'Recycling & Waste': { 'Plastic recycling': ['Mechanical recycling','Chemical recycling & pyrolysis'], 'Battery recycling': [], 'Solar panel recycling': [], 'E-waste & metals recovery': [], 'Textile recycling': [], 'Tire & rubber recycling': [], 'Organic waste & composting': [], 'Waste-to-energy': [], 'Reuse & repair': [], 'Waste collection & sorting': [] },
+  'Sustainable Materials': { 'Bioplastics & biopolymers': [], 'Sustainable packaging': [], 'Textiles & fibers': [], 'Leather alternatives': [], 'Coatings, resins & adhesives': [], 'Advanced carbon materials': [], 'Bio-based chemicals': [], 'Wood & natural-fiber composites': [] },
+  'Environmental Cleanup': { 'Air quality monitoring': [], 'Air purification': [], 'Soil & site remediation': [], 'Bioremediation': [], 'Toxics & exposure data': [] },
+  'Conservation & Adaptation': { 'Climate risk analytics': [], 'Weather & climate forecasting': [], 'Wildfire': [], 'Coastal protection': [], 'Forestry & reforestation': [], 'Biodiversity monitoring': [], 'Reef & ocean restoration': [], 'Disaster response': [] }
+};
+const FLAT = {
+  market: ['Utilities & grid operators','Utility-scale power','Commercial & industrial buildings','Homeowners','Multifamily & renters','Data centers','Heavy industry & manufacturing','Oil & gas','Mining','Farms & ranches','Food & beverage companies','Consumers & retail','EV drivers & charging operators','Fleets & freight','Aviation','Maritime & ports','Public transit','Government & municipalities','Defense','Corporate sustainability teams','Investors & lenders','Insurers','Real estate & construction','Energy project developers','Water & wastewater utilities','Waste & recycling operators','Off-grid & remote sites'],
+  business: ['Hardware','Software','Materials & chemicals','Project developer / operator','Services','Marketplace','Financial product','Consumer product','IP licensing'],
+  enabling: ['AI / machine learning','Biotech & synthetic biology','Computer vision','Sensors & IoT','Robotics & drones','Digital twins & simulation','Blockchain & tokenization']
+};
+const FAMILY_LABEL = { technology: 'Technology', market: 'Market', business: 'Business type', enabling: 'Enabling tech' };
+const SYNONYMS = { 'Electric vehicles': ['EV'], 'EV charging': ['EVSE'], 'DER management & VPPs': ['virtual power plant','DERMS'], 'Direct air capture': ['DAC'], 'Sustainable aviation fuel': ['SAF'], 'Battery cells': ['batteries'], 'Battery materials': ['batteries'], 'Carbon & other anodes': ['graphite','hard carbon','lithium metal'], 'AI / machine learning': ['ML'] };
+
+/* Flat index: {id, family, name, path[], parent, depth} */
+const TAGS = [];
+let nid = 0;
+const add = (family, name, path, parent) => { const t = { id: 't' + (nid++), family, name, path, parent, depth: path.length - 1, syn: SYNONYMS[name] || [] }; TAGS.push(t); return t; };
+for (const [l1, kids] of Object.entries(TECH)) {
+  const a = add('technology', l1, [l1], null);
+  for (const [l2, l3s] of Object.entries(kids)) {
+    const b = add('technology', l2, [l1, l2], a.id);
+    l3s.forEach(l3 => add('technology', l3, [l1, l2, l3], b.id));
+  }
+}
+for (const [fam, names] of Object.entries(FLAT)) names.forEach(n => add(fam, n, [n], null));
+const byId = Object.fromEntries(TAGS.map(t => [t.id, t]));
+const byPath = Object.fromEntries(TAGS.map(t => [t.family + ':' + t.path.join('>'), t]));
+const T = (fam, ...p) => byPath[fam + ':' + p.join('>')];
+const children = id => TAGS.filter(t => t.parent === id);
+const descendants = id => children(id).flatMap(c => [c, ...descendants(c.id)]);
+const ancestorsOf = t => { const out = []; let p = t.parent; while (p) { out.push(byId[p]); p = byId[p].parent; } return out; };
+
+const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* ---------- Example companies (fictional) ---------- */
+const COMPANIES = [
+  { name: 'Voltlane Materials', sector: 'Energy Storage', stage: 'Screening', applied: 'Mar 2026',
+    tags: [T('technology','Energy Storage','Battery materials','Silicon anodes'), T('technology','Energy Storage','Battery cells','Lithium-ion cells'), T('market','Utility-scale power'), T('market','EV drivers & charging operators'), T('business','Materials & chemicals'), T('enabling','AI / machine learning')] },
+  { name: 'Curbwise', sector: 'Transportation', stage: 'Pitch', applied: 'Jan 2026',
+    tags: [T('technology','Transportation','EV charging','Multifamily & curbside charging'), T('technology','Grid & Power','Demand response & load control'), T('market','Multifamily & renters'), T('business','Hardware')] },
+  { name: 'Brinewell', sector: 'Water', stage: 'Passed', applied: 'Nov 2025',
+    tags: [T('technology','Water','Desalination'), T('technology','Industrial','Critical minerals & mining','Lithium extraction & refining'), T('market','Mining'), T('market','Water & wastewater utilities'), T('business','Hardware')] },
+];
+
+/* ---------- Tags popover ---------- */
+function pathHtml(t) {
+  return t.path.map((seg, i) => {
+    const node = byPath['technology:' + t.path.slice(0, i + 1).join('>')];
+    return `<a href="#" class="${i === t.path.length - 1 ? 'leaf' : ''}" title="Find companies tagged ${esc(node.path.join(' › '))}">${esc(seg)}</a>`;
+  }).join('<span class="sep">›</span>');
+}
+function popHtml(c) {
+  const fams = ['technology', 'market', 'business', 'enabling'];
+  const body = fams.map(f => {
+    const ts = c.tags.filter(t => t.family === f);
+    if (!ts.length) return '';
+    const inner = f === 'technology'
+      ? `<div class="paths">${ts.map(t => `<div class="path">${pathHtml(t)}</div>`).join('')}</div>`
+      : `<div class="chips">${ts.map(t => `<a href="#" class="chip">${esc(t.name)}</a>`).join('')}</div>`;
+    return `<div class="fam"><div class="fl">${FAMILY_LABEL[f]}</div>${inner}</div>`;
+  }).join('');
+  return `<div class="ph">Tags <button class="x" aria-label="Close">✕</button></div><div class="pb">${body}</div>
+    <div class="pf"><span>Tagged by AI from the ${esc(c.applied)} application</span><a href="#">Edit</a></div>`;
+}
+document.getElementById('hdr-pop').innerHTML = popHtml(COMPANIES[0]);
+document.getElementById('hdr-tags').addEventListener('click', e => {
+  const pop = document.getElementById('hdr-pop'); const open = pop.hidden; pop.hidden = !open; e.currentTarget.setAttribute('aria-expanded', String(open));
+});
+document.querySelector('#hdr-pop .x').addEventListener('click', () => { document.getElementById('hdr-pop').hidden = true; document.getElementById('hdr-tags').setAttribute('aria-expanded', 'false'); });
+
+/* ---------- Grid ---------- */
+const gb = document.getElementById('gridbody');
+COMPANIES.forEach((c, i) => {
+  const lead = c.tags.find(t => t.family === 'technology');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><b>${esc(c.name)}</b></td><td><span class="chip sector">${esc(c.sector)}</span></td>
+    <td><div class="cellrow"><span class="chip" title="${esc(lead.path.join(' › '))}">${esc(lead.name)}</span>
+      <span class="rel"><button class="chip tagspill" aria-expanded="false">+${c.tags.length - 1}</button><div class="pop" hidden style="top:28px;left:0"></div></span></div></td>
+    <td><span class="chip stage">${esc(c.stage)}</span></td><td class="muted">${esc(c.applied)}</td>`;
+  const btn = tr.querySelector('.tagspill'), pop = tr.querySelector('.pop');
+  pop.innerHTML = popHtml(c);
+  btn.addEventListener('click', () => { pop.hidden = !pop.hidden; btn.setAttribute('aria-expanded', String(!pop.hidden)); });
+  pop.querySelector('.x').addEventListener('click', () => { pop.hidden = true; });
+  gb.append(tr);
+});
+
+/* ---------- Picker ---------- */
+const state = { q: '', sel: new Set([T('technology','Energy Storage','Battery materials').id]), open: new Set([T('technology','Energy Storage').id, T('technology','Energy Storage','Battery materials').id]) };
+const isImplied = t => ancestorsOf(t).some(a => state.sel.has(a.id));
+function hl(text, q) {
+  if (!q) return esc(text);
+  const i = text.toLowerCase().indexOf(q.toLowerCase());
+  return i < 0 ? esc(text) : esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + q.length)) + '</mark>' + esc(text.slice(i + q.length));
+}
+function toggle(t) {
+  if (isImplied(t)) return;
+  if (state.sel.has(t.id)) state.sel.delete(t.id);
+  else { state.sel.add(t.id); descendants(t.id).forEach(d => state.sel.delete(d.id)); }
+  renderPicker();
+}
+function optRow(t, { showCrumb, indent }) {
+  const implied = isImplied(t), checked = implied || state.sel.has(t.id);
+  const kids = children(t.id).length;
+  const div = document.createElement('div');
+  div.className = 'opt' + (implied ? ' implied' : '');
+  div.style.paddingLeft = (12 + (indent || 0) * 18) + 'px';
+  const twisty = !showCrumb && kids ? `<span class="tw" data-tw>${state.open.has(t.id) ? '▾' : '▸'}</span>` : `<span class="tw"></span>`;
+  const crumb = showCrumb && t.path.length > 1 ? `<span class="crumb">${esc(t.path.slice(0, -1).join(' › '))}</span>` : '';
+  const hint = implied ? '<span class="hint">included</span>' : (kids ? `<span class="hint">+${descendants(t.id).length} below</span>` : '');
+  div.innerHTML = `${twisty}<input type="checkbox" ${checked ? 'checked' : ''} ${implied ? 'disabled' : ''} tabindex="-1"><span class="lbl">${hl(t.name, showCrumb ? state.q : '')}${crumb}</span>${hint}`;
+  div.addEventListener('click', e => {
+    if (e.target.hasAttribute('data-tw')) { state.open.has(t.id) ? state.open.delete(t.id) : state.open.add(t.id); renderPicker(); return; }
+    toggle(t);
+  });
+  return div;
+}
+function search(q) {
+  const ql = q.toLowerCase();
+  const hits = TAGS.filter(t => t.name.toLowerCase().includes(ql) || t.syn.some(s => s.toLowerCase().includes(ql)));
+  const score = t => (t.name.toLowerCase().startsWith(ql) ? 0 : 1) * 10 + t.depth;
+  return hits.sort((a, b) => score(a) - score(b) || a.name.localeCompare(b.name)).slice(0, 40);
+}
+function renderPicker() {
+  const p = document.getElementById('picker');
+  const prevInput = p.querySelector('input[type=search]');
+  const hadFocus = prevInput && document.activeElement === prevInput;
+  p.innerHTML = `<div class="search"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="#94a3b8" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg>
+    <input type="search" id="tagsearch" placeholder="Search tags…" aria-label="Search tags"></div><div class="selected"></div><div class="list" role="listbox"></div>
+    <div class="pfoot"><span class="muted">${state.sel.size} selected</span><button id="clearsel">Clear</button></div>`;
+  const input = p.querySelector('input'); input.value = state.q;
+  input.addEventListener('input', () => { state.q = input.value; renderPicker(); });
+  if (hadFocus) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
+  p.querySelector('#clearsel').addEventListener('click', () => { state.sel.clear(); renderPicker(); });
+  const selBox = p.querySelector('.selected');
+  [...state.sel].map(id => byId[id]).forEach(t => {
+    const c = document.createElement('span'); c.className = 'chip blue';
+    c.title = t.path.join(' › ');
+    c.innerHTML = `${esc(t.name)}${children(t.id).length ? ' <span style="font-weight:400">+ all below</span>' : ''} <button class="x" aria-label="Remove">✕</button>`;
+    c.querySelector('button').addEventListener('click', () => { state.sel.delete(t.id); renderPicker(); });
+    selBox.append(c);
+  });
+  const list = p.querySelector('.list');
+  if (state.q.trim()) {
+    const hits = search(state.q.trim());
+    if (!hits.length) list.innerHTML = '<div class="opt muted">No tags match</div>';
+    ['technology', 'market', 'business', 'enabling'].forEach(f => {
+      const fh = hits.filter(t => t.family === f); if (!fh.length) return;
+      const g = document.createElement('div'); g.className = 'grp'; g.textContent = FAMILY_LABEL[f]; list.append(g);
+      fh.forEach(t => list.append(optRow(t, { showCrumb: true })));
+    });
+  } else {
+    const walk = (t, indent) => { list.append(optRow(t, { indent })); if (state.open.has(t.id)) children(t.id).forEach(c => walk(c, indent + 1)); };
+    ['technology', 'market', 'business', 'enabling'].forEach(f => {
+      const g = document.createElement('div'); g.className = 'grp'; g.textContent = FAMILY_LABEL[f]; list.append(g);
+      TAGS.filter(t => t.family === f && !t.parent).forEach(t => walk(t, 0));
+    });
+  }
+  // mirror into filter button + explore bar
+  const names = [...state.sel].map(id => byId[id].name);
+  document.getElementById('pick-trigger').textContent = names.length ? names.join(', ') : 'Select tags…';
+  document.getElementById('bar-count').textContent = names.length;
+  const bar = document.getElementById('bar-chips'); bar.innerHTML = '';
+  [...state.sel].forEach(id => { const t = byId[id]; const c = document.createElement('span'); c.className = 'chip blue'; c.title = t.path.join(' › '); c.textContent = t.name; bar.append(c); });
+}
+renderPicker();
+
+/* ---------- Edit list ---------- */
+const el = document.getElementById('editlist');
+const v = COMPANIES[0];
+v.tags.forEach((t, i) => {
+  const d = document.createElement('div'); d.className = 'edititem';
+  const label = t.family === 'technology' ? t.path.join(' › ') : t.name;
+  d.innerHTML = `<span class="muted" style="width:92px">${FAMILY_LABEL[t.family]}</span><span class="chip ${t.family === 'technology' ? '' : ''}" title="${esc(label)}">${esc(label)}</span>
+    <span class="src ${i === 3 ? 'man' : 'ai'}">${i === 3 ? 'Manual' : 'AI'}</span><button class="x" aria-label="Remove">✕</button>`;
+  el.append(d);
+});
+const addb = document.createElement('button'); addb.className = 'addbtn'; addb.textContent = '+ Add tag'; el.append(addb);
+</script>
+</body>
+</html>

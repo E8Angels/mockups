@@ -1,0 +1,6 @@
+# Changelog
+
+- 2026-09-25: Initial plan and mockup: Sector rename, Tags families (Technology tree, Market, Business type, Enabling tech), tag picker, display surfaces, data model, work packages.
+- 2026-09-25: Decisions recorded (applicants hidden, Sectors of Interest remap, embed keys + e8angels.com, leaf + N cell). Classification revised: Sector derived from primary Technology tag, scope notes, brief → tag → 3-run vote, provenance, review queue, WP0 accuracy gate with gold set; Market/Business type/Enabling tightened.
+- 2026-09-25: Per Jordan: Sector stays independent of Technology; no Market cap; Government/Heavy industry/AI kept with tighter definitions; Energy project developers market added. Human gold set replaced by a two-vendor frontier reference set; model comparison (GPT-6 Luna, GPT-5.6 Luna, Haiku 4.5 vs frontier references); monthly taxonomy health report and model-drift checks.
+- 2026-09-26: Reference models = flagship per vendor (GPT-6 Sol, Claude Opus 5.5); production candidates add Sonnet 5; tags = union of 3 runs with per-tag vote counts (tested vs 2-of-3 in WP0); classify once when the best input is ready; monthly Taxonomy health page + Slack link to #screening-chairs-jordan-sarah, reviewed monthly by Jordan.
