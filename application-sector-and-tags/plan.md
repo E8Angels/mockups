@@ -33,7 +33,10 @@ The redesign was tested on the 1,080 applications added since 2024-09-19. Taxono
    - Rename Recycling to Recycling & Waste, and Infrastructure to Grid & Power.
    - The full list and its rules are in the appendix.
 4. Tags and Sector live on the **company**, as categories do today. They are derived from the company's latest submitted application, using the AI application summary when one exists and the form fields otherwise.
-5. **AI results are saved, not recomputed.** A human edit locks that field (Sector, or the tag set) against AI re-tagging. Re-tagging a locked company requires an explicit force.
+5. **AI results are saved, not recomputed.**
+   - A person's Sector choice is never overwritten by AI.
+   - A tag a person adds stays; a tag a person removes never comes back.
+   - New applications only add tags (see Re-applications).
 6. Meaning-based search (vectors) is a later, separate plan. It runs on the full application text, with tags as filters. This plan only has to leave the data ready for it.
 
 ## Display
@@ -41,17 +44,18 @@ The redesign was tested on the 1,080 applications added since 2024-09-19. Taxono
 See `mockup.html`.
 
 - **Company page and application flyout header** (`UnifiedRecordIsland`): the Sector pill replaces the category pill, keeping its managed colour. Next to it is a **Tags pill** with a tag icon and a count. Clicking it opens a popover grouped by family:
-  - Technology tags show as paths (Energy Storage › Battery materials › **Silicon anodes**).
-  - The other families show as chips.
-  - Every tag, and every level of a path, links to Explore Companies filtered to that tag.
-  - The footer names the source ("Tagged by AI from the Mar 2026 application") and has an Edit link.
+  - Every tag is a pill.
+  - Technology pills show the level above in grey (*Battery materials ›* **Silicon anodes**) so similarly named tags can't be confused. The full path shows in the tag picker and on hover.
+  - Clicking a tag opens Explore Companies filtered to it.
+  - The footer has an Edit link only. The UI never shows whether a tag came from AI or a person.
 - **Grids and lists:** admin grids, Explore Companies, Stage Review, Pitch History and the portfolio grid get two columns:
   - **Sector:** a pill.
-  - **Tags:** the most specific Technology tag as a chip, then a `+N` button that opens the same popover.
+  - **Tags:** the lead Technology tag as a pill, then a `+N` button that opens the same popover.
 
   Cells stay on one line, because the virtualizer requires it. Every tag stays reachable through the popover, not only through a tooltip.
 - **Portfolio detail header:** same Sector pill and Tags pill as the company header.
-- **Edit mode:** a Sector select and a tag list. Each tag shows an AI or Manual badge, has a remove button, and "+ Add tag" opens the tag picker.
+- **Edit mode:** a Sector select and a tag list. Each tag has a remove button, and "+ Add tag" opens the tag picker. There are no source badges. The source is tracked internally only, to protect manual edits.
+- **Explore Companies is member-facing:** members see Sector and Tags there, as they see categories today.
 - **Public embed:** Sector only.
 
 ## Filtering and search
@@ -78,7 +82,7 @@ See `mockup.html`.
 Use expand/contract so old and new code can run side by side. Production runs on more than one machine, so a rename in place would break whichever machines are still on old code during the deploy.
 
 - **`companies`:**
-  - Add `sector TEXT`, `sector_source TEXT` (`ai` | `manual`) and `tags_source TEXT` (`ai` | `manual`).
+  - Add `sector TEXT` and `sector_source TEXT` (`ai` | `manual`).
   - Copy `category` into `sector` for existing rows. Old values that are no longer valid stay until the backfill replaces them.
   - Drop `category` and `secondary_category` in the cleanup phase.
 - **`taxonomy_tags`:**
@@ -86,7 +90,15 @@ Use expand/contract so old and new code can run side by side. Production runs on
   - A rename changes `name` only.
   - A tag that is retired is deactivated, never deleted. It can optionally be merged into another tag, which moves its company links.
 - **`company_tags`:** (`company_record_id`, `tag_id`) as the primary key, plus `is_primary` (exactly one Technology tag per company), `votes` (1–3), `source` (`ai` | `manual`), `from_application_record_id`, `created_at` and `created_by_person_record_id`.
-- **`company_classifications`:** one row per company for its latest AI run. Columns: `application_record_id`, `taxonomy_version`, `prompt_version`, `model`, `agreement` (3/3 or 2/3), `needs_review`, `rationale`, `suggested_tag` and `classified_at`.
+- **`application_classifications`:** one row per application, the AI result for that application. Columns:
+  - `sector`
+  - `sector_agreement` (3/3 or 2/3)
+  - `tags_json` (tag ids with votes)
+  - `taxonomy_version`, `prompt_version`, `model`
+  - `needs_review`, `rationale`, `suggested_tag`, `input` (`summary` | `form`) and `classified_at`
+
+  The company's Sector and Tags are rolled up from these rows (see Re-applications).
+- **`company_tag_exclusions`:** (`company_record_id`, `tag_id`, `removed_by`, `removed_at`). A tag a person removed never comes back from AI.
 - **`application_classification_briefs`:** per application, the brief JSON, model and created date. Vector search will reuse it later.
 - **`taxonomy_tags`** also stores scope notes (`includes`, `excludes_json` naming the see-also tags). The taxonomy has a version number that goes up on every edit.
 - **Managed lists:** the list key `category` becomes `sector`, labelled "Sector", and is re-seeded with the new 16 values and definitions. The `subcategory` list is retired in cleanup. Sector keeps its managed colours.
@@ -166,6 +178,18 @@ There will be no human-labelled test set. Accuracy therefore rests on three thin
 
 Later summary regenerations do not trigger re-classification. A trigger never overwrites a `manual` field.
 
+### Re-applications
+
+When a company that is already tagged submits a new application, the new application is classified on its own and stored in `application_classifications`. Then the company roll-up is recomputed:
+
+- **Tags are additive:** the union of every application's tags.
+  - A tag is never dropped because a newer application doesn't mention it.
+  - Removing tags is manual only. A removal is recorded in `company_tag_exclusions` so AI never re-adds it.
+  - Each tag keeps its highest vote count across applications.
+- **Sector:** the company shows the Sector of its **latest** application, unless a person set it manually. A pivot is a real change.
+  - When a re-application's Sector differs from the previous one, it appears in the monthly report under "Sector changes", so pivots are visible rather than silent.
+- **Reporting:** dealflow counts use **each application's own Sector**. A 2024 application stays in the Sector it was classified as in 2024, even if the company later pivots, so historical reports don't shift.
+
 ### Model choice
 
 Prices are per million tokens, input / output, at standard rates as of 2026-09-25. Batch processing halves them.
@@ -218,7 +242,7 @@ Prices are per million tokens, input / output, at standard rates as of 2026-09-2
 On the 1st of each month, a job in the worker builds a **Taxonomy health report**:
 
 - **Where it lives:** saved as a monthly snapshot and viewable on a portal page, **Admin → Lists → Taxonomy health**. The page keeps past months.
-- **Notification:** a Slack message with the link to `#screening-chairs-jordan-sarah`, through the existing `lib/slack-notifier.js`. This needs the channel's ID in a new env var and the Slack bot invited to the channel.
+- **Notification:** a Slack message with the link to `#screening-chairs-sarah-jordan`, channel ID `C0B8LQD6SN4`, via the existing `lib/slack-notifier.js` and a new env var `SLACK_TAXONOMY_REPORT_CHANNEL_ID`. The E8 bot is confirmed as a member, checked with the dev environment's bot token. Production must use the same bot.
 
 **What the report covers:**
 
@@ -314,7 +338,7 @@ WP0 and WP1 start together. WP1 must merge before the others because it defines 
 | WP | Scope | Depends on |
 |---|---|---|
 | **WP0 Accuracy gate** | Write definitions (includes / excludes / synonyms) for every Sector and tag, and apply the facet changes. Build the ~200-application reference set with two vendors' frontier models, reconciling disagreements. Build the eval harness (following `lib/insights/evals`). Test the small-model candidates. Write a results note that fixes the model and method. | none |
-| **WP1 Foundation** | Dev migration SQL (`scripts/migrate-sector-and-tags.sql`): new columns and tables (including `company_classifications`, briefs, scope notes, taxonomy version), copy `category`→`sector`, managed-list re-key, saved-view field-key rewrite. Seed file `lib/taxonomy/seed.json` built from the tree in `mockup.html`. Cache-manager read/write methods, expanded row fields, `GET /api/taxonomy`, the `PATCH` changes, merge lists, write contracts. | none |
+| **WP1 Foundation** | Dev migration SQL (`scripts/migrate-sector-and-tags.sql`): new columns and tables (including `application_classifications`, `company_tag_exclusions`, briefs, scope notes, taxonomy version), copy `category`→`sector`, managed-list re-key, saved-view field-key rewrite. Seed file `lib/taxonomy/seed.json` built from the tree in `mockup.html`. Cache-manager read/write methods, expanded row fields, `GET /api/taxonomy`, the `PATCH` changes, merge lists, write contracts. | none |
 | **WP2 Tagging** | `lib/company-tagging.js` (brief → classify → 3-run vote with union tags, provenance), `tagging` role in `lib/ai-models.js`, single-trigger logic, monthly taxonomy health job, the Taxonomy health page with accept/dismiss, and the Slack link, both triggers, `needs_review` queue view, backfill script (Batch API, dry-run report), retire `ai-categorizer.js`. | WP1; model and method from WP0 |
 | **WP3 Components + record page** | `SectorPill` (renamed `CategoryPill`), `TagsPill` + popover, `tag-picker.jsx`. Company header and edit mode, portfolio detail header. Remove the applicant dashboard editors and summary rows (decision 1). | WP1 API shape; can start on fixtures |
 | **WP4 Grids + filters** | Admin grid fields and options, RecordGrid value control, CompaniesAdmin grids, Explore Companies (dropdowns, URL params, search), Stage Review, Pitch History, Metrics "By Sector". | WP1, WP3 components |
