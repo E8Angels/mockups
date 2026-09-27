@@ -9,28 +9,29 @@ WP0 PR: see `implementation-status.md`. Branch `wp0-sector-tags-accuracy`. Date:
   - Sector agreement with the reference: 92.0%
   - Technology agreement at the second level: 89.0%
   - Cost: $0.00084 per application for 3 runs on the batch API
-  - The catch: it classifies the application text directly, without the brief. That is a change to the plan's pipeline, so it needs a decision (below).
-- **Recommendation, pending decision:**
-  - Model: GPT-6 Luna (`gpt-6-luna`), reasoning effort `low`, 3 runs, union tag rule.
-  - Accept the run-to-run shortfall. Sector 2–1 splits go to `needs_review`, as the plan already provides; that is about 10% of applications.
-  - The monthly health report tracks the split rate.
-  - Nothing is chosen until Jordan decides the two open questions at the end of this note.
+  - It classifies the application text directly, without the brief.
+- **Decided by Jordan on 2026-09-27** (plan decisions 8–9):
+  - Model: GPT-6 Luna (`gpt-6-luna`), reasoning effort `low`, 3 runs, union tag rule, classifying the AI summary when one exists and the form fields otherwise. There is no brief step.
+  - The run-to-run shortfall is accepted. Sector 2–1 splits keep the majority and go to `needs_review` (about 10% of applications). The monthly health report tracks the split rate.
+  - Business type is "every value customers pay for as a real part of the business", with no "most companies have one" expectation.
+- **Unmeasured changes:** prompt version 3 (the Business type wording) and the four seed v2 Sector definition edits. Every reported run used prompt v1 with multi-value Business type, and the reference set was labelled with v1.
 - **Actual AI spend: $11.60** of the $13 cap.
 
 ## What was built
 
 | Piece | Where |
 |---|---|
-| Shared, versioned classification prompt and schema (production and eval use the same text) | `lib/taxonomy/classification-prompt.js`, prompt version 2 |
+| Shared, versioned classification prompt and schema (production and eval use the same text) | `lib/taxonomy/classification-prompt.js`, prompt version 3 (the production, direct-input path) |
 | Reference set: 200 application ids and labels, no applicant text, frozen | `lib/taxonomy/evals/reference-set.json` |
 | Eval harness: validation, 3-run vote (union and 2-of-3), metrics, cost | `lib/taxonomy/evals/harness.js`, `providers.js`, `thresholds.json` |
 | Runner: fetch inputs, pilot, estimate, batch or standard runs, build reference, score | `scripts/run-taxonomy-evals.js` |
-| `tagging` role (references and candidates, with prices) | `lib/ai-models.js` → `TAGGING_MODELS` |
+| `tagging` role: production choice, references and candidates, with prices | `lib/ai-models.js` → `TAGGING_MODELS` (`TAGGING_MODELS.production`) |
+| Brief prompt, eval-only (kept so the brief comparison can be reproduced; not production) | `lib/taxonomy/evals/brief-prompt.js` |
 | Tests | `__tests__/lib/taxonomy-evals.test.js`, `taxonomy-seed.test.js`, `ai-models.test.js` |
 
 The runner reads application text from production (read-only, through `scripts/db-query.js`) into a cache directory outside git. Raw model outputs stay there too. The repo holds only ids and labels.
 
-To repeat a run: `node scripts/run-taxonomy-evals.js fetch-inputs --env=prod`, then `run`, then `score`. The file header lists every flag.
+To repeat a run: `node scripts/run-taxonomy-evals.js fetch-inputs --env=prod`, then `run`, then `score`. The file header lists every flag. Stage names: this note's "direct" is runner stage `classify` (production), and "brief" is the eval-only stages `brief` and `brief-classify`.
 
 ## Reference set
 
@@ -194,7 +195,7 @@ Production holds taxonomy v1, loaded from the seed merged in PR #921. This PR se
 | Industrial | includes; excludes → Sustainable Materials | A non-toxic substitute chemistry sold to replace a conventional one is Sustainable Materials, even when called a catalyst. AI or computational materials-discovery companies go by their current business. |
 | Sustainable Materials | includes; excludes → Industrial | Mirror of the Industrial change. |
 
-The classification prompt version is 2. The measured runs used version 1: the v1 definitions plus the Business type changes. The four reconciliation edits have not been measured.
+The classification prompt version is 3. The measured runs used version 1: the v1 definitions plus the multi-value Business type change. The four reconciliation edits (v2) and the v3 Business type wording have not been measured.
 
 ## Actual spend
 
@@ -239,15 +240,11 @@ These are costs computed from the token usage each API reported, at list prices,
 | For comparison: Haiku 4.5, standard API | about $39 |
 | For comparison: Sonnet 5, standard API | about $135 (estimated from its pilot) |
 
-## Open questions for Jordan
+## Decisions (formerly open questions)
 
-1. **Run-to-run bar (≥95% of applications with 3 of 3 on Sector).** No candidate meets it; the best is about 90–92%, and about 93% pairwise. Options:
-   - (a) Accept it. Sector 2–1 splits (about 10% of applications) go to `needs_review`, which is already how the plan handles them. This is my recommendation.
-   - (b) Test Claude Sonnet 5. About $6 for 3 runs on the standard API; needs budget. Production backfill would then be about $135.
-   - (c) Tighten definitions around the 18 applications that split repeatedly, then re-measure. About $0.20 per GPT-6 Luna rerun, or about $1.70 to also re-label the Sol reference.
-   - How stable the reference models themselves are was not measured, because each ran once.
-2. **Brief vs direct input for classification.** Classifying the application text directly is more accurate: +3 points on Sector and 8–11 points more tag precision, at similar stability and cost. The plan's brief can still be generated and stored for vector search. It just wouldn't be the classification input. This is a change to the plan's pipeline step 1, so it needs a decision.
-3. **Business type wording.** Apply the proposed tightening, or leave multi-value tagging as the models currently read it?
+1. **Run-to-run bar:** accepted as is. 2–1 splits go to `needs_review`. Sonnet 5 was not tested and definitions were not re-measured.
+2. **Input:** classify directly. No brief is generated now; the vector-search plan generates briefs when it needs them.
+3. **Business type wording:** the tightening was not applied, and "most companies have one" was removed.
 
 ## Notes for later work packages
 

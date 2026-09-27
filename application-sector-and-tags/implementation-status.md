@@ -4,9 +4,9 @@ Last updated: 2026-09-27. Update this file as work moves.
 
 | WP | Status | Branch / PR | Worktree URL | Notes |
 |---|---|---|---|---|
-| WP0 Accuracy gate | **Results ready**: [`wp0-results.md`](wp0-results.md). PR [#924](https://github.com/E8Angels/e8-portal/pull/924) not merged; waiting on Jordan's three decisions | `wp0-sector-tags-accuracy` | http://localhost:8100 | $11.60 of the $13 cap spent. Recommended: GPT-6 Luna, low effort, direct input, union |
+| WP0 Accuracy gate | **Done.** [#921](https://github.com/E8Angels/e8-portal/pull/921) and [#924](https://github.com/E8Angels/e8-portal/pull/924) merged; results in [`wp0-results.md`](wp0-results.md) | `wp0-sector-tags-accuracy` | http://localhost:8100 | $11.60 spent. GPT-6 Luna, low effort, direct input, union |
 | WP1 Foundation | **Merged** ([#922](https://github.com/E8Angels/e8-portal/pull/922), `a7ae2be0`) after Opus review; 12 findings fixed. Prod migration and seed v1 applied 2026-09-27 | `wp1-sector-tags-foundation` | http://localhost:8120 | Deploy and post-deploy steps wait for rollout |
-| WP2 Tagging | Not started | | | Waits on WP0 results and the shared prompt module |
+| WP2 Tagging | Starting (Opus) | `wp2-sector-tags-tagging` | | Backfill about $2.60 on GPT-6 Luna batch; live runs need approval |
 | WP3 Components + record page | Fixing 11 findings from the Opus review of [#923](https://github.com/E8Angels/e8-portal/pull/923), incl. parent-tick deleting child tags in edit mode | `wp3-sector-tags-components` | http://localhost:8130 | |
 | WP4 Grids + filters | Not started | | | Waits on WP1 and WP3 components |
 | WP5 AI + MCP | In progress (Sonnet) | `wp5-sector-tags-ai-mcp` | | Live eval run needs a cost estimate and approval |

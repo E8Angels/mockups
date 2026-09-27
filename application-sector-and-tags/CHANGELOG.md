@@ -17,3 +17,4 @@
 - 2026-09-27: WP1 merged; prod migration and seed v1 applied with approval; WP5, WP6 and WP7 started.
 - 2026-09-27: WP0 results published (wp0-results.md); WP3 review fixes under way.
 - 2026-09-27: WP0 decisions recorded; pipeline classifies directly (no brief step).
+- 2026-09-27: WP0 done (#924 merged); WP2 starting.
