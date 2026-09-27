@@ -8,11 +8,11 @@ Last updated: 2026-09-27. Update this file as work moves.
 | WP1 Foundation | **Merged** ([#922](https://github.com/E8Angels/e8-portal/pull/922), `a7ae2be0`) after Opus review; 12 findings fixed. Prod migration and seed v1 applied 2026-09-27 | `wp1-sector-tags-foundation` | http://localhost:8120 | Deploy and post-deploy steps wait for rollout |
 | WP2 Tagging | **Merged** ([#930](https://github.com/E8Angels/e8-portal/pull/930)) after three Opus review rounds | `wp2-sector-tags-tagging` | http://localhost:8170 | Dev live calls $0.013. Prod backfill about $2.50 (worst $11.13). Monthly health AI parts about $1.40/month in prod |
 | WP3 Components + record page | **Merged** ([#923](https://github.com/E8Angels/e8-portal/pull/923), `b9f95307`) after Opus review; 13 fixes | `wp3-sector-tags-components` | http://localhost:8130 | Tag picker `mode="assign"` in edit mode, `mode="filter"` for filters |
-| WP4 Grids + filters | Fixing 12 findings from the Opus review of [#934](https://github.com/E8Angels/e8-portal/pull/934) (Partners Tags column regression, click-through, ?tag= reload; Metrics back to a straight rename) | `wp4-sector-tags-grids` | http://localhost:8200 | |
+| WP4 Grids + filters | **Merged** ([#934](https://github.com/E8Angels/e8-portal/pull/934)) after Opus review; 12 fixes. Metrics is a straight rename to "By Sector" | `wp4-sector-tags-grids` | http://localhost:8200 | |
 | WP5 AI + MCP | **Merged** ([#927](https://github.com/E8Angels/e8-portal/pull/927), `1e03f4a9`) after Opus review; 9 fixes | `wp5-sector-tags-ai-mcp` | http://localhost:8140 | Live eval suite (default model `gpt-5.6`) about $1–10; not run |
 | WP6 Lists admin | **Merged** ([#925](https://github.com/E8Angels/e8-portal/pull/925)); finished on Opus after three review rounds | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Sector delete deactivates. A cited tag can't be deactivated until it's merged or its references are removed. Don't edit the Lists admin during the rolling deploy |
 | WP7 Label sweep + Sectors of Interest | **Merged** ([#926](https://github.com/E8Angels/e8-portal/pull/926)) after Opus review; 13 fixes plus a follow-up | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
-| Rollout | Not started | | | Every step needs Jordan's approval |
+| Rollout | **Ready; awaiting Jordan's approval.** WP0–WP7 are merged; main `f337bcdf` passes the full suite (only the local Node-pin test fails) and `vite build`. Combined server: http://localhost:8110 | | http://localhost:8110 | Every step needs Jordan's approval |
 | WP8 Cleanup | Not started | | | At least one week after rollout |
 
 ## Decision changes
@@ -36,6 +36,7 @@ None.
 ## Follow-ups found along the way
 
 - Metrics "By Category" counts investments, so it becomes "By Sector" bucketed by the company's current Sector (the plan's rename). Decision 5 (each application counted under its own Sector) applies to dealflow reports; no dealflow-by-sector report exists today, so it applies when one is built. `application_classifications.sector` holds the per-application Sector.
+- PR #932 (outside this project) left two TopNav tests stale on main; fixed in [#935](https://github.com/E8Angels/e8-portal/pull/935).
 - `dynamic-rollups.test.js` broke on main after WP5 (the test was out of date); fixed in [#933](https://github.com/E8Angels/e8-portal/pull/933).
 - New companies no longer get `secondary_category` (`ai-categorizer.js` is retired). The public embed's legacy `secondary_categories` key is therefore empty for new companies until WP8 removes it; e8angels.com moves to `sector`.
 - The smoke auth session expired on 2026-09-20; a fresh dev session was minted on 2026-09-27.
