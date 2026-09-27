@@ -6,11 +6,11 @@ Last updated: 2026-09-27. Update this file as work moves.
 |---|---|---|---|---|
 | WP0 Accuracy gate | **Done.** [#921](https://github.com/E8Angels/e8-portal/pull/921) and [#924](https://github.com/E8Angels/e8-portal/pull/924) merged; results in [`wp0-results.md`](wp0-results.md) | `wp0-sector-tags-accuracy` | http://localhost:8100 | $11.60 spent. GPT-6 Luna, low effort, direct input, union |
 | WP1 Foundation | **Merged** ([#922](https://github.com/E8Angels/e8-portal/pull/922), `a7ae2be0`) after Opus review; 12 findings fixed. Prod migration and seed v1 applied 2026-09-27 | `wp1-sector-tags-foundation` | http://localhost:8120 | Deploy and post-deploy steps wait for rollout |
-| WP2 Tagging | In progress (Opus) | `wp2-sector-tags-tagging` | | Backfill about $2.60 on GPT-6 Luna batch; live runs need approval |
+| WP2 Tagging | PR [#930](https://github.com/E8Angels/e8-portal/pull/930) under Opus review | `wp2-sector-tags-tagging` | http://localhost:8170 | Dev live calls $0.013. Prod backfill estimate about $2.50 (worst case $11.13); 2,678 applications classifiable, 32 have no text |
 | WP3 Components + record page | **Merged** ([#923](https://github.com/E8Angels/e8-portal/pull/923), `b9f95307`) after Opus review; 13 fixes | `wp3-sector-tags-components` | http://localhost:8130 | Tag picker `mode="assign"` in edit mode, `mode="filter"` for filters |
 | WP4 Grids + filters | In progress (Sonnet) | `wp4-sector-tags-grids` | | Turns on `TAG_CHIP_EXPLORE_LINKS_ENABLED` once `?tag=` works |
 | WP5 AI + MCP | Fixing 9 findings from the Opus review of [#927](https://github.com/E8Angels/e8-portal/pull/927) (empty similar list with no tags, legacy Sector aliases, synonym resolution) | `wp5-sector-tags-ai-mcp` | http://localhost:8140 | Live eval suite about $2.60 typical, $10 worst (gpt-5.6-terra prices); not run |
-| WP6 Lists admin | Fixing 14 findings from the Opus review of [#925](https://github.com/E8Angels/e8-portal/pull/925) (merge vs exclusions, seed reload reverting admin edits, refresh failures) | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Moves to Opus if it fails review again |
+| WP6 Lists admin | 14 fixes pushed to [#925](https://github.com/E8Angels/e8-portal/pull/925); Opus re-review in progress | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Adds `taxonomy_tags.admin_edited_at` |
 | WP7 Label sweep + Sectors of Interest | **Merged** ([#926](https://github.com/E8Angels/e8-portal/pull/926)) after Opus review; 13 fixes plus a follow-up | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
 | Rollout | Not started | | | Every step needs Jordan's approval |
 | WP8 Cleanup | Not started | | | At least one week after rollout |
@@ -51,11 +51,19 @@ Done (approved by Jordan 2026-09-27):
 - `node scripts/run-sql-migration.js --env=prod scripts/migrate-sector-and-tags.sql`: 21 statements. 2,733 companies got `sector` (0 mismatches with `category`); 6 tables created; `sector` list with 16 items. The `category` list is still active.
 - `node scripts/load-taxonomy-seed.js --env=prod`: 240 tags (197/27/9/7) and 16 Sector definitions, taxonomy version 1.
 
-Awaiting approval (rollout):
-1. Deploy.
-2. `node scripts/run-sql-migration.js --env=prod scripts/migrate-sector-and-tags-post-deploy.sql`: deactivates the `category` list and re-copies gap edits where `sector_source IS NULL`.
-3. `node scripts/migrate-saved-views-sector.js --env=prod`: 26 views, columns only; 0 filters and 0 row-colour rules dropped.
-4. Re-load the seed (v2: four Sector definitions and the Business type wording): `node scripts/load-taxonomy-seed.js --env=prod`, with `--dry-run` first.
-5. Sectors of Interest remap: `node scripts/remap-sectors-of-interest.js --env=prod`. The read-only prod dry-run (with the 6 extra legacy mappings) found 125 members scanned and 106 affected; 0 unmapped values remain; 1 member is left with no sector.
-6. WP5: `node scripts/migrate-application-insights-prompt.js --file=docs/application-insights-prompt.md --env=prod` and `node scripts/run-sql-migration.js --env=prod scripts/migrate-member-data-query-views.sql`.
-7. The e8angels.com change (push, deploy, Sanity schema and re-import) after the backfill.
+Awaiting approval (rollout), in order:
+1. Pre-deploy migrations (additive; the old code ignores them):
+   - `node scripts/run-sql-migration.js --env=prod scripts/migrate-taxonomy-admin-tracking.sql` (WP6)
+   - `node scripts/run-sql-migration.js --env=prod scripts/migrate-sector-and-tags-tagging.sql` (WP2)
+   - `node scripts/run-sql-migration.js --env=prod scripts/migrate-member-data-query-views.sql` (WP5)
+2. Seed v2 reload: `node scripts/load-taxonomy-seed.js --env=prod --dry-run`, then again without `--dry-run`.
+3. Backfill classify-and-save before the deploy: `node scripts/backfill-sector-and-tags.js --env=prod --dry-run` (about $2.50), then `--report --report-file=tmp/prod-backfill-report.json` for Jordan to review.
+4. Deploy, and set `SLACK_TAXONOMY_REPORT_CHANNEL_ID=C0B8LQD6SN4` on Fly. The monthly health job's AI parts default on in prod, about $1.40 a month.
+5. Right after the deploy:
+   - `node scripts/backfill-sector-and-tags.js --env=prod --apply`
+   - `node scripts/run-sql-migration.js --env=prod scripts/migrate-sector-and-tags-post-deploy.sql`
+   - `node scripts/migrate-application-insights-prompt.js --file=docs/application-insights-prompt.md --env=prod`
+6. `node scripts/migrate-saved-views-sector.js --env=prod`: 26 views, columns only.
+7. `node scripts/remap-sectors-of-interest.js --env=prod`: 106 of 125 members affected.
+8. Optional: the live Ask AI eval suite (about $2.60 typical).
+9. The e8angels.com change (push, deploy, Sanity schema and re-import).
