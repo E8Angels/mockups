@@ -24,7 +24,7 @@ The redesign was tested on the 1,080 applications added since 2024-09-19. Taxono
 2. **Tags** replace "Secondary categories". They come in four families:
    - **Technology:** a tree up to 3 levels deep. Only the most specific tag is stored; every level above it is implied.
    - **Market:** flat, as many as genuinely apply: who the company sells to or intends to work with. Broad values like Government are useful for combining with other filters.
-   - **Business type:** flat, as many as genuinely apply. Defined as *what customers pay for*. Most companies have one; tag another only when customers pay for it as a real part of the business.
+   - **Business type:** flat, as many as genuinely apply. Defined as *what customers pay for*: tag each thing customers pay for as a real part of the business.
    - **Built with:** flat. The underlying capability the product relies on, in any domain: AI, sensors, robotics, biotech and so on. It includes *Biotech & synthetic biology*, moved out of Business type. Technology answers "what are they building?" and Built with answers "what is it built with?". For example, *Technology: Desalination*, *Built with: AI / machine learning*. Each definition says which family a borderline concept belongs to: *Biomanufacturing* is Technology, *Biotech* is Built with.
 3. Sector list changes:
    - Rename "Industry" to **Industrial**.
@@ -159,9 +159,7 @@ There will be no human-labelled test set. Accuracy therefore rests on three thin
 
 `lib/company-tagging.js` replaces `ai-categorizer.js`. Models are chosen through `lib/ai-models.js`, which gets a new `tagging` role.
 
-1. **Brief.** One call turns the application into a short structured description: what they do, the technology path in their own words, applications, customers, and what they sell. It is stored per application as `application_classification_briefs`.
-   - The test run showed that mapping this normalized text to the taxonomy is more consistent than mapping raw applications of very different lengths (summary vs form fields).
-   - Vector search will embed the same brief later.
+1. **Input.** The application's AI summary when one exists, otherwise its form fields. There is no separate brief step: WP0 measured direct input as more accurate (Sector +3 points, tag precision +8–11 points) at about the same cost. `application_classification_briefs` stays in the schema for the vector-search plan, which generates briefs when it needs them.
 2. **Classify.** Structured output with enums over the active Sector list and taxonomy, including every definition. The static definitions come first so the prompt is cached. It returns:
    - Sector
    - Technology tags (most specific that fits)
@@ -172,7 +170,7 @@ There will be no human-labelled test set. Accuracy therefore rests on three thin
    - **Sector:** majority. A 2–1 split marks the company `needs_review`.
    - **Tags:** the default is the **union**, any tag returned by any run. Missing a company in a search costs more than an occasional extra match.
    - Each tag stores how many runs returned it (`votes` 1–3). Similar-company ranking weights 3-vote tags above 1-vote tags, and the health report watches the 1-vote share.
-   - WP0 tests union against 2-of-3 on the reference set, measuring recall, precision, tags per company, and run-to-run agreement of the final set. Union ships unless it clearly over-tags.
+   - WP0 confirmed union with direct input: tags per company match the reference (Technology 1.54 vs 1.52, Market 3.12 vs 3.03). Union ships.
 
 **Every assignment records** `taxonomy_version`, `prompt_version`, `model`, `agreement` and the source application. When a node is split later, only the companies on that node are re-tagged.
 
@@ -375,7 +373,9 @@ Orchestration, gates and per-package done criteria: `orchestrator-brief.md`. Liv
 4. **Grid Tags cell:** the most specific Technology tag plus `+N`.
 5. **Dealflow reporting** counts each application under its own Sector (confirmed 2026-09-27).
 6. **Members** see Sector and Tags on Explore Companies (confirmed 2026-09-27).
-7. **Business type** has no limit on the number of values; it was exactly 1 (changed 2026-09-27).
+7. **Business type** has no limit on the number of values; it was exactly 1 (changed 2026-09-27). There is no "most companies have one" expectation: both reference models give about half of companies two.
+8. **Production model** (from WP0, 2026-09-27): GPT-6 Luna (`gpt-6-luna`), `low` reasoning effort, classifying the application text directly, 3 runs, union tags. Backfill cost about $2.60 on the OpenAI batch API. See `wp0-results.md`.
+9. **Run-to-run bar:** the 95% "all three runs agree on Sector" bar is not met (about 90%). Accepted: 2–1 splits keep the majority Sector and are flagged `needs_review` (about 10% of applications), and the monthly report tracks the rate.
 
 ## Appendix: Sector list and rules
 

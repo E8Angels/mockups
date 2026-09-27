@@ -23,9 +23,11 @@ Last updated: 2026-09-27. Update this file as work moves.
 
 - 2026-09-27: WP0 trimmed. GPT-6 Sol labels all 200 as the reference; Opus 5.5 labels 60 (boundary-weighted) to check cross-vendor agreement and how much a Sol-only reference flatters the OpenAI candidates. Lunas and Haiku get 3 runs each; Sonnet only if nothing cheaper passes. No separate stability runs, since the production 3-run vote measures that. Hard cap $13.
 
+- 2026-09-27: WP0 decisions (Jordan): accept the run-to-run shortfall, with 2–1 splits going to `needs_review`; classify directly with no brief step; remove the "most companies have one" Business type wording. Production model: GPT-6 Luna, low effort, union tags (plan decisions 8–9).
+
 ## Blockers
 
-- **WP0 decisions (awaiting Jordan):** (1) accept the run-to-run shortfall (90% unanimous vs the 95% bar), with 2–1 splits going to `needs_review`; (2) classify from the application text instead of the brief; (3) whether to tighten the Business type wording. WP2 waits on these.
+None.
 
 ## Follow-ups found along the way
 

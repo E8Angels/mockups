@@ -161,7 +161,7 @@ As instructed, the stability of the final voted set was not measured separately;
 
 - Scored like Market: recall against the reference intersection, precision against the union, Jaccard, and an exact-set match against either reference model.
 - It is voted and compared under both tag rules above.
-- **Finding:** every model over-applies it relative to "most companies have one".
+- **Finding:** every model, including both references, gives about half of companies two Business types. Jordan removed the "most companies have one" wording on 2026-09-27; the rule is just "as many as genuinely apply".
   - GPT-6 Sol gives exactly one Business type to 45% of companies (average 1.74). Opus 5.5 gives one to 50% (average 1.6). Candidates average 1.8–2.0.
   - This is a wording problem, not a small-model problem.
   - **Proposed tightening (not applied, untested):** "Most companies have exactly one. Add a second only when the application shows customers paying separately for it today, or plans it as a revenue line of similar weight."
