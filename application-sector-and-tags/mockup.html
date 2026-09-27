@@ -111,9 +111,9 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="mock-banner">Mockup. The companies are made up; the tag lists are the current draft (Industry renamed Industrial, Biotech moved to Enabling tech).</div>
+  <div class="mock-banner">Mockup. The companies are made up; the tag lists are the current draft (Industry renamed Industrial, Biotech moved to Built with, Enabling tech renamed Built with).</div>
   <h1>Sector &amp; Tags</h1>
-  <p class="lede">"Category" becomes <b>Sector</b> everywhere. The old secondary categories become <b>Tags</b>, in four families: Technology (a tree), Market, Business type and Enabling tech. Companies show one Sector pill and one Tags pill. The pill opens the full list, grouped by family.</p>
+  <p class="lede">"Category" becomes <b>Sector</b> everywhere. The old secondary categories become <b>Tags</b>, in four families: Technology (a tree), Market, Business type and Built with. Companies show one Sector pill and one Tags pill. The pill opens the full list, grouped by family.</p>
 
   <!-- 1. Company header -->
   <h2 class="sec">1 · Company page and application flyout header</h2>
@@ -187,7 +187,7 @@
             <span class="sel" style="color:var(--slate-400)">Search companies…</span>
           </div>
           <div class="chips" id="bar-chips"></div>
-          <p class="note" style="margin:0">On Explore the picker covers all four families at once. In admin grids each family is its own filter field: Technology, Market, Business type and Enabling tech.</p>
+          <p class="note" style="margin:0">On Explore the picker covers all four families at once. In admin grids each family is its own filter field: Technology, Market, Business type and Built with.</p>
         </div>
       </div>
     </div>
@@ -229,7 +229,7 @@ const FLAT = {
   business: ['Hardware','Software','Materials & chemicals','Project developer / operator','Services','Marketplace','Financial product','Consumer product','IP licensing'],
   enabling: ['AI / machine learning','Biotech & synthetic biology','Computer vision','Sensors & IoT','Robotics & drones','Digital twins & simulation','Blockchain & tokenization']
 };
-const FAMILY_LABEL = { technology: 'Technology', market: 'Market', business: 'Business type', enabling: 'Enabling tech' };
+const FAMILY_LABEL = { technology: 'Technology', market: 'Market', business: 'Business type', enabling: 'Built with' };
 const SYNONYMS = { 'Electric vehicles': ['EV'], 'EV charging': ['EVSE'], 'DER management & VPPs': ['virtual power plant','DERMS'], 'Direct air capture': ['DAC'], 'Sustainable aviation fuel': ['SAF'], 'Battery cells': ['batteries'], 'Battery materials': ['batteries'], 'Carbon & other anodes': ['graphite','hard carbon','lithium metal'], 'AI / machine learning': ['ML'] };
 
 /* Flat index: {id, family, name, path[], parent, depth} */

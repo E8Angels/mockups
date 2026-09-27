@@ -3,7 +3,7 @@ title: "Sector & Tags"
 status: planning
 owner: jordan
 created: 2026-09-25
-last_updated: 2026-09-26
+last_updated: 2026-09-27
 home: mockup
 ---
 
@@ -25,7 +25,7 @@ The redesign was tested on the 1,080 applications added since 2024-09-19. Taxono
    - **Technology:** a tree up to 3 levels deep. Only the most specific tag is stored; every level above it is implied.
    - **Market:** flat, as many as genuinely apply: who the company sells to or intends to work with. Broad values like Government are useful for combining with other filters.
    - **Business type:** flat, exactly 1. Defined as *what customers pay for*.
-   - **Enabling tech:** flat, 0–2. Now includes *Biotech & synthetic biology*, moved out of Business type.
+   - **Built with:** flat. The underlying capability the product relies on, in any domain: AI, sensors, robotics, biotech and so on. It includes *Biotech & synthetic biology*, moved out of Business type. Technology answers "what are they building?" and Built with answers "what is it built with?". For example, *Technology: Desalination*, *Built with: AI / machine learning*. Each definition says which family a borderline concept belongs to: *Biomanufacturing* is Technology, *Biotech* is Built with.
 3. Sector list changes:
    - Rename "Industry" to **Industrial**.
    - Drop Software, Finance and Energy Efficiency.
@@ -70,7 +70,7 @@ See `mockup.html`.
 - **Matching:** each company row carries `tag_ids_expanded`, which is its stored tags plus every ancestor. A filter on any tag is then an ordinary `has_any_of` / `has_all_of` / `has_none_of` against that array. The existing grid filter code (`_applyAdminGridFiltersToRows`, `evaluateRowColorRule`) needs no knowledge of the tree.
 - **Admin grid fields**, on companies, applications and portfolio:
   - `sector` (single select)
-  - `technology_tags`, `market_tags`, `business_type` and `enabling_tags`, each a multi select that uses the tag picker as its value control
+  - `technology_tags`, `market_tags`, `business_type` and `built_with_tags`, each a multi select that uses the tag picker as its value control
   - Options come from the taxonomy, not from the values present in the rows.
 - **Explore Companies:** a Sector dropdown (existing `MultiSelectDropdown`) and a Tags dropdown (the tag picker, all families). The URL takes `?sector=` and `?tag=` for links from pills and Metrics. Free-text search matches tag names, including ancestor names.
 - **Stage Review:** its "Primary Category" filter becomes Sector.
@@ -86,7 +86,7 @@ Use expand/contract so old and new code can run side by side. Production runs on
   - Copy `category` into `sector` for existing rows. Old values that are no longer valid stay until the backfill replaces them.
   - Drop `category` and `secondary_category` in the cleanup phase.
 - **`taxonomy_tags`:**
-  - Columns: `id` (stable slug, never reused), `family` (`technology` | `market` | `business_type` | `enabling`), `name`, `parent_id`, `description` (also used as prompt text), `synonyms_json`, `sort_order`, `active`, and timestamps.
+  - Columns: `id` (stable slug, never reused), `family` (`technology` | `market` | `business_type` | `built_with`), `name`, `parent_id`, `description` (also used as prompt text), `synonyms_json`, `sort_order`, `active`, and timestamps.
   - A rename changes `name` only.
   - A tag that is retired is deactivated, never deleted. It can optionally be merged into another tag, which moves its company links.
 - **`company_tags`:** (`company_record_id`, `tag_id`) as the primary key, plus `is_primary` (exactly one Technology tag per company), `votes` (1–3), `source` (`ai` | `manual`), `from_application_record_id`, `created_at` and `created_by_person_record_id`.
@@ -147,7 +147,7 @@ There will be no human-labelled test set. Accuracy therefore rests on three thin
   - "Builders & developers" splits in two: **Real estate & construction** (buildings) and **Energy project developers** (companies that build solar, wind, storage and similar projects, as customers).
   - Business type keeps its separate value, *Project developer / operator*, for a company that develops projects itself.
 - **Business type** follows what customers pay for. "Hardware + software" is dropped: a device with an app is Hardware, and a subscription is Software.
-- **Enabling tech:** a technology is tagged when it is the product or fundamental to the pitch. For AI, that means AI is what's being sold, or the pitch depends on it; an incidental mention doesn't count.
+- **Built with:** a capability is tagged when it is the product or fundamental to the pitch. For AI, that means AI is what's being sold, or the pitch depends on it; an incidental mention doesn't count.
 
 ### Pipeline
 
@@ -159,7 +159,7 @@ There will be no human-labelled test set. Accuracy therefore rests on three thin
 2. **Classify.** Structured output with enums over the active Sector list and taxonomy, including every definition. The static definitions come first so the prompt is cached. It returns:
    - Sector
    - Technology tags (most specific that fits)
-   - Market, Business type and Enabling
+   - Market, Business type and Built with
    - a one-line rationale
    - an optional `suggested_tag` when nothing fits
 3. **Vote.** Step 2 runs 3 times.
