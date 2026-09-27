@@ -18,3 +18,4 @@
 - 2026-09-27: WP0 results published (wp0-results.md); WP3 review fixes under way.
 - 2026-09-27: WP0 decisions recorded; pipeline classifies directly (no brief step).
 - 2026-09-27: WP0 done (#924 merged); WP2 starting.
+- 2026-09-27: WP3 merged; WP4 started.

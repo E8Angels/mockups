@@ -6,11 +6,11 @@ Last updated: 2026-09-27. Update this file as work moves.
 |---|---|---|---|---|
 | WP0 Accuracy gate | **Done.** [#921](https://github.com/E8Angels/e8-portal/pull/921) and [#924](https://github.com/E8Angels/e8-portal/pull/924) merged; results in [`wp0-results.md`](wp0-results.md) | `wp0-sector-tags-accuracy` | http://localhost:8100 | $11.60 spent. GPT-6 Luna, low effort, direct input, union |
 | WP1 Foundation | **Merged** ([#922](https://github.com/E8Angels/e8-portal/pull/922), `a7ae2be0`) after Opus review; 12 findings fixed. Prod migration and seed v1 applied 2026-09-27 | `wp1-sector-tags-foundation` | http://localhost:8120 | Deploy and post-deploy steps wait for rollout |
-| WP2 Tagging | Starting (Opus) | `wp2-sector-tags-tagging` | | Backfill about $2.60 on GPT-6 Luna batch; live runs need approval |
-| WP3 Components + record page | Fixing 11 findings from the Opus review of [#923](https://github.com/E8Angels/e8-portal/pull/923), incl. parent-tick deleting child tags in edit mode | `wp3-sector-tags-components` | http://localhost:8130 | |
-| WP4 Grids + filters | Not started | | | Waits on WP1 and WP3 components |
+| WP2 Tagging | In progress (Opus) | `wp2-sector-tags-tagging` | | Backfill about $2.60 on GPT-6 Luna batch; live runs need approval |
+| WP3 Components + record page | **Merged** ([#923](https://github.com/E8Angels/e8-portal/pull/923), `b9f95307`) after Opus review; 13 fixes | `wp3-sector-tags-components` | http://localhost:8130 | Tag picker `mode="assign"` in edit mode, `mode="filter"` for filters |
+| WP4 Grids + filters | In progress (Sonnet) | `wp4-sector-tags-grids` | | Turns on `TAG_CHIP_EXPLORE_LINKS_ENABLED` once `?tag=` works |
 | WP5 AI + MCP | In progress (Sonnet) | `wp5-sector-tags-ai-mcp` | | Live eval run needs a cost estimate and approval |
-| WP6 Lists admin | PR [#925](https://github.com/E8Angels/e8-portal/pull/925) under Opus review | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Targeted directory refresh on tag edits (fixes the ~100 s full rebuild) |
+| WP6 Lists admin | Fixing 14 findings from the Opus review of [#925](https://github.com/E8Angels/e8-portal/pull/925) (merge vs exclusions, seed reload reverting admin edits, refresh failures) | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Moves to Opus if it fails review again |
 | WP7 Label sweep + Sectors of Interest | PR [#926](https://github.com/E8Angels/e8-portal/pull/926) under Opus review | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
 | Rollout | Not started | | | Every step needs Jordan's approval |
 | WP8 Cleanup | Not started | | | At least one week after rollout |
