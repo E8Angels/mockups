@@ -8,3 +8,4 @@
 - 2026-09-27: "Enabling tech" renamed "Built with" (kept as its own family; Technology = what they build, Built with = what it's built with).
 - 2026-09-27: Confirmed: reporting by each application's Sector; members see Sector and Tags on Explore Companies.
 - 2026-09-27: Handoff package: orchestrator-brief.md (sequence, gates, seed format, done criteria), implementation-status.md, category-usage-inventory.md, ui-building-blocks.md; plan consistency fixes (per-application classification, PATCH semantics, WP0 owns seed.json).
+- 2026-09-27: Orchestrator brief gains a Model use section (Opus for WP0–WP2 and review, Sonnet for WP3–WP7, Haiku/Sonnet for searches).

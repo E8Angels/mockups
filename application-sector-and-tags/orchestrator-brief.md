@@ -56,6 +56,24 @@ Pre-authorized, per `AGENTS.md`:
 - dev database migrations
 - read-only production queries through `scripts/db-query.js --env=prod`
 
+## Model use for sub-agents
+
+Sub-agents run on your own model unless you set `model` when you launch them. Choose on purpose:
+
+| Work | Model | Why |
+|---|---|---|
+| **Orchestration** (you) | Opus | Sequencing, reviewing, gates |
+| **WP0** (definitions, reconciling reference disagreements, choosing the model) | Opus | Judgment that sets accuracy for everything downstream |
+| **WP1** (schema, migration, roll-up, `PATCH` semantics) | Opus | Data-integrity risk; edits to the huge shared `lib/cache-manager.js` |
+| **WP2** (tagging pipeline, backfill, health job) | Opus | Correctness of voting, roll-up and exclusions; spends real money |
+| **WP3, WP4** (components, grids, filters) | Sonnet | Well-specified by the mockup and plan |
+| **WP5** (Ask AI, MCP, AI Insights) | Sonnet | Well-specified. Use Opus if the eval changes or the similar-applications scoring get tricky. |
+| **WP6, WP7** (lists admin, label sweep, Sectors of Interest) | Sonnet | Mechanical once WP1 lands |
+| **Codebase searches and file inventories** | Haiku or Sonnet | Only the conclusion comes back to you |
+
+- **Review:** before any PR merges, review its diff yourself, or have a fresh Opus agent review it with `/code-review`. Pay particular attention to WP1, WP2 and anything touching production data paths.
+- **Escalation:** if a Sonnet agent struggles, or its work fails review twice, finish that WP on Opus rather than iterating on it.
+
 ## Conventions
 
 - **Worktrees:** one worktree, one branch and one PR per WP, created with `scripts/worktree-create.sh`. Run `scripts/worktree-ensure.sh` before anything that needs the environment, and start the worktree's own dev server (`scripts/worktree-dev.sh --background`) before handing off.
