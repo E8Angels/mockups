@@ -21,3 +21,4 @@
 - 2026-09-27: WP3 merged; WP4 started.
 - 2026-09-27: WP7 merged.
 - 2026-09-27: WP6 escalated to Opus per the brief.
+- 2026-09-27: WP5 merged.
