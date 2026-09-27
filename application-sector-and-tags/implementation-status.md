@@ -9,7 +9,7 @@ Last updated: 2026-09-27. Update this file as work moves.
 | WP2 Tagging | In progress (Opus) | `wp2-sector-tags-tagging` | | Backfill about $2.60 on GPT-6 Luna batch; live runs need approval |
 | WP3 Components + record page | **Merged** ([#923](https://github.com/E8Angels/e8-portal/pull/923), `b9f95307`) after Opus review; 13 fixes | `wp3-sector-tags-components` | http://localhost:8130 | Tag picker `mode="assign"` in edit mode, `mode="filter"` for filters |
 | WP4 Grids + filters | In progress (Sonnet) | `wp4-sector-tags-grids` | | Turns on `TAG_CHIP_EXPLORE_LINKS_ENABLED` once `?tag=` works |
-| WP5 AI + MCP | PR [#927](https://github.com/E8Angels/e8-portal/pull/927) under Opus review | `wp5-sector-tags-ai-mcp` | http://localhost:8140 | Prod: AI Insights prompt v14, `companies_public` view, live eval run (cost being estimated) |
+| WP5 AI + MCP | Fixing 9 findings from the Opus review of [#927](https://github.com/E8Angels/e8-portal/pull/927) (empty similar list with no tags, legacy Sector aliases, synonym resolution) | `wp5-sector-tags-ai-mcp` | http://localhost:8140 | Live eval suite about $2.60 typical, $10 worst (gpt-5.6-terra prices); not run |
 | WP6 Lists admin | Fixing 14 findings from the Opus review of [#925](https://github.com/E8Angels/e8-portal/pull/925) (merge vs exclusions, seed reload reverting admin edits, refresh failures) | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Moves to Opus if it fails review again |
 | WP7 Label sweep + Sectors of Interest | Fixing Opus review findings on [#926](https://github.com/E8Angels/e8-portal/pull/926): validation would block ~90 members' profile saves; 6 legacy values unmapped | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
 | Rollout | Not started | | | Every step needs Jordan's approval |
@@ -26,6 +26,8 @@ Last updated: 2026-09-27. Update this file as work moves.
 - 2026-09-27: WP0 decisions (Jordan): accept the run-to-run shortfall, with 2–1 splits going to `needs_review`; classify directly with no brief step; remove the "most companies have one" Business type wording. Production model: GPT-6 Luna, low effort, union tags (plan decisions 8–9).
 
 - 2026-09-27 (orchestrator call, open to Jordan's override): the extra legacy Sectors of Interest values map as Grid → Grid & Power, Renewables → Energy Generation, AgTech and Food → AgTech & Food, Circular Economy → Recycling & Waste, Other Environmental → Other.
+
+- 2026-09-27: The rollout keeps the gap between deploy and backfill to minutes. The backfill classifies and saves to `application_classifications` on prod before the deploy (the current code never reads that table); Jordan reviews the report; the apply runs right after the deploy. Prod has 251 companies with no submitted application, which can't be tagged; 8 have legacy Sector values (Infrastructure and Recycling map deterministically, the rest go to manual review). Untagged companies fall back to Sector-only similar applications in AI Insights.
 
 ## Blockers
 
