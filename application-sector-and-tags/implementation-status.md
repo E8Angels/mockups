@@ -10,7 +10,7 @@ Last updated: 2026-09-27. Update this file as work moves.
 | WP3 Components + record page | **Merged** ([#923](https://github.com/E8Angels/e8-portal/pull/923), `b9f95307`) after Opus review; 13 fixes | `wp3-sector-tags-components` | http://localhost:8130 | Tag picker `mode="assign"` in edit mode, `mode="filter"` for filters |
 | WP4 Grids + filters | In progress (Sonnet) | `wp4-sector-tags-grids` | | Turns on `TAG_CHIP_EXPLORE_LINKS_ENABLED` once `?tag=` works |
 | WP5 AI + MCP | Fixing 9 findings from the Opus review of [#927](https://github.com/E8Angels/e8-portal/pull/927) (empty similar list with no tags, legacy Sector aliases, synonym resolution) | `wp5-sector-tags-ai-mcp` | http://localhost:8140 | Live eval suite about $2.60 typical, $10 worst (gpt-5.6-terra prices); not run |
-| WP6 Lists admin | 14 fixes pushed to [#925](https://github.com/E8Angels/e8-portal/pull/925); Opus re-review in progress | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Adds `taxonomy_tags.admin_edited_at` |
+| WP6 Lists admin | **Escalated to Opus** after failing review twice; fixing 11 findings on [#925](https://github.com/E8Angels/e8-portal/pull/925) (seed reload vs Sector edits, merge into an ancestor, primary tag) | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Adds `taxonomy_tags.admin_edited_at` |
 | WP7 Label sweep + Sectors of Interest | **Merged** ([#926](https://github.com/E8Angels/e8-portal/pull/926)) after Opus review; 13 fixes plus a follow-up | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
 | Rollout | Not started | | | Every step needs Jordan's approval |
 | WP8 Cleanup | Not started | | | At least one week after rollout |
