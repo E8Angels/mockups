@@ -6,9 +6,9 @@ Last updated: 2026-09-27. Update this file as work moves.
 |---|---|---|---|---|
 | WP0 Accuracy gate | **Done.** [#921](https://github.com/E8Angels/e8-portal/pull/921) and [#924](https://github.com/E8Angels/e8-portal/pull/924) merged; results in [`wp0-results.md`](wp0-results.md) | `wp0-sector-tags-accuracy` | http://localhost:8100 | $11.60 spent. GPT-6 Luna, low effort, direct input, union |
 | WP1 Foundation | **Merged** ([#922](https://github.com/E8Angels/e8-portal/pull/922), `a7ae2be0`) after Opus review; 12 findings fixed. Prod migration and seed v1 applied 2026-09-27 | `wp1-sector-tags-foundation` | http://localhost:8120 | Deploy and post-deploy steps wait for rollout |
-| WP2 Tagging | 12 fixes pushed to [#930](https://github.com/E8Angels/e8-portal/pull/930) (sweep job, jobs table, atomic claim); Opus re-review in progress | `wp2-sector-tags-tagging` | http://localhost:8170 | Prod backfill about $2.50 |
+| WP2 Tagging | Second fix round on [#930](https://github.com/E8Angels/e8-portal/pull/930): a summary arriving mid-run was lost across processes; roll-up retry, stale-batch policy, timeouts | `wp2-sector-tags-tagging` | http://localhost:8170 | Prod backfill about $2.50 |
 | WP3 Components + record page | **Merged** ([#923](https://github.com/E8Angels/e8-portal/pull/923), `b9f95307`) after Opus review; 13 fixes | `wp3-sector-tags-components` | http://localhost:8130 | Tag picker `mode="assign"` in edit mode, `mode="filter"` for filters |
-| WP4 Grids + filters | In progress (Sonnet) | `wp4-sector-tags-grids` | | Turns on `TAG_CHIP_EXPLORE_LINKS_ENABLED` once `?tag=` works |
+| WP4 Grids + filters | PR [#934](https://github.com/E8Angels/e8-portal/pull/934) under Opus review (incl. Metrics per-application Sector vs per-investment) | `wp4-sector-tags-grids` | http://localhost:8200 | Tag chip links to Explore now on |
 | WP5 AI + MCP | **Merged** ([#927](https://github.com/E8Angels/e8-portal/pull/927), `1e03f4a9`) after Opus review; 9 fixes | `wp5-sector-tags-ai-mcp` | http://localhost:8140 | Live eval suite (default model `gpt-5.6`) about $1–10; not run |
 | WP6 Lists admin | Opus fixes pushed to [#925](https://github.com/E8Angels/e8-portal/pull/925) (`5ea5151f`); final review in progress | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Sector delete now deactivates. Don't edit the Lists admin during the rolling deploy |
 | WP7 Label sweep + Sectors of Interest | **Merged** ([#926](https://github.com/E8Angels/e8-portal/pull/926)) after Opus review; 13 fixes plus a follow-up | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
@@ -35,6 +35,8 @@ None.
 
 ## Follow-ups found along the way
 
+- `dynamic-rollups.test.js` broke on main after WP5 (the test was out of date); fixed in [#933](https://github.com/E8Angels/e8-portal/pull/933).
+- New companies no longer get `secondary_category` (`ai-categorizer.js` is retired). The public embed's legacy `secondary_categories` key is therefore empty for new companies until WP8 removes it; e8angels.com moves to `sector`.
 - The smoke auth session expired on 2026-09-20; a fresh dev session was minted on 2026-09-27.
 - `worktree-create.sh` picks ports from `.worktrees/` only, so it can clash with registry-held ports (WP1 got 8120 instead of 8110).
 - Tag renames (WP6) invalidate the whole directory: a rebuild of about 100 s on every instance.
