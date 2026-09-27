@@ -15,6 +15,10 @@ Last updated: 2026-09-27. Update this file as work moves.
 | Rollout | Not started | | | Every step needs Jordan's approval |
 | WP8 Cleanup | Not started | | | At least one week after rollout |
 
+## Decision changes
+
+- 2026-09-27: Business type has no limit on the number of values; it was exactly 1. `plan.md` is updated, and WP0, WP1 and WP3 have been told. WP0 revises the Hardware/Software wording in the seed and scores Business type by overlap.
+
 ## Blockers
 
 None.
@@ -22,7 +26,7 @@ None.
 ## Follow-ups found along the way
 
 - WP0 ships `seed.json` as its own early PR so WP1 can load real content, then opens a second PR for the reference set and eval. This is a deliberate exception to one PR per WP.
-- Seed format unchanged. Family-wide rules (one Business type, Market = all that apply, Built with only when fundamental) and Sector rules 1–5 live in a shared, versioned prompt module (planned `lib/taxonomy/classification-prompt.js`), written in WP0 and imported by WP2.
+- Seed format unchanged. Family-wide rules (Business type = what customers pay for, as many as genuinely apply; Market = all that apply, Built with only when fundamental) and Sector rules 1–5 live in a shared, versioned prompt module (planned `lib/taxonomy/classification-prompt.js`), written in WP0 and imported by WP2.
 - `__tests__/lib/ai-models.test.js` pins current model IDs; update it when the `tagging` role lands.
 - Worktrees land under the orchestrator worktree's `.worktrees/` (`treasure-child/.worktrees/`), not the root repo.
 - The root `docs/mockups` checkout was missing on 2026-09-27 and was cloned so worktrees get the symlink.

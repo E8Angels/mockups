@@ -24,7 +24,7 @@ The redesign was tested on the 1,080 applications added since 2024-09-19. Taxono
 2. **Tags** replace "Secondary categories". They come in four families:
    - **Technology:** a tree up to 3 levels deep. Only the most specific tag is stored; every level above it is implied.
    - **Market:** flat, as many as genuinely apply: who the company sells to or intends to work with. Broad values like Government are useful for combining with other filters.
-   - **Business type:** flat, exactly 1. Defined as *what customers pay for*.
+   - **Business type:** flat, as many as genuinely apply. Defined as *what customers pay for*. Most companies have one; tag another only when customers pay for it as a real part of the business.
    - **Built with:** flat. The underlying capability the product relies on, in any domain: AI, sensors, robotics, biotech and so on. It includes *Biotech & synthetic biology*, moved out of Business type. Technology answers "what are they building?" and Built with answers "what is it built with?". For example, *Technology: Desalination*, *Built with: AI / machine learning*. Each definition says which family a borderline concept belongs to: *Biomanufacturing* is Technology, *Biotech* is Built with.
 3. Sector list changes:
    - Rename "Industry" to **Industrial**.
@@ -152,7 +152,7 @@ There will be no human-labelled test set. Accuracy therefore rests on three thin
   - "Heavy industry & manufacturing" means industrial customers.
   - "Builders & developers" splits in two: **Real estate & construction** (buildings) and **Energy project developers** (companies that build solar, wind, storage and similar projects, as customers).
   - Business type keeps its separate value, *Project developer / operator*, for a company that develops projects itself.
-- **Business type** follows what customers pay for. "Hardware + software" is dropped: a device with an app is Hardware, and a subscription is Software.
+- **Business type** follows what customers pay for, with no cap on the number of values. "Hardware + software" is dropped as a combined value: a device with an app is Hardware only, and a company gets both Hardware and Software only when customers pay separately for a substantial software subscription.
 - **Built with:** a capability is tagged when it is the product or fundamental to the pitch. For AI, that means AI is what's being sold, or the pitch depends on it; an incidental mention doesn't count.
 
 ### Pipeline
@@ -233,7 +233,7 @@ Prices are per million tokens, input / output, at standard rates as of 2026-09-2
    - For tags, the reference keeps both the union and the intersection of the two models' tags, so recall and precision can both be measured.
    - This costs a few dollars.
 2. **Candidate test.** Each small candidate classifies the whole set 3 times. Measured:
-   - agreement with the reference (Sector, then Technology at the second level and exact, Market overlap, Business type)
+   - agreement with the reference (Sector, then Technology at the second level and exact, Market overlap, Business type overlap)
    - run-to-run agreement
    - cost per application
 3. **Pick the cheapest model that clears the bar:**
@@ -375,6 +375,7 @@ Orchestration, gates and per-package done criteria: `orchestrator-brief.md`. Liv
 4. **Grid Tags cell:** the most specific Technology tag plus `+N`.
 5. **Dealflow reporting** counts each application under its own Sector (confirmed 2026-09-27).
 6. **Members** see Sector and Tags on Explore Companies (confirmed 2026-09-27).
+7. **Business type** has no limit on the number of values; it was exactly 1 (changed 2026-09-27).
 
 ## Appendix: Sector list and rules
 
