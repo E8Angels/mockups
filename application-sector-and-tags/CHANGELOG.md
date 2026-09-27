@@ -11,3 +11,4 @@
 - 2026-09-27: Orchestrator brief gains a Model use section (Opus for WP0–WP2 and review, Sonnet for WP3–WP7, Haiku/Sonnet for searches).
 
 - 2026-09-27: Orchestration started. WP0 and WP1 launched in parallel.
+- 2026-09-27: seed.json merged (#921). WP0 Phase B and WP3 (on fixtures) started.
