@@ -10,8 +10,8 @@ Last updated: 2026-09-27. Update this file as work moves.
 | WP3 Components + record page | Fixing 11 findings from the Opus review of [#923](https://github.com/E8Angels/e8-portal/pull/923), incl. parent-tick deleting child tags in edit mode | `wp3-sector-tags-components` | http://localhost:8130 | |
 | WP4 Grids + filters | Not started | | | Waits on WP1 and WP3 components |
 | WP5 AI + MCP | In progress (Sonnet) | `wp5-sector-tags-ai-mcp` | | Live eval run needs a cost estimate and approval |
-| WP6 Lists admin | In progress (Sonnet) | `wp6-sector-tags-lists-admin` | | |
-| WP7 Label sweep + Sectors of Interest | In progress (Sonnet) | `wp7-sector-tags-labels` | | Remap dry-run read-only on prod |
+| WP6 Lists admin | PR [#925](https://github.com/E8Angels/e8-portal/pull/925) under Opus review | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Targeted directory refresh on tag edits (fixes the ~100 s full rebuild) |
+| WP7 Label sweep + Sectors of Interest | PR [#926](https://github.com/E8Angels/e8-portal/pull/926) under Opus review | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
 | Rollout | Not started | | | Every step needs Jordan's approval |
 | WP8 Cleanup | Not started | | | At least one week after rollout |
 
@@ -51,4 +51,6 @@ Awaiting approval (rollout):
 1. Deploy.
 2. `node scripts/run-sql-migration.js --env=prod scripts/migrate-sector-and-tags-post-deploy.sql`: deactivates the `category` list and re-copies gap edits where `sector_source IS NULL`.
 3. `node scripts/migrate-saved-views-sector.js --env=prod`: 26 views, columns only; 0 filters and 0 row-colour rules dropped.
-4. Re-load the seed after WP0's definition changes: `node scripts/load-taxonomy-seed.js --env=prod` (dry-run first).
+4. Re-load the seed (v2: four Sector definitions and the Business type wording): `node scripts/load-taxonomy-seed.js --env=prod`, with `--dry-run` first.
+5. Sectors of Interest remap: `node scripts/remap-sectors-of-interest.js --env=prod`. The read-only prod dry-run found 125 members scanned and 90 affected: Energy Efficiency→Built Environment 62, Infrastructure→Grid & Power 34, Recycling→Recycling & Waste 24, Software removed 30, Finance removed 15; 1 member left with no sector.
+6. The e8angels.com change (push, deploy, Sanity schema and re-import) after the backfill.
