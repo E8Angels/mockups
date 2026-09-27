@@ -13,3 +13,4 @@
 - 2026-09-27: Orchestration started. WP0 and WP1 launched in parallel.
 - 2026-09-27: seed.json merged (#921). WP0 Phase B and WP3 (on fixtures) started.
 - 2026-09-27: Business type no longer limited to one value (plan decision 7).
+- 2026-09-27: WP0 trimmed to a $13 cap; WP1 PR #922 in review; WP3 draft PR #923; production steps listed.
