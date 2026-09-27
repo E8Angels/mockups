@@ -10,7 +10,7 @@ Last updated: 2026-09-27. Update this file as work moves.
 | WP3 Components + record page | **Merged** ([#923](https://github.com/E8Angels/e8-portal/pull/923), `b9f95307`) after Opus review; 13 fixes | `wp3-sector-tags-components` | http://localhost:8130 | Tag picker `mode="assign"` in edit mode, `mode="filter"` for filters |
 | WP4 Grids + filters | Fixing 12 findings from the Opus review of [#934](https://github.com/E8Angels/e8-portal/pull/934) (Partners Tags column regression, click-through, ?tag= reload; Metrics back to a straight rename) | `wp4-sector-tags-grids` | http://localhost:8200 | |
 | WP5 AI + MCP | **Merged** ([#927](https://github.com/E8Angels/e8-portal/pull/927), `1e03f4a9`) after Opus review; 9 fixes | `wp5-sector-tags-ai-mcp` | http://localhost:8140 | Live eval suite (default model `gpt-5.6`) about $1–10; not run |
-| WP6 Lists admin | Opus fixes pushed to [#925](https://github.com/E8Angels/e8-portal/pull/925) (`5ea5151f`); final review in progress | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Sector delete now deactivates. Don't edit the Lists admin during the rolling deploy |
+| WP6 Lists admin | **Merged** ([#925](https://github.com/E8Angels/e8-portal/pull/925)); finished on Opus after three review rounds | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Sector delete deactivates. A cited tag can't be deactivated until it's merged or its references are removed. Don't edit the Lists admin during the rolling deploy |
 | WP7 Label sweep + Sectors of Interest | **Merged** ([#926](https://github.com/E8Angels/e8-portal/pull/926)) after Opus review; 13 fixes plus a follow-up | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
 | Rollout | Not started | | | Every step needs Jordan's approval |
 | WP8 Cleanup | Not started | | | At least one week after rollout |
@@ -59,7 +59,7 @@ Awaiting approval (rollout), in order:
    - `node scripts/migrate-taxonomy-admin-tracking.js --env=prod` (WP6; must precede the seed reload)
    - `node scripts/run-sql-migration.js --env=prod scripts/migrate-sector-and-tags-tagging.sql` (WP2; 4 columns and 3 tables incl. `application_classification_jobs`)
    - `node scripts/run-sql-migration.js --env=prod scripts/migrate-member-data-query-views.sql` (WP5)
-2. Seed v2 reload: `node scripts/load-taxonomy-seed.js --env=prod --dry-run`, then again without `--dry-run`.
+2. Seed v2 reload: `node scripts/load-taxonomy-seed.js --env=prod --dry-run`, then again without `--dry-run`. The review simulated 9 tags and up to 5 Sectors updated, nothing skipped; re-check the dry-run counts after the migration.
 3. Backfill classify-and-save before the deploy: `node scripts/backfill-sector-and-tags.js --env=prod --dry-run` (about $2.50), then `--report --report-file=tmp/prod-backfill-report.json` for Jordan to review.
 4. Deploy, and set `SLACK_TAXONOMY_REPORT_CHANNEL_ID=C0B8LQD6SN4` on Fly. The monthly health job's AI parts default on in prod, about $1.40 a month.
 5. Right after the deploy:
