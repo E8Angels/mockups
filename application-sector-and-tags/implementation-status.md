@@ -9,9 +9,9 @@ Last updated: 2026-09-27. Update this file as work moves.
 | WP2 Tagging | In progress (Opus) | `wp2-sector-tags-tagging` | | Backfill about $2.60 on GPT-6 Luna batch; live runs need approval |
 | WP3 Components + record page | **Merged** ([#923](https://github.com/E8Angels/e8-portal/pull/923), `b9f95307`) after Opus review; 13 fixes | `wp3-sector-tags-components` | http://localhost:8130 | Tag picker `mode="assign"` in edit mode, `mode="filter"` for filters |
 | WP4 Grids + filters | In progress (Sonnet) | `wp4-sector-tags-grids` | | Turns on `TAG_CHIP_EXPLORE_LINKS_ENABLED` once `?tag=` works |
-| WP5 AI + MCP | In progress (Sonnet) | `wp5-sector-tags-ai-mcp` | | Live eval run needs a cost estimate and approval |
+| WP5 AI + MCP | PR [#927](https://github.com/E8Angels/e8-portal/pull/927) under Opus review | `wp5-sector-tags-ai-mcp` | http://localhost:8140 | Prod: AI Insights prompt v14, `companies_public` view, live eval run (cost being estimated) |
 | WP6 Lists admin | Fixing 14 findings from the Opus review of [#925](https://github.com/E8Angels/e8-portal/pull/925) (merge vs exclusions, seed reload reverting admin edits, refresh failures) | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Moves to Opus if it fails review again |
-| WP7 Label sweep + Sectors of Interest | PR [#926](https://github.com/E8Angels/e8-portal/pull/926) under Opus review | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
+| WP7 Label sweep + Sectors of Interest | Fixing Opus review findings on [#926](https://github.com/E8Angels/e8-portal/pull/926): validation would block ~90 members' profile saves; 6 legacy values unmapped | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
 | Rollout | Not started | | | Every step needs Jordan's approval |
 | WP8 Cleanup | Not started | | | At least one week after rollout |
 
@@ -24,6 +24,8 @@ Last updated: 2026-09-27. Update this file as work moves.
 - 2026-09-27: WP0 trimmed. GPT-6 Sol labels all 200 as the reference; Opus 5.5 labels 60 (boundary-weighted) to check cross-vendor agreement and how much a Sol-only reference flatters the OpenAI candidates. Lunas and Haiku get 3 runs each; Sonnet only if nothing cheaper passes. No separate stability runs, since the production 3-run vote measures that. Hard cap $13.
 
 - 2026-09-27: WP0 decisions (Jordan): accept the run-to-run shortfall, with 2–1 splits going to `needs_review`; classify directly with no brief step; remove the "most companies have one" Business type wording. Production model: GPT-6 Luna, low effort, union tags (plan decisions 8–9).
+
+- 2026-09-27 (orchestrator call, open to Jordan's override): the extra legacy Sectors of Interest values map as Grid → Grid & Power, Renewables → Energy Generation, AgTech and Food → AgTech & Food, Circular Economy → Recycling & Waste, Other Environmental → Other.
 
 ## Blockers
 
@@ -53,4 +55,5 @@ Awaiting approval (rollout):
 3. `node scripts/migrate-saved-views-sector.js --env=prod`: 26 views, columns only; 0 filters and 0 row-colour rules dropped.
 4. Re-load the seed (v2: four Sector definitions and the Business type wording): `node scripts/load-taxonomy-seed.js --env=prod`, with `--dry-run` first.
 5. Sectors of Interest remap: `node scripts/remap-sectors-of-interest.js --env=prod`. The read-only prod dry-run found 125 members scanned and 90 affected: Energy Efficiency→Built Environment 62, Infrastructure→Grid & Power 34, Recycling→Recycling & Waste 24, Software removed 30, Finance removed 15; 1 member left with no sector.
-6. The e8angels.com change (push, deploy, Sanity schema and re-import) after the backfill.
+6. WP5: `node scripts/migrate-application-insights-prompt.js --file=docs/application-insights-prompt.md --env=prod` and `node scripts/run-sql-migration.js --env=prod scripts/migrate-member-data-query-views.sql`.
+7. The e8angels.com change (push, deploy, Sanity schema and re-import) after the backfill.
