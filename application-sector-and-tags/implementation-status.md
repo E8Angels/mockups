@@ -11,7 +11,7 @@ Last updated: 2026-09-27. Update this file as work moves.
 | WP4 Grids + filters | In progress (Sonnet) | `wp4-sector-tags-grids` | | Turns on `TAG_CHIP_EXPLORE_LINKS_ENABLED` once `?tag=` works |
 | WP5 AI + MCP | Fixing 9 findings from the Opus review of [#927](https://github.com/E8Angels/e8-portal/pull/927) (empty similar list with no tags, legacy Sector aliases, synonym resolution) | `wp5-sector-tags-ai-mcp` | http://localhost:8140 | Live eval suite about $2.60 typical, $10 worst (gpt-5.6-terra prices); not run |
 | WP6 Lists admin | Fixing 14 findings from the Opus review of [#925](https://github.com/E8Angels/e8-portal/pull/925) (merge vs exclusions, seed reload reverting admin edits, refresh failures) | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Moves to Opus if it fails review again |
-| WP7 Label sweep + Sectors of Interest | Fixing Opus review findings on [#926](https://github.com/E8Angels/e8-portal/pull/926): validation would block ~90 members' profile saves; 6 legacy values unmapped | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
+| WP7 Label sweep + Sectors of Interest | **Merged** ([#926](https://github.com/E8Angels/e8-portal/pull/926)) after Opus review; 13 fixes plus a follow-up | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
 | Rollout | Not started | | | Every step needs Jordan's approval |
 | WP8 Cleanup | Not started | | | At least one week after rollout |
 
@@ -56,6 +56,6 @@ Awaiting approval (rollout):
 2. `node scripts/run-sql-migration.js --env=prod scripts/migrate-sector-and-tags-post-deploy.sql`: deactivates the `category` list and re-copies gap edits where `sector_source IS NULL`.
 3. `node scripts/migrate-saved-views-sector.js --env=prod`: 26 views, columns only; 0 filters and 0 row-colour rules dropped.
 4. Re-load the seed (v2: four Sector definitions and the Business type wording): `node scripts/load-taxonomy-seed.js --env=prod`, with `--dry-run` first.
-5. Sectors of Interest remap: `node scripts/remap-sectors-of-interest.js --env=prod`. The read-only prod dry-run found 125 members scanned and 90 affected: Energy Efficiency→Built Environment 62, Infrastructure→Grid & Power 34, Recycling→Recycling & Waste 24, Software removed 30, Finance removed 15; 1 member left with no sector.
+5. Sectors of Interest remap: `node scripts/remap-sectors-of-interest.js --env=prod`. The read-only prod dry-run (with the 6 extra legacy mappings) found 125 members scanned and 106 affected; 0 unmapped values remain; 1 member is left with no sector.
 6. WP5: `node scripts/migrate-application-insights-prompt.js --file=docs/application-insights-prompt.md --env=prod` and `node scripts/run-sql-migration.js --env=prod scripts/migrate-member-data-query-views.sql`.
 7. The e8angels.com change (push, deploy, Sanity schema and re-import) after the backfill.
