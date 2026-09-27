@@ -23,7 +23,7 @@ Last updated: 2026-09-27. Update this file as work moves.
 
 ## Blockers
 
-None.
+- **WP0 spend cap (awaiting Jordan):** $5.33 spent of $15. Finishing as scoped costs about $24.5 in total. The agent recommends trimming Sonnet 5 to 1 run on 200 plus 3 runs on 50, about $21 in total. The cause: the full-definition prompt is about 35k tokens, and Anthropic batch caching hit only 25%. WP0 is paused until this is decided.
 
 ## Follow-ups found along the way
 
