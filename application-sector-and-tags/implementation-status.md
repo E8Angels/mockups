@@ -5,13 +5,13 @@ Last updated: 2026-09-27. Update this file as work moves.
 | WP | Status | Branch / PR | Worktree URL | Notes |
 |---|---|---|---|---|
 | WP0 Accuracy gate | Phase A merged ([#921](https://github.com/E8Angels/e8-portal/pull/921)). Phase B in progress on the trimmed plan | `wp0-sector-tags-accuracy` | http://localhost:8100 | Cap raised to $13 on 2026-09-27; $5.33 spent so far |
-| WP1 Foundation | PR open ([#922](https://github.com/E8Angels/e8-portal/pull/922)), under review. Dev migration, seed and saved views applied | `wp1-sector-tags-foundation` | http://localhost:8120 | Prod commands listed below, not run |
-| WP2 Tagging | Not started | | | Waits on WP1 and WP0 results |
-| WP3 Components + record page | Draft PR ([#923](https://github.com/E8Angels/e8-portal/pull/923)); taking screenshots | `wp3-sector-tags-components` | http://localhost:8130 | Needs rebase and wiring after WP1 merges |
+| WP1 Foundation | **Merged** ([#922](https://github.com/E8Angels/e8-portal/pull/922), `a7ae2be0`) after Opus review; 12 findings fixed. Prod migration and seed v1 applied 2026-09-27 | `wp1-sector-tags-foundation` | http://localhost:8120 | Deploy and post-deploy steps wait for rollout |
+| WP2 Tagging | Not started | | | Waits on WP0 results and the shared prompt module |
+| WP3 Components + record page | Rebasing on WP1 and wiring the real API; draft [#923](https://github.com/E8Angels/e8-portal/pull/923) | `wp3-sector-tags-components` | http://localhost:8130 | Screenshots taken |
 | WP4 Grids + filters | Not started | | | Waits on WP1 and WP3 components |
-| WP5 AI + MCP | Not started | | | Waits on WP1 |
-| WP6 Lists admin | Not started | | | Waits on WP1 |
-| WP7 Label sweep + Sectors of Interest | Not started | | | Waits on WP1 |
+| WP5 AI + MCP | In progress (Sonnet) | `wp5-sector-tags-ai-mcp` | | Live eval run needs a cost estimate and approval |
+| WP6 Lists admin | In progress (Sonnet) | `wp6-sector-tags-lists-admin` | | |
+| WP7 Label sweep + Sectors of Interest | In progress (Sonnet) | `wp7-sector-tags-labels` | | Remap dry-run read-only on prod |
 | Rollout | Not started | | | Every step needs Jordan's approval |
 | WP8 Cleanup | Not started | | | At least one week after rollout |
 
@@ -39,11 +39,14 @@ None.
 - Worktrees land under the orchestrator worktree's `.worktrees/` (`treasure-child/.worktrees/`), not the root repo.
 - The root `docs/mockups` checkout was missing on 2026-09-27 and was cloned so worktrees get the symlink.
 
-## Production steps awaiting approval
+## Production steps
 
-WP1, in order. Not run; each needs Jordan's OK:
-1. `node scripts/run-sql-migration.js --env=prod scripts/migrate-sector-and-tags.sql`. Must run before the deploy.
-2. `node scripts/load-taxonomy-seed.js --env=prod`, with `--dry-run` first.
-3. Deploy.
-4. `node scripts/migrate-saved-views-sector.js --env=prod`. The read-only prod dry-run shows 26 views, column `category` → `sector` only, with no filters dropped. 20 views still show a `secondary_category` column (WP4).
-5. Re-run the `category` → `sector` copy from the migration header to catch companies categorized in the gap.
+Done (approved by Jordan 2026-09-27):
+- `node scripts/run-sql-migration.js --env=prod scripts/migrate-sector-and-tags.sql`: 21 statements. 2,733 companies got `sector` (0 mismatches with `category`); 6 tables created; `sector` list with 16 items. The `category` list is still active.
+- `node scripts/load-taxonomy-seed.js --env=prod`: 240 tags (197/27/9/7) and 16 Sector definitions, taxonomy version 1.
+
+Awaiting approval (rollout):
+1. Deploy.
+2. `node scripts/run-sql-migration.js --env=prod scripts/migrate-sector-and-tags-post-deploy.sql`: deactivates the `category` list and re-copies gap edits where `sector_source IS NULL`.
+3. `node scripts/migrate-saved-views-sector.js --env=prod`: 26 views, columns only; 0 filters and 0 row-colour rules dropped.
+4. Re-load the seed after WP0's definition changes: `node scripts/load-taxonomy-seed.js --env=prod` (dry-run first).
