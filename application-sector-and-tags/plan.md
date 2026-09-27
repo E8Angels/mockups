@@ -16,7 +16,7 @@ Companies carry a primary category (`companies.category`, one value) and seconda
 - The primary list mixes sectors (Water, Transportation) with business types (Software, Finance), so the same kind of company lands in different places. Sector stayed the same on all three runs for 89% of applications under the new rules, against a list that has the two mixed together today.
 - The secondary list is flat, so a company tagged "Anodes" is invisible to a search for "Batteries".
 
-The redesign was tested on the 1,080 applications added since 2024-09-19. Taxonomy review page: https://claude.ai/artifact/TSe7kFJEPMh1Jh3DCKGC86. Team feedback on the lists is being gathered in a Google Sheet. The lists stay editable after launch, so implementation does not wait on that feedback.
+The redesign was tested on the 1,080 applications added since 2024-09-19. Taxonomy review page: https://claude.ai/artifact/TSe7kFJEPMh1Jh3DCKGC86. Jordan may gather team feedback on the lists in a Google Sheet. If he shares it, fold it into the WP0 definitions. The lists stay editable after launch, so implementation does not wait on that feedback.
 
 ## Decisions
 
@@ -32,7 +32,9 @@ The redesign was tested on the 1,080 applications added since 2024-09-19. Taxono
    - Add Industrial, Clean Fuels & Hydrogen and Not cleantech.
    - Rename Recycling to Recycling & Waste, and Infrastructure to Grid & Power.
    - The full list and its rules are in the appendix.
-4. Tags and Sector live on the **company**, as categories do today. They are derived from the company's latest submitted application, using the AI application summary when one exists and the form fields otherwise.
+4. Each **application** is classified on its own, using its AI summary when one exists and its form fields otherwise.
+   - The **company** shows the Sector of its latest application and the union of all its applications' tags (see Re-applications).
+   - Dealflow reports count each application under its own Sector.
 5. **AI results are saved, not recomputed.**
    - A person's Sector choice is never overwritten by AI.
    - A tag a person adds stays; a tag a person removes never comes back.
@@ -86,7 +88,9 @@ Use expand/contract so old and new code can run side by side. Production runs on
   - Copy `category` into `sector` for existing rows. Old values that are no longer valid stay until the backfill replaces them.
   - Drop `category` and `secondary_category` in the cleanup phase.
 - **`taxonomy_tags`:**
-  - Columns: `id` (stable slug, never reused), `family` (`technology` | `market` | `business_type` | `built_with`), `name`, `parent_id`, `description` (also used as prompt text), `synonyms_json`, `sort_order`, `active`, and timestamps.
+  - Columns: `id` (stable slug, never reused), `family` (`technology` | `market` | `business_type` | `built_with`), `name`, `parent_id`, `description`, `includes`, `excludes_json` (see-also tag ids with a note), `synonyms_json`, `sort_order`, `active`, and timestamps.
+  - The definition fields are also the prompt text. Seeded from `lib/taxonomy/seed.json` (format in `orchestrator-brief.md`).
+  - A `taxonomy_versions` row (version number, changed_at, changed_by, summary) is added on every edit.
   - A rename changes `name` only.
   - A tag that is retired is deactivated, never deleted. It can optionally be merged into another tag, which moves its company links.
 - **`company_tags`:** (`company_record_id`, `tag_id`) as the primary key, plus `is_primary` (exactly one Technology tag per company), `votes` (1–3), `source` (`ai` | `manual`), `from_application_record_id`, `created_at` and `created_by_person_record_id`.
@@ -100,7 +104,6 @@ Use expand/contract so old and new code can run side by side. Production runs on
   The company's Sector and Tags are rolled up from these rows (see Re-applications).
 - **`company_tag_exclusions`:** (`company_record_id`, `tag_id`, `removed_by`, `removed_at`). A tag a person removed never comes back from AI.
 - **`application_classification_briefs`:** per application, the brief JSON, model and created date. Vector search will reuse it later.
-- **`taxonomy_tags`** also stores scope notes (`includes`, `excludes_json` naming the see-also tags). The taxonomy has a version number that goes up on every edit.
 - **Managed lists:** the list key `category` becomes `sector`, labelled "Sector", and is re-seeded with the new 16 values and definitions. The `subcategory` list is retired in cleanup. Sector keeps its managed colours.
 - **Cache / directory / grid rows:** add
   - `sector`
@@ -109,7 +112,10 @@ Use expand/contract so old and new code can run side by side. Production runs on
   - `tag_search_text`: all names on each path, for text search
 - **API:**
   - `GET /api/taxonomy`: the tree and flat families, with synonyms and active flag. Cached, and refreshed through the cache-invalidation log.
-  - `PATCH /api/sourcing/company/:id`: accepts `sector` and `tags` (an array of tag ids) and sets the matching `*_source = manual`.
+  - `PATCH /api/sourcing/company/:id`: accepts `sector` and `tags` (the full desired array of tag ids).
+    - A Sector change sets `sector_source = manual`.
+    - An added tag is written with `source = manual`.
+    - A removed tag is deleted and recorded in `company_tag_exclusions`.
   - Existing company and application payloads return `sector` and `tags` in the row shape above.
 - **Saved views:** a migration rewrites stored grid field keys (`category` → `sector`) in saved views and query plans. Filters on `secondary_category` can't be mapped automatically. They are dropped, and the migration prints each affected view so it can be rebuilt.
 - **Merge:** `sector` and `company_tags` are added to the company merge lists. The coverage test in `__tests__/lib/company-merge-coverage.test.js` enforces this.
@@ -223,7 +229,7 @@ Prices are per million tokens, input / output, at standard rates as of 2026-09-2
    - Stratified across sectors, the known boundary cases, and form-only as well as summary-based applications.
    - Each is classified at high effort by one flagship model from each vendor (GPT-6 Sol and Claude Opus 5.5).
    - Where the two agree, that is the reference label.
-   - For Sector, where they disagree, I review the case in the working session. Each disagreement either tightens a definition or is recorded as a genuine boundary case.
+   - For Sector, where they disagree, the WP0 agent reviews the case against the definitions and records its reasoning in the results note. Each disagreement either tightens a definition or is recorded as a genuine boundary case.
    - For tags, the reference keeps both the union and the intersection of the two models' tags, so recall and precision can both be measured.
    - This costs a few dollars.
 2. **Candidate test.** Each small candidate classifies the whole set 3 times. Measured:
@@ -337,9 +343,9 @@ WP0 and WP1 start together. WP1 must merge before the others because it defines 
 
 | WP | Scope | Depends on |
 |---|---|---|
-| **WP0 Accuracy gate** | Write definitions (includes / excludes / synonyms) for every Sector and tag, and apply the facet changes. Build the ~200-application reference set with two vendors' frontier models, reconciling disagreements. Build the eval harness (following `lib/insights/evals`). Test the small-model candidates. Write a results note that fixes the model and method. | none |
-| **WP1 Foundation** | Dev migration SQL (`scripts/migrate-sector-and-tags.sql`): new columns and tables (including `application_classifications`, `company_tag_exclusions`, briefs, scope notes, taxonomy version), copy `category`→`sector`, managed-list re-key, saved-view field-key rewrite. Seed file `lib/taxonomy/seed.json` built from the tree in `mockup.html`. Cache-manager read/write methods, expanded row fields, `GET /api/taxonomy`, the `PATCH` changes, merge lists, write contracts. | none |
-| **WP2 Tagging** | `lib/company-tagging.js` (brief → classify → 3-run vote with union tags, provenance), `tagging` role in `lib/ai-models.js`, single-trigger logic, monthly taxonomy health job, the Taxonomy health page with accept/dismiss, and the Slack link, both triggers, `needs_review` queue view, backfill script (Batch API, dry-run report), retire `ai-categorizer.js`. | WP1; model and method from WP0 |
+| **WP0 Accuracy gate** | Create `lib/taxonomy/seed.json` from `mockup.html` in the agreed format (first commit, merged early so WP1 can load it). Write definitions (includes / excludes / synonyms) for every Sector and tag, and apply the facet changes. Build the ~200-application reference set with two vendors' frontier models, reconciling disagreements. Build the eval harness (following `lib/insights/evals`). Test the small-model candidates. Write a results note that fixes the model and method. | none |
+| **WP1 Foundation** | Dev migration SQL (`scripts/migrate-sector-and-tags.sql`): new columns and tables (including `application_classifications`, `company_tag_exclusions`, briefs, scope notes, taxonomy version), copy `category`→`sector`, managed-list re-key, saved-view field-key rewrite. Seed loader for `lib/taxonomy/seed.json` (format in `orchestrator-brief.md`; content owned by WP0). Cache-manager read/write methods, expanded row fields, `GET /api/taxonomy`, the `PATCH` changes, merge lists, write contracts. | none |
+| **WP2 Tagging** | `lib/company-tagging.js` (brief → classify → 3-run vote with union tags, provenance, re-application roll-up), `tagging` role in `lib/ai-models.js`, classification triggers, `needs_review` queue view, backfill script (batch APIs, dry-run report), monthly Taxonomy health job and page (accept/dismiss) with the Slack link, retire `ai-categorizer.js`. | WP1; model and method from WP0 |
 | **WP3 Components + record page** | `SectorPill` (renamed `CategoryPill`), `TagsPill` + popover, `tag-picker.jsx`. Company header and edit mode, portfolio detail header. Remove the applicant dashboard editors and summary rows (decision 1). | WP1 API shape; can start on fixtures |
 | **WP4 Grids + filters** | Admin grid fields and options, RecordGrid value control, CompaniesAdmin grids, Explore Companies (dropdowns, URL params, search), Stage Review, Pitch History, Metrics "By Sector". | WP1, WP3 components |
 | **WP5 AI + MCP** | Semantic catalog, category-service, agent tools, evals, AI Insights similar applications + prompt migration, MCP docs, contracts, member view, data-service names. | WP1 |
@@ -348,7 +354,7 @@ WP0 and WP1 start together. WP1 must merge before the others because it defines 
 | **Rollout** | Prod migration → deploy → backfill dry-run report → Jordan approves → backfill → spot-check the review queue → Sectors of Interest remap → e8angels.com re-import. | WP0–WP7 |
 | **WP8 Cleanup** | Drop `category`, `secondary_category` and the `subcategory` list, remove the compatibility reads and the old embed keys, and split or merge leaves by their post-backfill size. | Rollout + one week |
 
-Each agent keeps `implementation-status.md` in this folder current, with done, in progress, blocked and follow-ups.
+Orchestration, gates and per-package done criteria: `orchestrator-brief.md`. Live status: `implementation-status.md`. Where categories are used today: `category-usage-inventory.md`. Reusable UI pieces: `ui-building-blocks.md`.
 
 ## Decisions made on 2026-09-25
 
@@ -372,7 +378,7 @@ Each agent keeps `implementation-status.md` in this folder current, with done, i
 
 ## Appendix: Sector list and rules
 
-The Tags seed is the `TECH` and `FLAT` constants in `mockup.html`.
+The starting Tags list is the `TECH` and `FLAT` constants in `mockup.html` (keys `business` → `business_type`, `enabling` → `built_with`). WP0 turns it into `lib/taxonomy/seed.json`.
 
 | Sector | Definition |
 |---|---|

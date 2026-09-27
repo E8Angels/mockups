@@ -7,3 +7,4 @@
 - 2026-09-26: No AI/Manual display (source tracked internally only); all tags as pills, Technology pills show parent level; re-applications additive (union of tags, manual removals stick, company Sector = latest application, reporting by each application's Sector); per-application classification rows; Slack channel C0B8LQD6SN4.
 - 2026-09-27: "Enabling tech" renamed "Built with" (kept as its own family; Technology = what they build, Built with = what it's built with).
 - 2026-09-27: Confirmed: reporting by each application's Sector; members see Sector and Tags on Explore Companies.
+- 2026-09-27: Handoff package: orchestrator-brief.md (sequence, gates, seed format, done criteria), implementation-status.md, category-usage-inventory.md, ui-building-blocks.md; plan consistency fixes (per-application classification, PATCH semantics, WP0 owns seed.json).
