@@ -6,7 +6,7 @@ Last updated: 2026-09-27. Update this file as work moves.
 |---|---|---|---|---|
 | WP0 Accuracy gate | **Done.** [#921](https://github.com/E8Angels/e8-portal/pull/921) and [#924](https://github.com/E8Angels/e8-portal/pull/924) merged; results in [`wp0-results.md`](wp0-results.md) | `wp0-sector-tags-accuracy` | http://localhost:8100 | $11.60 spent. GPT-6 Luna, low effort, direct input, union |
 | WP1 Foundation | **Merged** ([#922](https://github.com/E8Angels/e8-portal/pull/922), `a7ae2be0`) after Opus review; 12 findings fixed. Prod migration and seed v1 applied 2026-09-27 | `wp1-sector-tags-foundation` | http://localhost:8120 | Deploy and post-deploy steps wait for rollout |
-| WP2 Tagging | PR [#930](https://github.com/E8Angels/e8-portal/pull/930) under Opus review | `wp2-sector-tags-tagging` | http://localhost:8170 | Dev live calls $0.013. Prod backfill estimate about $2.50 (worst case $11.13); 2,678 applications classifiable, 32 have no text |
+| WP2 Tagging | Fixing 12 findings from the Opus review of [#930](https://github.com/E8Angels/e8-portal/pull/930) (lost deferred applications, rollout-gap re-applications, batch double-pay, application-text cleanup, roll-up races) | `wp2-sector-tags-tagging` | http://localhost:8170 | Prod backfill about $2.50 |
 | WP3 Components + record page | **Merged** ([#923](https://github.com/E8Angels/e8-portal/pull/923), `b9f95307`) after Opus review; 13 fixes | `wp3-sector-tags-components` | http://localhost:8130 | Tag picker `mode="assign"` in edit mode, `mode="filter"` for filters |
 | WP4 Grids + filters | In progress (Sonnet) | `wp4-sector-tags-grids` | | Turns on `TAG_CHIP_EXPLORE_LINKS_ENABLED` once `?tag=` works |
 | WP5 AI + MCP | Fixing 9 findings from the Opus review of [#927](https://github.com/E8Angels/e8-portal/pull/927) (empty similar list with no tags, legacy Sector aliases, synonym resolution) | `wp5-sector-tags-ai-mcp` | http://localhost:8140 | Live eval suite about $2.60 typical, $10 worst (gpt-5.6-terra prices); not run |
@@ -60,6 +60,7 @@ Awaiting approval (rollout), in order:
 3. Backfill classify-and-save before the deploy: `node scripts/backfill-sector-and-tags.js --env=prod --dry-run` (about $2.50), then `--report --report-file=tmp/prod-backfill-report.json` for Jordan to review.
 4. Deploy, and set `SLACK_TAXONOMY_REPORT_CHANNEL_ID=C0B8LQD6SN4` on Fly. The monthly health job's AI parts default on in prod, about $1.40 a month.
 5. Right after the deploy:
+   - `node scripts/backfill-sector-and-tags.js --env=prod --dry-run` again, as a catch-up that classifies only applications submitted since the first run (cents)
    - `node scripts/backfill-sector-and-tags.js --env=prod --apply`
    - `node scripts/run-sql-migration.js --env=prod scripts/migrate-sector-and-tags-post-deploy.sql`
    - `node scripts/migrate-application-insights-prompt.js --file=docs/application-insights-prompt.md --env=prod`
