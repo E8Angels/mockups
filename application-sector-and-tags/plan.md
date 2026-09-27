@@ -367,6 +367,8 @@ Each agent keeps `implementation-status.md` in this folder current, with done, i
    No survey or agreement form in this repo collects it. Any outside survey needs a manual update.
 3. **Public embed:** keep `primary_category` / `secondary_categories` and add `sector` / `tags`. The only outside consumer is e8angels.com (`~/dev/e8angels-com`). Its `scripts/import-portfolio.mjs` and Sanity `portfolioCompany` schema move to `sector` in the same rollout. The Sanity content re-import happens after the backfill. The old keys are removed in cleanup.
 4. **Grid Tags cell:** the most specific Technology tag plus `+N`.
+5. **Dealflow reporting** counts each application under its own Sector (confirmed 2026-09-27).
+6. **Members** see Sector and Tags on Explore Companies (confirmed 2026-09-27).
 
 ## Appendix: Sector list and rules
 
