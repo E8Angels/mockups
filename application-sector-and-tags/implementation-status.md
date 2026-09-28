@@ -12,7 +12,7 @@ Last updated: 2026-09-27. Update this file as work moves.
 | WP5 AI + MCP | **Merged** ([#927](https://github.com/E8Angels/e8-portal/pull/927), `1e03f4a9`) after Opus review; 9 fixes | `wp5-sector-tags-ai-mcp` | http://localhost:8140 | Live eval suite (default model `gpt-5.6`) about $1–10; not run |
 | WP6 Lists admin | **Merged** ([#925](https://github.com/E8Angels/e8-portal/pull/925)); finished on Opus after three review rounds | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Sector delete deactivates. A cited tag can't be deactivated until it's merged or its references are removed. Don't edit the Lists admin during the rolling deploy |
 | WP7 Label sweep + Sectors of Interest | **Merged** ([#926](https://github.com/E8Angels/e8-portal/pull/926)) after Opus review; 13 fixes plus a follow-up | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
-| Rollout | **Ready; awaiting Jordan's approval.** WP0–WP7 are merged; main `f337bcdf` passes the full suite (only the local Node-pin test fails) and `vite build`. Combined server: http://localhost:8110 | | http://localhost:8110 | Every step needs Jordan's approval |
+| Rollout | **Phase A approved and running** (2026-09-27): steps 1–4 done, backfill `--dry-run` running | | http://localhost:8110 | Phase B (deploy onward) needs Jordan's approval after the report |
 | WP8 Cleanup | Not started | | | At least one week after rollout |
 
 ## Decision changes
@@ -52,6 +52,11 @@ None.
 ## Production steps
 
 Done (approved by Jordan 2026-09-27):
+- Phase A step 1: `node scripts/migrate-taxonomy-admin-tracking.js --env=prod` added 3 columns and backfilled `seed_name` on 16 Sectors.
+- Phase A step 2: `migrate-sector-and-tags-tagging.sql`, 12 statements; jobs, health reports and proposals tables created.
+- Phase A step 3: `migrate-member-data-query-views.sql`, 16 statements; `companies_public` has 2,961 rows, 2,733 with a Sector.
+- Phase A step 4: seed v2 reload; 9 Business type tags and 5 Sector definitions updated; taxonomy version 2.
+- Phase A step 5: backfill `--dry-run` started (estimate $2.53, worst $11.38; 2,678 applications, 8,034 requests).
 - `node scripts/run-sql-migration.js --env=prod scripts/migrate-sector-and-tags.sql`: 21 statements. 2,733 companies got `sector` (0 mismatches with `category`); 6 tables created; `sector` list with 16 items. The `category` list is still active.
 - `node scripts/load-taxonomy-seed.js --env=prod`: 240 tags (197/27/9/7) and 16 Sector definitions, taxonomy version 1.
 
