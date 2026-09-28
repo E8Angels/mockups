@@ -32,8 +32,7 @@ Last updated: 2026-09-27. Update this file as work moves.
 ## Blockers
 
 - Sweep alerts every 15 min until #939 is deployed (Jordan deploys).
-- Awaiting Jordan's confirmation of 12 suggested Sectors: ATX LED, Enersponse, Full Moon Sensor, Open Ocean Robotics, EDEN Concept Fill, Green Think Energy, Propel, Revert, Retrolux, Atmos, Climate First Bank, Eko. Four of them (Atmos, Climate First Bank, Retrolux, Propel) are in the e8angels.com portfolio feed and block its import.
-- e8angels.com deploy and import: needs `vercel login` and `SANITY_API_TOKEN`.
+- e8angels.com: Vercel deploy in progress; the import waits on `SANITY_API_TOKEN` from Jordan.
 
 ## Follow-ups found along the way
 
@@ -69,7 +68,7 @@ Done (approved by Jordan 2026-09-27):
 - Phase B: Sectors of Interest remapped (106 members; 1 left with none).
 - Phase B: `--apply` finished; 2,671 companies tagged; Iteros and Novinium mapped Infrastructure → Grid & Power.
 - Phase B: post-deploy script run; `category` list definition inactive.
-- Manual Sectors set, approved by Jordan: EQO → Recycling & Waste, Transaera → Grid & Power.
+- Manual Sectors set, approved by Jordan: EQO → Recycling & Waste, Transaera → Grid & Power; then 12 more (ATX LED, Revert, Retrolux → Built Environment; Enersponse → Grid & Power; Full Moon Sensor → Carbon; Open Ocean Robotics → Conservation & Adaptation; EDEN Concept Fill → Sustainable Materials; Green Think Energy, Atmos → Energy Generation; Propel → Clean Fuels & Hydrogen; Climate First Bank → Other; Eko → Not cleantech). 0 retired values remain in prod.
 - Backfill fix #938: classified 6 more (UrbanX, 2S Water, Terra.do, OpConnect, Evrnu, Triton Anchor; $0.005) and rolled up only those.
 - e8angels.com: `sector` added to embed views #4, #1 and #3 (prod); site PR E8Angels/e8-website#84 merged, not deployed.
 - Phase A step 6: report. Of 2,710 companies: 1,403 unchanged, 1,249 changed (711 from retired values, 126 pure renames, 538 re-sorted between current Sectors), 26 newly given a Sector; 236 need review. Tags per company: Technology 1.53, Market 2.66, Business type 1.87, Built with 0.46; 1-vote share 15.8%.
