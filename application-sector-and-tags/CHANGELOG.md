@@ -25,3 +25,4 @@
 - 2026-09-27: WP6 merged.
 - 2026-09-27: WP2 merged.
 - 2026-09-27: WP4 merged. WP0–WP7 all merged; rollout awaiting approval.
+- 2026-09-28: Rollout complete; e8angels.com deployed and re-imported.
