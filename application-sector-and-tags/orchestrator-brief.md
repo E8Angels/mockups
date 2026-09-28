@@ -26,7 +26,7 @@ WP1 (foundation) ── merged ──┬─ WP2 tagging ◄──────┘
                              ├─ WP5 AI + MCP
                              ├─ WP6 lists admin
                              └─ WP7 label sweep + Sectors of Interest
-All merged ─► Rollout (Jordan approves each step) ─► WP8 cleanup (≥ 1 week later)
+All merged ─► Rollout (Jordan approves each step) ─► WP8 cleanup (right after rollout)
 ```
 
 - **WP0 and WP1 start together.** WP0's first commit is `seed.json` in the format below. Merge it early so WP1's loader has real content.
@@ -168,7 +168,7 @@ A WP isn't done until its PR has focused tests, the worktree server is running w
   - Embed returns `sector` / `tags` alongside the old keys.
   - The `~/dev/e8angels-com` change is prepared on a branch there, not pushed.
 - **Rollout:** the sequence in `plan.md`. Report after each step.
-- **WP8:** drops and removals only after Jordan confirms a week of clean production running.
+- **WP8:** drops and removals right after the rollout. The code deploy goes before the column drop, and prod steps still need Jordan's approval.
 
 ## Reporting
 

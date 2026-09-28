@@ -12,8 +12,8 @@ Last updated: 2026-09-27. Update this file as work moves.
 | WP5 AI + MCP | **Merged** ([#927](https://github.com/E8Angels/e8-portal/pull/927), `1e03f4a9`) after Opus review; 9 fixes | `wp5-sector-tags-ai-mcp` | http://localhost:8140 | Live eval suite (default model `gpt-5.6`) about $1–10; not run |
 | WP6 Lists admin | **Merged** ([#925](https://github.com/E8Angels/e8-portal/pull/925)); finished on Opus after three review rounds | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Sector delete deactivates. A cited tag can't be deactivated until it's merged or its references are removed. Don't edit the Lists admin during the rolling deploy |
 | WP7 Label sweep + Sectors of Interest | **Merged** ([#926](https://github.com/E8Angels/e8-portal/pull/926)) after Opus review; 13 fixes plus a follow-up | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
-| Rollout | **Complete** (2026-09-28). Portal deployed with hotfixes #938 and #939; all companies on valid Sectors; e8angels.com deployed and portfolio re-imported | | | WP8 cleanup no earlier than 2026-10-05, after a week of clean running |
-| WP8 Cleanup | Not started | | | At least one week after rollout |
+| Rollout | **Complete** (2026-09-28). Portal deployed with hotfixes #938 and #939; all companies on valid Sectors; e8angels.com deployed and portfolio re-imported | | | WP8 started immediately (no waiting period) |
+| WP8 Cleanup | In progress (Opus), started 2026-09-28: code PR removing legacy category reads/writes, contract migration and saved-view rewrite (dry-run only on prod) | `wp8-sector-tags-cleanup` | http://localhost:8250 | Prod: deploy → saved-view rewrite → drop columns and lists, each with Jordan's approval |
 
 ## Decision changes
 
@@ -28,6 +28,9 @@ Last updated: 2026-09-27. Update this file as work moves.
 - 2026-09-27 (orchestrator call, open to Jordan's override): the extra legacy Sectors of Interest values map as Grid → Grid & Power, Renewables → Energy Generation, AgTech and Food → AgTech & Food, Circular Economy → Recycling & Waste, Other Environmental → Other.
 
 - 2026-09-27: The rollout keeps the gap between deploy and backfill to minutes. The backfill classifies and saves to `application_classifications` on prod before the deploy (the current code never reads that table); Jordan reviews the report; the apply runs right after the deploy. Prod has 251 companies with no submitted application, which can't be tagged; 8 have legacy Sector values (Infrastructure and Recycling map deterministically, the rest go to manual review). Untagged companies fall back to Sector-only similar applications in AI Insights.
+
+- 2026-09-28: Jordan dropped the one-week wait before WP8; it had been written into the brief, not decided by him. There will be no redeploy rollback, and database backups exist. WP8 started immediately.
+- 2026-09-28: Torn down 13 merged worktrees (WP0–WP7 and 5 fixes).
 
 ## Blockers
 

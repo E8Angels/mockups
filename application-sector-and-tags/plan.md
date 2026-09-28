@@ -350,7 +350,7 @@ WP0 and WP1 start together. WP1 must merge before the others because it defines 
 | **WP6 Lists admin** | Sector list and tag tree editor. | WP1 |
 | **WP7 Label sweep + Sectors of Interest** | Remaining "Category" strings (exports, embed docs, View Builder). Sectors of Interest as a single source of truth, plus the value remap (decision 2). Embed `sector` / `tags` keys and the e8angels.com import and Sanity schema (decision 3). | WP1 |
 | **Rollout** | Prod migration → deploy → backfill dry-run report → Jordan approves → backfill → spot-check the review queue → Sectors of Interest remap → e8angels.com re-import. | WP0–WP7 |
-| **WP8 Cleanup** | Drop `category`, `secondary_category` and the `subcategory` list, remove the compatibility reads and the old embed keys, and split or merge leaves by their post-backfill size. | Rollout + one week |
+| **WP8 Cleanup** | Drop `category`, `secondary_category` and the `subcategory` list, remove the compatibility reads and the old embed keys, and split or merge leaves by their post-backfill size. | Rollout |
 
 Orchestration, gates and per-package done criteria: `orchestrator-brief.md`. Live status: `implementation-status.md`. Where categories are used today: `category-usage-inventory.md`. Reusable UI pieces: `ui-building-blocks.md`.
 
