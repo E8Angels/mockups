@@ -31,7 +31,7 @@ Last updated: 2026-09-27. Update this file as work moves.
 
 ## Blockers
 
-None. Watching the first `tagging_pending_sweep` run after the #939 deploy to confirm the alerts stopped.
+None. `tagging_pending_sweep` recorded success at 2026-09-28 04:00 UTC after the #939 deploy.
 
 ## Follow-ups found along the way
 
