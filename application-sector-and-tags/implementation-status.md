@@ -12,7 +12,7 @@ Last updated: 2026-09-27. Update this file as work moves.
 | WP5 AI + MCP | **Merged** ([#927](https://github.com/E8Angels/e8-portal/pull/927), `1e03f4a9`) after Opus review; 9 fixes | `wp5-sector-tags-ai-mcp` | http://localhost:8140 | Live eval suite (default model `gpt-5.6`) about $1–10; not run |
 | WP6 Lists admin | **Merged** ([#925](https://github.com/E8Angels/e8-portal/pull/925)); finished on Opus after three review rounds | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Sector delete deactivates. A cited tag can't be deactivated until it's merged or its references are removed. Don't edit the Lists admin during the rolling deploy |
 | WP7 Label sweep + Sectors of Interest | **Merged** ([#926](https://github.com/E8Angels/e8-portal/pull/926)) after Opus review; 13 fixes plus a follow-up | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
-| Rollout | **Deployed** (Jordan, 2026-09-28 ~03:15 UTC). Phase B in progress: prompt, saved views and remap done; `--apply` running (~1 h); post-deploy script next | | http://localhost:8110 | e8angels.com pending: public views don't return `sector` yet |
+| Rollout | **Portal rollout complete** (2026-09-28): `--apply` (2,671 companies tagged), post-deploy script, prompt v10, saved views and remap done. Hotfixes #939 (sweep alerts) and #938 (backfill uses the latest application with text) merged; **#939 needs a deploy** | | http://localhost:8110 | e8angels.com import waits on Vercel login, a Sanity token, and 4 portfolio companies still on retired Sectors |
 | WP8 Cleanup | Not started | | | At least one week after rollout |
 
 ## Decision changes
@@ -31,7 +31,9 @@ Last updated: 2026-09-27. Update this file as work moves.
 
 ## Blockers
 
-None.
+- Sweep alerts every 15 min until #939 is deployed (Jordan deploys).
+- Awaiting Jordan's confirmation of 12 suggested Sectors: ATX LED, Enersponse, Full Moon Sensor, Open Ocean Robotics, EDEN Concept Fill, Green Think Energy, Propel, Revert, Retrolux, Atmos, Climate First Bank, Eko. Four of them (Atmos, Climate First Bank, Retrolux, Propel) are in the e8angels.com portfolio feed and block its import.
+- e8angels.com deploy and import: needs `vercel login` and `SANITY_API_TOKEN`.
 
 ## Follow-ups found along the way
 
@@ -65,7 +67,11 @@ Done (approved by Jordan 2026-09-27):
 - Phase B: AI Insights prompt stored (screening_review v10).
 - Phase B: saved views rewritten (26; 0 filters or colour rules dropped).
 - Phase B: Sectors of Interest remapped (106 members; 1 left with none).
-- Phase B: `--apply` started (2,678 companies).
+- Phase B: `--apply` finished; 2,671 companies tagged; Iteros and Novinium mapped Infrastructure → Grid & Power.
+- Phase B: post-deploy script run; `category` list definition inactive.
+- Manual Sectors set, approved by Jordan: EQO → Recycling & Waste, Transaera → Grid & Power.
+- Backfill fix #938: classified 6 more (UrbanX, 2S Water, Terra.do, OpConnect, Evrnu, Triton Anchor; $0.005) and rolled up only those.
+- e8angels.com: `sector` added to embed views #4, #1 and #3 (prod); site PR E8Angels/e8-website#84 merged, not deployed.
 - Phase A step 6: report. Of 2,710 companies: 1,403 unchanged, 1,249 changed (711 from retired values, 126 pure renames, 538 re-sorted between current Sectors), 26 newly given a Sector; 236 need review. Tags per company: Technology 1.53, Market 2.66, Business type 1.87, Built with 0.46; 1-vote share 15.8%.
 - `node scripts/run-sql-migration.js --env=prod scripts/migrate-sector-and-tags.sql`: 21 statements. 2,733 companies got `sector` (0 mismatches with `category`); 6 tables created; `sector` list with 16 items. The `category` list is still active.
 - `node scripts/load-taxonomy-seed.js --env=prod`: 240 tags (197/27/9/7) and 16 Sector definitions, taxonomy version 1.
