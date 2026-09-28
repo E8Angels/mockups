@@ -13,7 +13,7 @@ Last updated: 2026-09-27. Update this file as work moves.
 | WP6 Lists admin | **Merged** ([#925](https://github.com/E8Angels/e8-portal/pull/925)); finished on Opus after three review rounds | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Sector delete deactivates. A cited tag can't be deactivated until it's merged or its references are removed. Don't edit the Lists admin during the rolling deploy |
 | WP7 Label sweep + Sectors of Interest | **Merged** ([#926](https://github.com/E8Angels/e8-portal/pull/926)) after Opus review; 13 fixes plus a follow-up | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
 | Rollout | **Complete** (2026-09-28). Portal deployed with hotfixes #938 and #939; all companies on valid Sectors; e8angels.com deployed and portfolio re-imported | | | WP8 started immediately (no waiting period) |
-| WP8 Cleanup | PR [#940](https://github.com/E8Angels/e8-portal/pull/940) under Opus review. Dev is contracted (columns and lists dropped); prod on hold until Jordan is standing by | `wp8-sector-tags-cleanup` | http://localhost:8250 | Prod: deploy → `migrate-saved-views-sector.js` (20 grid + 4 embed views) → `migrate-sector-and-tags-contract.js` (backup, then drop) |
+| WP8 Cleanup | **Done** (2026-09-28). [#940](https://github.com/E8Angels/e8-portal/pull/940) merged after Opus review plus a fix (`list_successful_exits` read `c.category`); deployed `de79bb06`; prod views rewritten (20 grid, 4 embed); prod contract drop done | | | Backup: `~/dev/e8-portal/tmp/sector-and-tags-contract-backup-prod-2026-09-28T14-27-30-871Z.json`. Tag split/merge tuning still open |
 
 ## Decision changes
 
@@ -32,12 +32,15 @@ Last updated: 2026-09-27. Update this file as work moves.
 - 2026-09-28: Jordan dropped the one-week wait before WP8; it had been written into the brief, not decided by him. There will be no redeploy rollback, and database backups exist. WP8 started immediately.
 - 2026-09-28: Torn down 13 merged worktrees (WP0–WP7 and 5 fixes).
 
+- 2026-09-28: WP8 prod steps, approved by Jordan: saved-view rewrite (before the deploy); deploy `de79bb06` (includes #941); `migrate-sector-and-tags-contract.js --env=prod` dropped `companies.category` (2,762 non-empty) and `secondary_category` (2,385), recreated `companies_public`, and deleted the `category` (16) and `subcategory` (40) lists. Dev is contracted too.
+
 ## Blockers
 
 None. `tagging_pending_sweep` recorded success at 2026-09-28 04:00 UTC after the #939 deploy.
 
 ## Follow-ups found along the way
 
+- **Open:** tag split/merge tuning (plan WP8 row): split tags on more than ~40 companies, merge those on fewer than 3. Merges fall under Jordan's standing approval; splits (new tags plus re-tagging) are shown to Jordan first.
 - 32 companies whose latest submitted application has no text stay unclassified. Twenty come from a 2026-02-15 bulk import. Nine need attention: six hold retired Sectors (EQO Recycling, Transaera Infrastructure, ATX LED and Enersponse Energy Efficiency, Terra.do Software) and four have none (Full Moon Sensor, Open Ocean Robotics, EDEN Concept Fill, Green Think Energy). Fix manually, or classify from the company record.
 - e8angels.com: the three public views (All active, E8 Fund, Decarbon8) return only `primary_category`, not `sector`. Add the Sector column in View Builder and remove the import's fallback to `primary_category`.
 - Long tag chips wrapped onto two lines in grid rows; fixed in [#937](https://github.com/E8Angels/e8-portal/pull/937).
