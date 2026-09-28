@@ -13,7 +13,7 @@ Last updated: 2026-09-27. Update this file as work moves.
 | WP6 Lists admin | **Merged** ([#925](https://github.com/E8Angels/e8-portal/pull/925)); finished on Opus after three review rounds | `wp6-sector-tags-lists-admin` | http://localhost:8160 | Sector delete deactivates. A cited tag can't be deactivated until it's merged or its references are removed. Don't edit the Lists admin during the rolling deploy |
 | WP7 Label sweep + Sectors of Interest | **Merged** ([#926](https://github.com/E8Angels/e8-portal/pull/926)) after Opus review; 13 fixes plus a follow-up | `wp7-sector-tags-labels` | http://localhost:8150 | e8angels-com branch `wp7-sector-tags-sector-field` (`fcde436`), local only |
 | Rollout | **Complete** (2026-09-28). Portal deployed with hotfixes #938 and #939; all companies on valid Sectors; e8angels.com deployed and portfolio re-imported | | | WP8 started immediately (no waiting period) |
-| WP8 Cleanup | In progress (Opus), started 2026-09-28: code PR removing legacy category reads/writes, contract migration and saved-view rewrite (dry-run only on prod) | `wp8-sector-tags-cleanup` | http://localhost:8250 | Prod: deploy → saved-view rewrite → drop columns and lists, each with Jordan's approval |
+| WP8 Cleanup | PR [#940](https://github.com/E8Angels/e8-portal/pull/940) under Opus review. Dev is contracted (columns and lists dropped); prod on hold until Jordan is standing by | `wp8-sector-tags-cleanup` | http://localhost:8250 | Prod: deploy → `migrate-saved-views-sector.js` (20 grid + 4 embed views) → `migrate-sector-and-tags-contract.js` (backup, then drop) |
 
 ## Decision changes
 
