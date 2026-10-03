@@ -5,459 +5,133 @@
 <title>Multiple Person Emails</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <style>
-  /* Stonewash tokens from src/css/e8-design-tokens.css (slate→neutral, blue→primary remap applied) */
-  :root {
-    color-scheme: light;
-    --page: #edf2f7;
-    --surface: #ffffff;
-    --surface-muted: #f7f8f6;
-    --surface-subtle: #eef1ee;
-    --ink: #14201e;
-    --ink-2: #45524d;
-    --ink-muted: #66746e;
-    --ink-faint: #93a09a;
-    --border: #9cab9f;
-    --border-soft: #dce3dd;
-    --border-strong: #c2cbc6;
-    --primary: #07312c;
-    --primary-hover: #0f5049;
-    --link: #157068;
-    --link-strong: #0f5049;
-    --primary-50: #ecf5f2;
-    --primary-100: #d9eae4;
-    --primary-200: #b8d5cc;
-    --danger: #dc2626; --danger-bg: #fef2f2; --danger-border: #fecaca;
-    --success: #15803d; --success-bg: #f0fdf4; --success-border: #bbf7d0;
-    --warn: #92400e; --warn-bg: #fffbeb; --warn-border: #fde68a;
-    --display: "Cosmica", "Avenir Next", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    /* entrepreneur marketing skin */
-    --mkt-bg: #f0ede8; --mkt-line: #d3cec6; --mkt-teal: #2ac4b4; --mkt-ink: #1a2826; --mkt-label: #3f4f49;
-  }
+  :root { color-scheme: light; --page: #edf2f7; --ink: #14201e; --muted: #66746e; --line: #c2cbc6; --primary: #07312c; }
   * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--page); color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-size: 14.5px; line-height: 1.5;
-  }
-  .page { max-width: 1100px; margin: 0 auto; padding: 20px 16px 64px; }
-  h1 { font-family: var(--display); font-size: 20px; margin: 0; font-weight: 600; }
-  .subtitle { color: var(--ink-muted); font-size: 13px; margin: 4px 0 14px; }
-
-  /* Mockup navigation (not product UI) */
-  .mocknav { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px; border: 1px dashed var(--border-strong); border-radius: 8px; background: var(--surface-subtle); }
-  .mocknav .label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-muted); padding: 4px 8px; }
-  .mocknav button { border: 0; border-radius: 6px; background: transparent; font: inherit; font-size: 12.5px; height: 28px; padding: 0 10px; cursor: pointer; color: var(--ink); }
-  .mocknav button.active { background: var(--primary); color: #fff; }
-  .caption { font-size: 13px; color: var(--ink-muted); margin: 8px 2px 16px; }
-  .screen { display: none; }
-  .screen.active { display: block; }
-
-  /* Primitives */
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 8px; font: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer; border: 1px solid transparent; white-space: nowrap; }
-  .btn-primary { background: var(--primary); color: #fff; }
-  .btn-primary:hover { background: var(--primary-hover); }
-  .btn-outline { background: #fff; border-color: var(--border-soft); color: var(--ink); }
-  .btn-outline:hover { background: var(--surface-subtle); }
-  .btn-ghost { background: transparent; color: var(--ink-2); }
-  .btn-ghost:hover { background: var(--surface-subtle); }
-  .btn-icon { width: 32px; padding: 0; }
-  .btn-link { background: none; border: 0; padding: 0; color: var(--link); cursor: pointer; font: inherit; font-size: 13px; }
-  .btn-link:hover { text-decoration: underline; }
-  .input { height: 32px; width: 100%; border: 1px solid var(--border-soft); border-radius: 8px; padding: 0 10px; font: inherit; font-size: 14px; background: #fff; color: var(--ink); }
-  .input:focus { outline: 2px solid var(--primary-200); border-color: var(--link); }
-  .input.err { border-color: var(--danger); }
-  .badge { display: inline-flex; align-items: center; border-radius: 9999px; border: 1px solid var(--primary-200); background: var(--primary-50); color: var(--link-strong); font-size: 11px; font-weight: 600; padding: 1px 8px; white-space: nowrap; }
-  .card { background: var(--surface); border: 1px solid var(--border-strong); border-radius: 10px; }
-  .card-h { padding: 10px 14px; background: var(--surface-muted); border-bottom: 1px solid var(--border-strong); border-radius: 10px 10px 0 0; display: flex; justify-content: space-between; align-items: center; }
-  .card-h h3 { margin: 0; font-family: var(--display); font-size: 14.5px; font-weight: 600; }
-  .card-b { padding: 12px 14px; }
-  .lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-muted); }
-  .note { font-size: 12px; color: var(--ink-muted); }
-  .alert { border-radius: 8px; padding: 8px 12px; font-size: 13px; }
-  .alert-danger { background: var(--danger-bg); border: 1px solid var(--danger-border); color: #b91c1c; }
-  .alert-warn { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn); }
-  a { color: var(--link); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  svg.i { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-
-  /* Sheet backdrop */
-  .stage { position: relative; border-radius: 12px; background: rgba(0,0,0,.30); padding: 28px; overflow: hidden; }
-  .sheet { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 16px 44px rgb(20 32 30 / 16%); }
-  .sheet-title { font-family: var(--display); font-size: 18px; font-weight: 600; margin: 0 0 14px; display: flex; justify-content: space-between; }
-  .grid3 { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 16px; }
-  .faded { opacity: .45; }
-  .info { display: grid; grid-template-columns: 92px 1fr; gap: 12px; padding: 4px 0; align-items: start; font-size: 12px; }
-  .info .v { font-weight: 500; min-width: 0; }
-  .info .v a { color: var(--link-strong); }
-  .email-line { display: flex; align-items: center; gap: 6px; min-width: 0; }
-  .email-line a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-  /* Admin edit rows */
-  .crow { display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: center; margin-bottom: 8px; }
-  .crow.top { align-items: start; }
-  .crow > .rl { text-align: right; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-muted); font-weight: 500; }
-  .crow.top > .rl { padding-top: 7px; }
-  .email-list { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-  .erow { display: flex; align-items: center; gap: 8px; min-width: 0; }
-  .erow .addr { flex: 1; min-width: 0; height: 32px; display: flex; align-items: center; padding: 0 10px; border: 1px solid var(--border-soft); border-radius: 8px; background: var(--surface-muted); font-size: 14px; }
-  .erow .addr span.t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .erow .tag { width: 64px; flex: none; justify-content: center; }
-  .menu { position: absolute; right: 0; top: 36px; z-index: 5; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; box-shadow: 0 16px 44px rgb(20 32 30 / 16%); padding: 4px; min-width: 170px; }
-  .menu div { padding: 6px 10px; border-radius: 6px; font-size: 13.5px; cursor: default; }
-  .menu div:hover { background: var(--surface-subtle); }
-  .menu .danger { color: #b91c1c; }
-  .rel { position: relative; }
-  .phone-row { display: flex; gap: 8px; }
-
-  /* Dialog */
-  .dlg-stage { background: rgba(0,0,0,.30); border-radius: 12px; padding: 48px 16px; display: flex; justify-content: center; }
-  .dlg { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 22px; width: 100%; max-width: 480px; box-shadow: 0 16px 44px rgb(20 32 30 / 16%); position: relative; }
-  .dlg.wide { max-width: 780px; }
-  .dlg h2 { font-family: var(--display); font-size: 18px; font-weight: 600; margin: 0 0 6px; line-height: 1.2; padding-right: 28px; }
-  .dlg .desc { font-size: 13px; color: var(--ink-muted); line-height: 1.6; margin: 0 0 14px; }
-  .dlg .x { position: absolute; right: 16px; top: 16px; color: var(--ink-muted); }
-  .dlg-foot { display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--surface-subtle); padding-top: 12px; margin-top: 16px; flex-wrap: wrap; }
-  .check { display: flex; gap: 8px; align-items: flex-start; font-size: 13.5px; }
-  .check input { margin-top: 3px; }
-
-  /* Member profile dialog */
-  .pgrid { display: grid; grid-template-columns: 160px minmax(0,1fr); gap: 20px; }
-  .photo { border: 1px solid var(--border-strong); background: var(--surface-muted); border-radius: 8px; height: 170px; display: flex; align-items: center; justify-content: center; color: var(--ink-faint); font-size: 12px; }
-  .fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
-  .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-  .field.full { grid-column: 1 / -1; }
-  .field .input { height: 36px; }
-  .self-erow { display: flex; gap: 8px; align-items: center; }
-  .self-erow .input { flex: 1; min-width: 0; }
-
-  /* Show Member */
-  .profile { display: flex; gap: 20px; align-items: flex-start; }
-  .avatar { width: 96px; height: 96px; border-radius: 9999px; background: var(--primary-100); color: var(--link-strong); display: flex; align-items: center; justify-content: center; font-family: var(--display); font-size: 30px; flex: none; }
-  .ptitle { font-family: var(--display); font-size: 17.8px; font-weight: 600; }
-  .fellow { border: 1px solid #fcd34d; background: #fef3c7; color: var(--warn); border-radius: 4px; padding: 1px 6px; font-size: 12px; font-weight: 500; }
-  .li { display: inline-flex; align-items: center; border: 1px solid var(--border-strong); border-radius: 6px; padding: 1px 8px; font-size: 12px; font-weight: 600; color: #0a66c2; background: #fff; }
-
-  /* Entrepreneur marketing skin */
-  .mkt { background: var(--mkt-bg); border-radius: 12px; padding: 28px 16px; font-family: "Cosmica", "Inter", -apple-system, sans-serif; color: var(--mkt-ink); }
-  .mkt-card { background: #fff; border: 1px solid var(--mkt-line); border-radius: 8px; padding: 24px 26px; max-width: 640px; margin: 0 auto; }
-  .mkt-card h4 { margin: 0 0 14px; font-size: 16px; font-weight: 600; }
-  .mkt-row { display: grid; grid-template-columns: 120px 1fr; gap: 14px; align-items: center; margin-bottom: 10px; }
-  .mkt-row > label { text-align: right; font-size: 13px; font-weight: 500; color: var(--mkt-label); }
-  .mkt-ghost { height: 34px; border-radius: 9999px; padding: 0 14px; font: inherit; font-size: 13.5px; border: 1px solid var(--mkt-line); background: #fff; color: #6b7873; cursor: pointer; }
-  .mkt-erow { display: flex; align-items: center; gap: 10px; font-size: 14px; flex-wrap: wrap; }
-  .mkt-pill { font-size: 11px; font-weight: 600; color: #0f766e; background: #e6f7f5; border: 1px solid #b6e7e1; border-radius: 9999px; padding: 1px 8px; }
-
-  .two { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
-
-  @media (max-width: 860px) {
-    .grid3, .two, .pgrid, .fgrid { grid-template-columns: 1fr; }
-    .crow { grid-template-columns: 1fr; gap: 4px; }
-    .crow > .rl, .crow.top > .rl { text-align: left; padding-top: 0; }
-    .stage { padding: 10px; }
-    .mkt-row { grid-template-columns: 1fr; gap: 4px; }
-    .mkt-row > label { text-align: left; }
-    .profile { flex-direction: column; }
-    .erow { flex-wrap: wrap; }
-  }
+  body { margin: 0; background: var(--page); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14.5px; line-height: 1.5; }
+  .page { max-width: 1500px; margin: 0 auto; padding: 20px 16px 64px; }
+  h1 { font-size: 20px; margin: 0; font-weight: 600; }
+  .sub { color: var(--muted); font-size: 13px; margin: 4px 0 18px; max-width: 900px; }
+  nav { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px; border: 1px dashed var(--line); border-radius: 8px; background: #fff; margin-bottom: 18px; }
+  nav a { font-size: 12.5px; padding: 4px 10px; border-radius: 6px; color: var(--ink); text-decoration: none; }
+  nav a:hover { background: #eef1ee; }
+  section { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px 18px; margin-bottom: 22px; }
+  section h2 { font-size: 16px; margin: 0 0 2px; }
+  .change { font-size: 13px; color: var(--muted); margin: 0 0 12px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .pair.single { grid-template-columns: 1fr; max-width: 740px; }
+  figure { margin: 0; }
+  figcaption { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  figcaption.after { color: var(--primary); }
+  img { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 8px; }
+  @media (max-width: 900px) { .pair { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 <div class="page">
   <h1>Multiple email addresses per person</h1>
-  <div class="subtitle">Mockup. All names and addresses are fictional. See plan.md for the data model and rules.</div>
+  <p class="sub">Each "after" image is the real worktree app (same components, classes and fonts) with only the proposed change added. "Before" is the same screen today. All names and addresses are fictional; real data was redacted in the page before capture. See plan.md for the rules.</p>
+  <nav>
+    <a href="#admin-several">Admin: several addresses</a>
+    <a href="#admin-one">Admin: one address</a>
+    <a href="#admin-conflict">Admin: address taken</a>
+    <a href="#admin-replace">Admin: replace confirm</a>
+    <a href="#self-pending">Member: change, verify pending</a>
+    <a href="#self-several">Member: several addresses</a>
+    <a href="#self-conflict">Member: address taken</a>
+    <a href="#show-member">Show Member</a>
+    <a href="#entre-several">Entrepreneur: several addresses</a>
+    <a href="#entre-pending">Entrepreneur: change, verify pending</a>
+  </nav>
 
-  <div class="mocknav" id="nav">
-    <span class="label">Screens</span>
-    <button data-s="admin-view" class="active">Admin: view</button>
-    <button data-s="admin-edit">Admin: edit</button>
-    <button data-s="admin-replace">Admin: replace confirm</button>
-    <button data-s="admin-conflict">Admin: address taken</button>
-    <button data-s="self-one">Self: one email</button>
-    <button data-s="self-many">Self: several emails</button>
-    <button data-s="self-pending">Self: verify / error</button>
-    <button data-s="entre">Entrepreneur account</button>
-    <button data-s="show-member">Show Member</button>
-    <button data-s="signin">Sign-in with a secondary</button>
-  </div>
-  <div class="caption" id="caption"></div>
-
-  <!-- ============ ADMIN VIEW ============ -->
-  <section class="screen active" id="admin-view" data-caption="Edit Person sheet, view mode. The Basic Info card lists every address with the primary first and marked. A person with one address looks exactly like today, with no badge.">
-    <div class="stage">
-      <div class="sheet">
-        <div class="sheet-title">Dana Okafor <span class="note">×</span></div>
-        <div class="grid3">
-          <div class="card">
-            <div class="card-h"><h3>Basic Info</h3>
-              <button class="btn btn-ghost btn-icon" title="Edit"><svg class="i" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
-            </div>
-            <div class="card-b">
-              <div class="info"><div class="lbl">Email</div>
-                <div class="v">
-                  <div class="email-line"><a href="#">dana@harborgrid.example</a><span class="badge">Primary</span></div>
-                  <div class="email-line"><a href="#">dana.okafor@gmail.example</a></div>
-                  <div class="email-line"><a href="#">dokafor@oldco.example</a></div>
-                </div>
-              </div>
-              <div class="info"><div class="lbl">Phone</div><div class="v">(415) 555-0142</div></div>
-              <div class="info"><div class="lbl">Title</div><div class="v">VP Engineering</div></div>
-              <div class="info"><div class="lbl">Location</div><div class="v">Oakland, California</div></div>
-            </div>
-          </div>
-          <div class="card faded"><div class="card-h"><h3>Membership</h3></div><div class="card-b note">…</div></div>
-          <div class="card faded"><div class="card-h"><h3>Engagement</h3></div><div class="card-b note">…</div></div>
-        </div>
-      </div>
+  <section id="admin-several">
+    <h2>Admin person editor: several addresses</h2>
+    <p class="change">The Email / Phone row keeps its input, which is the primary; typing over it replaces the address. Secondaries are listed underneath as plain text with Make primary and Remove links. A permanently failing address shows a Bounced badge. "+ Add another address" is a small link.</p>
+    <div class="pair">
+      <figure><figcaption>Before</figcaption><img src="screens/before-admin-editor.png" alt="Admin person editor today"></figure>
+      <figure><figcaption class="after">After</figcaption><img src="screens/after-admin-several.png" alt="Admin person editor with secondary addresses"></figure>
     </div>
   </section>
 
-  <!-- ============ ADMIN EDIT ============ -->
-  <section class="screen" id="admin-edit" data-caption="Edit mode. The primary is an ordinary input, so typing over it replaces the address (the default action). Secondaries sit underneath as read-only rows with a ⋯ menu. 'Add another address' is a small text link.">
-    <div class="stage">
-      <div class="sheet">
-        <div class="sheet-title">Dana Okafor <span class="note">×</span></div>
-        <div class="two">
-          <div class="card">
-            <div class="card-h"><h3>Basic Information</h3><span class="note">×</span></div>
-            <div class="card-b">
-              <div class="crow"><div class="rl">Name</div><div class="phone-row"><input class="input" value="Dana"><input class="input" value="Okafor"></div></div>
-              <div class="crow top"><div class="rl">Email / Phone</div>
-                <div class="email-list">
-                  <div class="erow">
-                    <input class="input" type="email" value="dana@harborgrid.example" style="flex:1;min-width:0">
-                    <span class="badge tag">Primary</span>
-                    <button class="btn btn-outline btn-icon" title="Send email"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></button>
-                    <input class="input" value="(415) 555-0142" style="width:144px;flex:none">
-                  </div>
-                  <div class="erow">
-                    <div class="addr"><span class="t">dana.okafor@gmail.example</span></div>
-                    <button class="btn btn-ghost btn-icon" title="More">⋯</button>
-                  </div>
-                  <div class="erow">
-                    <div class="addr"><span class="t">dokafor@oldco.example</span></div>
-                    <div class="rel">
-                      <button class="btn btn-ghost btn-icon" style="background:var(--surface-subtle)" title="More">⋯</button>
-                      <div class="menu">
-                        <div>Make primary</div>
-                        <div>Edit address</div>
-                        <div class="danger">Remove</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div style="margin-top:2px"><button class="btn-link">+ Add another address</button></div>
-                  <div style="height:64px"></div>
-                </div>
-              </div>
-              <div class="crow"><div class="rl">Title</div><input class="input" value="VP Engineering"></div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-h"><h3>After “Add another address”</h3></div>
-            <div class="card-b">
-              <div class="erow">
-                <input class="input" type="email" placeholder="Another email address" style="flex:1">
-                <button class="btn btn-ghost btn-icon" title="Cancel">×</button>
-              </div>
-              <p class="note">An empty row appears under the list and saves on blur, like the other autosaved fields. A person with no address shows one empty input, as today; the link appears only once a primary exists.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+  <section id="admin-one">
+    <h2>Admin person editor: one address (most people)</h2>
+    <p class="change">The only change is the "+ Add another address" link under the input.</p>
+    <div class="pair">
+      <figure><figcaption>Before</figcaption><img src="screens/before-admin-editor.png" alt="Admin person editor today"></figure>
+      <figure><figcaption class="after">After</figcaption><img src="screens/after-admin-one.png" alt="Admin person editor with add link"></figure>
     </div>
   </section>
 
-  <!-- ============ ADMIN REPLACE CONFIRM ============ -->
-  <section class="screen" id="admin-replace" data-caption="Shown only when an admin replaces the primary of someone who has signed in (active session or sign-in link) or holds admin access, 2FA or a data-connector grant, since the change moves how they sign in. Everyone else's edit autosaves with no dialog.">
-    <div class="dlg-stage">
-      <div class="dlg">
-        <span class="x">×</span>
-        <h2>Change Dana's sign-in email?</h2>
-        <p class="desc">Dana will sign in and get E8 email at <b>dana@northpier.example</b>. Sign-in links sent to <b>dana@harborgrid.example</b> stop working. Dana stays signed in on their current devices.</p>
-        <label class="check"><input type="checkbox"> <span>Keep <b>dana@harborgrid.example</b> as another address</span></label>
-        <div class="dlg-foot">
-          <button class="btn btn-ghost">Cancel</button>
-          <button class="btn btn-primary">Change email</button>
-        </div>
-      </div>
+  <section id="admin-conflict">
+    <h2>Admin person editor: address belongs to someone else</h2>
+    <p class="change">The added address doesn't save. A red line names the person who holds it, links to their record, and offers People Merge. The rule is one person per address in any casing (the same rule as PR #1020).</p>
+    <div class="pair">
+      <figure><figcaption>Before</figcaption><img src="screens/before-admin-editor.png" alt="Admin person editor today"></figure>
+      <figure><figcaption class="after">After</figcaption><img src="screens/after-admin-conflict.png" alt="Address taken error"></figure>
     </div>
   </section>
 
-  <!-- ============ ADMIN CONFLICT ============ -->
-  <section class="screen" id="admin-conflict" data-caption="An address belongs to at most one person, case-insensitively, whether it is their primary or not. Admins see who holds it and can open that record or start a People Merge. The input keeps the typed value and nothing saves.">
-    <div class="stage">
-      <div class="sheet">
-        <div class="sheet-title">Dana Okafor <span class="note">×</span></div>
-        <div class="card" style="max-width:640px">
-          <div class="card-h"><h3>Basic Information</h3><span class="note">×</span></div>
-          <div class="card-b">
-            <div class="crow top"><div class="rl">Email / Phone</div>
-              <div class="email-list">
-                <div class="erow">
-                  <input class="input" value="dana@harborgrid.example" style="flex:1;min-width:0">
-                  <span class="badge tag">Primary</span>
-                </div>
-                <div class="erow">
-                  <input class="input err" type="email" value="d.okafor@icloud.example" style="flex:1;min-width:0">
-                  <button class="btn btn-ghost btn-icon" title="Cancel">×</button>
-                </div>
-                <div class="alert alert-danger">That address belongs to <a href="#"><b>Dana O.</b></a> (Entrepreneur). <button class="btn-link">Merge them…</button></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <section id="admin-replace">
+    <h2>Admin person editor: replace confirmation</h2>
+    <p class="change">Shown only when the person has signed in before or holds admin access, 2FA or a data-connector grant. Replace deletes the old address; there is no option to keep it. Everyone else's edit autosaves as it does today.</p>
+    <div class="pair">
+      <figure><figcaption>Before</figcaption><img src="screens/before-admin-editor.png" alt="Admin person editor today"></figure>
+      <figure><figcaption class="after">After</figcaption><img src="screens/after-admin-replace-confirm.png" alt="Replace confirmation dialog"></figure>
     </div>
   </section>
 
-  <!-- ============ SELF: ONE EMAIL ============ -->
-  <section class="screen" id="self-one" data-caption="Member profile dialog for someone with one address. It looks the same as today: editing the field replaces the address, and there is no way to add a second. A new address takes effect only after the member clicks a verification link sent to it.">
-    <div class="dlg-stage">
-      <div class="dlg wide">
-        <span class="x">×</span>
-        <h2>Please confirm your member profile</h2>
-        <p class="desc">Please review the contact information we have for you and make any needed updates.</p>
-        <div class="pgrid">
-          <div class="photo">Photo</div>
-          <div class="fgrid">
-            <div class="field"><span class="lbl">First name</span><input class="input" value="Marcus"></div>
-            <div class="field"><span class="lbl">Last name</span><input class="input" value="Lindqvist"></div>
-            <div class="field full"><span class="lbl">Email</span><input class="input" type="email" autocomplete="email" value="marcus@lindqvist.example"></div>
-            <div class="field"><span class="lbl">Phone</span><input class="input" value="(206) 555-0187"></div>
-            <div class="field"><span class="lbl">LinkedIn</span><input class="input" value="linkedin.com/in/mlindqvist"></div>
-          </div>
-        </div>
-        <div class="dlg-foot" style="justify-content:space-between">
-          <button class="btn btn-ghost">Not now</button>
-          <span><button class="btn btn-outline">‹ Back</button> <button class="btn btn-primary">Continue ›</button></span>
-        </div>
-      </div>
+  <section id="self-pending">
+    <h2>Member profile dialog: changing your email</h2>
+    <p class="change">The field looks the same as today, but saving a new address now sends a verification link to it. The current address stays until the member clicks the link, and is then deleted. A notice under the field shows the pending change and lets them cancel it.</p>
+    <div class="pair">
+      <figure><figcaption>Before</figcaption><img src="screens/before-self.png" alt="Member profile dialog today"></figure>
+      <figure><figcaption class="after">After</figcaption><img src="screens/after-self-pending.png" alt="Verification pending notice"></figure>
     </div>
   </section>
 
-  <!-- ============ SELF: SEVERAL ============ -->
-  <section class="screen" id="self-many" data-caption="The same dialog for someone with several addresses (added by staff, a merge or an import). They can edit every address, remove any address except the one we email, and choose which address we email. There is still no Add button.">
-    <div class="dlg-stage">
-      <div class="dlg wide">
-        <span class="x">×</span>
-        <h2>Please confirm your member profile</h2>
-        <p class="desc">Please review the contact information we have for you and make any needed updates.</p>
-        <div class="pgrid">
-          <div class="photo">Photo</div>
-          <div class="fgrid">
-            <div class="field"><span class="lbl">First name</span><input class="input" value="Priya"></div>
-            <div class="field"><span class="lbl">Last name</span><input class="input" value="Raman"></div>
-            <div class="field full"><span class="lbl">Emails</span>
-              <div style="display:flex;flex-direction:column;gap:6px">
-                <div class="self-erow">
-                  <input class="input" type="email" autocomplete="email" value="priya@cedarlabs.example">
-                  <label class="check" style="width:150px;flex:none"><input type="radio" name="p" checked> Use for E8 email</label>
-                  <span style="width:32px;flex:none"></span>
-                </div>
-                <div class="self-erow">
-                  <input class="input" type="email" autocomplete="off" value="priya.raman@gmail.example">
-                  <label class="check" style="width:150px;flex:none"><input type="radio" name="p"> Use for E8 email</label>
-                  <button class="btn btn-ghost btn-icon" title="Remove">×</button>
-                </div>
-              </div>
-            </div>
-            <div class="field"><span class="lbl">Phone</span><input class="input" value="(503) 555-0110"></div>
-            <div class="field"><span class="lbl">LinkedIn</span><input class="input" value=""></div>
-          </div>
-        </div>
-        <div class="dlg-foot" style="justify-content:space-between">
-          <button class="btn btn-ghost">Not now</button>
-          <span><button class="btn btn-outline">‹ Back</button> <button class="btn btn-primary">Continue ›</button></span>
-        </div>
-      </div>
+  <section id="self-several">
+    <h2>Member profile dialog: several addresses</h2>
+    <p class="change">Only for people who already have several addresses (added by an admin or a merge). Every address is editable, and each secondary has a remove ×. An edited address needs verification before it is saved. There is still no way to add a new address here.</p>
+    <div class="pair">
+      <figure><figcaption>Before</figcaption><img src="screens/before-self.png" alt="Member profile dialog today"></figure>
+      <figure><figcaption class="after">After</figcaption><img src="screens/after-self-several.png" alt="Member profile dialog with two addresses"></figure>
     </div>
   </section>
 
-  <!-- ============ SELF: PENDING ============ -->
-  <section class="screen" id="self-pending" data-caption="Top: a member typed a new primary address, so we sent a verification link to it, and nothing changes until they click it. Removing a secondary, or picking an existing secondary as primary, applies immediately. Bottom: the 'address already taken' error. Members never see who holds the address.">
-    <div class="dlg-stage">
-      <div class="dlg wide">
-        <span class="x">×</span>
-        <h2>Please confirm your member profile</h2>
-        <p class="desc">Please review the contact information we have for you and make any needed updates.</p>
-        <div class="pgrid">
-          <div class="photo">Photo</div>
-          <div class="fgrid">
-            <div class="field full"><span class="lbl">Email</span>
-              <input class="input" type="email" value="marcus@lindqvist.example">
-              <div class="alert alert-warn" style="margin-top:6px">We sent a link to <b>marcus@fjordventures.example</b>. Your email changes once you click it. <button class="btn-link">Cancel change</button></div>
-            </div>
-            <div class="field full"><span class="lbl">Email</span>
-              <input class="input err" type="email" value="m.lindqvist@fjordventures.example">
-              <div class="alert alert-danger" style="margin-top:6px">That email address is already associated with another account. Contact <a href="#">support@e8angels.com</a> if it's yours.</div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <section id="self-conflict">
+    <h2>Member profile dialog: address belongs to someone else</h2>
+    <p class="change">Uses the existing entrepreneur wording and never names the person who holds the address.</p>
+    <div class="pair">
+      <figure><figcaption>Before</figcaption><img src="screens/before-self.png" alt="Member profile dialog today"></figure>
+      <figure><figcaption class="after">After</figcaption><img src="screens/after-self-conflict.png" alt="Address taken error for members"></figure>
     </div>
   </section>
 
-  <!-- ============ ENTREPRENEUR ============ -->
-  <section class="screen" id="entre" data-caption="Entrepreneur My Account page (marketing skin). Top: one address, unchanged; 'Change email' runs the existing verified flow. Bottom: several addresses (rare, added by staff or a merge), where secondaries are listed with Make primary and Remove. Sign-up still asks for a single email.">
-    <div class="mkt">
-      <div class="mkt-card" style="margin-bottom:16px">
-        <h4>Email address</h4>
-        <div class="mkt-row"><label>Current</label><div class="mkt-erow">founder@brightkiln.example <button class="mkt-ghost" style="margin-left:auto">Change email</button></div></div>
-      </div>
-      <div class="mkt-card">
-        <h4>Email addresses</h4>
-        <div class="mkt-row"><label>Current</label><div class="mkt-erow">founder@brightkiln.example <span class="mkt-pill">Primary</span><button class="mkt-ghost" style="margin-left:auto">Change email</button></div></div>
-        <div class="mkt-row"><label>Also</label><div class="mkt-erow">jo.marsh@gmail.example <button class="mkt-ghost" style="margin-left:auto">Make primary</button><button class="mkt-ghost">Remove</button></div></div>
-      </div>
+  <section id="show-member">
+    <h2>Show Member dialog (member directory)</h2>
+    <p class="change">Every address is shown, primary first and comma-separated, and each one is its own mailto link.</p>
+    <div class="pair">
+      <figure><figcaption>Before</figcaption><img src="screens/before-show-member.png" alt="Show Member dialog today"></figure>
+      <figure><figcaption class="after">After</figcaption><img src="screens/after-show-member.png" alt="Show Member dialog with two addresses"></figure>
     </div>
   </section>
 
-  <!-- ============ SHOW MEMBER ============ -->
-  <section class="screen" id="show-member" data-caption="Member directory profile (PersonProfileModal): every address is listed, primary first and comma-separated, and each one is its own mailto link.">
-    <div class="dlg-stage">
-      <div class="dlg wide" style="max-width:720px;padding:28px">
-        <span class="x">×</span>
-        <div class="profile">
-          <div class="avatar">PR</div>
-          <div style="min-width:0;flex:1;padding-top:4px">
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px"><span class="ptitle">Priya Raman</span><span class="fellow">Fellow</span></div>
-            <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
-              <div style="overflow-wrap:anywhere"><a href="#">priya@cedarlabs.example</a>, <a href="#">priya.raman@gmail.example</a></div>
-              <div><span class="li">in</span></div>
-              <div style="color:var(--ink-2)">(503) 555-0110</div>
-              <div style="color:var(--ink-2)">Portland, OR · Since 2023</div>
-            </div>
-          </div>
-        </div>
-        <div style="border-top:1px solid var(--border-strong);margin-top:18px;padding-top:14px">
-          <div class="lbl">Bio</div>
-          <p style="margin:6px 0 0;color:var(--ink-2)">Operator and angel focused on grid software…</p>
-        </div>
-      </div>
+  <section id="entre-several">
+    <h2>Entrepreneur My Account: several addresses</h2>
+    <p class="change">The section title becomes "Email addresses", and an "Also" row lists each secondary with a Remove button. "Change email" (which replaces the primary) is unchanged. With one address the page doesn't change at all. Sign-up still asks for a single email.</p>
+    <div class="pair">
+      <figure><figcaption>Before</figcaption><img src="screens/before-entrepreneur-account.png" alt="Entrepreneur account page today"></figure>
+      <figure><figcaption class="after">After</figcaption><img src="screens/after-entrepreneur-several.png" alt="Entrepreneur account with a secondary address"></figure>
     </div>
   </section>
 
-  <!-- ============ SIGN-IN ============ -->
-  <section class="screen" id="signin" data-caption="Recommended sign-in rule: links go only to the primary. If someone enters a secondary, we send the link to their primary and show a masked hint. An address that is already someone's secondary never creates a new account.">
-    <div class="mkt">
-      <div class="mkt-card" style="max-width:460px;text-align:center">
-        <h4 style="font-size:20px">Check your email</h4>
-        <p style="font-size:14px;color:var(--mkt-label);line-height:1.6;margin:0 0 6px">We sent a sign-in link to the main address on your account, <b>pr•••@ce•••.example</b>.</p>
-        <p style="font-size:13px;color:#6b7873;margin:0">No longer have access to it? Contact support@e8angels.com.</p>
-      </div>
+  <section id="entre-pending">
+    <h2>Entrepreneur My Account: change pending</h2>
+    <p class="change">This is the existing pending banner, with one added sentence: once the new address is confirmed, the current one is removed rather than kept.</p>
+    <div class="pair">
+      <figure><figcaption>Before</figcaption><img src="screens/before-entrepreneur-account.png" alt="Entrepreneur account page today"></figure>
+      <figure><figcaption class="after">After</figcaption><img src="screens/after-entrepreneur-pending.png" alt="Entrepreneur pending email change"></figure>
     </div>
   </section>
 </div>
-<script>
-  const nav = document.getElementById('nav');
-  const cap = document.getElementById('caption');
-  function show(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
-    nav.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.s === id));
-    cap.textContent = document.getElementById(id).dataset.caption;
-    try { history.replaceState(null, '', '#' + id); } catch (e) {}
-  }
-  nav.addEventListener('click', e => { if (e.target.dataset.s) show(e.target.dataset.s); });
-  show(location.hash && document.getElementById(location.hash.slice(1)) ? location.hash.slice(1) : 'admin-view');
-</script>
 </body>
 </html>
