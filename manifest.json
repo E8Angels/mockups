@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-03T00:41:20+00:00",
+  "generated": "2026-10-03T01:11:35+00:00",
   "plans": [
     {
       "slug": "ambassador-guide",
@@ -234,12 +234,12 @@
     {
       "slug": "multiple-person-emails",
       "title": "Multiple email addresses per person",
-      "status": "draft",
+      "status": "agreed",
       "owner": "jordan",
       "created": "2026-10-02",
       "last_updated": "2026-10-02",
       "last_changed_by": "Jordan Schwartz",
-      "last_changed_at": "2026-10-02T17:41:09-07:00",
+      "last_changed_at": "2026-10-02T18:11:18-07:00",
       "has_plan": true,
       "has_changelog": true,
       "mockups": [
